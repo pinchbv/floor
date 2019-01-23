@@ -1,0 +1,13 @@
+name: floor
+description: A supportive SQLite abstraction for your Flutter applications
+version: 0.0.1
+homepage: https://github.com/vitusortner/floor
+author: vitusortner
+
+environment:
+  sdk: '>=2.0.0 <3.0.0'
+
+dependencies:
+
+dev_dependencies:
+  test: ^1.0.0
