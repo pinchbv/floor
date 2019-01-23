@@ -1,5 +1,7 @@
-name: floor
-description: A supportive SQLite abstraction for your Flutter applications.
+name: floor_generator
+description: >
+  A supportive SQLite abstraction for your Flutter applications.
+  This library is the dev dependency.
 version: 0.0.1
 homepage: https://github.com/vitusortner/floor
 author: vitusortner
@@ -7,7 +9,7 @@ author: vitusortner
 environment:
   sdk: '>=2.0.0 <3.0.0'
 
-dependencies:
+#dependencies:
 
 dev_dependencies:
   test: ^1.0.0
