@@ -9,7 +9,7 @@ author: vitusortner
 environment:
   sdk: '>=2.0.0 <3.0.0'
 
-#dependencies:
-
 dev_dependencies:
-  test: ^1.0.0
+  floor_generator:
+    path: ../floor_generator/
+  build_runner: ^1.1.3
