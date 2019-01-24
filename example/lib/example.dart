@@ -1,1 +1,0 @@
-part 'example.g.dart';

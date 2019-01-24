@@ -1,13 +1,13 @@
-name: example
+name: floor
 description: >
   A supportive SQLite abstraction for your Flutter applications.
-  This is an example on how to use the library.
+  This library is the runtime dependency.
 version: 0.0.1
 homepage: https://github.com/vitusortner/floor
 author: vitusortner
 
 environment:
-  sdk: '>=2.0.0 <3.0.0'
+  sdk: ">=2.0.0-dev.68.0 <3.0.0"
 
 dependencies:
   flutter:
@@ -16,6 +16,3 @@ dependencies:
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  floor_generator:
-    path: ../floor_generator/
-  build_runner: ^1.1.3
