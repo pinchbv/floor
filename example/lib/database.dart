@@ -25,4 +25,10 @@ class Car {
 }
 
 @database
-abstract class MyDatabase extends FloorDatabase {}
+abstract class MyDatabase extends FloorDatabase {
+  static Future<MyDatabase> openDatabase() async => await _$open();
+}
+
+Future<void> main() async {
+  final database = await MyDatabase.openDatabase();
+}
