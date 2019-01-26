@@ -15,10 +15,16 @@ class DatabaseWriter implements Writer {
 
   @override
   Spec write() {
-    return _generateDatabase(library);
+    final database = _getDatabaseClassElement(library);
+
+    return Library((builder) => builder
+      ..body.addAll([
+        _generateOpenDatabaseFunction(database),
+        _generateDatabaseImplementation(database, library)
+      ]));
   }
 
-  Spec _generateDatabase(LibraryReader library) {
+  ClassElement _getDatabaseClassElement(LibraryReader library) {
     final databases = library.classes.where((clazz) =>
         clazz.isAbstract && clazz.metadata.any(isDatabaseAnnotation));
 
@@ -29,11 +35,25 @@ class DatabaseWriter implements Writer {
       throw InvalidGenerationSourceError(
           'Only one database is allowed. There are too many classes annotated with @Database.');
     } else {
-      return _generateOpenDatabaseImplementation(databases.first, library);
+      return databases.first;
     }
   }
 
-  Spec _generateOpenDatabaseImplementation(
+  Method _generateOpenDatabaseFunction(ClassElement database) {
+    final databaseName = database.displayName;
+
+    return Method((builder) => builder
+      ..returns = refer('Future<$databaseName>')
+      ..name = '_\$open'
+      ..modifier = MethodModifier.async
+      ..body = Code('''
+            final database = _\$$databaseName();
+            database.database = await database.open();
+            return database;
+            '''));
+  }
+
+  Class _generateDatabaseImplementation(
       ClassElement database, LibraryReader library) {
     final createTableStatements =
         _generateCreateTableSqlStatements(library.classes.toList())
