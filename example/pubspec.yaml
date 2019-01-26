@@ -9,7 +9,15 @@ author: vitusortner
 environment:
   sdk: '>=2.0.0 <3.0.0'
 
-#dependencies:
+dependencies:
+  flutter:
+    sdk: flutter
+  floor:
+    path: ../floor/
 
 dev_dependencies:
-  test: ^1.0.0
+  flutter_test:
+    sdk: flutter
+  floor_generator:
+    path: ../floor_generator/
+  build_runner: ^1.1.3

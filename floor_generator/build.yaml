@@ -1,0 +1,17 @@
+targets:
+  $default:
+    builders:
+      floor_generator:
+        enabled: true
+
+builders:
+  floor_generator:
+    import: "package:floor_generator/builder.dart"
+    # The builder function name, which gets called on build/watch
+    builder_factories: ["floorBuilder"]
+    # The 'partId' argument to 'SharedPartBuilder' is 'floor'
+    build_extensions: {".dart": [".floor.g.part"]}
+    auto_apply: dependents
+    build_to: cache
+    # To copy the '.g.dart' content into '.g.dart' in the source tree
+    applies_builders: ["source_gen|combining_builder"]
