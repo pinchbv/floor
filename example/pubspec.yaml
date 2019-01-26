@@ -12,6 +12,8 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  floor:
+    path: ../floor/
 
 dev_dependencies:
   flutter_test:
