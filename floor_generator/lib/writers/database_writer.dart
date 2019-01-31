@@ -3,6 +3,8 @@ import 'package:floor_generator/misc/annotation_expression.dart';
 import 'package:floor_generator/models/column.dart';
 import 'package:floor_generator/misc/sql_utils.dart';
 import 'package:floor_generator/misc/type_utils.dart';
+import 'package:floor_generator/models/query_method.dart';
+import 'package:floor_generator/writers/query_method_writer.dart';
 import 'package:floor_generator/writers/writer.dart';
 import 'package:source_gen/source_gen.dart';
 import 'package:code_builder/code_builder.dart';
@@ -15,16 +17,16 @@ class DatabaseWriter implements Writer {
 
   @override
   Spec write() {
-    final database = _getDatabaseClassElement(library);
+    final database = _getDatabaseClassElement();
 
     return Library((builder) => builder
       ..body.addAll([
         _generateOpenDatabaseFunction(database),
-        _generateDatabaseImplementation(database, library)
+        _generateDatabaseImplementation(database)
       ]));
   }
 
-  ClassElement _getDatabaseClassElement(LibraryReader library) {
+  ClassElement _getDatabaseClassElement() {
     final databases = library.classes.where((clazz) =>
         clazz.isAbstract && clazz.metadata.any(isDatabaseAnnotation));
 
@@ -53,8 +55,7 @@ class DatabaseWriter implements Writer {
             '''));
   }
 
-  Class _generateDatabaseImplementation(
-      ClassElement database, LibraryReader library) {
+  Class _generateDatabaseImplementation(ClassElement database) {
     final createTableStatements =
         _generateCreateTableSqlStatements(library.classes.toList())
             .map((statement) => 'await database.execute($statement);')
@@ -87,8 +88,22 @@ class DatabaseWriter implements Writer {
               },
             );
             ''')),
-        ),
+        )
+        ..methods.addAll(_generateQueryMethods(database.methods)),
     );
+  }
+
+  List<Method> _generateQueryMethods(List<MethodElement> methods) {
+    return _getQueryMethods(methods)
+        .map((queryMethod) => QueryMethodWriter(library, queryMethod).write())
+        .toList();
+  }
+
+  List<QueryMethod> _getQueryMethods(List<MethodElement> methods) {
+    return methods
+        .where((method) => method.metadata.any(isQueryAnnotation))
+        .map((method) => QueryMethod(method))
+        .toList();
   }
 
   List<String> _generateCreateTableSqlStatements(List<ClassElement> classes) {
@@ -131,9 +146,18 @@ class DatabaseWriter implements Writer {
           .toBoolValue();
     }
 
+    final columnType = getColumnType(field.type);
+
+    if (columnType == null) {
+      throw InvalidGenerationSourceError(
+        'Column type is not supported for ${field.type}.',
+        element: field,
+      );
+    }
+
     return Column(
       field.displayName,
-      getColumnType(field.type),
+      columnType,
       isPrimaryKey,
       autoGenerate,
     );
