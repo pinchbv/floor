@@ -1,8 +1,7 @@
-import 'package:analyzer/dart/element/element.dart';
 import 'package:floor_generator/misc/annotation_expression.dart';
-import 'package:floor_generator/model/column.dart';
-import 'package:floor_generator/misc/sql_utils.dart';
 import 'package:floor_generator/misc/type_utils.dart';
+import 'package:floor_generator/model/database.dart';
+import 'package:floor_generator/model/entity.dart';
 import 'package:floor_generator/model/query_method.dart';
 import 'package:floor_generator/writer/query_method_writer.dart';
 import 'package:floor_generator/writer/writer.dart';
@@ -17,33 +16,31 @@ class DatabaseWriter implements Writer {
 
   @override
   Spec write() {
-    final database = _getDatabaseClassElement();
+    final database = _getDatabase();
 
     return Library((builder) => builder
       ..body.addAll([
-        _generateOpenDatabaseFunction(database),
+        _generateOpenDatabaseFunction(database.name),
         _generateDatabaseImplementation(database)
       ]));
   }
 
-  ClassElement _getDatabaseClassElement() {
-    final databases = library.classes.where((clazz) =>
+  Database _getDatabase() {
+    final databaseClasses = library.classes.where((clazz) =>
         clazz.isAbstract && clazz.metadata.any(isDatabaseAnnotation));
 
-    if (databases.isEmpty) {
+    if (databaseClasses.isEmpty) {
       throw InvalidGenerationSourceError(
           'No database defined. Add a @Database annotation to your abstract database class.');
-    } else if (databases.length > 1) {
+    } else if (databaseClasses.length > 1) {
       throw InvalidGenerationSourceError(
           'Only one database is allowed. There are too many classes annotated with @Database.');
     } else {
-      return databases.first;
+      return Database(databaseClasses.first);
     }
   }
 
-  Method _generateOpenDatabaseFunction(ClassElement database) {
-    final databaseName = database.displayName;
-
+  Method _generateOpenDatabaseFunction(String databaseName) {
     return Method((builder) => builder
       ..returns = refer('Future<$databaseName>')
       ..name = '_\$open'
@@ -55,9 +52,9 @@ class DatabaseWriter implements Writer {
             '''));
   }
 
-  Class _generateDatabaseImplementation(ClassElement database) {
+  Class _generateDatabaseImplementation(Database database) {
     final createTableStatements =
-        _generateCreateTableSqlStatements(library.classes.toList())
+        _generateCreateTableSqlStatements(database.getEntities(library))
             .map((statement) => 'await database.execute($statement);')
             .join('\n');
 
@@ -66,7 +63,7 @@ class DatabaseWriter implements Writer {
           'There are no entities defined. Use the @Entity annotation on model classes to do so.');
     }
 
-    final databaseName = database.displayName;
+    final databaseName = database.name;
 
     return Class(
       (builder) => builder
@@ -89,77 +86,31 @@ class DatabaseWriter implements Writer {
             );
             ''')),
         )
-        ..methods.addAll(_generateQueryMethods(database.methods)),
+        ..methods.addAll(_generateQueryMethods(database.queryMethods)),
     );
   }
 
-  List<Method> _generateQueryMethods(List<MethodElement> methods) {
-    return _getQueryMethods(methods)
+  List<Method> _generateQueryMethods(List<QueryMethod> queryMethods) {
+    return queryMethods
         .map((queryMethod) => QueryMethodWriter(library, queryMethod).write())
         .toList();
   }
 
-  List<QueryMethod> _getQueryMethods(List<MethodElement> methods) {
-    return methods
-        .where((method) => method.metadata.any(isQueryAnnotation))
-        .map((method) => QueryMethod(method))
-        .toList();
+  List<String> _generateCreateTableSqlStatements(List<Entity> entities) {
+    return entities.map(_generateSql).toList();
   }
 
-  List<String> _generateCreateTableSqlStatements(List<ClassElement> classes) {
-    return classes
-        .where((clazz) =>
-            !clazz.isAbstract && clazz.metadata.any(isEntityAnnotation))
-        .map(_generateSql)
-        .toList();
-  }
+  String _generateSql(Entity entity) {
+    final columns = entity.columns.map((column) {
+      var columnString = '${column.name} ${column.type}';
 
-  String _generateSql(ClassElement clazz) {
-    final columns =
-        clazz.fields.map((field) => _createColumn(field)).map((column) {
-      String primaryKeyString = '';
-
-      if (column.isPrimaryKey) {
-        primaryKeyString += ' ${SqlConstants.PRIMARY_KEY}';
-        if (column.autoGenerate) {
-          primaryKeyString += ' ${SqlConstants.AUTOINCREMENT}';
-        }
+      final additionals = column.additionals;
+      if (additionals != null) {
+        columnString += additionals;
       }
-
-      return '${column.name} ${column.type}$primaryKeyString';
+      return columnString;
     }).join(', ');
 
-    return "'CREATE TABLE IF NOT EXISTS ${clazz.displayName} ($columns)'";
-  }
-
-  Column _createColumn(FieldElement field) {
-    final primaryKeyAnnotations = field.metadata.where(isPrimaryKeyAnnotation);
-
-    bool isPrimaryKey = false;
-    bool autoGenerate;
-
-    if (primaryKeyAnnotations.isNotEmpty) {
-      isPrimaryKey = true;
-      autoGenerate = primaryKeyAnnotations.first
-          .computeConstantValue()
-          .getField('autoGenerate')
-          .toBoolValue();
-    }
-
-    final columnType = getColumnType(field.type);
-
-    if (columnType == null) {
-      throw InvalidGenerationSourceError(
-        'Column type is not supported for ${field.type}.',
-        element: field,
-      );
-    }
-
-    return Column(
-      field.displayName,
-      columnType,
-      isPrimaryKey,
-      autoGenerate,
-    );
+    return "'CREATE TABLE IF NOT EXISTS ${entity.name} ($columns)'";
   }
 }
