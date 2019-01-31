@@ -1,5 +1,6 @@
 import 'package:analyzer/dart/element/element.dart';
 import 'package:analyzer/dart/element/type.dart';
+import 'package:floor_generator/misc/constants.dart';
 
 bool isString(DartType type) {
   return type.displayName == SupportedType.STRING && _isDartCore(type);
@@ -61,23 +62,4 @@ bool _isDartCore(DartType type) {
 
 String _getAnnotationName(ElementAnnotation annotation) {
   return annotation.computeConstantValue().type.displayName;
-}
-
-abstract class SupportedType {
-  static const STRING = 'String';
-  static const BOOL = 'bool';
-  static const INT = 'int';
-  static const DOUBLE = 'double';
-}
-
-abstract class Annotation {
-  static const ENTITY = 'Entity';
-  static const DATABASE = 'Database';
-  static const COLUMN_INFO = 'ColumnInfo';
-  static const PRIMARY_KEY = 'PrimaryKey';
-  static const QUERY = 'Query';
-}
-
-abstract class AnnotationField {
-  static const QUERY_VALUE = 'value';
 }
