@@ -11,6 +11,32 @@ class Column {
 
   String get name => field.displayName;
 
+  String get customName {
+    if (!hasColumnInfoAnnotation) {
+      return null;
+    }
+    return field.metadata
+        .firstWhere(isColumnInfoAnnotation)
+        .computeConstantValue()
+        .getField(AnnotationField.COLUMN_INFO_NAME)
+        .toStringValue();
+  }
+
+  bool get isNullable {
+    if (!hasColumnInfoAnnotation) {
+      return true; // all Dart fields are nullable by default
+    }
+    return field.metadata
+        .firstWhere(isColumnInfoAnnotation)
+        .computeConstantValue()
+        .getField(AnnotationField.COLUMN_INFO_NULLABLE)
+        .toBoolValue();
+  }
+
+  bool get hasColumnInfoAnnotation {
+    return field.metadata.any(isColumnInfoAnnotation);
+  }
+
   String get type {
     final type = field.type;
     if (isInt(type)) {
@@ -37,7 +63,7 @@ class Column {
     return field.metadata
         .firstWhere(isPrimaryKeyAnnotation)
         .computeConstantValue()
-        .getField(AnnotationField.COLUMN_INFO_AUTO_GENERATE)
+        .getField(AnnotationField.PRIMARY_KEY_AUTO_GENERATE)
         .toBoolValue();
   }
 

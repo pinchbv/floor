@@ -52,6 +52,10 @@ bool isQueryAnnotation(ElementAnnotation annotation) {
   return _getAnnotationName(annotation) == Annotation.QUERY;
 }
 
+bool isInsertAnnotation(ElementAnnotation annotation) {
+  return _getAnnotationName(annotation) == Annotation.INSERT;
+}
+
 DartType flattenList(DartType type) {
   return (type as ParameterizedType).typeArguments.first;
 }

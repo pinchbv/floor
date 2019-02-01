@@ -10,6 +10,12 @@ class FloorGenerator implements Generator {
   @override
   FutureOr<String> generate(LibraryReader library, BuildStep buildStep) {
     final database = DatabaseWriter(library).write();
+
+    // TODO generator runs for every file of the project, so this fails without
+    if (database == null) {
+      return null;
+    }
+
     return database.accept(DartEmitter()).toString();
   }
 }

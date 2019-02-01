@@ -2,7 +2,9 @@ import 'package:floor_generator/misc/annotation_expression.dart';
 import 'package:floor_generator/misc/type_utils.dart';
 import 'package:floor_generator/model/database.dart';
 import 'package:floor_generator/model/entity.dart';
+import 'package:floor_generator/model/insert_method.dart';
 import 'package:floor_generator/model/query_method.dart';
+import 'package:floor_generator/writer/insert_method_writer.dart';
 import 'package:floor_generator/writer/query_method_writer.dart';
 import 'package:floor_generator/writer/writer.dart';
 import 'package:source_gen/source_gen.dart';
@@ -18,6 +20,11 @@ class DatabaseWriter implements Writer {
   Spec write() {
     final database = _getDatabase();
 
+    // TODO generator runs for every file of the project, so this fails without
+    if (database == null) {
+      return null;
+    }
+
     return Library((builder) => builder
       ..body.addAll([
         _generateOpenDatabaseFunction(database.name),
@@ -30,8 +37,10 @@ class DatabaseWriter implements Writer {
         clazz.isAbstract && clazz.metadata.any(isDatabaseAnnotation));
 
     if (databaseClasses.isEmpty) {
-      throw InvalidGenerationSourceError(
-          'No database defined. Add a @Database annotation to your abstract database class.');
+      // TODO generator runs for every file of the project, so this fails without
+      return null;
+//      throw InvalidGenerationSourceError(
+//          'No database defined. Add a @Database annotation to your abstract database class.');
     } else if (databaseClasses.length > 1) {
       throw InvalidGenerationSourceError(
           'Only one database is allowed. There are too many classes annotated with @Database.');
@@ -69,25 +78,39 @@ class DatabaseWriter implements Writer {
       (builder) => builder
         ..name = '_\$$databaseName'
         ..extend = refer(databaseName)
-        ..methods.add(
-          Method((builder) => builder
-            ..name = 'open'
-            ..annotations.add(AnnotationExpression('override'))
-            ..returns = refer('Future<sqflite.Database>')
-            ..modifier = MethodModifier.async
-            ..body = Code('''
-            final path = join(await sqflite.getDatabasesPath(), '${databaseName.toLowerCase()}.db');
-
-            return await sqflite.openDatabase(
-              path,
-              onCreate: (database, version) async {
-                $createTableStatements
-              },
-            );
-            ''')),
-        )
-        ..methods.addAll(_generateQueryMethods(database.queryMethods)),
+        ..methods.add(_generateOpenMethod(databaseName, createTableStatements))
+        ..methods.addAll(_generateQueryMethods(database.queryMethods))
+        ..methods.addAll(_generateInsertMethods(database.insertMethods)),
     );
+  }
+
+  Method _generateOpenMethod(
+    String databaseName,
+    String createTableStatements,
+  ) {
+    return Method((builder) => builder
+      ..name = 'open'
+      ..annotations.add(AnnotationExpression('override'))
+      ..returns = refer('Future<sqflite.Database>')
+      ..modifier = MethodModifier.async
+      ..body = Code('''
+          final path = join(await sqflite.getDatabasesPath(), '${databaseName.toLowerCase()}.db');
+
+          return sqflite.openDatabase(
+            path,
+            version: 1,
+            onCreate: (database, version) async {
+              $createTableStatements
+            },
+          );
+          '''));
+  }
+
+  List<Method> _generateInsertMethods(List<InsertMethod> insertMethods) {
+    return insertMethods
+        .map(
+            (insertMethod) => InsertMethodWriter(library, insertMethod).write())
+        .toList();
   }
 
   List<Method> _generateQueryMethods(List<QueryMethod> queryMethods) {
