@@ -7,7 +7,7 @@ import 'package:floor_generator/model/query_method.dart';
 import 'package:floor_generator/writer/writer.dart';
 import 'package:source_gen/source_gen.dart';
 
-class   QueryMethodWriter implements Writer {
+class QueryMethodWriter implements Writer {
   final LibraryReader library;
   final QueryMethod queryMethod;
 
@@ -19,39 +19,20 @@ class   QueryMethodWriter implements Writer {
   }
 
   Method _generateQueryMethod(QueryMethod queryMethod) {
-    _assertReturnsFuture(queryMethod);
-    _assertReturnsEntity(queryMethod);
+    _assertReturnsFuture();
+    _assertReturnsEntity();
 
-    final parameters = _generateMethodParameters(queryMethod.parameters);
-    final mapping = _generateMapping(queryMethod);
-
-    // TODO extract toBool
-    return Method((builder) =>
-    builder
+    return Method((builder) => builder
       ..annotations.add(AnnotationExpression('override'))
       ..returns = refer(queryMethod.rawReturnType.displayName)
       ..name = queryMethod.name
-      ..requiredParameters.addAll(parameters)
+      ..requiredParameters.addAll(_generateMethodParameters())
       ..modifier = MethodModifier.async
-      ..body = Code('''
-      bool toBool(int value) {
-        if (value == 0) {
-          return false;
-        } else {
-          return true;
-        }
-      }
-      
-      final rows = await this.database.rawQuery('${queryMethod.query}');
-      if (rows.isEmpty) {
-        return null;
-      }
-      $mapping
-      '''));
+      ..body = Code(_generateMethodBody()));
   }
 
-  List<Parameter> _generateMethodParameters(List<ParameterElement> parameters) {
-    return parameters.map((parameter) {
+  List<Parameter> _generateMethodParameters() {
+    return queryMethod.parameters.map((parameter) {
       if (!isSupportedType(parameter.type)) {
         InvalidGenerationSourceError(
           'The type of this parameter is not supported.',
@@ -59,16 +40,15 @@ class   QueryMethodWriter implements Writer {
         );
       }
 
-      return Parameter((builder) =>
-      builder
+      return Parameter((builder) => builder
         ..name = parameter.name
         ..type = refer(parameter.type.displayName));
     }).toList();
   }
 
-  String _generateMapping(QueryMethod queryMethod) {
+  String _generateMapping() {
     final constructorCall =
-    _generateConstructorCall(queryMethod.flattenedReturnType);
+        _generateConstructorCall(queryMethod.flattenedReturnType);
 
     if (queryMethod.returnsList) {
       return 'return rows.map((row) => $constructorCall).toList();';
@@ -89,7 +69,7 @@ class   QueryMethodWriter implements Writer {
       final parameterValue = "row['${parameter.displayName}']";
 
       if (isBool(parameter.type)) {
-        return 'toBool($parameterValue as int)';
+        return '($parameterValue as int) != 0'; // maps int to bool
       } else if (isString(parameter.type)) {
         return '$parameterValue as String';
       } else if (isInt(parameter.type)) {
@@ -102,14 +82,26 @@ class   QueryMethodWriter implements Writer {
     return '${type.displayName}($parameterValues)';
   }
 
-  void _assertReturnsFuture(QueryMethod queryMethod) {
+  String _generateMethodBody() {
+    final mapping = _generateMapping();
+
+    return '''
+    final rows = await this.database.rawQuery('${queryMethod.query}');
+    if (rows.isEmpty) {
+      return null;
+    }
+    $mapping
+    ''';
+  }
+
+  void _assertReturnsFuture() {
     if (!queryMethod.rawReturnType.isDartAsyncFuture) {
       throw InvalidGenerationSourceError('All queries have to return a Future.',
           element: queryMethod.method);
     }
   }
 
-  void _assertReturnsEntity(QueryMethod queryMethod) {
+  void _assertReturnsEntity() {
     if (!queryMethod.returnsEntity(library)) {
       throw InvalidGenerationSourceError('The return type is not an entity.',
           element: queryMethod.method);

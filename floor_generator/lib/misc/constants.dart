@@ -11,11 +11,15 @@ abstract class Annotation {
   static const COLUMN_INFO = 'ColumnInfo';
   static const PRIMARY_KEY = 'PrimaryKey';
   static const QUERY = 'Query';
+  static const INSERT = 'Insert';
 }
 
 abstract class AnnotationField {
   static const QUERY_VALUE = 'value';
-  static const COLUMN_INFO_AUTO_GENERATE = 'autoGenerate';
+  static const PRIMARY_KEY_AUTO_GENERATE = 'autoGenerate';
+
+  static const COLUMN_INFO_NAME = 'name';
+  static const COLUMN_INFO_NULLABLE = 'nullable';
 }
 
 abstract class SqlConstants {
@@ -24,5 +28,5 @@ abstract class SqlConstants {
   static const REAL = 'REAL';
 
   static const PRIMARY_KEY = 'PRIMARY KEY';
-  static const AUTOINCREMENT = 'AUTOINCREMNT';
+  static const AUTOINCREMENT = 'AUTOINCREMENT';
 }

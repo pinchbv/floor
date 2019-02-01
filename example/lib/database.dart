@@ -25,11 +25,44 @@ class Car {
   Car(this.id, this.manufacturer, this.wheels);
 }
 
+@entity
+class Task {
+  @PrimaryKey(autoGenerate: true)
+  final int id;
+  final String message;
+
+  Task(this.id, this.message);
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is Task &&
+          runtimeType == other.runtimeType &&
+          id == other.id &&
+          message == other.message;
+
+  @override
+  int get hashCode => id.hashCode ^ message.hashCode;
+
+  @override
+  String toString() {
+    return 'Task{id: $id, message: $message}';
+  }
+}
+
+@entity
+class Bar {
+  final int id;
+  final String foo;
+
+  Bar(this.id, this.foo);
+}
+
 @database
 abstract class MyDatabase extends FloorDatabase {
   static Future<MyDatabase> openDatabase() async => await _$open();
 
-  @Query('SELECT * FROM PERSON')
+  @Query('SELECT * FROM Person')
   Future<List<Person>> findAllPersons();
 
   @Query('SELECT * FROM Person WHERE id = :id')
@@ -37,6 +70,18 @@ abstract class MyDatabase extends FloorDatabase {
 
   @Query('SELECT * FROM Car WHERE id = :id')
   Future<Car> findCarById(int id);
+
+  @insert
+  Future<void> insertPerson(Person person);
+
+  @insert
+  Future<void> insertCar(Car car);
+
+  @Query('SELECT * FROM Task')
+  Future<List<Task>> findAllTasks();
+
+  @insert
+  Future<void> insertTask(Task task);
 }
 
 Future<void> main() async {

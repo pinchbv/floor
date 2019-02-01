@@ -19,6 +19,7 @@ const entity = Entity();
 class ColumnInfo {
   /// The custom name of the column.
   final String name;
+
   // Does it make sense to have this field?
   // It's very easy to still assign `null` to the field without recognising.
   /// Defines if the associated column is allowed to contain 'null'.
@@ -32,7 +33,8 @@ class PrimaryKey {
   /// Let SQLite auto generate the unique id.
   final bool autoGenerate;
 
-  const PrimaryKey({this.autoGenerate = true});
+  /// Defaults [autoGenerate] to false.
+  const PrimaryKey({this.autoGenerate = false});
 }
 
 const primaryKey = PrimaryKey();
@@ -44,3 +46,11 @@ class Query {
 
   const Query(this.value);
 }
+
+/// Marks a method as an insert method.
+class Insert {
+  const Insert();
+}
+
+/// Marks a method as an insert method.
+const insert = Insert();
