@@ -56,6 +56,10 @@ bool isInsertAnnotation(ElementAnnotation annotation) {
   return _getAnnotationName(annotation) == Annotation.INSERT;
 }
 
+bool isUpdateAnnotation(ElementAnnotation annotation) {
+  return _getAnnotationName(annotation) == Annotation.UPDATE;
+}
+
 DartType flattenList(DartType type) {
   return (type as ParameterizedType).typeArguments.first;
 }

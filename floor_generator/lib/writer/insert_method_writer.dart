@@ -21,7 +21,7 @@ class InsertMethodWriter implements Writer {
     _assertInsertsEntity();
 
     return Method((builder) => builder
-      ..annotations.add(AnnotationExpression('override'))
+      ..annotations.add(overrideAnnotationExpression)
       ..returns = refer(insertMethod.returnType.displayName)
       ..name = insertMethod.name
       ..requiredParameters.add(_generateParameter())

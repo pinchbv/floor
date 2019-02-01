@@ -3,6 +3,7 @@ import 'package:floor_generator/misc/type_utils.dart';
 import 'package:floor_generator/model/entity.dart';
 import 'package:floor_generator/model/insert_method.dart';
 import 'package:floor_generator/model/query_method.dart';
+import 'package:floor_generator/model/update_method.dart';
 import 'package:source_gen/source_gen.dart';
 
 class Database {
@@ -25,6 +26,13 @@ class Database {
     return methods
         .where((method) => method.metadata.any(isInsertAnnotation))
         .map((method) => InsertMethod(method))
+        .toList();
+  }
+
+  List<UpdateMethod> get updateMethods {
+    return methods
+        .where((method) => method.metadata.any(isUpdateAnnotation))
+        .map((method) => UpdateMethod(method))
         .toList();
   }
 

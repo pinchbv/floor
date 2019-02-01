@@ -10,8 +10,10 @@ abstract class Annotation {
   static const DATABASE = 'Database';
   static const COLUMN_INFO = 'ColumnInfo';
   static const PRIMARY_KEY = 'PrimaryKey';
+
   static const QUERY = 'Query';
   static const INSERT = 'Insert';
+  static const UPDATE = 'Update';
 }
 
 abstract class AnnotationField {

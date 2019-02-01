@@ -4,8 +4,10 @@ import 'package:floor_generator/model/database.dart';
 import 'package:floor_generator/model/entity.dart';
 import 'package:floor_generator/model/insert_method.dart';
 import 'package:floor_generator/model/query_method.dart';
+import 'package:floor_generator/model/update_method.dart';
 import 'package:floor_generator/writer/insert_method_writer.dart';
 import 'package:floor_generator/writer/query_method_writer.dart';
+import 'package:floor_generator/writer/update_method_writer.dart';
 import 'package:floor_generator/writer/writer.dart';
 import 'package:source_gen/source_gen.dart';
 import 'package:code_builder/code_builder.dart';
@@ -74,14 +76,20 @@ class DatabaseWriter implements Writer {
 
     final databaseName = database.name;
 
-    return Class(
-      (builder) => builder
-        ..name = '_\$$databaseName'
-        ..extend = refer(databaseName)
-        ..methods.add(_generateOpenMethod(databaseName, createTableStatements))
-        ..methods.addAll(_generateQueryMethods(database.queryMethods))
-        ..methods.addAll(_generateInsertMethods(database.insertMethods)),
-    );
+    return Class((builder) => builder
+      ..name = '_\$$databaseName'
+      ..extend = refer(databaseName)
+      ..methods.add(_generateOpenMethod(databaseName, createTableStatements))
+      ..methods.addAll(_generateQueryMethods(database.queryMethods))
+      ..methods.addAll(_generateInsertMethods(database.insertMethods))
+      ..methods.addAll(_generateUpdateMethods(database.updateMethods)));
+  }
+
+  List<Method> _generateUpdateMethods(List<UpdateMethod> updateMethods) {
+    return updateMethods
+        .map(
+            (updateMethod) => UpdateMethodWriter(library, updateMethod).write())
+        .toList();
   }
 
   Method _generateOpenMethod(
@@ -90,7 +98,7 @@ class DatabaseWriter implements Writer {
   ) {
     return Method((builder) => builder
       ..name = 'open'
-      ..annotations.add(AnnotationExpression('override'))
+      ..annotations.add(overrideAnnotationExpression)
       ..returns = refer('Future<sqflite.Database>')
       ..modifier = MethodModifier.async
       ..body = Code('''

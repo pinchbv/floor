@@ -82,6 +82,12 @@ abstract class MyDatabase extends FloorDatabase {
 
   @insert
   Future<void> insertTask(Task task);
+
+  @update
+  Future<void> updateTask(Task task);
+
+  @update
+  Future<void> updatePerson(Person person);
 }
 
 Future<void> main() async {

@@ -6,3 +6,5 @@ class AnnotationExpression extends CodeExpression {
 
   AnnotationExpression(this.annotation) : super(Code(annotation));
 }
+
+final overrideAnnotationExpression = AnnotationExpression('override');

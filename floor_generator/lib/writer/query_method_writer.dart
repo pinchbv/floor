@@ -23,7 +23,7 @@ class QueryMethodWriter implements Writer {
     _assertReturnsEntity();
 
     return Method((builder) => builder
-      ..annotations.add(AnnotationExpression('override'))
+      ..annotations.add(overrideAnnotationExpression)
       ..returns = refer(queryMethod.rawReturnType.displayName)
       ..name = queryMethod.name
       ..requiredParameters.addAll(_generateMethodParameters())
