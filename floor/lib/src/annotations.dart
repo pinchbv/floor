@@ -54,3 +54,11 @@ class Insert {
 
 /// Marks a method as an insert method.
 const insert = Insert();
+
+/// Marks a method as an update method.
+class Update {
+  const Update();
+}
+
+/// Marks a method as an update method.
+const update = Update();
