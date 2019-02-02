@@ -60,6 +60,10 @@ bool isUpdateAnnotation(ElementAnnotation annotation) {
   return _getAnnotationName(annotation) == Annotation.UPDATE;
 }
 
+bool isDeleteAnnotation(ElementAnnotation annotation) {
+  return _getAnnotationName(annotation) == Annotation.DELETE;
+}
+
 DartType flattenList(DartType type) {
   return (type as ParameterizedType).typeArguments.first;
 }

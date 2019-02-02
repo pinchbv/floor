@@ -62,3 +62,11 @@ class Update {
 
 /// Marks a method as an update method.
 const update = Update();
+
+/// Marks a method as a delete method.
+class Delete {
+  const Delete();
+}
+
+/// Marks a method as a delete method.
+const delete = Delete();
