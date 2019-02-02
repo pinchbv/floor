@@ -14,6 +14,7 @@ abstract class Annotation {
   static const QUERY = 'Query';
   static const INSERT = 'Insert';
   static const UPDATE = 'Update';
+  static const DELETE = 'Delete';
 }
 
 abstract class AnnotationField {

@@ -1,10 +1,12 @@
 import 'package:floor_generator/misc/annotation_expression.dart';
 import 'package:floor_generator/misc/type_utils.dart';
 import 'package:floor_generator/model/database.dart';
+import 'package:floor_generator/model/delete_method.dart';
 import 'package:floor_generator/model/entity.dart';
 import 'package:floor_generator/model/insert_method.dart';
 import 'package:floor_generator/model/query_method.dart';
 import 'package:floor_generator/model/update_method.dart';
+import 'package:floor_generator/writer/delete_method_writer.dart';
 import 'package:floor_generator/writer/insert_method_writer.dart';
 import 'package:floor_generator/writer/query_method_writer.dart';
 import 'package:floor_generator/writer/update_method_writer.dart';
@@ -82,14 +84,8 @@ class DatabaseWriter implements Writer {
       ..methods.add(_generateOpenMethod(databaseName, createTableStatements))
       ..methods.addAll(_generateQueryMethods(database.queryMethods))
       ..methods.addAll(_generateInsertMethods(database.insertMethods))
-      ..methods.addAll(_generateUpdateMethods(database.updateMethods)));
-  }
-
-  List<Method> _generateUpdateMethods(List<UpdateMethod> updateMethods) {
-    return updateMethods
-        .map(
-            (updateMethod) => UpdateMethodWriter(library, updateMethod).write())
-        .toList();
+      ..methods.addAll(_generateUpdateMethods(database.updateMethods))
+      ..methods.addAll(_generateDeleteMethods(database.deleteMethods)));
   }
 
   Method _generateOpenMethod(
@@ -116,14 +112,25 @@ class DatabaseWriter implements Writer {
 
   List<Method> _generateInsertMethods(List<InsertMethod> insertMethods) {
     return insertMethods
-        .map(
-            (insertMethod) => InsertMethodWriter(library, insertMethod).write())
+        .map((method) => InsertMethodWriter(library, method).write())
         .toList();
   }
 
   List<Method> _generateQueryMethods(List<QueryMethod> queryMethods) {
     return queryMethods
-        .map((queryMethod) => QueryMethodWriter(library, queryMethod).write())
+        .map((method) => QueryMethodWriter(library, method).write())
+        .toList();
+  }
+
+  List<Method> _generateUpdateMethods(List<UpdateMethod> updateMethods) {
+    return updateMethods
+        .map((method) => UpdateMethodWriter(library, method).write())
+        .toList();
+  }
+
+  List<Method> _generateDeleteMethods(List<DeleteMethod> deleteMethods) {
+    return deleteMethods
+        .map((method) => DeleteMethodWriter(library, method).write())
         .toList();
   }
 

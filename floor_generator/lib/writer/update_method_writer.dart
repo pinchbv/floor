@@ -1,5 +1,7 @@
+import 'package:analyzer/dart/element/element.dart';
 import 'package:code_builder/code_builder.dart';
 import 'package:floor_generator/misc/annotation_expression.dart';
+import 'package:floor_generator/misc/type_utils.dart';
 import 'package:floor_generator/model/update_method.dart';
 import 'package:floor_generator/writer/writer.dart';
 import 'package:source_gen/source_gen.dart';
@@ -36,13 +38,40 @@ class UpdateMethodWriter implements Writer {
   }
 
   String _generateMethodBody() {
-    final entity = updateMethod.getEntity(library);
-    final primaryKeyColumn =
-        entity.columns.firstWhere((column) => column.isPrimaryKey);
-    final methodHeadParameterName = updateMethod.parameter.name;
+    final parameter = updateMethod.parameter;
+    final methodHeadParameterName = parameter.displayName;
 
+    final keyValueList = (parameter.type.element as ClassElement)
+        .constructors
+        .first
+        .parameters
+        .map((parameter) {
+      final valueMapping = _getValueMapping(parameter, methodHeadParameterName);
+
+      return "'${parameter.displayName}': $valueMapping";
+    }).join(', ');
+
+    final entity = updateMethod.getEntity(library);
+
+    // TODO exclude id?
     return '''
-    await this.database.rawDelete('DELETE FROM ${entity.name} WHERE ${primaryKeyColumn.name} = \${$methodHeadParameterName.${primaryKeyColumn.field.displayName}}');
+    final values = <String, dynamic>{
+      $keyValueList
+    };
+    await this.database.update('${entity.name}', values);
     ''';
+  }
+
+  String _getValueMapping(
+    ParameterElement parameter,
+    String methodParameterName,
+  ) {
+    final parameterName = parameter.displayName;
+
+    if (isBool(parameter.type)) {
+      return '$methodParameterName.$parameterName ? 1 : 0';
+    } else {
+      return '$methodParameterName.$parameterName';
+    }
   }
 }

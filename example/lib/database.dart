@@ -88,6 +88,9 @@ abstract class MyDatabase extends FloorDatabase {
 
   @update
   Future<void> updatePerson(Person person);
+
+  @delete
+  Future<void> deletePerson(Person person);
 }
 
 Future<void> main() async {
