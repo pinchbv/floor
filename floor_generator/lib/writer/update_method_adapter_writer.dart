@@ -1,44 +1,23 @@
 import 'package:analyzer/dart/element/element.dart';
 import 'package:code_builder/code_builder.dart';
-import 'package:floor_generator/misc/annotation_expression.dart';
 import 'package:floor_generator/misc/type_utils.dart';
 import 'package:floor_generator/model/update_method.dart';
 import 'package:floor_generator/writer/writer.dart';
 import 'package:source_gen/source_gen.dart';
 
-class UpdateMethodWriter implements Writer {
+class UpdateMethodAdapterWriter implements Writer {
   final LibraryReader library;
-  final UpdateMethod updateMethod;
+  final UpdateMethod method;
 
-  UpdateMethodWriter(this.library, this.updateMethod);
+  UpdateMethodAdapterWriter(this.library, this.method);
 
   @override
-  Method write() {
-    return _generateUpdateMethod();
-  }
-
-  Method _generateUpdateMethod() {
-    // TODO assert is entity
-
-    return Method((builder) => builder
-      ..annotations.add(overrideAnnotationExpression)
-      ..returns = refer(updateMethod.returnType.displayName)
-      ..name = updateMethod.name
-      ..requiredParameters.add(_generateParameter())
-      ..modifier = MethodModifier.async
-      ..body = Code(_generateMethodBody()));
-  }
-
-  Parameter _generateParameter() {
-    final parameter = updateMethod.parameter;
-
-    return Parameter((builder) => builder
-      ..name = parameter.name
-      ..type = refer(parameter.type.displayName));
+  Code write() {
+    return Code(_generateMethodBody());
   }
 
   String _generateMethodBody() {
-    final parameter = updateMethod.parameter;
+    final parameter = method.parameter;
     final methodHeadParameterName = parameter.displayName;
 
     final keyValueList = (parameter.type.element as ClassElement)
@@ -51,9 +30,8 @@ class UpdateMethodWriter implements Writer {
       return "'${parameter.displayName}': $valueMapping";
     }).join(', ');
 
-    final entity = updateMethod.getEntity(library);
+    final entity = method.getEntity(library);
 
-    // TODO exclude id?
     return '''
     final values = <String, dynamic>{
       $keyValueList
