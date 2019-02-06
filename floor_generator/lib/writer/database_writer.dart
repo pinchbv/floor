@@ -6,10 +6,11 @@ import 'package:floor_generator/model/entity.dart';
 import 'package:floor_generator/model/insert_method.dart';
 import 'package:floor_generator/model/query_method.dart';
 import 'package:floor_generator/model/update_method.dart';
-import 'package:floor_generator/writer/delete_method_writer.dart';
-import 'package:floor_generator/writer/insert_method_writer.dart';
+import 'package:floor_generator/writer/change_method_writer.dart';
+import 'package:floor_generator/writer/delete_method_body_writer.dart';
+import 'package:floor_generator/writer/insert_method_body_writer.dart';
 import 'package:floor_generator/writer/query_method_writer.dart';
-import 'package:floor_generator/writer/update_method_writer.dart';
+import 'package:floor_generator/writer/update_method_body_writer.dart';
 import 'package:floor_generator/writer/writer.dart';
 import 'package:source_gen/source_gen.dart';
 import 'package:code_builder/code_builder.dart';
@@ -111,26 +112,29 @@ class DatabaseWriter implements Writer {
   }
 
   List<Method> _generateInsertMethods(List<InsertMethod> insertMethods) {
-    return insertMethods
-        .map((method) => InsertMethodWriter(library, method).write())
-        .toList();
+    return insertMethods.map((method) {
+      final writer = InsertMethodBodyWriter(library, method);
+      return ChangeMethodWriter(library, method, writer).write();
+    }).toList();
+  }
+
+  List<Method> _generateUpdateMethods(List<UpdateMethod> updateMethods) {
+    return updateMethods.map((method) {
+      final writer = UpdateMethodBodyWriter(library, method);
+      return ChangeMethodWriter(library, method, writer).write();
+    }).toList();
+  }
+
+  List<Method> _generateDeleteMethods(List<DeleteMethod> deleteMethods) {
+    return deleteMethods.map((method) {
+      final writer = DeleteMethodBodyWriter(library, method);
+      return ChangeMethodWriter(library, method, writer).write();
+    }).toList();
   }
 
   List<Method> _generateQueryMethods(List<QueryMethod> queryMethods) {
     return queryMethods
         .map((method) => QueryMethodWriter(library, method).write())
-        .toList();
-  }
-
-  List<Method> _generateUpdateMethods(List<UpdateMethod> updateMethods) {
-    return updateMethods
-        .map((method) => UpdateMethodWriter(library, method).write())
-        .toList();
-  }
-
-  List<Method> _generateDeleteMethods(List<DeleteMethod> deleteMethods) {
-    return deleteMethods
-        .map((method) => DeleteMethodWriter(library, method).write())
         .toList();
   }
 
