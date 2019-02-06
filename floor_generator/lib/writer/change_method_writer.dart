@@ -7,9 +7,9 @@ import 'package:source_gen/source_gen.dart';
 class ChangeMethodWriter implements Writer {
   final LibraryReader library;
   final ChangeMethod method;
-  final Writer adapterWriter;
+  final Writer methodBodyWriter;
 
-  ChangeMethodWriter(this.library, this.method, this.adapterWriter);
+  ChangeMethodWriter(this.library, this.method, this.methodBodyWriter);
 
   @override
   Method write() {
@@ -24,7 +24,7 @@ class ChangeMethodWriter implements Writer {
       ..name = method.name
       ..requiredParameters.add(_generateParameter())
       ..modifier = MethodModifier.async
-      ..body = adapterWriter.write());
+      ..body = methodBodyWriter.write());
   }
 
   Parameter _generateParameter() {

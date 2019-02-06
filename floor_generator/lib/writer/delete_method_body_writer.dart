@@ -3,11 +3,11 @@ import 'package:floor_generator/model/delete_method.dart';
 import 'package:floor_generator/writer/writer.dart';
 import 'package:source_gen/source_gen.dart';
 
-class DeleteMethodWriterAdapter implements Writer {
+class DeleteMethodBodyWriter implements Writer {
   final LibraryReader library;
   final DeleteMethod method;
 
-  DeleteMethodWriterAdapter(this.library, this.method);
+  DeleteMethodBodyWriter(this.library, this.method);
 
   @override
   Code write() {
