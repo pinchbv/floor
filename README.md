@@ -1,6 +1,8 @@
 # Floor
 **A supportive SQLite abstraction for your Flutter applications.**
 
+This package is in a very early development stage. Better don't use it.
+
 *Floor - the bottom layer of a [Room](https://developer.android.com/topic/libraries/architecture/room).*
 
 ## Bugs and Feedback
