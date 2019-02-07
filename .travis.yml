@@ -1,0 +1,31 @@
+# Created with package:mono_repo v1.2.1
+language: dart
+
+before_install:
+  - chmod +x tool/travis.sh
+
+jobs:
+  include:
+    - stage: analyze
+      name: "SDK: stable - DIR: floor_generator - TASKS: dartfmt -n --set-exit-if-changed ."
+      script: ./tool/travis.sh dartfmt
+      env: PKG="floor_generator"
+      dart: stable
+    - stage: analyze
+      name: "SDK: stable - DIR: floor_generator - TASKS: dartanalyzer --fatal-infos --fatal-warnings ."
+      script: ./tool/travis.sh dartanalyzer
+      env: PKG="floor_generator"
+      dart: stable
+    - stage: unit_test
+      name: "SDK: stable - DIR: floor_generator - TASKS: pub run test"
+      script: ./tool/travis.sh test
+      env: PKG="floor_generator"
+      dart: stable
+
+stages:
+  - analyze
+  - unit_test
+
+cache:
+  directories:
+    - "$HOME/.pub-cache"
