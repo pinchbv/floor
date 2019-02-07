@@ -36,7 +36,7 @@ class UpdateMethodBodyWriter implements Writer {
     final values = <String, dynamic>{
       $keyValueList
     };
-    await this.database.update('${entity.name}', values);
+    await database.update('${entity.name}', values);
     ''';
   }
 
