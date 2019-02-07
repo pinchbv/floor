@@ -144,7 +144,7 @@ class DatabaseWriter implements Writer {
 
   String _generateSql(Entity entity) {
     final columns = entity.columns.map((column) {
-      var columnString = '${column.name} ${column.type}';
+      var columnString = '`${column.name}` ${column.type}';
 
       final additionals = column.additionals;
       if (additionals != null) {
@@ -153,6 +153,6 @@ class DatabaseWriter implements Writer {
       return columnString;
     }).join(', ');
 
-    return "'CREATE TABLE IF NOT EXISTS ${entity.name} ($columns)'";
+    return "'CREATE TABLE IF NOT EXISTS `${entity.name}` ($columns)'";
   }
 }
