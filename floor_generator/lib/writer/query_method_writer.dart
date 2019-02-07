@@ -86,7 +86,7 @@ class QueryMethodWriter implements Writer {
     final mapping = _generateMapping();
 
     return '''
-    final rows = await this.database.rawQuery('${queryMethod.query}');
+    final rows = await database.rawQuery('${queryMethod.query}');
     if (rows.isEmpty) {
       return null;
     }

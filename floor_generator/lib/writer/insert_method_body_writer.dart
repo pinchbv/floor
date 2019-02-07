@@ -36,7 +36,7 @@ class InsertMethodBodyWriter implements Writer {
     final values = <String, dynamic>{
       $keyValueList
     };
-    await this.database.insert('${entity.name}', values);
+    await database.insert('${entity.name}', values);
     ''';
   }
 

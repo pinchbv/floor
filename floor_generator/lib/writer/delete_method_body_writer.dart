@@ -21,7 +21,7 @@ class DeleteMethodBodyWriter implements Writer {
     final methodHeadParameterName = method.parameter.name;
 
     return '''
-    await this.database.rawDelete('DELETE FROM ${entity.name} WHERE ${primaryKeyColumn.name} = \${$methodHeadParameterName.${primaryKeyColumn.field.displayName}}');
+    await database.rawDelete('DELETE FROM `${entity.name}` WHERE `${primaryKeyColumn.name}` = \${$methodHeadParameterName.${primaryKeyColumn.field.displayName}}');
     ''';
   }
 }
