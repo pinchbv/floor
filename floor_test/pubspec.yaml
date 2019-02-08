@@ -1,0 +1,23 @@
+name: floor_test
+description: >
+  A supportive SQLite abstraction for your Flutter applications.
+  This is the testing module.
+version: 0.0.1
+homepage: https://github.com/vitusortner/floor
+author: vitusortner
+
+environment:
+  sdk: ">=2.1.0 <3.0.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  floor:
+    path: ../floor/
+  floor_generator:
+    path: ../floor_generator/
+  build_runner: ^1.1.3

@@ -3,8 +3,6 @@ class Database {
   const Database();
 }
 
-const database = Database();
-
 /// Marks a class as a database entity (table).
 class Entity {
   /// The table name of the SQLite table.
@@ -36,8 +34,6 @@ class PrimaryKey {
   /// Defaults [autoGenerate] to false.
   const PrimaryKey({this.autoGenerate = false});
 }
-
-const primaryKey = PrimaryKey();
 
 /// Marks a method as a query method.
 class Query {
