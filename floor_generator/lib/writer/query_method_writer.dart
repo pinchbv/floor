@@ -54,6 +54,9 @@ class QueryMethodWriter implements Writer {
       return 'return rows.map((row) => $constructorCall).toList();';
     } else {
       return '''
+      if (rows.isEmpty) {
+        return null;
+      }
       final row = rows.first;
       return $constructorCall;
       ''';
@@ -87,9 +90,6 @@ class QueryMethodWriter implements Writer {
 
     return '''
     final rows = await database.rawQuery('${queryMethod.query}');
-    if (rows.isEmpty) {
-      return null;
-    }
     $mapping
     ''';
   }
