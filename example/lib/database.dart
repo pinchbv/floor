@@ -6,7 +6,7 @@ part 'database.g.dart';
 
 @entity
 class Person {
-  @primaryKey
+  @PrimaryKey()
   final int id;
   final String name;
   final int age;

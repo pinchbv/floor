@@ -37,8 +37,6 @@ class PrimaryKey {
   const PrimaryKey({this.autoGenerate = false});
 }
 
-const primaryKey = PrimaryKey();
-
 /// Marks a method as a query method.
 class Query {
   /// The SQLite query.
