@@ -3,8 +3,6 @@ class Database {
   const Database();
 }
 
-const database = Database();
-
 /// Marks a class as a database entity (table).
 class Entity {
   /// The table name of the SQLite table.

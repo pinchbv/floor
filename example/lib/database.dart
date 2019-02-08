@@ -58,9 +58,9 @@ class Bar {
   Bar(this.id, this.foo);
 }
 
-@database
+@Database()
 abstract class MyDatabase extends FloorDatabase {
-  static Future<MyDatabase> openDatabase() async => await _$open();
+  static Future<MyDatabase> openDatabase() async => _$open();
 
   @Query('SELECT * FROM Person')
   Future<List<Person>> findAllPersons();

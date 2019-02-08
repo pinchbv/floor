@@ -5,6 +5,7 @@ abstract class FloorDatabase {
   /// Use this for direct access to the sqflite database.
   sqflite.Database database;
 
+  // TODO remove this
   /// Opens the database to be able to query it.
   Future<sqflite.Database> open();
 
