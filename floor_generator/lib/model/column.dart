@@ -9,31 +9,31 @@ class Column {
 
   Column(this.field);
 
-  String get name => field.displayName;
-
-  String get customName {
-    if (!hasColumnInfoAnnotation) {
-      return null;
+  String get name {
+    if (!_hasColumnInfoAnnotation) {
+      return field.displayName;
     }
     return field.metadata
-        .firstWhere(isColumnInfoAnnotation)
-        .computeConstantValue()
-        .getField(AnnotationField.COLUMN_INFO_NAME)
-        .toStringValue();
+            .firstWhere(isColumnInfoAnnotation)
+            .computeConstantValue()
+            .getField(AnnotationField.COLUMN_INFO_NAME)
+            .toStringValue() ??
+        field.displayName;
   }
 
   bool get isNullable {
-    if (!hasColumnInfoAnnotation) {
+    if (!_hasColumnInfoAnnotation) {
       return true; // all Dart fields are nullable by default
     }
     return field.metadata
-        .firstWhere(isColumnInfoAnnotation)
-        .computeConstantValue()
-        .getField(AnnotationField.COLUMN_INFO_NULLABLE)
-        .toBoolValue();
+            .firstWhere(isColumnInfoAnnotation)
+            .computeConstantValue()
+            .getField(AnnotationField.COLUMN_INFO_NULLABLE)
+            .toBoolValue() ??
+        true;
   }
 
-  bool get hasColumnInfoAnnotation {
+  bool get _hasColumnInfoAnnotation {
     return field.metadata.any(isColumnInfoAnnotation);
   }
 
@@ -56,15 +56,16 @@ class Column {
 
   bool get isPrimaryKey => field.metadata.any(isPrimaryKeyAnnotation);
 
-  bool get autoGenerate {
+  bool get _autoGenerate {
     if (!isPrimaryKey) {
       return null;
     }
     return field.metadata
-        .firstWhere(isPrimaryKeyAnnotation)
-        .computeConstantValue()
-        .getField(AnnotationField.PRIMARY_KEY_AUTO_GENERATE)
-        .toBoolValue();
+            .firstWhere(isPrimaryKeyAnnotation)
+            .computeConstantValue()
+            .getField(AnnotationField.PRIMARY_KEY_AUTO_GENERATE)
+            .toBoolValue() ??
+        false;
   }
 
   /// Primary key and auto increment.
@@ -73,7 +74,7 @@ class Column {
 
     if (isPrimaryKey) {
       add += ' ${SqlConstants.PRIMARY_KEY}';
-      if (autoGenerate) {
+      if (_autoGenerate) {
         add += ' ${SqlConstants.AUTOINCREMENT}';
       }
     }

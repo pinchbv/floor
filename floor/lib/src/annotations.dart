@@ -18,8 +18,6 @@ class ColumnInfo {
   /// The custom name of the column.
   final String name;
 
-  // Does it make sense to have this field?
-  // It's very easy to still assign `null` to the field without recognising.
   /// Defines if the associated column is allowed to contain 'null'.
   final bool nullable;
 

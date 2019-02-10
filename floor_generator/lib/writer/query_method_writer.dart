@@ -64,25 +64,44 @@ class QueryMethodWriter implements Writer {
   }
 
   String _generateConstructorCall(DartType type) {
-    final parameterValues = (type.element as ClassElement)
-        .constructors
-        .first
-        .parameters
-        .map((parameter) {
-      final parameterValue = "row['${parameter.displayName}']";
+    final columnNames = queryMethod
+        .getEntity(library)
+        .columns
+        .map((column) => column.name)
+        .toList();
+    final constructorParameters =
+        (type.element as ClassElement).constructors.first.parameters;
 
-      if (isBool(parameter.type)) {
-        return '($parameterValue as int) != 0'; // maps int to bool
-      } else if (isString(parameter.type)) {
-        return '$parameterValue as String';
-      } else if (isInt(parameter.type)) {
-        return '$parameterValue as int';
-      } else if (isDouble(parameter.type)) {
-        return '$parameterValue as double';
+    final parameterValues = <String>[];
+
+    for (var i = 0; i < constructorParameters.length; i++) {
+      final parameterValue = "row['${columnNames[i]}']";
+      final castedParameterValue =
+          _castParameterValue(constructorParameters[i].type, parameterValue);
+
+      if (castedParameterValue != null) {
+        parameterValues.add(castedParameterValue);
       }
-    }).join(', ');
+    }
 
-    return '${type.displayName}($parameterValues)';
+    return '${type.displayName}(${parameterValues.join(', ')})';
+  }
+
+  String _castParameterValue(
+    DartType parameterType,
+    String parameterValue,
+  ) {
+    if (isBool(parameterType)) {
+      return '($parameterValue as int) != 0'; // maps int to bool
+    } else if (isString(parameterType)) {
+      return '$parameterValue as String';
+    } else if (isInt(parameterType)) {
+      return '$parameterValue as int';
+    } else if (isDouble(parameterType)) {
+      return '$parameterValue as double';
+    } else {
+      return null;
+    }
   }
 
   String _generateMethodBody() {

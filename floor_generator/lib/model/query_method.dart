@@ -2,6 +2,7 @@ import 'package:analyzer/dart/element/element.dart';
 import 'package:analyzer/dart/element/type.dart';
 import 'package:floor_generator/misc/type_utils.dart';
 import 'package:floor_generator/misc/constants.dart';
+import 'package:floor_generator/model/entity.dart';
 import 'package:source_gen/source_gen.dart';
 
 /// Raps a method annotated with Query
@@ -52,6 +53,17 @@ class QueryMethod {
   bool get returnsList {
     final type = method.returnType.flattenFutures(method.context.typeSystem);
     return isList(type);
+  }
+
+  Entity getEntity(LibraryReader library) {
+    // TODO exception handling
+    final entity = library.classes
+        .where((clazz) =>
+            !clazz.isAbstract && clazz.metadata.any(isEntityAnnotation))
+        .firstWhere(
+            (entity) => entity.displayName == flattenedReturnType.displayName);
+
+    return Entity(entity);
   }
 
   bool returnsEntity(LibraryReader library) {
