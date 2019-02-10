@@ -20,29 +20,32 @@ class InsertMethodBodyWriter implements Writer {
     final parameter = method.parameter;
     final methodHeadParameterName = parameter.displayName;
 
-    final keyValueList = (parameter.type.element as ClassElement)
-        .constructors
-        .first
-        .parameters
-        .map((parameter) {
-      final valueMapping = _getValueMapping(parameter, methodHeadParameterName);
+    final columnNames =
+        method.getEntity(library).columns.map((column) => column.name).toList();
+    final constructorParameters =
+        (parameter.type.element as ClassElement).constructors.first.parameters;
 
-      return "'${parameter.displayName}': $valueMapping";
-    }).join(', ');
+    final keyValueList = <String>[];
 
-    final entity = method.getEntity(library);
+    for (var i = 0; i < constructorParameters.length; i++) {
+      final valueMapping =
+          _getValueMapping(constructorParameters[i], methodHeadParameterName);
+      keyValueList.add("'${columnNames[i]}': $valueMapping");
+    }
+
+    final entityName = method.getEntity(library).name;
 
     return '''
     final values = <String, dynamic>{
-      $keyValueList
+      ${keyValueList.join(', ')}
     };
-    await database.insert('${entity.name}', values);
+    await database.insert('$entityName', values);
     ''';
   }
 
   String _getValueMapping(
-    ParameterElement parameter,
-    String methodParameterName,
+    final ParameterElement parameter,
+    final String methodParameterName,
   ) {
     final parameterName = parameter.displayName;
 
