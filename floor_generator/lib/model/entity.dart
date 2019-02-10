@@ -8,7 +8,11 @@ class Entity {
 
   String get name => clazz.displayName;
 
-  List<FieldElement> get fields => clazz.fields;
+  List<FieldElement> get fields {
+    return clazz.fields
+        .where((field) => field.displayName != 'hashCode')
+        .toList();
+  }
 
   List<Column> get columns {
     return fields.map((field) => Column(field)).toList();
