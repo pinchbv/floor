@@ -18,7 +18,7 @@ class QueryMethodWriter implements Writer {
     return _generateQueryMethod(queryMethod);
   }
 
-  Method _generateQueryMethod(QueryMethod queryMethod) {
+  Method _generateQueryMethod(final QueryMethod queryMethod) {
     _assertReturnsFuture();
     _assertReturnsEntity();
 
@@ -63,7 +63,7 @@ class QueryMethodWriter implements Writer {
     }
   }
 
-  String _generateConstructorCall(DartType type) {
+  String _generateConstructorCall(final DartType type) {
     final columnNames = queryMethod
         .getEntity(library)
         .columns
@@ -88,8 +88,8 @@ class QueryMethodWriter implements Writer {
   }
 
   String _castParameterValue(
-    DartType parameterType,
-    String parameterValue,
+    final DartType parameterType,
+    final String parameterValue,
   ) {
     if (isBool(parameterType)) {
       return '($parameterValue as int) != 0'; // maps int to bool

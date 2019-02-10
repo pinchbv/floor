@@ -55,24 +55,29 @@ class QueryMethod {
     return isList(type);
   }
 
-  Entity getEntity(LibraryReader library) {
-    // TODO exception handling
-    final entity = library.classes
-        .where((clazz) =>
-            !clazz.isAbstract && clazz.metadata.any(isEntityAnnotation))
-        .firstWhere(
-            (entity) => entity.displayName == flattenedReturnType.displayName);
+  Entity getEntity(final LibraryReader library) {
+    final entity = _getEntities(library).firstWhere(
+        (entity) => entity.displayName == flattenedReturnType.displayName,
+        orElse: () => null); // doesn't return an entity
 
-    return Entity(entity);
+    if (entity != null) {
+      return Entity(entity);
+    } else {
+      return null;
+    }
   }
 
-  bool returnsEntity(LibraryReader library) {
-    final entities = library.classes
-        .where((clazz) =>
-            !clazz.isAbstract && clazz.metadata.any(isEntityAnnotation))
-        .map((clazz) => clazz.displayName)
-        .toList();
+  bool returnsEntity(final LibraryReader library) {
+    final entities =
+        _getEntities(library).map((clazz) => clazz.displayName).toList();
 
     return entities.any((entity) => entity == flattenedReturnType.displayName);
+  }
+
+  List<ClassElement> _getEntities(LibraryReader library) {
+    return library.classes
+        .where((clazz) =>
+            !clazz.isAbstract && clazz.metadata.any(isEntityAnnotation))
+        .toList();
   }
 }

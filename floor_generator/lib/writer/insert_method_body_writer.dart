@@ -44,8 +44,8 @@ class InsertMethodBodyWriter implements Writer {
   }
 
   String _getValueMapping(
-    ParameterElement parameter,
-    String methodParameterName,
+    final ParameterElement parameter,
+    final String methodParameterName,
   ) {
     final parameterName = parameter.displayName;
 
