@@ -150,6 +150,9 @@ class DatabaseWriter implements Writer {
       if (additionals != null) {
         columnString += additionals;
       }
+      if (!column.isNullable) {
+        columnString += ' NOT NULL';
+      }
       return columnString;
     }).join(', ');
 

@@ -28,7 +28,7 @@ abstract class TestDatabase extends FloorDatabase {
 class Person {
   @PrimaryKey()
   final int id;
-  @ColumnInfo(name: 'custom_name')
+  @ColumnInfo(name: 'custom_name', nullable: false)
   final String name;
 
   Person(this.id, this.name);
