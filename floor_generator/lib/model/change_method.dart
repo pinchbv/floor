@@ -30,20 +30,30 @@ class ChangeMethod {
     return parameters.first;
   }
 
-  Entity getEntity(LibraryReader library) {
+  bool get changesMultipleItems => isList(parameter.type);
+
+  ClassElement get flattenedParameterClass {
+    return _flattenedParameterType.element as ClassElement;
+  }
+
+  Entity getEntity(final LibraryReader library) {
     final entityClass = _getEntities(library).firstWhere(
-        (entity) => entity.displayName == parameter.type.displayName);
+        (entity) => entity.displayName == _flattenedParameterType.displayName);
 
     return Entity(entityClass);
   }
 
-  bool changesEntity(LibraryReader library) {
+  bool changesEntity(final LibraryReader library) {
     return _getEntities(library)
         .map((clazz) => clazz.displayName)
-        .any((entity) => entity == parameter.type.displayName);
+        .any((entity) => entity == _flattenedParameterType.displayName);
   }
 
-  List<ClassElement> _getEntities(LibraryReader library) {
+  DartType get _flattenedParameterType {
+    return changesMultipleItems ? flattenList(parameter.type) : parameter.type;
+  }
+
+  List<ClassElement> _getEntities(final LibraryReader library) {
     return library.classes
         .where((clazz) =>
             !clazz.isAbstract && clazz.metadata.any(isEntityAnnotation))

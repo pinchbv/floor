@@ -2,6 +2,7 @@ import 'package:analyzer/dart/element/element.dart';
 import 'package:floor_generator/misc/constants.dart';
 import 'package:floor_generator/misc/type_utils.dart';
 import 'package:floor_generator/model/column.dart';
+import 'package:source_gen/source_gen.dart';
 
 class Entity {
   final ClassElement clazz;
@@ -25,5 +26,14 @@ class Entity {
 
   List<Column> get columns {
     return fields.map((field) => Column(field)).toList();
+  }
+
+  Column get primaryKeyColumn {
+    return columns.firstWhere(
+      (column) => column.isPrimaryKey,
+      orElse: throw InvalidGenerationSourceError(
+          'There is no primary key defined on the entity $name.',
+          element: clazz),
+    );
   }
 }

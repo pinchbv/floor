@@ -48,7 +48,46 @@ void main() {
       await database.updatePerson(updatedPerson);
 
       final actual = await database.findPersonById(person.id);
-      expect(actual, updatedPerson);
+      expect(actual, equals(updatedPerson));
+    });
+
+    test('insert persons', () async {
+      final persons = [Person(1, 'Simon'), Person(2, 'Frank')];
+
+      await database.insertPersons(persons);
+
+      final actual = await database.findAllPersons();
+      expect(actual, equals(persons));
+    });
+
+    test('delete persons', () async {
+      final persons = [Person(1, 'Simon'), Person(2, 'Frank')];
+      await database.insertPersons(persons);
+
+      await database.deletePersons(persons);
+
+      final actual = await database.findAllPersons();
+      expect(actual, isEmpty);
+    });
+
+    test('update persons', () async {
+      final person1 = Person(1, 'Simon');
+      final person2 = Person(2, 'Frank');
+      final persons = [person1, person2];
+      await database.insertPersons(persons);
+
+      final updatedPersons = [
+        Person(person1.id, _reverse(person1.name)),
+        Person(person2.id, _reverse(person2.name))
+      ];
+      await database.updatePersons(updatedPersons);
+
+      final actual = await database.findAllPersons();
+      expect(actual, equals(updatedPersons));
     });
   });
+}
+
+String _reverse(String value) {
+  return value.split('').reversed.join();
 }

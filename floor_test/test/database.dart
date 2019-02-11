@@ -17,11 +17,20 @@ abstract class TestDatabase extends FloorDatabase {
   @insert
   Future<void> insertPerson(Person person);
 
+  @insert
+  Future<void> insertPersons(List<Person> persons);
+
   @update
   Future<void> updatePerson(Person person);
 
+  @update
+  Future<void> updatePersons(List<Person> persons);
+
   @delete
   Future<void> deletePerson(Person person);
+
+  @delete
+  Future<void> deletePersons(List<Person> person);
 }
 
 @Entity(tableName: 'person')

@@ -16,12 +16,22 @@ class DeleteMethodBodyWriter implements Writer {
 
   String _generateMethodBody() {
     final entity = method.getEntity(library);
-    final primaryKeyColumn =
-        entity.columns.firstWhere((column) => column.isPrimaryKey);
+    final primaryKeyColumn = entity.primaryKeyColumn;
     final methodHeadParameterName = method.parameter.name;
 
-    return '''
-    await database.rawDelete('DELETE FROM `${entity.name}` WHERE `${primaryKeyColumn.name}` = \${$methodHeadParameterName.${primaryKeyColumn.field.displayName}}');
-    ''';
+    if (method.changesMultipleItems) {
+      return '''
+      final batch = database.batch();
+      for (final item in $methodHeadParameterName) {
+        batch.delete('${entity.name}', where: '${primaryKeyColumn.name} = ?', whereArgs: <int>[item.${primaryKeyColumn.field.displayName}]);
+      }
+      await batch.commit(noResult: true);
+      ''';
+    } else {
+      return '''
+      final item = $methodHeadParameterName;
+      await database.delete('${entity.name}', where: '${primaryKeyColumn.name} = ?', whereArgs: <int>[item.${primaryKeyColumn.field.displayName}]);
+      ''';
+    }
   }
 }
