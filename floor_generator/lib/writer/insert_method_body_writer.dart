@@ -17,42 +17,49 @@ class InsertMethodBodyWriter implements Writer {
   }
 
   String _generateMethodBody() {
-    final parameter = method.parameter;
-    final methodHeadParameterName = parameter.displayName;
+    final methodHeadParameterName = method.parameter.displayName;
 
     final columnNames =
         method.getEntity(library).columns.map((column) => column.name).toList();
     final constructorParameters =
-        (parameter.type.element as ClassElement).constructors.first.parameters;
+        method.flattenedParameterClass.constructors.first.parameters;
 
     final keyValueList = <String>[];
 
     for (var i = 0; i < constructorParameters.length; i++) {
-      final valueMapping =
-          _getValueMapping(constructorParameters[i], methodHeadParameterName);
+      final valueMapping = _getValueMapping(constructorParameters[i]);
       keyValueList.add("'${columnNames[i]}': $valueMapping");
     }
 
     final entityName = method.getEntity(library).name;
 
-    return '''
-    final values = <String, dynamic>{
-      ${keyValueList.join(', ')}
-    };
-    await database.insert('$entityName', values);
-    ''';
+    if (method.changesMultipleItems) {
+      return '''
+      final batch = database.batch();
+      for (final item in $methodHeadParameterName) {
+        final values = <String, dynamic>{
+          ${keyValueList.join(', ')}
+        };
+        batch.insert('$entityName', values);
+      }
+      await batch.commit(noResult: true);
+      ''';
+    } else {
+      return '''
+      final item = $methodHeadParameterName;
+      final values = <String, dynamic>{
+        ${keyValueList.join(', ')}
+      };
+      await database.insert('$entityName', values);
+      ''';
+    }
   }
 
-  String _getValueMapping(
-    final ParameterElement parameter,
-    final String methodParameterName,
-  ) {
+  String _getValueMapping(final ParameterElement parameter) {
     final parameterName = parameter.displayName;
 
-    if (isBool(parameter.type)) {
-      return '$methodParameterName.$parameterName ? 1 : 0';
-    } else {
-      return '$methodParameterName.$parameterName';
-    }
+    return isBool(parameter.type)
+        ? 'item.$parameterName ? 1 : 0'
+        : 'item.$parameterName';
   }
 }
