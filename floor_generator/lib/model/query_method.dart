@@ -20,7 +20,7 @@ class QueryMethod {
         .getField(AnnotationField.QUERY_VALUE)
         .toStringValue();
 
-    if (query.isEmpty) {
+    if (query.isEmpty || query == null) {
       throw InvalidGenerationSourceError("You didn't define a query.",
           element: method);
     }
