@@ -8,10 +8,10 @@ part 'database.g.dart';
 abstract class TestDatabase extends FloorDatabase {
   static Future<TestDatabase> openDatabase() async => _$open();
 
-  @Query('SELECT * FROM Person')
+  @Query('SELECT * FROM person')
   Future<List<Person>> findAllPersons();
 
-  @Query('SELECT * FROM Person WHERE id = :id')
+  @Query('SELECT * FROM person WHERE id = :id')
   Future<Person> findPersonById(int id);
 
   @insert
@@ -24,7 +24,7 @@ abstract class TestDatabase extends FloorDatabase {
   Future<void> deletePerson(Person person);
 }
 
-@entity
+@Entity(tableName: 'person')
 class Person {
   @PrimaryKey()
   final int id;

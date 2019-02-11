@@ -20,6 +20,7 @@ abstract class Annotation {
 abstract class AnnotationField {
   static const QUERY_VALUE = 'value';
   static const PRIMARY_KEY_AUTO_GENERATE = 'autoGenerate';
+  static const ENTITY_TABLE_NAME = 'tableName';
 
   static const COLUMN_INFO_NAME = 'name';
   static const COLUMN_INFO_NULLABLE = 'nullable';
