@@ -31,12 +31,19 @@ abstract class TestDatabase extends FloorDatabase {
 
   @delete
   Future<void> deletePersons(List<Person> person);
+
+  @transaction
+  Future<void> replacePersons(List<Person> persons) async {
+    await database.execute('DELETE FROM person');
+    await insertPersons(persons);
+  }
 }
 
 @Entity(tableName: 'person')
 class Person {
   @PrimaryKey()
   final int id;
+
   @ColumnInfo(name: 'custom_name', nullable: false)
   final String name;
 

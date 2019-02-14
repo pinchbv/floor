@@ -29,11 +29,14 @@ class Entity {
   }
 
   Column get primaryKeyColumn {
-    return columns.firstWhere(
-      (column) => column.isPrimaryKey,
-      orElse: throw InvalidGenerationSourceError(
-          'There is no primary key defined on the entity $name.',
-          element: clazz),
-    );
+    return columns.firstWhere((column) => column.isPrimaryKey);
+
+    // TODO why does this always throw?
+//    return columns.firstWhere(
+//      (column) => column.isPrimaryKey,
+//      orElse: throw InvalidGenerationSourceError(
+//          'There is no primary key defined on the entity $name.',
+//          element: clazz),
+//    );
   }
 }

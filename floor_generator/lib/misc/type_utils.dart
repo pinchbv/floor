@@ -64,6 +64,10 @@ bool isDeleteAnnotation(ElementAnnotation annotation) {
   return _getAnnotationName(annotation) == Annotation.DELETE;
 }
 
+bool isTransactionAnnotation(ElementAnnotation annotation) {
+  return _getAnnotationName(annotation) == Annotation.TRANSACTION;
+}
+
 DartType flattenList(DartType type) {
   return (type as ParameterizedType).typeArguments.first;
 }

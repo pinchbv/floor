@@ -12,7 +12,7 @@ void main() {
     });
 
     tearDown(() async {
-      await database.database.execute('DELETE FROM Person');
+      await database.database.execute('DELETE FROM person');
     });
 
     test('database initially is empty', () async {
@@ -84,6 +84,17 @@ void main() {
 
       final actual = await database.findAllPersons();
       expect(actual, equals(updatedPersons));
+    });
+
+    test('replace persons in transaction', () async {
+      final persons = [Person(1, 'Simon'), Person(2, 'Frank')];
+      await database.insertPersons(persons);
+
+      final newPersons = [Person(3, 'Paul'), Person(4, 'Karl')];
+      await database.replacePersons(newPersons);
+
+      final actual = await database.findAllPersons();
+      expect(actual, equals(newPersons));
     });
   });
 }

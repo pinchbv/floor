@@ -5,11 +5,13 @@ import 'package:floor_generator/model/delete_method.dart';
 import 'package:floor_generator/model/entity.dart';
 import 'package:floor_generator/model/insert_method.dart';
 import 'package:floor_generator/model/query_method.dart';
+import 'package:floor_generator/model/transaction_method.dart';
 import 'package:floor_generator/model/update_method.dart';
 import 'package:floor_generator/writer/change_method_writer.dart';
 import 'package:floor_generator/writer/delete_method_body_writer.dart';
 import 'package:floor_generator/writer/insert_method_body_writer.dart';
 import 'package:floor_generator/writer/query_method_writer.dart';
+import 'package:floor_generator/writer/transaction_method_writer.dart';
 import 'package:floor_generator/writer/update_method_body_writer.dart';
 import 'package:floor_generator/writer/writer.dart';
 import 'package:source_gen/source_gen.dart';
@@ -86,7 +88,9 @@ class DatabaseWriter implements Writer {
       ..methods.addAll(_generateQueryMethods(database.queryMethods))
       ..methods.addAll(_generateInsertMethods(database.insertMethods))
       ..methods.addAll(_generateUpdateMethods(database.updateMethods))
-      ..methods.addAll(_generateDeleteMethods(database.deleteMethods)));
+      ..methods.addAll(_generateDeleteMethods(database.deleteMethods))
+      ..methods
+          .addAll(_generateTransactionMethods(database.transactionMethods)));
   }
 
   Method _generateOpenMethod(
@@ -138,22 +142,24 @@ class DatabaseWriter implements Writer {
         .toList();
   }
 
+  List<Method> _generateTransactionMethods(
+    List<TransactionMethod> transactionMethods,
+  ) {
+    return transactionMethods
+        .map((method) => TransactionMethodWriter(library, method).write())
+        .toList();
+  }
+
   List<String> _generateCreateTableSqlStatements(List<Entity> entities) {
     return entities.map(_generateSql).toList();
   }
 
   String _generateSql(Entity entity) {
     final columns = entity.columns.map((column) {
-      var columnString = '`${column.name}` ${column.type}';
-
-      final additionals = column.additionals;
-      if (additionals != null) {
-        columnString += additionals;
-      }
-      if (!column.isNullable) {
-        columnString += ' NOT NULL';
-      }
-      return columnString;
+      final primaryKey = column.isPrimaryKey ? ' PRIMARY KEY' : '';
+      final autoIncrement = column.autoGenerate ? ' AUTOINCREMENT' : '';
+      final nullable = column.isNullable ? '' : ' NOT NULL';
+      return '`${column.name}` ${column.type}$primaryKey$autoIncrement$nullable';
     }).join(', ');
 
     return "'CREATE TABLE IF NOT EXISTS `${entity.name}` ($columns)'";

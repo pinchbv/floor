@@ -4,6 +4,7 @@ import 'package:floor_generator/model/delete_method.dart';
 import 'package:floor_generator/model/entity.dart';
 import 'package:floor_generator/model/insert_method.dart';
 import 'package:floor_generator/model/query_method.dart';
+import 'package:floor_generator/model/transaction_method.dart';
 import 'package:floor_generator/model/update_method.dart';
 import 'package:source_gen/source_gen.dart';
 
@@ -41,6 +42,13 @@ class Database {
     return methods
         .where((method) => method.metadata.any(isDeleteAnnotation))
         .map((method) => DeleteMethod(method))
+        .toList();
+  }
+
+  List<TransactionMethod> get transactionMethods {
+    return methods
+        .where((method) => method.metadata.any(isTransactionAnnotation))
+        .map((method) => TransactionMethod(method, name))
         .toList();
   }
 
