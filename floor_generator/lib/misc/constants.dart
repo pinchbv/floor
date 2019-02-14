@@ -10,6 +10,7 @@ abstract class Annotation {
   static const DATABASE = 'Database';
   static const COLUMN_INFO = 'ColumnInfo';
   static const PRIMARY_KEY = 'PrimaryKey';
+  static const TRANSACTION = '_Transaction';
 
   static const QUERY = 'Query';
   static const INSERT = 'Insert';
@@ -26,11 +27,8 @@ abstract class AnnotationField {
   static const COLUMN_INFO_NULLABLE = 'nullable';
 }
 
-abstract class SqlConstants {
+abstract class SqlType {
   static const INTEGER = 'INTEGER';
   static const TEXT = 'TEXT';
   static const REAL = 'REAL';
-
-  static const PRIMARY_KEY = 'PRIMARY KEY';
-  static const AUTOINCREMENT = 'AUTOINCREMENT';
 }
