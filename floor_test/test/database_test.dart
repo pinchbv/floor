@@ -71,14 +71,11 @@ void main() {
     });
 
     test('update persons', () async {
-      final person1 = Person(1, 'Simon');
-      final person2 = Person(2, 'Frank');
-      final persons = [person1, person2];
+      final persons = [Person(1, 'Simon'), Person(2, 'Frank')];
       await database.insertPersons(persons);
-      final updatedPersons = [
-        Person(person1.id, _reverse(person1.name)),
-        Person(person2.id, _reverse(person2.name))
-      ];
+      final updatedPersons = persons
+          .map((person) => Person(person.id, _reverse(person.name)))
+          .toList();
 
       await database.updatePersons(updatedPersons);
 
@@ -106,13 +103,12 @@ void main() {
     });
 
     test('insert persons and return ids of inserted items', () async {
-      final person1 = Person(1, 'Simon');
-      final person2 = Person(2, 'Frank');
-      final persons = [person1, person2];
+      final persons = [Person(1, 'Simon'), Person(2, 'Frank')];
 
       final actual = await database.insertPersonsWithReturn(persons);
 
-      expect(actual, equals([person1.id, person2.id]));
+      final expected = persons.map((person) => person.id).toList();
+      expect(actual, equals(expected));
     });
 
     test('update person and return 1 (affected row count)', () async {
@@ -128,14 +124,11 @@ void main() {
     });
 
     test('update persons and return affected rows count', () async {
-      final person1 = Person(1, 'Simon');
-      final person2 = Person(2, 'Frank');
-      final persons = [person1, person2];
+      final persons = [Person(1, 'Simon'), Person(2, 'Frank')];
       await database.insertPersons(persons);
-      final updatedPersons = [
-        Person(person1.id, _reverse(person1.name)),
-        Person(person2.id, _reverse(person2.name))
-      ];
+      final updatedPersons = persons
+          .map((person) => Person(person.id, _reverse(person.name)))
+          .toList();
 
       final actual = await database.updatePersonsWithReturn(updatedPersons);
 
