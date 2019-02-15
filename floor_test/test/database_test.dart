@@ -136,6 +136,24 @@ void main() {
       expect(persistentPersons, equals(updatedPersons));
       expect(actual, equals(2));
     });
+
+    test('delete person and return 1 (affected row count)', () async {
+      final person = Person(1, 'Simon');
+      await database.insertPerson(person);
+
+      final actual = await database.deletePersonWithReturn(person);
+
+      expect(actual, equals(1));
+    });
+
+    test('delete persons and return affected rows count', () async {
+      final persons = [Person(1, 'Simon'), Person(2, 'Frank')];
+      await database.insertPersons(persons);
+
+      final actual = await database.deletePersonsWithReturn(persons);
+
+      expect(actual, equals(2));
+    });
   });
 }
 
