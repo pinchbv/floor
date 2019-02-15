@@ -17,8 +17,6 @@ class InsertMethodBodyWriter implements Writer {
   }
 
   String _generateMethodBody() {
-    final methodHeadParameterName = method.parameter.displayName;
-
     final columnNames =
         method.getEntity(library).columns.map((column) => column.name).toList();
     final constructorParameters =
@@ -32,11 +30,37 @@ class InsertMethodBodyWriter implements Writer {
     }
 
     final entityName = method.getEntity(library).name;
+    final methodSignatureParameterName = method.parameter.displayName;
 
+    if (method.returnsInt) {
+      return _generateIntReturnMethodBody(
+        methodSignatureParameterName,
+        keyValueList,
+        entityName,
+      );
+    } else if (method.returnsVoid) {
+      return _generateVoidReturnMethodBody(
+        methodSignatureParameterName,
+        keyValueList,
+        entityName,
+      );
+    } else {
+      throw InvalidGenerationSourceError(
+        'Insert methods have to return a Future of either void, int or List<int>',
+        element: method.method,
+      );
+    }
+  }
+
+  String _generateVoidReturnMethodBody(
+    final String methodSignatureParameterName,
+    final List<String> keyValueList,
+    final String entityName,
+  ) {
     if (method.changesMultipleItems) {
       return '''
       final batch = database.batch();
-      for (final item in $methodHeadParameterName) {
+      for (final item in $methodSignatureParameterName) {
         final values = <String, dynamic>{
           ${keyValueList.join(', ')}
         };
@@ -46,11 +70,38 @@ class InsertMethodBodyWriter implements Writer {
       ''';
     } else {
       return '''
-      final item = $methodHeadParameterName;
+      final item = $methodSignatureParameterName;
       final values = <String, dynamic>{
         ${keyValueList.join(', ')}
       };
       await database.insert('$entityName', values);
+      ''';
+    }
+  }
+
+  String _generateIntReturnMethodBody(
+    final String methodSignatureParameterName,
+    final List<String> keyValueList,
+    final String entityName,
+  ) {
+    if (method.changesMultipleItems) {
+      return '''
+      final batch = database.batch();
+      for (final item in $methodSignatureParameterName) {
+        final values = <String, dynamic>{
+          ${keyValueList.join(', ')}
+        };
+        batch.insert('$entityName', values);
+      }
+      return (await batch.commit(noResult: false)).cast<int>();
+      ''';
+    } else {
+      return '''
+      final item = $methodSignatureParameterName;
+      final values = <String, dynamic>{
+        ${keyValueList.join(', ')}
+      };
+      return database.insert('$entityName', values);
       ''';
     }
   }

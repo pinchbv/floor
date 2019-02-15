@@ -12,6 +12,10 @@ class ChangeMethod {
 
   DartType get returnType => method.returnType;
 
+  bool get returnsInt => isInt(_flattenedReturnType);
+
+  bool get returnsVoid => _flattenedReturnType.isVoid;
+
   String get name => method.displayName;
 
   ParameterElement get parameter {
@@ -58,5 +62,15 @@ class ChangeMethod {
         .where((clazz) =>
             !clazz.isAbstract && clazz.metadata.any(isEntityAnnotation))
         .toList();
+  }
+
+  DartType get _flattenedReturnType {
+    final type = method.returnType.flattenFutures(method.context.typeSystem);
+    return _returnsList ? flattenList(type) : type;
+  }
+
+  bool get _returnsList {
+    final type = method.returnType.flattenFutures(method.context.typeSystem);
+    return isList(type);
   }
 }

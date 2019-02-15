@@ -14,11 +14,20 @@ abstract class TestDatabase extends FloorDatabase {
   @Query('SELECT * FROM person WHERE id = :id')
   Future<Person> findPersonById(int id);
 
+  @Query('SELECT * FROM person WHERE id = :id AND name = :name')
+  Future<Person> findPersonByIdAndName(int id, String name);
+
   @insert
   Future<void> insertPerson(Person person);
 
   @insert
   Future<void> insertPersons(List<Person> persons);
+
+  @insert
+  Future<int> insertPersonWithReturn(Person person);
+
+  @insert
+  Future<List<int>> insertPersonsWithReturn(List<Person> persons);
 
   @update
   Future<void> updatePerson(Person person);
