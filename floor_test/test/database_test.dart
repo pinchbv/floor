@@ -96,6 +96,24 @@ void main() {
       final actual = await database.findAllPersons();
       expect(actual, equals(newPersons));
     });
+
+    test('insert person and return id of inserted item', () async {
+      final person = Person(1, 'Simon');
+
+      final actual = await database.insertPersonWithReturn(person);
+
+      expect(actual, equals(person.id));
+    });
+
+    test('insert persons and return ids of inserted items', () async {
+      final person1 = Person(1, 'Simon');
+      final person2 = Person(2, 'Frank');
+      final persons = [person1, person2];
+
+      final actual = await database.insertPersonsWithReturn(persons);
+
+      expect(actual, equals([person1.id, person2.id]));
+    });
   });
 }
 

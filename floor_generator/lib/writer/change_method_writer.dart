@@ -17,6 +17,7 @@ class ChangeMethodWriter implements Writer {
     return _generateChangeMethod();
   }
 
+  // TODO remove async modifier when returning single int (one id)
   Method _generateChangeMethod() {
     return Method((builder) => builder
       ..annotations.add(overrideAnnotationExpression)
