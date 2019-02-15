@@ -33,6 +33,12 @@ abstract class TestDatabase extends FloorDatabase {
   Future<void> updatePerson(Person person);
 
   @update
+  Future<int> updatePersonWithReturn(Person person);
+
+  @update
+  Future<int> updatePersonsWithReturn(List<Person> persons);
+
+  @update
   Future<void> updatePersons(List<Person> persons);
 
   @delete
