@@ -66,10 +66,10 @@ class ChangeMethod {
 
   DartType get _flattenedReturnType {
     final type = method.returnType.flattenFutures(method.context.typeSystem);
-    return _returnsList ? flattenList(type) : type;
+    return returnsList ? flattenList(type) : type;
   }
 
-  bool get _returnsList {
+  bool get returnsList {
     final type = method.returnType.flattenFutures(method.context.typeSystem);
     return isList(type);
   }

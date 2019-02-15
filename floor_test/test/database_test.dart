@@ -43,8 +43,8 @@ void main() {
     test('update person', () async {
       final person = Person(1, 'Simon');
       await database.insertPerson(person);
+      final updatedPerson = Person(person.id, _reverse(person.name));
 
-      final updatedPerson = Person(person.id, 'Frank');
       await database.updatePerson(updatedPerson);
 
       final actual = await database.findPersonById(person.id);
@@ -75,11 +75,11 @@ void main() {
       final person2 = Person(2, 'Frank');
       final persons = [person1, person2];
       await database.insertPersons(persons);
-
       final updatedPersons = [
         Person(person1.id, _reverse(person1.name)),
         Person(person2.id, _reverse(person2.name))
       ];
+
       await database.updatePersons(updatedPersons);
 
       final actual = await database.findAllPersons();
@@ -89,8 +89,8 @@ void main() {
     test('replace persons in transaction', () async {
       final persons = [Person(1, 'Simon'), Person(2, 'Frank')];
       await database.insertPersons(persons);
-
       final newPersons = [Person(3, 'Paul'), Person(4, 'Karl')];
+
       await database.replacePersons(newPersons);
 
       final actual = await database.findAllPersons();
@@ -113,6 +113,35 @@ void main() {
       final actual = await database.insertPersonsWithReturn(persons);
 
       expect(actual, equals([person1.id, person2.id]));
+    });
+
+    test('update person and return 1 (affected row count)', () async {
+      final person = Person(1, 'Simon');
+      await database.insertPerson(person);
+      final updatedPerson = Person(person.id, _reverse(person.name));
+
+      final actual = await database.updatePersonWithReturn(updatedPerson);
+
+      final persistentPerson = await database.findPersonById(person.id);
+      expect(persistentPerson, equals(updatedPerson));
+      expect(actual, equals(1));
+    });
+
+    test('update persons and return affected rows count', () async {
+      final person1 = Person(1, 'Simon');
+      final person2 = Person(2, 'Frank');
+      final persons = [person1, person2];
+      await database.insertPersons(persons);
+      final updatedPersons = [
+        Person(person1.id, _reverse(person1.name)),
+        Person(person2.id, _reverse(person2.name))
+      ];
+
+      final actual = await database.updatePersonsWithReturn(updatedPersons);
+
+      final persistentPersons = await database.findAllPersons();
+      expect(persistentPersons, equals(updatedPersons));
+      expect(actual, equals(2));
     });
   });
 }

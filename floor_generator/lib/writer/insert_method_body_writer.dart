@@ -17,8 +17,9 @@ class InsertMethodBodyWriter implements Writer {
   }
 
   String _generateMethodBody() {
-    final columnNames =
-        method.getEntity(library).columns.map((column) => column.name).toList();
+    final entity = method.getEntity(library);
+
+    final columnNames = entity.columns.map((column) => column.name).toList();
     final constructorParameters =
         method.flattenedParameterClass.constructors.first.parameters;
 
@@ -29,7 +30,7 @@ class InsertMethodBodyWriter implements Writer {
       keyValueList.add("'${columnNames[i]}': $valueMapping");
     }
 
-    final entityName = method.getEntity(library).name;
+    final entityName = entity.name;
     final methodSignatureParameterName = method.parameter.displayName;
 
     if (method.returnsInt) {
@@ -46,7 +47,7 @@ class InsertMethodBodyWriter implements Writer {
       );
     } else {
       throw InvalidGenerationSourceError(
-        'Insert methods have to return a Future of either void, int or List<int>',
+        'Insert methods have to return a Future of either void, int or List<int>.',
         element: method.method,
       );
     }
