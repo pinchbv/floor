@@ -11,7 +11,7 @@ import 'package:source_gen/source_gen.dart';
 class Database {
   final ClassElement clazz;
 
-  Database(this.clazz);
+  Database(final this.clazz);
 
   String get name => clazz.displayName;
 
@@ -52,7 +52,7 @@ class Database {
         .toList();
   }
 
-  List<Entity> getEntities(LibraryReader library) {
+  List<Entity> getEntities(final LibraryReader library) {
     return library.classes
         .where((clazz) =>
             !clazz.isAbstract && clazz.metadata.any(isEntityAnnotation))

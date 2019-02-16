@@ -9,7 +9,7 @@ class InsertMethodBodyWriter implements Writer {
   final LibraryReader library;
   final InsertMethod method;
 
-  InsertMethodBodyWriter(this.library, this.method);
+  InsertMethodBodyWriter(final this.library, final this.method);
 
   @override
   Code write() {

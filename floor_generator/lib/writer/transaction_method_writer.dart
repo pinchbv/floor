@@ -8,7 +8,7 @@ class TransactionMethodWriter implements Writer {
   final LibraryReader library;
   final TransactionMethod method;
 
-  TransactionMethodWriter(this.library, this.method);
+  TransactionMethodWriter(final this.library, final this.method);
 
   @override
   Method write() {

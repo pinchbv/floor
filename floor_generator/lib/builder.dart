@@ -8,5 +8,5 @@ import 'package:source_gen/source_gen.dart';
 ///
 /// Use 'flutter packages pub run build_runner watch' to trigger
 /// code generation on changes.
-Builder floorBuilder(BuilderOptions _) =>
+Builder floorBuilder(final BuilderOptions _) =>
     SharedPartBuilder([FloorGenerator()], 'floor');

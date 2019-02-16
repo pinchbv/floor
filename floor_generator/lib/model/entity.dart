@@ -6,7 +6,7 @@ import 'package:floor_generator/model/column.dart';
 class Entity {
   final ClassElement clazz;
 
-  Entity(this.clazz);
+  Entity(final this.clazz);
 
   String get name {
     return clazz.metadata

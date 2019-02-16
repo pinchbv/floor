@@ -5,7 +5,7 @@ class TransactionMethod {
   final MethodElement method;
   final String databaseName;
 
-  TransactionMethod(this.method, this.databaseName);
+  TransactionMethod(final this.method, final this.databaseName);
 
   DartType get returnType => method.returnType;
 

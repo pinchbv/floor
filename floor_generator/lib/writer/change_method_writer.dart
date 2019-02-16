@@ -9,7 +9,11 @@ class ChangeMethodWriter implements Writer {
   final ChangeMethod method;
   final Writer methodBodyWriter;
 
-  ChangeMethodWriter(this.library, this.method, this.methodBodyWriter);
+  ChangeMethodWriter(
+    final this.library,
+    final this.method,
+    final this.methodBodyWriter,
+  );
 
   @override
   Method write() {

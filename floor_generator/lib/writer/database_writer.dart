@@ -21,7 +21,7 @@ import 'package:code_builder/code_builder.dart';
 class DatabaseWriter implements Writer {
   final LibraryReader library;
 
-  DatabaseWriter(this.library);
+  DatabaseWriter(final this.library);
 
   @override
   Spec write() {
@@ -56,7 +56,7 @@ class DatabaseWriter implements Writer {
     }
   }
 
-  Method _generateOpenDatabaseFunction(String databaseName) {
+  Method _generateOpenDatabaseFunction(final String databaseName) {
     return Method((builder) => builder
       ..returns = refer('Future<$databaseName>')
       ..name = '_\$open'
@@ -68,7 +68,7 @@ class DatabaseWriter implements Writer {
             '''));
   }
 
-  Class _generateDatabaseImplementation(Database database) {
+  Class _generateDatabaseImplementation(final Database database) {
     final createTableStatements =
         _generateCreateTableSqlStatements(database.getEntities(library))
             .map((statement) => 'await database.execute($statement);')
@@ -94,8 +94,8 @@ class DatabaseWriter implements Writer {
   }
 
   Method _generateOpenMethod(
-    String databaseName,
-    String createTableStatements,
+    final String databaseName,
+    final String createTableStatements,
   ) {
     return Method((builder) => builder
       ..name = 'open'
@@ -115,46 +115,46 @@ class DatabaseWriter implements Writer {
           '''));
   }
 
-  List<Method> _generateInsertMethods(List<InsertMethod> insertMethods) {
+  List<Method> _generateInsertMethods(final List<InsertMethod> insertMethods) {
     return insertMethods.map((method) {
       final writer = InsertMethodBodyWriter(library, method);
       return ChangeMethodWriter(library, method, writer).write();
     }).toList();
   }
 
-  List<Method> _generateUpdateMethods(List<UpdateMethod> updateMethods) {
+  List<Method> _generateUpdateMethods(final List<UpdateMethod> updateMethods) {
     return updateMethods.map((method) {
       final writer = UpdateMethodBodyWriter(library, method);
       return ChangeMethodWriter(library, method, writer).write();
     }).toList();
   }
 
-  List<Method> _generateDeleteMethods(List<DeleteMethod> deleteMethods) {
+  List<Method> _generateDeleteMethods(final List<DeleteMethod> deleteMethods) {
     return deleteMethods.map((method) {
       final writer = DeleteMethodBodyWriter(library, method);
       return ChangeMethodWriter(library, method, writer).write();
     }).toList();
   }
 
-  List<Method> _generateQueryMethods(List<QueryMethod> queryMethods) {
+  List<Method> _generateQueryMethods(final List<QueryMethod> queryMethods) {
     return queryMethods
         .map((method) => QueryMethodWriter(library, method).write())
         .toList();
   }
 
   List<Method> _generateTransactionMethods(
-    List<TransactionMethod> transactionMethods,
+    final List<TransactionMethod> transactionMethods,
   ) {
     return transactionMethods
         .map((method) => TransactionMethodWriter(library, method).write())
         .toList();
   }
 
-  List<String> _generateCreateTableSqlStatements(List<Entity> entities) {
+  List<String> _generateCreateTableSqlStatements(final List<Entity> entities) {
     return entities.map(_generateSql).toList();
   }
 
-  String _generateSql(Entity entity) {
+  String _generateSql(final Entity entity) {
     final columns = entity.columns.map((column) {
       final primaryKey = column.isPrimaryKey ? ' PRIMARY KEY' : '';
       final autoIncrement = column.autoGenerate ? ' AUTOINCREMENT' : '';
