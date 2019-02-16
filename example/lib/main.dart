@@ -54,7 +54,7 @@ class TasksWidgetState extends State<TasksWidget> {
     await database.insertTask(task);
     _tasks = await database.findAllTasks();
 
-    setState(() {}); // trigger rebuild
+    setState(() {}); // trigger rebuild to show inserted task
   }
 
   @override
