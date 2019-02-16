@@ -4,31 +4,40 @@ import 'package:sqflite/sqflite.dart' as sqflite;
 
 part 'database.g.dart';
 
-@entity
-class Person {
-  @PrimaryKey()
-  final int id;
-  final String name;
-  final int age;
-  final bool isHungry;
+@Database()
+abstract class MyDatabase extends FloorDatabase {
+  static Future<MyDatabase> openDatabase() async => _$open();
 
-  Person(this.id, this.name, this.age, this.isHungry);
+  @Query('SELECT * FROM task WHERE id = :id')
+  Future<Task> findTaskById(int id);
+
+  @Query('SELECT * FROM task')
+  Future<List<Task>> findAllTasks();
+
+  @insert
+  Future<void> insertTask(Task task);
+
+  @insert
+  Future<void> insertTasks(List<Task> tasks);
+
+  @update
+  Future<void> updateTask(Task task);
+
+  @update
+  Future<void> updateTasks(List<Task> task);
+
+  @delete
+  Future<void> deleteTask(Task task);
+
+  @delete
+  Future<void> deleteTasks(List<Task> tasks);
 }
 
-@entity
-class Car {
-  @PrimaryKey(autoGenerate: false)
-  final int id;
-  final String manufacturer;
-  final int wheels;
-
-  Car(this.id, this.manufacturer, this.wheels);
-}
-
-@entity
+@Entity(tableName: 'task')
 class Task {
   @PrimaryKey(autoGenerate: true)
   final int id;
+
   final String message;
 
   Task(this.id, this.message);
@@ -48,51 +57,4 @@ class Task {
   String toString() {
     return 'Task{id: $id, message: $message}';
   }
-}
-
-@entity
-class Bar {
-  final int id;
-  final String foo;
-
-  Bar(this.id, this.foo);
-}
-
-@Database()
-abstract class MyDatabase extends FloorDatabase {
-  static Future<MyDatabase> openDatabase() async => _$open();
-
-  @Query('SELECT * FROM Person')
-  Future<List<Person>> findAllPersons();
-
-  @Query('SELECT * FROM Person WHERE id = :id')
-  Future<Person> findPersonById(int id);
-
-  @Query('SELECT * FROM Car WHERE id = :id')
-  Future<Car> findCarById(int id);
-
-  @insert
-  Future<void> insertPerson(Person person);
-
-  @insert
-  Future<void> insertCar(Car car);
-
-  @Query('SELECT * FROM Task')
-  Future<List<Task>> findAllTasks();
-
-  @insert
-  Future<void> insertTask(Task task);
-
-  @update
-  Future<void> updateTask(Task task);
-
-  @update
-  Future<void> updatePerson(Person person);
-
-  @delete
-  Future<void> deletePerson(Person person);
-}
-
-Future<void> main() async {
-  final database = await MyDatabase.openDatabase();
 }
