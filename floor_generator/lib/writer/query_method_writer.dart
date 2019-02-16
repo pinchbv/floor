@@ -11,7 +11,7 @@ class QueryMethodWriter implements Writer {
   final LibraryReader library;
   final QueryMethod queryMethod;
 
-  const QueryMethodWriter(this.library, this.queryMethod);
+  const QueryMethodWriter(final this.library, final this.queryMethod);
 
   @override
   Method write() {

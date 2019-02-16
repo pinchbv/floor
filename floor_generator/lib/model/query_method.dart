@@ -10,7 +10,7 @@ import 'package:source_gen/source_gen.dart';
 class QueryMethod {
   final MethodElement method;
 
-  QueryMethod(this.method);
+  QueryMethod(final this.method);
 
   /// Query as defined in by user in Dart code.
   String get rawQuery {
@@ -74,7 +74,7 @@ class QueryMethod {
     return entities.any((entity) => entity == flattenedReturnType.displayName);
   }
 
-  List<ClassElement> _getEntities(LibraryReader library) {
+  List<ClassElement> _getEntities(final LibraryReader library) {
     return library.classes
         .where((clazz) =>
             !clazz.isAbstract && clazz.metadata.any(isEntityAnnotation))

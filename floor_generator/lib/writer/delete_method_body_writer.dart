@@ -8,7 +8,7 @@ class DeleteMethodBodyWriter implements Writer {
   final LibraryReader library;
   final DeleteMethod method;
 
-  DeleteMethodBodyWriter(this.library, this.method);
+  DeleteMethodBodyWriter(final this.library, final this.method);
 
   @override
   Code write() {

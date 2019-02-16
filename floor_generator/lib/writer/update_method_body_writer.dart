@@ -10,7 +10,7 @@ class UpdateMethodBodyWriter implements Writer {
   final LibraryReader library;
   final UpdateMethod method;
 
-  UpdateMethodBodyWriter(this.library, this.method);
+  UpdateMethodBodyWriter(final this.library, final this.method);
 
   @override
   Code write() {

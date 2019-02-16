@@ -2,27 +2,27 @@ import 'package:analyzer/dart/element/element.dart';
 import 'package:analyzer/dart/element/type.dart';
 import 'package:floor_generator/misc/constants.dart';
 
-bool isString(DartType type) {
+bool isString(final DartType type) {
   return type.displayName == SupportedType.STRING && _isDartCore(type);
 }
 
-bool isBool(DartType type) {
+bool isBool(final DartType type) {
   return type.displayName == SupportedType.BOOL && _isDartCore(type);
 }
 
-bool isInt(DartType type) {
+bool isInt(final DartType type) {
   return type.isDartCoreInt;
 }
 
-bool isDouble(DartType type) {
+bool isDouble(final DartType type) {
   return type.displayName == SupportedType.DOUBLE && _isDartCore(type);
 }
 
-bool isList(DartType type) {
+bool isList(final DartType type) {
   return type.name == 'List' && _isDartCore(type);
 }
 
-bool isSupportedType(DartType type) {
+bool isSupportedType(final DartType type) {
   return [
         SupportedType.STRING,
         SupportedType.BOOL,
@@ -32,50 +32,50 @@ bool isSupportedType(DartType type) {
       _isDartCore(type);
 }
 
-bool isEntityAnnotation(ElementAnnotation annotation) {
+bool isEntityAnnotation(final ElementAnnotation annotation) {
   return _getAnnotationName(annotation) == Annotation.ENTITY;
 }
 
-bool isDatabaseAnnotation(ElementAnnotation annotation) {
+bool isDatabaseAnnotation(final ElementAnnotation annotation) {
   return _getAnnotationName(annotation) == Annotation.DATABASE;
 }
 
-bool isColumnInfoAnnotation(ElementAnnotation annotation) {
+bool isColumnInfoAnnotation(final ElementAnnotation annotation) {
   return _getAnnotationName(annotation) == Annotation.COLUMN_INFO;
 }
 
-bool isPrimaryKeyAnnotation(ElementAnnotation annotation) {
+bool isPrimaryKeyAnnotation(final ElementAnnotation annotation) {
   return _getAnnotationName(annotation) == Annotation.PRIMARY_KEY;
 }
 
-bool isQueryAnnotation(ElementAnnotation annotation) {
+bool isQueryAnnotation(final ElementAnnotation annotation) {
   return _getAnnotationName(annotation) == Annotation.QUERY;
 }
 
-bool isInsertAnnotation(ElementAnnotation annotation) {
+bool isInsertAnnotation(final ElementAnnotation annotation) {
   return _getAnnotationName(annotation) == Annotation.INSERT;
 }
 
-bool isUpdateAnnotation(ElementAnnotation annotation) {
+bool isUpdateAnnotation(final ElementAnnotation annotation) {
   return _getAnnotationName(annotation) == Annotation.UPDATE;
 }
 
-bool isDeleteAnnotation(ElementAnnotation annotation) {
+bool isDeleteAnnotation(final ElementAnnotation annotation) {
   return _getAnnotationName(annotation) == Annotation.DELETE;
 }
 
-bool isTransactionAnnotation(ElementAnnotation annotation) {
+bool isTransactionAnnotation(final ElementAnnotation annotation) {
   return _getAnnotationName(annotation) == Annotation.TRANSACTION;
 }
 
-DartType flattenList(DartType type) {
+DartType flattenList(final DartType type) {
   return (type as ParameterizedType).typeArguments.first;
 }
 
-bool _isDartCore(DartType type) {
+bool _isDartCore(final DartType type) {
   return type.element.library.isDartCore;
 }
 
-String _getAnnotationName(ElementAnnotation annotation) {
+String _getAnnotationName(final ElementAnnotation annotation) {
   return annotation.computeConstantValue().type.displayName;
 }

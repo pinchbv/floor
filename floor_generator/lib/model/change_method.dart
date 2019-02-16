@@ -8,7 +8,7 @@ import 'package:source_gen/source_gen.dart';
 class ChangeMethod {
   final MethodElement method;
 
-  ChangeMethod(this.method);
+  ChangeMethod(final this.method);
 
   DartType get returnType => method.returnType;
 
