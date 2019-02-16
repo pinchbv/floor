@@ -7,7 +7,7 @@ import 'package:source_gen/source_gen.dart';
 class Column {
   final FieldElement field;
 
-  const Column(final this.field);
+  Column(final this.field);
 
   String get name {
     if (!_hasColumnInfoAnnotation) {
