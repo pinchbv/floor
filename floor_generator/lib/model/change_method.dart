@@ -12,8 +12,10 @@ class ChangeMethod {
 
   DartType get returnType => method.returnType;
 
+  /// Whether this method returns an int or a list of ints.
   bool get returnsInt => isInt(_flattenedReturnType);
 
+  /// Whether this methods 'returns' void.
   bool get returnsVoid => _flattenedReturnType.isVoid;
 
   String get name => method.displayName;
@@ -34,6 +36,8 @@ class ChangeMethod {
     return parameters.first;
   }
 
+  /// Whether this method takes a list as parameter and thus
+  /// changes multiple items.
   bool get changesMultipleItems => isList(parameter.type);
 
   ClassElement get flattenedParameterClass {
@@ -53,6 +57,13 @@ class ChangeMethod {
         .any((entity) => entity == _flattenedParameterType.displayName);
   }
 
+  bool get requiresAsyncModifier => returnsVoid || changesMultipleItems;
+
+  bool get returnsList {
+    final type = method.returnType.flattenFutures(method.context.typeSystem);
+    return isList(type);
+  }
+
   DartType get _flattenedParameterType {
     return changesMultipleItems ? flattenList(parameter.type) : parameter.type;
   }
@@ -67,10 +78,5 @@ class ChangeMethod {
   DartType get _flattenedReturnType {
     final type = method.returnType.flattenFutures(method.context.typeSystem);
     return returnsList ? flattenList(type) : type;
-  }
-
-  bool get returnsList {
-    final type = method.returnType.flattenFutures(method.context.typeSystem);
-    return isList(type);
   }
 }
