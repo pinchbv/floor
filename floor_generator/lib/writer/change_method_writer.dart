@@ -17,15 +17,19 @@ class ChangeMethodWriter implements Writer {
     return _generateChangeMethod();
   }
 
-  // TODO remove async modifier when returning single int (one id)
   Method _generateChangeMethod() {
-    return Method((builder) => builder
+    final builder = MethodBuilder()
       ..annotations.add(overrideAnnotationExpression)
       ..returns = refer(method.returnType.displayName)
       ..name = method.name
       ..requiredParameters.add(_generateParameter())
-      ..modifier = MethodModifier.async
-      ..body = methodBodyWriter.write());
+      ..body = methodBodyWriter.write();
+
+    if (method.requiresAsyncModifier) {
+      builder..modifier = MethodModifier.async;
+    }
+
+    return builder.build();
   }
 
   Parameter _generateParameter() {
