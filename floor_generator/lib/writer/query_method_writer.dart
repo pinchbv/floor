@@ -15,12 +15,13 @@ class QueryMethodWriter implements Writer {
 
   @override
   Method write() {
-    return _generateQueryMethod(queryMethod);
+    return _generateQueryMethod();
   }
 
-  Method _generateQueryMethod(final QueryMethod queryMethod) {
+  Method _generateQueryMethod() {
     _assertReturnsFuture();
     _assertReturnsEntity();
+    _assertQueryParameters();
 
     return Method((builder) => builder
       ..annotations.add(overrideAnnotationExpression)
@@ -113,17 +114,41 @@ class QueryMethodWriter implements Writer {
     ''';
   }
 
+  void _assertQueryParameters() {
+    final queryParameterNames = queryMethod.queryParameterNames;
+    final methodSignatureParameterNames =
+        queryMethod.parameters.map((parameter) => parameter.name).toList();
+
+    final sameAmountParameters =
+        queryParameterNames.length == methodSignatureParameterNames.length;
+
+    final allParametersAreAvailable = queryParameterNames.every(
+        (parameterName) =>
+            methodSignatureParameterNames.any((name) => name == parameterName));
+
+    if (!allParametersAreAvailable || !sameAmountParameters) {
+      throw InvalidGenerationSourceError(
+        "Parameters of method signature don't match with parameters in the query.",
+        element: queryMethod.method,
+      );
+    }
+  }
+
   void _assertReturnsFuture() {
     if (!queryMethod.rawReturnType.isDartAsyncFuture) {
-      throw InvalidGenerationSourceError('All queries have to return a Future.',
-          element: queryMethod.method);
+      throw InvalidGenerationSourceError(
+        'All queries have to return a Future.',
+        element: queryMethod.method,
+      );
     }
   }
 
   void _assertReturnsEntity() {
     if (!queryMethod.returnsEntity(library)) {
-      throw InvalidGenerationSourceError('The return type is not an entity.',
-          element: queryMethod.method);
+      throw InvalidGenerationSourceError(
+        'The return type is not an entity.',
+        element: queryMethod.method,
+      );
     }
   }
 }
