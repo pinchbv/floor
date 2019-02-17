@@ -14,7 +14,7 @@ abstract class TestDatabase extends FloorDatabase {
   @Query('SELECT * FROM person WHERE id = :id')
   Future<Person> findPersonById(int id);
 
-  @Query('SELECT * FROM person WHERE id = :id AND name = :name')
+  @Query('SELECT * FROM person WHERE id = :id AND custom_name = :name')
   Future<Person> findPersonByIdAndName(int id, String name);
 
   @insert

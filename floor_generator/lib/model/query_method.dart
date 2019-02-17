@@ -5,7 +5,7 @@ import 'package:floor_generator/misc/constants.dart';
 import 'package:floor_generator/model/entity.dart';
 import 'package:source_gen/source_gen.dart';
 
-/// Raps a method annotated with Query
+/// Wraps a method annotated with Query
 /// to enable easy access to code generation relevant data.
 class QueryMethod {
   final MethodElement method;
@@ -13,7 +13,7 @@ class QueryMethod {
   QueryMethod(final this.method);
 
   /// Query as defined in by user in Dart code.
-  String get rawQuery {
+  String get _rawQuery {
     final query = method.metadata
         .firstWhere(isQueryAnnotation)
         .computeConstantValue()
@@ -21,15 +21,24 @@ class QueryMethod {
         .toStringValue();
 
     if (query.isEmpty || query == null) {
-      throw InvalidGenerationSourceError("You didn't define a query.",
-          element: method);
+      throw InvalidGenerationSourceError(
+        "You didn't define a query.",
+        element: method,
+      );
     }
 
     return query;
   }
 
   /// Query where ':' got replaced with '$'.
-  String get query => rawQuery.replaceAll(RegExp(':'), '\$');
+  String get query => _rawQuery.replaceAll(RegExp(':'), r'$');
+
+  List<String> get queryParameterNames {
+    return RegExp(r'\$.[^\s]+')
+        .allMatches(query)
+        .map((match) => match.group(0).replaceFirst(RegExp(r'\$'), ''))
+        .toList();
+  }
 
   String get name => method.displayName;
 
