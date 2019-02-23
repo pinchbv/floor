@@ -3,7 +3,7 @@
 
 The Floor library provides a lightweight SQLite abstraction with automatic mapping between in-memory objects and database rows while still offering full control of the database with the use of SQL.
 
-This package is still under active development and the API will likely change.
+This package is still in an early phase and the API will likely change.
 
 ### Table of contents
 
