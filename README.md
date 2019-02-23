@@ -1,7 +1,7 @@
 # Floor
 **A supportive SQLite abstraction for your Flutter applications.**
 
-This package is under heavy development and the API will likely change.
+This package is still under development and the API will likely change.
 
 1. [How to use this library](#how-to-use-this-library)
 1. [Querying](#querying)
@@ -26,7 +26,7 @@ This package is under heavy development and the API will likely change.
       floor:
         git: 
           url: https://github.com/vitusortner/floor.git
-          path: /floor
+          path: /floor/
     
     dev_dependencies:
       flutter_test:
@@ -34,7 +34,7 @@ This package is under heavy development and the API will likely change.
       floor_generator:
         git: 
             url: https://github.com/vitusortner/floor.git
-            path: /floor_generator
+            path: /floor_generator/
       build_runner: ^1.1.3
     ````
 
@@ -175,6 +175,7 @@ It also requires to add the `async` modifier. These methods can only return `Fut
 ```dart
 @transaction
 Future<void> replacePersons(List<Person> persons) async {
+  // execute SQL without automatically generated code
   await database.execute('DELETE FROM Person');
   await insertPersons(persons);
 }
