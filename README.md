@@ -98,6 +98,15 @@ This package is under heavy development and the API will likely change.
     To automatically run it, whenever a file changes, use `flutter packages pub run build_runner watch`.
     
 1. Use the generated code.
+
+```dart
+final database = await AppDatabase.openDatabase();
+
+final person = await database.findPersonById(1);
+await database.insertPerson(person);
+await database.updatePerson(person);
+await database.deletePerson(person);
+```
     
 For further examples take a look at the `example` and `floor_test` directories.
     
