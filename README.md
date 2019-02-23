@@ -3,6 +3,12 @@
 
 This package is under heavy development and the API will likely change.
 
+1. [How to use this library](#how-to-use-this-library)
+1. [Querying](#querying)
+1. [Persisting Data Changes](#persisting-data-changes)
+1. [Transactions](#transactions)
+1. [Foreign Keys](#foreign-keys)
+
 ## How to use this library
 1. Add the runtime dependency `floor` as well as the generator `floor_generator` to your `pubspec.yaml`.
     The third dependency is `build_runner` which has to be included as a dev dependency just like the generator.
@@ -99,16 +105,16 @@ This package is under heavy development and the API will likely change.
     
 1. Use the generated code.
 
-```dart
-final database = await AppDatabase.openDatabase();
+    ```dart
+    final database = await AppDatabase.openDatabase();
 
-final person = await database.findPersonById(1);
-await database.insertPerson(person);
-await database.updatePerson(person);
-await database.deletePerson(person);
-```
+    final person = await database.findPersonById(1);
+    await database.insertPerson(person);
+    await database.updatePerson(person);
+    await database.deletePerson(person);
+    ```
     
-For further examples take a look at the `example` and `floor_test` directories.
+For further examples take a look at the [example](https://github.com/vitusortner/floor/tree/develop/example) and [floor_test](https://github.com/vitusortner/floor/tree/develop/floor_test) directories.
     
 
 ## Querying
@@ -161,6 +167,20 @@ Future<List<int>> updatePersons(List<Person> person);
 @delete
 Future<List<int>> deletePersons(List<Person> person);
 ```
+
+## Transactions
+Whenever you want to perform some operations in a transaction you have to add the `@transaction` annotation to the method.
+It also requires to add the `async` modifier. These methods can only return `Future<void>`.
+
+```dart
+@transaction
+Future<void> replacePersons(List<Person> persons) async {
+  await database.execute('DELETE FROM Person');
+  await insertPersons(persons);
+}
+```
+
+## Foreign Keys
     
 ## Naming
 *Floor - the bottom layer of a [Room](https://developer.android.com/topic/libraries/architecture/room).*
