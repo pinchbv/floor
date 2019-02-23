@@ -3,7 +3,7 @@
 
 The Floor library provides a lightweight SQLite abstraction with automatic mapping between in-memory objects and database rows while still offering full control of the database with the use of SQL.
 
-This package is still under development and the API will likely change.
+This package is still under active development and the API will likely change.
 
 ### Table of contents
 
@@ -14,6 +14,9 @@ This package is still under development and the API will likely change.
 1. [Entities](#entities)
 1. [Foreign Keys](#foreign-keys)
 1. [Examples](#examples)
+1. [Naming](#naming)
+1. [Bugs and Feedback](#bugs-and-feedback)
+1. [License](#license)
 
 ## How to use this library
 1. Add the runtime dependency `floor` as well as the generator `floor_generator` to your `pubspec.yaml`.
@@ -116,8 +119,6 @@ This package is still under development and the API will likely change.
 
     final person = await database.findPersonById(1);
     await database.insertPerson(person);
-    await database.updatePerson(person);
-    await database.deletePerson(person);
     ```
     
 For further examples take a look at the [example](https://github.com/vitusortner/floor/tree/develop/example) and [floor_test](https://github.com/vitusortner/floor/tree/develop/floor_test) directories.
@@ -172,15 +173,15 @@ All these methods accept single or multiple entity instances.
 Future<List<int>> insertPersons(List<Person> person);
 
 @update
-Future<List<int>> updatePersons(List<Person> person);
+Future<int> updatePersons(List<Person> person);
 
 @delete
-Future<List<int>> deletePersons(List<Person> person);
+Future<int> deletePersons(List<Person> person);
 ```
 
 ## Transactions
 Whenever you want to perform some operations in a transaction you have to add the `@transaction` annotation to the method.
-It also requires to add the `async` modifier. These methods can only return `Future<void>`.
+It's also required to add the `async` modifier. These methods can only return `Future<void>`.
 
 ```dart
 @transaction
@@ -209,7 +210,7 @@ With the annotation it's possible to give columns a custom name and define if th
 ```dart
 @Entity(tableName: 'person')
 class Person {
-  @PrimaryKey()
+  @PrimaryKey(autoGenerate: true)
   final int id;
 
   @ColumnInfo(name: 'custom_name', nullable: false)
@@ -250,14 +251,14 @@ class Dog {
 
 ## Examples
 For further examples take a look at the [example](https://github.com/vitusortner/floor/tree/develop/example) and [floor_test](https://github.com/vitusortner/floor/tree/develop/floor_test) directories.
-    
-### Naming
+     
+## Naming
 *Floor - the bottom layer of a [Room](https://developer.android.com/topic/libraries/architecture/room).*
 
-### Bugs and Feedback
+## Bugs and Feedback
 For bugs, questions and discussions please use the [Github Issues](https://github.com/vitusortner/floor/issues).
 
-### License
+## License
     Copyright 2019 Vitus Ortner
 
     Licensed under the Apache License, Version 2.0 (the "License");
