@@ -55,7 +55,7 @@ abstract class TestDatabase extends FloorDatabase {
 
   @transaction
   Future<void> replacePersons(List<Person> persons) async {
-    await database.execute('DELETE FROM person');
+    await deleteAllPersons();
     await insertPersons(persons);
   }
 
@@ -67,6 +67,9 @@ abstract class TestDatabase extends FloorDatabase {
 
   @Query('SELECT * FROM dog')
   Future<List<Dog>> findAllDogs();
+
+  @Query('DELETE FROM person')
+  Future<void> deleteAllPersons();
 }
 
 @Entity(tableName: 'person')
@@ -76,6 +79,9 @@ class Person {
 
   @ColumnInfo(name: 'custom_name', nullable: false)
   final String name;
+
+//  @embedded
+//  final Address address;
 
   Person(this.id, this.name);
 
@@ -133,5 +139,28 @@ class Dog {
   @override
   String toString() {
     return 'Dog{id: $id, name: $name, ownerId: $ownerId}';
+  }
+}
+
+class Address {
+  final String street;
+  final String city;
+
+  Address(this.street, this.city);
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is Address &&
+          runtimeType == other.runtimeType &&
+          street == other.street &&
+          city == other.city;
+
+  @override
+  int get hashCode => street.hashCode ^ city.hashCode;
+
+  @override
+  String toString() {
+    return 'Address{street: $street, city: $city}';
   }
 }

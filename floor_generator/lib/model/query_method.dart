@@ -64,6 +64,10 @@ class QueryMethod {
     return isList(type);
   }
 
+  bool get returnsVoid {
+    return method.returnType.flattenFutures(method.context.typeSystem).isVoid;
+  }
+
   Entity getEntity(final LibraryReader library) {
     final entity = _getEntities(library).firstWhere(
         (entity) => entity.displayName == flattenedReturnType.displayName,

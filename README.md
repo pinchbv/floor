@@ -126,8 +126,9 @@ For further examples take a look at the [example](https://github.com/vitusortner
 ## Querying
 Method signatures turn into query methods by adding the `@Query()` annotation with the query in parenthesis to them.
 Be patient about the correctness of your SQL statements.
-The are only partly validated while generating the code.
-These queries have to return an entity.
+They are only partly validated while generating the code.
+These queries have to return either a `Future` of an entity or `void`.
+Returning `Future<void>` comes in handy whenever you want to delete the full content of a table.
 
 ````dart
 @Query('SELECT * FROM Person WHERE id = :id')
@@ -138,6 +139,9 @@ Future<Person> findPersonByIdAndName(int id, String name);
 
 @Query('SELECT * FROM Person')
 Future<List<Person>> findAllPersons(); // select multiple items
+
+@Query('DELETE FROM person')
+Future<void> deleteAllPersons(); // query without returning an entity
 ````
 
 ## Persisting Data Changes
@@ -186,8 +190,7 @@ It's also required to add the `async` modifier. These methods can only return `F
 ```dart
 @transaction
 Future<void> replacePersons(List<Person> persons) async {
-  // execute SQL without automatically generated code
-  await database.execute('DELETE FROM Person');
+  await deleteAllPersons();
   await insertPersons(persons);
 }
 ```
