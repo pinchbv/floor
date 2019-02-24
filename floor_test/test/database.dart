@@ -55,7 +55,7 @@ abstract class TestDatabase extends FloorDatabase {
 
   @transaction
   Future<void> replacePersons(List<Person> persons) async {
-    await database.execute('DELETE FROM person');
+    await deleteAllPersons();
     await insertPersons(persons);
   }
 
