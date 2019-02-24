@@ -198,6 +198,18 @@ void main() {
         expect(actual, isEmpty);
       });
     });
+
+    group('query with void return', () {
+      test('delete all persons', () async {
+        final persons = [Person(1, 'Simon'), Person(2, 'Frank')];
+        await database.insertPersons(persons);
+
+        await database.deleteAllPersons();
+        final actual = await database.findAllPersons();
+
+        expect(actual, isEmpty);
+      });
+    });
   });
 }
 

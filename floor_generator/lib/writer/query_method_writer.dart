@@ -20,7 +20,6 @@ class QueryMethodWriter implements Writer {
 
   Method _generateQueryMethod() {
     _assertReturnsFuture();
-    _assertReturnsEntity();
     _assertQueryParameters();
 
     return Method((builder) => builder
@@ -106,11 +105,14 @@ class QueryMethodWriter implements Writer {
   }
 
   String _generateMethodBody() {
-    final mapping = _generateMapping();
+    if (queryMethod.returnsVoid) {
+      return "await database.rawQuery('${queryMethod.query}');";
+    }
 
+    _assertReturnsEntity();
     return '''
     final rows = await database.rawQuery('${queryMethod.query}');
-    $mapping
+    ${_generateMapping()}
     ''';
   }
 

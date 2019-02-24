@@ -126,8 +126,8 @@ For further examples take a look at the [example](https://github.com/vitusortner
 ## Querying
 Method signatures turn into query methods by adding the `@Query()` annotation with the query in parenthesis to them.
 Be patient about the correctness of your SQL statements.
-The are only partly validated while generating the code.
-These queries have to return an entity.
+They are only partly validated while generating the code.
+These queries have to return either a `Future` of an entity or `void`.
 
 ````dart
 @Query('SELECT * FROM Person WHERE id = :id')
