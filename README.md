@@ -3,6 +3,9 @@
 
 The Floor library provides a lightweight SQLite abstraction with automatic mapping between in-memory objects and database rows while still offering full control of the database with the use of SQL.
 
+It's important to note that this library is not a full featured ORM like Hibernate and will never be.
+Thus not supporting automatic relationship mapping is intentional.
+
 This package is still in an early phase and the API will likely change.
 
 ### Table of contents
