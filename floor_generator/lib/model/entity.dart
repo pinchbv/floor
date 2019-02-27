@@ -41,11 +41,25 @@ class Entity {
 
   List<ForeignKey> get foreignKeys {
     return clazz.metadata
-        .firstWhere(isEntityAnnotation)
-        .computeConstantValue()
-        .getField(AnnotationField.ENTITY_FOREIGN_KEYS)
-        ?.toListValue()
-        ?.map((object) => ForeignKey(clazz, object))
-        ?.toList();
+            .firstWhere(isEntityAnnotation)
+            .computeConstantValue()
+            .getField(AnnotationField.ENTITY_FOREIGN_KEYS)
+            ?.toListValue()
+            ?.map((object) => ForeignKey(clazz, object))
+            ?.toList() ??
+        [];
+  }
+
+  String getCreateTableStatement(final LibraryReader library) {
+    final databaseDefinition =
+        columns.map((column) => column.definition).toList();
+
+    final foreignKeyDefinitions = foreignKeys
+        .map((foreignKey) => foreignKey.getDefinition(library))
+        .toList();
+
+    databaseDefinition.addAll(foreignKeyDefinitions);
+
+    return "'CREATE TABLE IF NOT EXISTS `$name` (${databaseDefinition.join(', ')})'";
   }
 }

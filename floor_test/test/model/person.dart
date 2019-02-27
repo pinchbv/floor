@@ -8,10 +8,7 @@ class Person {
   @ColumnInfo(name: 'custom_name', nullable: false)
   final String name;
 
-  @embedded
-  final Address address;
-
-  Person(this.id, this.name, this.address);
+  Person(this.id, this.name);
 
   @override
   bool operator ==(Object other) =>
@@ -19,14 +16,13 @@ class Person {
       other is Person &&
           runtimeType == other.runtimeType &&
           id == other.id &&
-          name == other.name &&
-          address == other.address;
+          name == other.name;
 
   @override
-  int get hashCode => id.hashCode ^ name.hashCode ^ address.hashCode;
+  int get hashCode => id.hashCode ^ name.hashCode;
 
   @override
   String toString() {
-    return 'Person{id: $id, name: $name, address: $address}';
+    return 'Person{id: $id, name: $name}';
   }
 }

@@ -1,6 +1,5 @@
 import 'package:code_builder/code_builder.dart';
 import 'package:floor_generator/misc/annotation_expression.dart';
-import 'package:floor_generator/misc/constants.dart';
 import 'package:floor_generator/misc/type_utils.dart';
 import 'package:floor_generator/model/database.dart';
 import 'package:floor_generator/model/delete_method.dart';
@@ -155,60 +154,8 @@ class DatabaseWriter implements Writer {
   }
 
   List<String> _generateCreateTableSqlStatements(final List<Entity> entities) {
-    return entities.map(_generateSql).toList();
-  }
-
-  String _generateSql(final Entity entity) {
-    final foreignKeys = _generateForeignKeys(entity) ?? '';
-
-    final columns = entity.columns.map((column) {
-      final primaryKey = column.isPrimaryKey ? ' PRIMARY KEY' : '';
-      final autoIncrement = column.autoGenerate ? ' AUTOINCREMENT' : '';
-      final nullable = column.isNullable ? '' : ' NOT NULL';
-
-      return '`${column.name}` ${column.type}$primaryKey$autoIncrement$nullable';
-    }).join(', ');
-
-    return "'CREATE TABLE IF NOT EXISTS `${entity.name}` ($columns$foreignKeys)'";
-  }
-
-  String _generateForeignKeys(final Entity entity) {
-    return entity.foreignKeys?.map((foreignKey) {
-      final childColumns = foreignKey.childColumns.join(', ');
-      final parentColumns = foreignKey.parentColumns.join(', ');
-      final parentName = foreignKey.getParentName(library);
-
-      final onUpdate = _getOnUpdateAction(foreignKey.onUpdate) ?? '';
-      final onDelete = _getOnDeleteAction(foreignKey.onDelete) ?? '';
-
-      return ', FOREIGN KEY ($childColumns) REFERENCES `$parentName` ($parentColumns)$onUpdate$onDelete';
-    })?.join();
-  }
-
-  String _getOnUpdateAction(final int action) {
-    final updateAction = _getAction(action);
-    return updateAction != null ? ' ON UPDATE $updateAction' : null;
-  }
-
-  String _getOnDeleteAction(final int action) {
-    final deleteAction = _getAction(action);
-    return deleteAction != null ? ' ON DELETE $deleteAction' : null;
-  }
-
-  String _getAction(final int action) {
-    switch (action) {
-      case ForeignKeyAction.NO_ACTION:
-        return 'NO_ACTION';
-      case ForeignKeyAction.RESTRICT:
-        return 'RESTRICT';
-      case ForeignKeyAction.SET_NULL:
-        return 'SET_NULL';
-      case ForeignKeyAction.SET_DEFAULT:
-        return 'SET_DEFAULT';
-      case ForeignKeyAction.CASCADE:
-        return 'CASCADE';
-      default:
-        return null;
-    }
+    return entities
+        .map((entity) => entity.getCreateTableStatement(library))
+        .toList();
   }
 }
