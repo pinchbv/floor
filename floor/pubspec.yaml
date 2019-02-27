@@ -14,7 +14,7 @@ dependencies:
     sdk: flutter
   meta: ^1.1.6
   path: ^1.6.2
-  sqflite: ^1.0.0
+  sqflite: ^1.1.1
 
 dev_dependencies:
   flutter_test:
