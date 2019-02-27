@@ -21,26 +21,26 @@ class Column {
         field.displayName;
   }
 
-  bool get isNullable {
+  bool get isPrimaryKey => field.metadata.any(isPrimaryKeyAnnotation);
+
+  /// The database column definition.
+  String get definition {
+    final columnSpecification = StringBuffer();
+
     if (isPrimaryKey) {
-      return false;
+      columnSpecification.write(' PRIMARY KEY');
     }
-    if (!_hasColumnInfoAnnotation) {
-      return true; // all Dart fields are nullable by default
+    if (_autoGenerate) {
+      columnSpecification.write(' AUTOINCREMENT');
     }
-    return field.metadata
-            .firstWhere(isColumnInfoAnnotation)
-            .computeConstantValue()
-            .getField(AnnotationField.COLUMN_INFO_NULLABLE)
-            .toBoolValue() ??
-        true;
+    if (!_isNullable) {
+      columnSpecification.write(' NOT NULL');
+    }
+
+    return '`$name` $_type$columnSpecification';
   }
 
-  bool get _hasColumnInfoAnnotation {
-    return field.metadata.any(isColumnInfoAnnotation);
-  }
-
-  String get type {
+  String get _type {
     final type = field.type;
     if (isInt(type)) {
       return SqlType.INTEGER;
@@ -57,9 +57,11 @@ class Column {
     );
   }
 
-  bool get isPrimaryKey => field.metadata.any(isPrimaryKeyAnnotation);
+  bool get _hasColumnInfoAnnotation {
+    return field.metadata.any(isColumnInfoAnnotation);
+  }
 
-  bool get autoGenerate {
+  bool get _autoGenerate {
     if (!isPrimaryKey) {
       return false;
     }
@@ -69,5 +71,20 @@ class Column {
             .getField(AnnotationField.PRIMARY_KEY_AUTO_GENERATE)
             .toBoolValue() ??
         false;
+  }
+
+  bool get _isNullable {
+    if (isPrimaryKey) {
+      return false;
+    }
+    if (!_hasColumnInfoAnnotation) {
+      return true; // all Dart fields are nullable by default
+    }
+    return field.metadata
+            .firstWhere(isColumnInfoAnnotation)
+            .computeConstantValue()
+            .getField(AnnotationField.COLUMN_INFO_NULLABLE)
+            .toBoolValue() ??
+        true;
   }
 }

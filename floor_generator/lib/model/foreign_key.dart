@@ -11,8 +11,18 @@ class ForeignKey {
 
   ForeignKey(this.entityClass, this.object);
 
+  String getDefinition(final LibraryReader library) {
+    final onUpdateAction = _getAction(_onUpdate);
+    final onDeleteAction = _getAction(_onDelete);
+
+    return 'FOREIGN KEY (${_childColumns.join(', ')}) '
+        ' REFERENCES `${_getParentName(library)}` (${_parentColumns.join(', ')})'
+        ' ON UPDATE $onUpdateAction'
+        ' ON DELETE $onDeleteAction';
+  }
+
   /// Returns the parent column name referenced with this foreign key.
-  String getParentName(final LibraryReader library) {
+  String _getParentName(final LibraryReader library) {
     final entityClassName =
         object.getField(ForeignKeyField.ENTITY)?.toTypeValue()?.displayName ??
             (throw InvalidGenerationSourceError(
@@ -34,31 +44,54 @@ class ForeignKey {
         .name;
   }
 
-  List<String> get childColumns {
-    return _getColumns(ForeignKeyField.CHILD_COLUMNS) ??
-        (throw InvalidGenerationSourceError(
-          'No child columns defined for foreign key',
-          element: entityClass,
-        ));
+  List<String> get _childColumns {
+    final columns = _getColumns(ForeignKeyField.CHILD_COLUMNS);
+    if (columns.isEmpty) {
+      throw InvalidGenerationSourceError(
+        'No child columns defined for foreign key',
+        element: entityClass,
+      );
+    }
+    return columns;
   }
 
-  List<String> get parentColumns {
-    return _getColumns(ForeignKeyField.PARENT_COLUMNS) ??
-        (throw InvalidGenerationSourceError(
-          'No parent columns defined for foreign key',
-          element: entityClass,
-        ));
+  List<String> get _parentColumns {
+    final columns = _getColumns(ForeignKeyField.PARENT_COLUMNS);
+    if (columns.isEmpty) {
+      throw InvalidGenerationSourceError(
+        'No parent columns defined for foreign key',
+        element: entityClass,
+      );
+    }
+    return columns;
   }
 
-  int get onUpdate => object.getField(ForeignKeyField.ON_UPDATE)?.toIntValue();
+  int get _onUpdate => object.getField(ForeignKeyField.ON_UPDATE)?.toIntValue();
 
-  int get onDelete => object.getField(ForeignKeyField.ON_DELETE)?.toIntValue();
+  int get _onDelete => object.getField(ForeignKeyField.ON_DELETE)?.toIntValue();
+
+  String _getAction(final int action) {
+    switch (action) {
+      case ForeignKeyAction.RESTRICT:
+        return 'RESTRICT';
+      case ForeignKeyAction.SET_NULL:
+        return 'SET_NULL';
+      case ForeignKeyAction.SET_DEFAULT:
+        return 'SET_DEFAULT';
+      case ForeignKeyAction.CASCADE:
+        return 'CASCADE';
+      case ForeignKeyAction.NO_ACTION:
+      default:
+        return 'NO_ACTION';
+    }
+  }
 
   List<String> _getColumns(final String foreignKeyField) {
     return object
-        .getField(foreignKeyField)
-        ?.toListValue()
-        ?.map((object) => object.toStringValue())
-        ?.toList();
+            .getField(foreignKeyField)
+            ?.toListValue()
+            ?.map((object) => object.toStringValue())
+            ?.toList() ??
+        [];
   }
 }

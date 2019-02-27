@@ -3,6 +3,9 @@ import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart' as sqflite;
 
 part 'database.g.dart';
+part 'model/dog.dart';
+part 'model/address.dart';
+part 'model/person.dart';
 
 @Database()
 abstract class TestDatabase extends FloorDatabase {
@@ -70,97 +73,4 @@ abstract class TestDatabase extends FloorDatabase {
 
   @Query('DELETE FROM person')
   Future<void> deleteAllPersons();
-}
-
-@Entity(tableName: 'person')
-class Person {
-  @PrimaryKey()
-  final int id;
-
-  @ColumnInfo(name: 'custom_name', nullable: false)
-  final String name;
-
-//  @embedded
-//  final Address address;
-
-  Person(this.id, this.name);
-
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      other is Person &&
-          runtimeType == other.runtimeType &&
-          id == other.id &&
-          name == other.name;
-
-  @override
-  int get hashCode => id.hashCode ^ name.hashCode;
-
-  @override
-  String toString() {
-    return 'Person{id: $id, name: $name}';
-  }
-}
-
-@Entity(
-  tableName: 'dog',
-  foreignKeys: [
-    ForeignKey(
-      childColumns: ['owner_id'],
-      parentColumns: ['id'],
-      entity: Person,
-      onDelete: ForeignKeyAction.CASCADE,
-    )
-  ],
-)
-class Dog {
-  @PrimaryKey()
-  final int id;
-
-  final String name;
-
-  @ColumnInfo(name: 'owner_id')
-  final int ownerId;
-
-  Dog(this.id, this.name, this.ownerId);
-
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      other is Dog &&
-          runtimeType == other.runtimeType &&
-          id == other.id &&
-          name == other.name &&
-          ownerId == other.ownerId;
-
-  @override
-  int get hashCode => id.hashCode ^ name.hashCode ^ ownerId.hashCode;
-
-  @override
-  String toString() {
-    return 'Dog{id: $id, name: $name, ownerId: $ownerId}';
-  }
-}
-
-class Address {
-  final String street;
-  final String city;
-
-  Address(this.street, this.city);
-
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      other is Address &&
-          runtimeType == other.runtimeType &&
-          street == other.street &&
-          city == other.city;
-
-  @override
-  int get hashCode => street.hashCode ^ city.hashCode;
-
-  @override
-  String toString() {
-    return 'Address{street: $street, city: $city}';
-  }
 }

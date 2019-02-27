@@ -52,9 +52,15 @@ class ForeignKey {
   final Type entity;
 
   /// [ForeignKeyAction]
+  /// Action to take when the parent [Entity] is updated from the database.
+  ///
+  /// By default, [ForeignKeyAction.NO_ACTION] is used.
   final int onUpdate;
 
   /// [ForeignKeyAction]
+  /// Action to take when the parent [Entity] is deleted from the database.
+  ///
+  /// By default, [ForeignKeyAction.NO_ACTION] is used.
   final int onDelete;
 
   /// Declares a foreign key on another [Entity].
@@ -62,8 +68,8 @@ class ForeignKey {
     @required this.childColumns,
     @required this.parentColumns,
     @required this.entity,
-    this.onUpdate,
-    this.onDelete,
+    this.onUpdate = ForeignKeyAction.NO_ACTION,
+    this.onDelete = ForeignKeyAction.NO_ACTION,
   });
 }
 

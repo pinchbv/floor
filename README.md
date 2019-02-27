@@ -140,7 +140,7 @@ Future<Person> findPersonByIdAndName(int id, String name);
 @Query('SELECT * FROM Person')
 Future<List<Person>> findAllPersons(); // select multiple items
 
-@Query('DELETE FROM person')
+@Query('DELETE FROM Person')
 Future<void> deleteAllPersons(); // query without returning an entity
 ````
 

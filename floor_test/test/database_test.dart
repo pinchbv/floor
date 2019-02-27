@@ -172,7 +172,7 @@ void main() {
       test('foreign key constraint failed exception', () {
         final dog = Dog(null, 'Peter', 2);
 
-        expect(() => database.insertDog(dog), throwsDatabaseException);
+        expect(() => database.insertDog(dog), _throwsDatabaseException);
       });
 
       test('find dog for person', () async {
@@ -213,8 +213,8 @@ void main() {
   });
 }
 
-final throwsDatabaseException = throwsA(const TypeMatcher<DatabaseException>());
+final _throwsDatabaseException = throwsA(const TypeMatcher<DatabaseException>());
 
-String _reverse(String value) {
+String _reverse(final String value) {
   return value.split('').reversed.join();
 }
