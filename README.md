@@ -154,6 +154,8 @@ All these methods accept single or multiple entity instances.
 - **Insert**
 
     `@insert` marks a method as an insertion method.
+    WHen using the capitalized `@Insert` you can specify a conflict strategy.
+    Else it just defaults to aborting the insert.
     These methods can return a `Future` of either `void`, `int` or `List<int>`.
     - `void` return nothing
     - `int` return primary key of inserted item
@@ -162,6 +164,8 @@ All these methods accept single or multiple entity instances.
 - **Update**
 
     `@update` marks a method as an update method.
+    When using the capitalized `@Update` you can specify a conflict strategy.
+    Else it just defaults to aborting the update.
     These methods can return a `Future` of either `void` or `int`.
     - `void` return nothing
     - `int` return number of changed rows
