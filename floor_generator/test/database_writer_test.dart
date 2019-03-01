@@ -23,15 +23,15 @@ void main() {
     ''');
 
     expect(actual, equalsDart(r'''
-      Future<TestDatabase> _$open() async {
+      Future<TestDatabase> _$open([List<Migration> migrations = const []]) async {
         final database = _$TestDatabase();
-        database.database = await database.open();
+        database.database = await database.open(migrations);
         return database;
       }
       
       class _$TestDatabase extends TestDatabase {
         @override
-        Future<sqflite.Database> open() async {
+        Future<sqflite.Database> open(List<Migration> migrations) async {
           final path = join(await sqflite.getDatabasesPath(), 'testdatabase.db');
       
           return sqflite.openDatabase(
@@ -39,6 +39,9 @@ void main() {
             version: 1,
             onConfigure: (database) async {
               await database.execute('PRAGMA foreign_keys = ON');
+            },
+            onUpgrade: (database, startVersion, endVersion) async {
+              runMigrations(database, startVersion, endVersion, migrations);
             },
             onCreate: (database, version) async {
               await database.execute(
@@ -65,15 +68,15 @@ void main() {
     ''');
 
     expect(actual, equalsDart(r'''
-      Future<TestDatabase> _$open() async {
+      Future<TestDatabase> _$open([List<Migration> migrations = const []]) async {
         final database = _$TestDatabase();
-        database.database = await database.open();
+        database.database = await database.open(migrations);
         return database;
       }
       
       class _$TestDatabase extends TestDatabase {
         @override
-        Future<sqflite.Database> open() async {
+        Future<sqflite.Database> open(List<Migration> migrations) async {
           final path = join(await sqflite.getDatabasesPath(), 'testdatabase.db');
       
           return sqflite.openDatabase(
@@ -81,6 +84,9 @@ void main() {
             version: 1,
             onConfigure: (database) async {
               await database.execute('PRAGMA foreign_keys = ON');
+            },
+            onUpgrade: (database, startVersion, endVersion) async {
+              runMigrations(database, startVersion, endVersion, migrations);
             },
             onCreate: (database, version) async {
               await database.execute(
@@ -106,7 +112,7 @@ Future<Spec> _generateDatabase(final String entity) async {
       
       import 'package:floor_annotation/floor_annotation.dart';
       
-      @Database()
+      @Database(version: 1)
       abstract class TestDatabase extends FloorDatabase {
         static Future<TestDatabase> openDatabase() async => _\$open();
       }

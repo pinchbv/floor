@@ -57,13 +57,19 @@ class DatabaseWriter implements Writer {
   }
 
   Method _generateOpenDatabaseFunction(final String databaseName) {
+    final migrationsParameter = Parameter((builder) => builder
+      ..name = 'migrations'
+      ..type = refer('List<Migration>')
+      ..defaultTo = const Code('const []'));
+
     return Method((builder) => builder
       ..returns = refer('Future<$databaseName>')
       ..name = '_\$open'
       ..modifier = MethodModifier.async
+      ..optionalParameters.add(migrationsParameter)
       ..body = Code('''
             final database = _\$$databaseName();
-            database.database = await database.open();
+            database.database = await database.open(migrations);
             return database;
             '''));
   }
@@ -76,7 +82,7 @@ class DatabaseWriter implements Writer {
 
     if (createTableStatements.isEmpty) {
       throw InvalidGenerationSourceError(
-          'There are no entities defined. Use the @Entity annotation on model classes to do so.');
+          'There are no entities defined. Use the @Entity annotation on persistent classes to do so.');
     }
 
     final databaseName = database.name;
@@ -84,7 +90,7 @@ class DatabaseWriter implements Writer {
     return Class((builder) => builder
       ..name = '_\$$databaseName'
       ..extend = refer(databaseName)
-      ..methods.add(_generateOpenMethod(databaseName, createTableStatements))
+      ..methods.add(_generateOpenMethod(database, createTableStatements))
       ..methods.addAll(_generateQueryMethods(database.queryMethods))
       ..methods.addAll(_generateInsertMethods(database.insertMethods))
       ..methods.addAll(_generateUpdateMethods(database.updateMethods))
@@ -94,22 +100,30 @@ class DatabaseWriter implements Writer {
   }
 
   Method _generateOpenMethod(
-    final String databaseName,
+    final Database database,
     final String createTableStatements,
   ) {
+    final migrationsParameter = Parameter((builder) => builder
+      ..name = 'migrations'
+      ..type = refer('List<Migration>'));
+
     return Method((builder) => builder
       ..name = 'open'
       ..annotations.add(overrideAnnotationExpression)
       ..returns = refer('Future<sqflite.Database>')
       ..modifier = MethodModifier.async
+      ..requiredParameters.add(migrationsParameter)
       ..body = Code('''
-          final path = join(await sqflite.getDatabasesPath(), '${databaseName.toLowerCase()}.db');
+          final path = join(await sqflite.getDatabasesPath(), '${database.name.toLowerCase()}.db');
 
           return sqflite.openDatabase(
             path,
-            version: 1,
+            version: ${database.version},
             onConfigure: (database) async {
               await database.execute('PRAGMA foreign_keys = ON');
+            },
+            onUpgrade: (database, startVersion, endVersion) async {
+              runMigrations(database, startVersion, endVersion, migrations);
             },
             onCreate: (database, version) async {
               $createTableStatements

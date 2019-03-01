@@ -3,13 +3,17 @@ import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart' as sqflite;
 
 part 'database.g.dart';
-part 'model/dog.dart';
+
 part 'model/address.dart';
+
+part 'model/dog.dart';
+
 part 'model/person.dart';
 
-@Database()
+@Database(version: 2)
 abstract class TestDatabase extends FloorDatabase {
-  static Future<TestDatabase> openDatabase() async => _$open();
+  static Future<TestDatabase> openDatabase(List<Migration> migrations) async =>
+      _$open(migrations);
 
   @Query('SELECT * FROM person')
   Future<List<Person>> findAllPersons();
