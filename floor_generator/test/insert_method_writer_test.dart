@@ -1,0 +1,153 @@
+import 'package:build_test/build_test.dart';
+import 'package:code_builder/code_builder.dart';
+import 'package:floor_generator/misc/type_utils.dart';
+import 'package:floor_generator/model/database.dart';
+import 'package:floor_generator/writer/change_method_writer.dart';
+import 'package:floor_generator/writer/insert_method_body_writer.dart';
+import 'package:source_gen/source_gen.dart';
+import 'package:test/test.dart';
+
+import 'test_utils.dart';
+
+void main() {
+  useDartfmt();
+
+  test('insert method on conflict default (abort)', () async {
+    final actual = await _generateInsertMethod('''
+    @insert
+    Future<void> insertPerson(Person person);
+    ''');
+
+    expect(actual, equalsDart(r'''
+      @override
+      Future<void> insertPerson(Person person) async {
+        final item = person;
+        final values = <String, dynamic>{'id': item.id, 'custom_name': item.name};
+        await database.insert('person', values,
+            conflictAlgorithm: sqflite.ConflictAlgorithm.abort);
+      }
+      '''));
+  });
+
+  test('insert method on conflict replace', () async {
+    final actual = await _generateInsertMethod('''
+    @Insert(onConflict: OnConflictStrategy.REPLACE)
+    Future<void> insertPerson(Person person);
+    ''');
+
+    expect(actual, equalsDart(r'''
+      @override
+      Future<void> insertPerson(Person person) async {
+        final item = person;
+        final values = <String, dynamic>{'id': item.id, 'custom_name': item.name};
+        await database.insert('person', values,
+            conflictAlgorithm: sqflite.ConflictAlgorithm.replace);
+      }
+      '''));
+  });
+
+  test('insert method on conflict rollback', () async {
+    final actual = await _generateInsertMethod('''
+    @Insert(onConflict: OnConflictStrategy.ROLLBACK)
+    Future<void> insertPerson(Person person);
+    ''');
+
+    expect(actual, equalsDart(r'''
+      @override
+      Future<void> insertPerson(Person person) async {
+        final item = person;
+        final values = <String, dynamic>{'id': item.id, 'custom_name': item.name};
+        await database.insert('person', values,
+            conflictAlgorithm: sqflite.ConflictAlgorithm.rollback);
+      }
+      '''));
+  });
+
+  test('insert method on conflict abort', () async {
+    final actual = await _generateInsertMethod('''
+    @Insert(onConflict: OnConflictStrategy.ABORT)
+    Future<void> insertPerson(Person person);
+    ''');
+
+    expect(actual, equalsDart(r'''
+      @override
+      Future<void> insertPerson(Person person) async {
+        final item = person;
+        final values = <String, dynamic>{'id': item.id, 'custom_name': item.name};
+        await database.insert('person', values,
+            conflictAlgorithm: sqflite.ConflictAlgorithm.abort);
+      }
+      '''));
+  });
+
+  test('insert method on conflict fail', () async {
+    final actual = await _generateInsertMethod('''
+    @Insert(onConflict: OnConflictStrategy.FAIL)
+    Future<void> insertPerson(Person person);
+    ''');
+
+    expect(actual, equalsDart(r'''
+      @override
+      Future<void> insertPerson(Person person) async {
+        final item = person;
+        final values = <String, dynamic>{'id': item.id, 'custom_name': item.name};
+        await database.insert('person', values,
+            conflictAlgorithm: sqflite.ConflictAlgorithm.fail);
+      }
+      '''));
+  });
+
+  test('insert method on conflict ignore', () async {
+    final actual = await _generateInsertMethod('''
+    @Insert(onConflict: OnConflictStrategy.IGNORE)
+    Future<void> insertPerson(Person person);
+    ''');
+
+    expect(actual, equalsDart(r'''
+      @override
+      Future<void> insertPerson(Person person) async {
+        final item = person;
+        final values = <String, dynamic>{'id': item.id, 'custom_name': item.name};
+        await database.insert('person', values,
+            conflictAlgorithm: sqflite.ConflictAlgorithm.ignore);
+      }
+      '''));
+  });
+}
+
+Future<Method> _generateInsertMethod(final String methodSignature) async {
+  final library = await resolveSource('''
+      library test;
+      
+      import 'package:floor_annotation/floor_annotation.dart';
+      
+      @Database()
+      abstract class TestDatabase extends FloorDatabase {
+        static Future<TestDatabase> openDatabase() async => _\$open();
+      
+        $methodSignature
+      }
+      
+      @Entity(tableName: 'person')
+      class Person {
+        @PrimaryKey()
+        final int id;
+      
+        @ColumnInfo(name: 'custom_name', nullable: false)
+        final String name;
+      
+        Person(this.id, this.name);
+      }
+      ''', (resolver) async {
+    return LibraryReader(await resolver.findLibraryByName('test'));
+  });
+  final databaseClass = library.classes
+      .where((clazz) =>
+          clazz.isAbstract && clazz.metadata.any(isDatabaseAnnotation))
+      .first;
+  final database = Database(databaseClass);
+  final insertMethod = database.insertMethods.first;
+
+  final writer = InsertMethodBodyWriter(library, insertMethod);
+  return ChangeMethodWriter(library, insertMethod, writer).write();
+}

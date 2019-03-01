@@ -19,3 +19,5 @@ dependencies:
 dev_dependencies:
   test: ^1.5.3
   build_test: ^0.10.6
+  floor_annotation:
+    path: ../floor_annotation/
