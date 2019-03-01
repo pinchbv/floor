@@ -20,7 +20,7 @@ abstract class TestDatabase extends FloorDatabase {
   @Query('SELECT * FROM person WHERE id = :id AND custom_name = :name')
   Future<Person> findPersonByIdAndName(int id, String name);
 
-  @insert
+  @Insert(onConflict: OnConflictStrategy.REPLACE)
   Future<void> insertPerson(Person person);
 
   @insert

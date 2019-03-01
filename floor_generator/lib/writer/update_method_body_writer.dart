@@ -72,7 +72,7 @@ class UpdateMethodBodyWriter implements Writer {
         final values = <String, dynamic>{
           ${keyValueList.join(', ')}
         };
-        batch.update('$entityName', values, where: '${primaryKeyColumn.name} = ?', whereArgs: <int>[item.${primaryKeyColumn.field.displayName}]);
+        batch.update('$entityName', values, where: '${primaryKeyColumn.name} = ?', whereArgs: <int>[item.${primaryKeyColumn.field.displayName}], conflictAlgorithm: ${method.onConflict});
       }
       return (await batch.commit(noResult: false))
           .cast<int>()
@@ -84,7 +84,7 @@ class UpdateMethodBodyWriter implements Writer {
       final values = <String, dynamic>{
         ${keyValueList.join(', ')}
       };
-      return database.update('$entityName', values, where: '${primaryKeyColumn.name} = ?', whereArgs: <int>[item.${primaryKeyColumn.field.displayName}]);
+      return database.update('$entityName', values, where: '${primaryKeyColumn.name} = ?', whereArgs: <int>[item.${primaryKeyColumn.field.displayName}], conflictAlgorithm: ${method.onConflict});
       ''';
     }
   }
@@ -102,7 +102,7 @@ class UpdateMethodBodyWriter implements Writer {
         final values = <String, dynamic>{
           ${keyValueList.join(', ')}
         };
-        batch.update('$entityName', values, where: '${primaryKeyColumn.name} = ?', whereArgs: <int>[item.${primaryKeyColumn.field.displayName}]);
+        batch.update('$entityName', values, where: '${primaryKeyColumn.name} = ?', whereArgs: <int>[item.${primaryKeyColumn.field.displayName}], conflictAlgorithm: ${method.onConflict});
       }
       await batch.commit(noResult: true);
       ''';
@@ -112,7 +112,7 @@ class UpdateMethodBodyWriter implements Writer {
       final values = <String, dynamic>{
         ${keyValueList.join(', ')}
       };
-      await database.update('$entityName', values, where: '${primaryKeyColumn.name} = ?', whereArgs: <int>[item.${primaryKeyColumn.field.displayName}]);
+      await database.update('$entityName', values, where: '${primaryKeyColumn.name} = ?', whereArgs: <int>[item.${primaryKeyColumn.field.displayName}], conflictAlgorithm: ${method.onConflict});
       ''';
     }
   }
