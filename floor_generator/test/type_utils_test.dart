@@ -1,7 +1,7 @@
 import 'package:floor_generator/misc/type_utils.dart' as type_utils;
 import 'package:test/test.dart';
 
-import '../test_utils.dart';
+import 'test_utils.dart';
 
 void main() {
   group('assert type', () {
