@@ -268,9 +268,10 @@ Increase the database version and change the `openDatabase` method to take in a 
 This parameter has to get passed to the `_$open()` method.
 Define a `Migration` which specifies a `startVersion`, an `endVersion` and a function that executes SQL to migrate the data.
 Lastly, call `openDatabase` with your newly created `Migration`.
+Don't forget to trigger the code generator again, to create the code for handling the new entity.
 
 ```dart
-// Updated entity with new 'nickname' field
+// Update entity with new 'nickname' field
 @Entity(tableName: 'person')
 class Person {
   @PrimaryKey(autoGenerate: true)
