@@ -7,6 +7,16 @@ before_install:
 jobs:
   include:
     - stage: analyze
+      name: "SDK: stable - DIR: floor_annotation - TASKS: dartfmt -n --set-exit-if-changed ."
+      script: ./tool/travis.sh dartfmt
+      env: PKG="floor_annotation"
+      dart: stable
+    - stage: analyze
+      name: "SDK: stable - DIR: floor_annotation - TASKS: dartanalyzer --fatal-infos --fatal-warnings ."
+      script: ./tool/travis.sh dartanalyzer
+      env: PKG="floor_annotation"
+      dart: stable
+    - stage: analyze
       name: "SDK: stable - DIR: floor_generator - TASKS: dartfmt -n --set-exit-if-changed ."
       script: ./tool/travis.sh dartfmt
       env: PKG="floor_generator"
