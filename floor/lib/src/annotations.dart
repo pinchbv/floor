@@ -135,18 +135,30 @@ class Query {
 
 /// Marks a method as an insert method.
 class Insert {
-  const Insert();
+  /// How to handle conflicts. Defaults to [OnConflictStrategy.ABORT].
+  final int onConflict;
+
+  /// Marks a method as an insert method.
+  const Insert({this.onConflict = OnConflictStrategy.ABORT});
 }
 
 /// Marks a method as an insert method.
+///
+/// Defaults conflict strategy to [OnConflictStrategy.ABORT].
 const insert = Insert();
 
 /// Marks a method as an update method.
 class Update {
-  const Update();
+  /// How to handle conflicts. Defaults to [OnConflictStrategy.ABORT].
+  final int onConflict;
+
+  /// Marks a method as an update method.
+  const Update({this.onConflict = OnConflictStrategy.ABORT});
 }
 
 /// Marks a method as an update method.
+///
+/// Defaults conflict strategy to [OnConflictStrategy.ABORT].
 const update = Update();
 
 /// Marks a method as a delete method.
@@ -156,6 +168,27 @@ class Delete {
 
 /// Marks a method as a delete method.
 const delete = Delete();
+
+/// Set of conflict handling strategies for insert and update methods.
+///
+/// Check SQLite conflict documentation for details.
+abstract class OnConflictStrategy {
+  /// OnConflict strategy constant to replace the old data and continue the
+  /// transaction.
+  static const REPLACE = 1;
+
+  /// OnConflict strategy constant to rollback the transaction.
+  static const ROLLBACK = 2;
+
+  /// OnConflict strategy constant to abort the transaction.
+  static const ABORT = 3;
+
+  /// OnConflict strategy constant to fail the transaction.
+  static const FAIL = 4;
+
+  /// OnConflict strategy constant to ignore the conflict.
+  static const IGNORE = 5;
+}
 
 /// Marks a method as a transaction method.
 class _Transaction {

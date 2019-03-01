@@ -21,6 +21,7 @@ abstract class Annotation {
 abstract class AnnotationField {
   static const QUERY_VALUE = 'value';
   static const PRIMARY_KEY_AUTO_GENERATE = 'autoGenerate';
+  static const ON_CONFLICT = 'onConflict';
 
   static const COLUMN_INFO_NAME = 'name';
   static const COLUMN_INFO_NULLABLE = 'nullable';
@@ -49,4 +50,29 @@ abstract class SqlType {
   static const INTEGER = 'INTEGER';
   static const TEXT = 'TEXT';
   static const REAL = 'REAL';
+}
+
+abstract class OnConflictStrategy {
+  static const REPLACE = 1;
+  static const ROLLBACK = 2;
+  static const ABORT = 3;
+  static const FAIL = 4;
+  static const IGNORE = 5;
+
+  /// Sqflite conflict algorithm
+  static String getConflictAlgorithm(final int strategy) {
+    switch (strategy) {
+      case OnConflictStrategy.REPLACE:
+        return 'replace';
+      case OnConflictStrategy.ROLLBACK:
+        return 'rollback';
+      case OnConflictStrategy.FAIL:
+        return 'fail';
+      case OnConflictStrategy.IGNORE:
+        return 'ignore';
+      case OnConflictStrategy.ABORT:
+      default:
+        return 'abort';
+    }
+  }
 }

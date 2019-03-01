@@ -65,7 +65,7 @@ class InsertMethodBodyWriter implements Writer {
         final values = <String, dynamic>{
           ${keyValueList.join(', ')}
         };
-        batch.insert('$entityName', values);
+        batch.insert('$entityName', values, conflictAlgorithm: ${method.onConflict});
       }
       await batch.commit(noResult: true);
       ''';
@@ -75,7 +75,7 @@ class InsertMethodBodyWriter implements Writer {
       final values = <String, dynamic>{
         ${keyValueList.join(', ')}
       };
-      await database.insert('$entityName', values);
+      await database.insert('$entityName', values, conflictAlgorithm: ${method.onConflict});
       ''';
     }
   }
@@ -92,7 +92,7 @@ class InsertMethodBodyWriter implements Writer {
         final values = <String, dynamic>{
           ${keyValueList.join(', ')}
         };
-        batch.insert('$entityName', values);
+        batch.insert('$entityName', values, conflictAlgorithm: ${method.onConflict});
       }
       return (await batch.commit(noResult: false)).cast<int>();
       ''';
@@ -102,7 +102,7 @@ class InsertMethodBodyWriter implements Writer {
       final values = <String, dynamic>{
         ${keyValueList.join(', ')}
       };
-      return database.insert('$entityName', values);
+      return database.insert('$entityName', values, conflictAlgorithm: ${method.onConflict});
       ''';
     }
   }
