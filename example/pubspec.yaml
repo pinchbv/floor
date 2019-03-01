@@ -2,7 +2,7 @@ name: example
 description: >
   A supportive SQLite abstraction for your Flutter applications.
   This is an example on how to use the library.
-version: 0.0.1
+version: 0.1.0
 homepage: https://github.com/vitusortner/floor
 author: vitusortner
 
