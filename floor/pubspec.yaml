@@ -16,4 +16,6 @@ dependencies:
   sqflite: ^1.1.1
   floor_annotation:
     path: ../floor_annotation/
-
+  mockito: ^4.0.0
+  flutter_test:
+    sdk: flutter

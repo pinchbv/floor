@@ -1,3 +1,4 @@
+import 'package:floor/floor.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:matcher/matcher.dart';
 import 'package:sqflite/sqflite.dart';
@@ -10,7 +11,13 @@ void main() {
     TestDatabase database;
 
     setUpAll(() async {
-      database = await TestDatabase.openDatabase();
+      final migration1to2 = Migration(1, 2, (database) {
+        database.execute('ALTER TABLE dog ADD COLUMN nick_name TEXT');
+      });
+      final allMigrations = [migration1to2];
+
+      database = await TestDatabase.openDatabase(allMigrations);
+
       await database.database.execute('DELETE FROM dog');
       await database.database.execute('DELETE FROM person');
     });
@@ -170,7 +177,7 @@ void main() {
 
     group('foreign key', () {
       test('foreign key constraint failed exception', () {
-        final dog = Dog(null, 'Peter', 2);
+        final dog = Dog(null, 'Peter', 'Pete', 2);
 
         expect(() => database.insertDog(dog), _throwsDatabaseException);
       });
@@ -178,7 +185,7 @@ void main() {
       test('find dog for person', () async {
         final person = Person(1, 'Simon');
         await database.insertPerson(person);
-        final dog = Dog(2, 'Peter', person.id);
+        final dog = Dog(2, 'Peter', 'Pete', person.id);
         await database.insertDog(dog);
 
         final actual = await database.findDogForPersonId(person.id);
@@ -189,7 +196,7 @@ void main() {
       test('cascade delete dog on deletion of person', () async {
         final person = Person(1, 'Simon');
         await database.insertPerson(person);
-        final dog = Dog(2, 'Peter', person.id);
+        final dog = Dog(2, 'Peter', 'Pete', person.id);
         await database.insertDog(dog);
 
         await database.deletePerson(person);
@@ -213,7 +220,8 @@ void main() {
   });
 }
 
-final _throwsDatabaseException = throwsA(const TypeMatcher<DatabaseException>());
+final _throwsDatabaseException =
+    throwsA(const TypeMatcher<DatabaseException>());
 
 String _reverse(final String value) {
   return value.split('').reversed.join();

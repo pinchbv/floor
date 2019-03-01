@@ -16,6 +16,7 @@ This package is still in an early phase and the API will likely change.
 1. [Transactions](#transactions)
 1. [Entities](#entities)
 1. [Foreign Keys](#foreign-keys)
+1. [Migrations](#migrations)
 1. [Examples](#examples)
 1. [Naming](#naming)
 1. [Bugs and Feedback](#bugs-and-feedback)
@@ -93,7 +94,7 @@ This package is still in an early phase and the API will likely change.
     - `@insert` marks a method as an insertion method.
         
     ```dart
-    @Database()
+    @Database(version: 1)
     abstract class AppDatabase extends FloorDatabase {
       static Future<AppDatabase> openDatabase() async => _$open();
       
@@ -257,6 +258,46 @@ class Dog {
 
   Dog(this.id, this.name, this.ownerId);
 }
+```
+
+## Migrations
+Whenever are doing changes to your entities, you're required to also migrate the old data.
+
+First, update your entity.
+Increase the database version and change the `openDatabase` method to take in a list of `Migration`s.
+This parameter has to get passed to the `_$open()` method.
+Define a `Migration` which specifies a `startVersion`, an `endVersion` and a function that executes SQL to migrate the data.
+Lastly, call `openDatabase` with your newly created `Migration`.
+Don't forget to trigger the code generator again, to create the code for handling the new entity.
+
+```dart
+// Update entity with new 'nickname' field
+@Entity(tableName: 'person')
+class Person {
+  @PrimaryKey(autoGenerate: true)
+  final int id;
+
+  @ColumnInfo(name: 'custom_name', nullable: false)
+  final String name;
+  
+  final String nickname;
+
+  Person(this.id, this.name, this.nickname);
+}
+
+// Bump up database version
+@Database(version: 2)
+abstract class AppDatabase extends FloorDatabase {
+  static Future<AppDatabase> openDatabase(List<Migration> migrations) async =>
+      _$open(migrations);
+}
+
+// Create migration
+final migration1to2 = Migration(1, 2, (database) {
+  database.execute('ALTER TABLE person ADD COLUMN nickname TEXT');
+});
+
+final database = await AppDatabase.openDatabase([migration1to2]);
 ```
 
 ## Examples

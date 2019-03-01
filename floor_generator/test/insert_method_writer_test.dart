@@ -201,7 +201,7 @@ Future<Method> _generateInsertMethod(final String methodSignature) async {
       
       import 'package:floor_annotation/floor_annotation.dart';
       
-      @Database()
+      @Database(version: 1)
       abstract class TestDatabase extends FloorDatabase {
         static Future<TestDatabase> openDatabase() async => _\$open();
       

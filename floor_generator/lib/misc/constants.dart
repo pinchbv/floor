@@ -22,6 +22,7 @@ abstract class AnnotationField {
   static const QUERY_VALUE = 'value';
   static const PRIMARY_KEY_AUTO_GENERATE = 'autoGenerate';
   static const ON_CONFLICT = 'onConflict';
+  static const DATABASE_VERSION = 'version';
 
   static const COLUMN_INFO_NAME = 'name';
   static const COLUMN_INFO_NULLABLE = 'nullable';

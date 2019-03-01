@@ -1,4 +1,5 @@
 import 'package:analyzer/dart/element/element.dart';
+import 'package:floor_generator/misc/constants.dart';
 import 'package:floor_generator/misc/type_utils.dart';
 import 'package:floor_generator/model/delete_method.dart';
 import 'package:floor_generator/model/entity.dart';
@@ -14,6 +15,21 @@ class Database {
   Database(final this.clazz);
 
   String get name => clazz.displayName;
+
+  int get version {
+    final databaseVersion = clazz.metadata
+        .firstWhere(isDatabaseAnnotation)
+        .computeConstantValue()
+        .getField(AnnotationField.DATABASE_VERSION)
+        ?.toIntValue();
+
+    return databaseVersion != null
+        ? databaseVersion
+        : throw InvalidGenerationSourceError(
+            'No version for this database specified even though it is required.',
+            element: clazz,
+          );
+  }
 
   List<MethodElement> get methods => clazz.methods;
 

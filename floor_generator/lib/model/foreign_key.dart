@@ -82,7 +82,7 @@ class ForeignKey {
         return 'CASCADE';
       case ForeignKeyAction.NO_ACTION:
       default:
-        return 'NO_ACTION';
+        return 'NO ACTION';
     }
   }
 
