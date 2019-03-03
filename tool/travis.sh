@@ -12,7 +12,6 @@ if [ "$#" == "0" ]; then
 fi
 
 pushd $PKG
-pub upgrade || exit $?
 
 EXIT_CODE=0
 
@@ -20,21 +19,25 @@ while (( "$#" )); do
   TASK=$1
   case $TASK in
   dartanalyzer) echo
+    pub upgrade || exit $?
     echo -e '\033[1mTASK: dartanalyzer\033[22m'
     echo -e 'dartanalyzer --fatal-infos --fatal-warnings .'
     dartanalyzer --fatal-infos --fatal-warnings . || EXIT_CODE=$?
     ;;
   dartfmt) echo
+    pub upgrade || exit $?
     echo -e '\033[1mTASK: dartfmt\033[22m'
     echo -e 'dartfmt -n --set-exit-if-changed .'
     dartfmt -n --set-exit-if-changed . || EXIT_CODE=$?
     ;;
   test) echo
+    pub upgrade || exit $?
     echo -e '\033[1mTASK: test\033[22m'
     echo -e 'pub run test'
     pub run test || EXIT_CODE=$?
     ;;
   flutter_test) echo
+    flutter packages get || exit $?
     echo -e '\033[1mTASK: flutter test\033[22m'
     echo -e 'flutter test'
     flutter test || EXIT_CODE=$?
