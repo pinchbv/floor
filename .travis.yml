@@ -11,26 +11,52 @@ jobs:
       script: ./tool/travis.sh dartfmt
       env: PKG="floor_annotation"
       dart: stable
+
     - stage: analyze
       name: "SDK: stable - DIR: floor_annotation - TASKS: dartanalyzer --fatal-infos --fatal-warnings ."
       script: ./tool/travis.sh dartanalyzer
       env: PKG="floor_annotation"
       dart: stable
+
     - stage: analyze
       name: "SDK: stable - DIR: floor_generator - TASKS: dartfmt -n --set-exit-if-changed ."
       script: ./tool/travis.sh dartfmt
       env: PKG="floor_generator"
       dart: stable
+
     - stage: analyze
       name: "SDK: stable - DIR: floor_generator - TASKS: dartanalyzer --fatal-infos --fatal-warnings ."
       script: ./tool/travis.sh dartanalyzer
       env: PKG="floor_generator"
       dart: stable
+
     - stage: unit_test
       name: "SDK: stable - DIR: floor_generator - TASKS: pub run test"
       script: ./tool/travis.sh test
       env: PKG="floor_generator"
       dart: stable
+
+    - stage: unit_test
+      name: "floor"
+      env: PKG="floor"
+      os: linux
+      sudo: false
+      addons:
+        apt:
+          # Flutter depends on /usr/lib/x86_64-linux-gnu/libstdc++.so.6 version GLIBCXX_3.4.18
+          sources:
+            - ubuntu-toolchain-r-test # if we don't specify this, the libstdc++6 we get is the wrong version
+          packages:
+            - libstdc++6
+            - fonts-droid
+      before_script:
+        - git clone https://github.com/flutter/flutter.git -b beta
+        - ./flutter/bin/flutter doctor
+      script:
+        - ./flutter/bin/flutter test
+      cache:
+        directories:
+          - $HOME/.pub-cache
 
 stages:
   - analyze
