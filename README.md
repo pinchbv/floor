@@ -8,6 +8,8 @@ Thus not supporting automatic relationship mapping is intentional.
 
 This package is still in an early phase and the API will likely change.
 
+[![Build Status](https://travis-ci.org/vitusortner/floor.svg?branch=develop)](https://travis-ci.org/vitusortner/floor)
+
 ### Table of contents
 
 1. [How to use this library](#how-to-use-this-library)
