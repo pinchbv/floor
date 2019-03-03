@@ -41,5 +41,4 @@ class QueryAdapterWriter {
     builder..fields.add(queryAdapterSingleton);
     builder..methods.add(getQueryAdapter);
   }
-
 }
