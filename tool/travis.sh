@@ -36,6 +36,11 @@ while (( "$#" )); do
     echo -e 'pub run test'
     pub run test || EXIT_CODE=$?
     ;;
+  flutter_analyze) echo
+    echo -e '\033[1mTASK: flutter analyze\033[22m'
+    echo -e 'flutter analyze'
+    flutter analyze || EXIT_CODE=$?
+    ;;
   flutter_test) echo
     flutter packages get || exit $?
     echo -e '\033[1mTASK: flutter test\033[22m'
