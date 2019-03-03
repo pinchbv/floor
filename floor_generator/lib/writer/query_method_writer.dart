@@ -22,13 +22,18 @@ class QueryMethodWriter implements Writer {
     _assertReturnsFuture();
     _assertQueryParameters();
 
-    return Method((builder) => builder
+    final builder = MethodBuilder()
       ..annotations.add(overrideAnnotationExpression)
       ..returns = refer(queryMethod.rawReturnType.displayName)
       ..name = queryMethod.name
       ..requiredParameters.addAll(_generateMethodParameters())
-      ..modifier = MethodModifier.async
-      ..body = Code(_generateMethodBody()));
+      ..body = Code(_generateMethodBody());
+
+    if (queryMethod.returnsVoid) {
+      builder..modifier = MethodModifier.async;
+    }
+
+    return builder.build();
   }
 
   List<Parameter> _generateMethodParameters() {
@@ -46,74 +51,23 @@ class QueryMethodWriter implements Writer {
     }).toList();
   }
 
-  String _generateMapping() {
-    final constructorCall =
-        _generateConstructorCall(queryMethod.flattenedReturnType);
-
-    if (queryMethod.returnsList) {
-      return 'return rows.map((row) => $constructorCall).toList();';
-    } else {
-      return '''
-      if (rows.isEmpty) {
-        return null;
-      }
-      final row = rows.first;
-      return $constructorCall;
-      ''';
-    }
-  }
-
-  String _generateConstructorCall(final DartType type) {
-    final columnNames = queryMethod
-        .getEntity(library)
-        .columns
-        .map((column) => column.name)
-        .toList();
-    final constructorParameters =
-        (type.element as ClassElement).constructors.first.parameters;
-
-    final parameterValues = <String>[];
-
-    for (var i = 0; i < constructorParameters.length; i++) {
-      final parameterValue = "row['${columnNames[i]}']";
-      final castedParameterValue =
-          _castParameterValue(constructorParameters[i].type, parameterValue);
-
-      if (castedParameterValue != null) {
-        parameterValues.add(castedParameterValue);
-      }
-    }
-
-    return '${type.displayName}(${parameterValues.join(', ')})';
-  }
-
-  String _castParameterValue(
-    final DartType parameterType,
-    final String parameterValue,
-  ) {
-    if (isBool(parameterType)) {
-      return '($parameterValue as int) != 0'; // maps int to bool
-    } else if (isString(parameterType)) {
-      return '$parameterValue as String';
-    } else if (isInt(parameterType)) {
-      return '$parameterValue as int';
-    } else if (isDouble(parameterType)) {
-      return '$parameterValue as double';
-    } else {
-      return null;
-    }
-  }
-
   String _generateMethodBody() {
     if (queryMethod.returnsVoid) {
-      return "await database.rawQuery('${queryMethod.query}');";
+      return "await _queryAdapter.queryNoReturn('${queryMethod.query}');";
     }
 
     _assertReturnsEntity();
-    return '''
-    final rows = await database.rawQuery('${queryMethod.query}');
-    ${_generateMapping()}
-    ''';
+    final mapper = '_${queryMethod.getEntity(library).name}Mapper';
+
+    if (queryMethod.returnsList) {
+      return '''
+        return _queryAdapter.queryList('${queryMethod.query}', $mapper);
+      ''';
+    } else {
+      return '''
+        return _queryAdapter.query('${queryMethod.query}', $mapper);
+      ''';
+    }
   }
 
   void _assertQueryParameters() {

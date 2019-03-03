@@ -1,11 +1,11 @@
-import 'package:floor/src/database.dart';
+import 'package:floor/src/adapter/migration_adapter.dart';
 import 'package:floor/src/migration.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/mockito.dart';
-import 'package:sqflite/sqlite_api.dart';
+
+import '../util/mocks.dart';
 
 void main() {
-  final floorDatabase = TestFloorDatabase();
   final mockMigrationDatabase = MockSqfliteDatabase();
 
   tearDown(() {
@@ -22,8 +22,7 @@ void main() {
       })
     ];
 
-    // ignore: invalid_use_of_protected_member
-    floorDatabase.runMigrations(
+    MigrationAdapter.runMigrations(
       mockMigrationDatabase,
       startVersion,
       endVersion,
@@ -51,8 +50,7 @@ void main() {
       }),
     ];
 
-    // ignore: invalid_use_of_protected_member
-    floorDatabase.runMigrations(
+    MigrationAdapter.runMigrations(
       mockMigrationDatabase,
       startVersion,
       endVersion,
@@ -76,8 +74,7 @@ void main() {
       })
     ];
 
-    // ignore: invalid_use_of_protected_member
-    final actual = () => floorDatabase.runMigrations(
+    final actual = () => MigrationAdapter.runMigrations(
           mockMigrationDatabase,
           startVersion,
           endVersion,
@@ -98,24 +95,14 @@ void main() {
       })
     ];
 
-    // ignore: invalid_use_of_protected_member
-    final actual = () => floorDatabase.runMigrations(
-      mockMigrationDatabase,
-      startVersion,
-      endVersion,
-      migrations,
-    );
+    final actual = () => MigrationAdapter.runMigrations(
+          mockMigrationDatabase,
+          startVersion,
+          endVersion,
+          migrations,
+        );
 
     expect(actual, throwsStateError);
     verifyZeroInteractions(mockMigrationDatabase);
   });
 }
-
-class TestFloorDatabase extends FloorDatabase {
-  @override
-  Future<Database> open(List<Migration> migrations) {
-    return null;
-  }
-}
-
-class MockSqfliteDatabase extends Mock implements Database {}

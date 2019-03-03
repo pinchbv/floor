@@ -22,10 +22,7 @@ void main() {
       expect(actual, equalsDart(r'''
         @override
         Future<void> insertPerson(Person person) async {
-          final item = person;
-          final values = <String, dynamic>{'id': item.id, 'custom_name': item.name};
-          await database.insert('person', values,
-              conflictAlgorithm: sqflite.ConflictAlgorithm.abort);
+          await _personInsertionAdapter.insert(person, sqflite.ConflictAlgorithm.abort);
         }
       '''));
     });
@@ -39,13 +36,7 @@ void main() {
       expect(actual, equalsDart('''
         @override
         Future<void> insertPersons(List<Person> persons) async {
-          final batch = database.batch();
-          for (final item in persons) {
-            final values = <String, dynamic>{'id': item.id, 'custom_name': item.name};
-            batch.insert('person', values,
-                conflictAlgorithm: sqflite.ConflictAlgorithm.abort);
-          }
-          await batch.commit(noResult: true);
+          await _personInsertionAdapter.insertList(persons, sqflite.ConflictAlgorithm.abort);
         }
       '''));
     });
@@ -61,10 +52,7 @@ void main() {
       expect(actual, equalsDart('''
         @override
         Future<int> insertPersonWithReturn(Person person) {
-          final item = person;
-          final values = <String, dynamic>{'id': item.id, 'custom_name': item.name};
-          return database.insert('person', values,
-              conflictAlgorithm: sqflite.ConflictAlgorithm.abort);
+          return _personInsertionAdapter.insertAndReturnId(person, sqflite.ConflictAlgorithm.abort);
         }
       '''));
     });
@@ -77,14 +65,8 @@ void main() {
 
       expect(actual, equalsDart('''
         @override
-        Future<List<int>> insertPersonsWithReturn(List<Person> persons) async {
-          final batch = database.batch();
-          for (final item in persons) {
-            final values = <String, dynamic>{'id': item.id, 'custom_name': item.name};
-            batch.insert('person', values,
-                conflictAlgorithm: sqflite.ConflictAlgorithm.abort);
-          }
-          return (await batch.commit(noResult: false)).cast<int>();
+        Future<List<int>> insertPersonsWithReturn(List<Person> persons) {
+          return _personInsertionAdapter.insertListAndReturnIds(persons, sqflite.ConflictAlgorithm.abort);
         }
       '''));
     });
@@ -100,10 +82,7 @@ void main() {
       expect(actual, equalsDart(r'''
         @override
         Future<void> insertPerson(Person person) async {
-          final item = person;
-          final values = <String, dynamic>{'id': item.id, 'custom_name': item.name};
-          await database.insert('person', values,
-              conflictAlgorithm: sqflite.ConflictAlgorithm.abort);
+          await _personInsertionAdapter.insert(person, sqflite.ConflictAlgorithm.abort);
         }
        '''));
     });
@@ -117,10 +96,7 @@ void main() {
       expect(actual, equalsDart(r'''
         @override
         Future<void> insertPerson(Person person) async {
-          final item = person;
-          final values = <String, dynamic>{'id': item.id, 'custom_name': item.name};
-          await database.insert('person', values,
-              conflictAlgorithm: sqflite.ConflictAlgorithm.replace);
+          await _personInsertionAdapter.insert(person, sqflite.ConflictAlgorithm.replace);
         }
       '''));
     });
@@ -134,10 +110,7 @@ void main() {
       expect(actual, equalsDart(r'''
          @override
          Future<void> insertPerson(Person person) async {
-           final item = person;
-           final values = <String, dynamic>{'id': item.id, 'custom_name': item.name};
-           await database.insert('person', values,
-               conflictAlgorithm: sqflite.ConflictAlgorithm.rollback);
+           await _personInsertionAdapter.insert(person, sqflite.ConflictAlgorithm.rollback);
          }
       '''));
     });
@@ -151,10 +124,7 @@ void main() {
       expect(actual, equalsDart(r'''
         @override
         Future<void> insertPerson(Person person) async {
-          final item = person;
-          final values = <String, dynamic>{'id': item.id, 'custom_name': item.name};
-          await database.insert('person', values,
-              conflictAlgorithm: sqflite.ConflictAlgorithm.abort);
+          await _personInsertionAdapter.insert(person, sqflite.ConflictAlgorithm.abort);
         }
       '''));
     });
@@ -168,10 +138,7 @@ void main() {
       expect(actual, equalsDart(r'''
         @override
         Future<void> insertPerson(Person person) async {
-          final item = person;
-          final values = <String, dynamic>{'id': item.id, 'custom_name': item.name};
-          await database.insert('person', values,
-              conflictAlgorithm: sqflite.ConflictAlgorithm.fail);
+          await _personInsertionAdapter.insert(person, sqflite.ConflictAlgorithm.fail);
         }
       '''));
     });
@@ -185,10 +152,7 @@ void main() {
       expect(actual, equalsDart(r'''
         @override
         Future<void> insertPerson(Person person) async {
-          final item = person;
-          final values = <String, dynamic>{'id': item.id, 'custom_name': item.name};
-          await database.insert('person', values,
-              conflictAlgorithm: sqflite.ConflictAlgorithm.ignore);
+        await _personInsertionAdapter.insert(person, sqflite.ConflictAlgorithm.ignore);
         }
       '''));
     });

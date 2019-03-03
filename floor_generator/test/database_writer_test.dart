@@ -41,7 +41,7 @@ void main() {
               await database.execute('PRAGMA foreign_keys = ON');
             },
             onUpgrade: (database, startVersion, endVersion) async {
-              runMigrations(database, startVersion, endVersion, migrations);
+              MigrationAdapter.runMigrations(database, startVersion, endVersion, migrations);
             },
             onCreate: (database, version) async {
               await database.execute(
@@ -86,7 +86,7 @@ void main() {
               await database.execute('PRAGMA foreign_keys = ON');
             },
             onUpgrade: (database, startVersion, endVersion) async {
-              runMigrations(database, startVersion, endVersion, migrations);
+              MigrationAdapter.runMigrations(database, startVersion, endVersion, migrations);
             },
             onCreate: (database, version) async {
               await database.execute(

@@ -8,8 +8,12 @@ import 'package:floor_generator/model/insert_method.dart';
 import 'package:floor_generator/model/query_method.dart';
 import 'package:floor_generator/model/transaction_method.dart';
 import 'package:floor_generator/model/update_method.dart';
+import 'package:floor_generator/writer/adapter/insertion_adapters_writer.dart';
+import 'package:floor_generator/writer/adapter/query_adapter_writer.dart';
+import 'package:floor_generator/writer/adapter/update_adapters_writer.dart';
 import 'package:floor_generator/writer/change_method_writer.dart';
 import 'package:floor_generator/writer/delete_method_body_writer.dart';
+import 'package:floor_generator/writer/adapter/deletion_adapters_writer.dart';
 import 'package:floor_generator/writer/insert_method_body_writer.dart';
 import 'package:floor_generator/writer/query_method_writer.dart';
 import 'package:floor_generator/writer/transaction_method_writer.dart';
@@ -87,16 +91,40 @@ class DatabaseWriter implements Writer {
 
     final databaseName = database.name;
 
-    return Class((builder) => builder
+    final builder = ClassBuilder()
       ..name = '_\$$databaseName'
-      ..extend = refer(databaseName)
+      ..extend = refer(databaseName);
+
+    final queryMethods = database.queryMethods;
+    if (queryMethods.isNotEmpty) {
+      QueryAdapterWriter(library, builder, queryMethods).write();
+    }
+
+    final insertMethods = database.insertMethods;
+    if (insertMethods.isNotEmpty) {
+      InsertionAdaptersWriter(library, builder, insertMethods).write();
+    }
+
+    final updateMethods = database.updateMethods;
+    if (updateMethods.isNotEmpty) {
+      UpdateAdaptersWriter(library, builder, updateMethods).write();
+    }
+
+    final deleteMethods = database.deleteMethods;
+    if (deleteMethods.isNotEmpty) {
+      DeletionAdaptersWriter(library, builder, deleteMethods).write();
+    }
+
+    builder
       ..methods.add(_generateOpenMethod(database, createTableStatements))
-      ..methods.addAll(_generateQueryMethods(database.queryMethods))
-      ..methods.addAll(_generateInsertMethods(database.insertMethods))
-      ..methods.addAll(_generateUpdateMethods(database.updateMethods))
-      ..methods.addAll(_generateDeleteMethods(database.deleteMethods))
+      ..methods.addAll(_generateQueryMethods(queryMethods))
+      ..methods.addAll(_generateInsertMethods(insertMethods))
+      ..methods.addAll(_generateUpdateMethods(updateMethods))
+      ..methods.addAll(_generateDeleteMethods(deleteMethods))
       ..methods
-          .addAll(_generateTransactionMethods(database.transactionMethods)));
+          .addAll(_generateTransactionMethods(database.transactionMethods));
+
+    return builder.build();
   }
 
   Method _generateOpenMethod(
@@ -123,7 +151,7 @@ class DatabaseWriter implements Writer {
               await database.execute('PRAGMA foreign_keys = ON');
             },
             onUpgrade: (database, startVersion, endVersion) async {
-              runMigrations(database, startVersion, endVersion, migrations);
+              MigrationAdapter.runMigrations(database, startVersion, endVersion, migrations);
             },
             onCreate: (database, version) async {
               $createTableStatements
