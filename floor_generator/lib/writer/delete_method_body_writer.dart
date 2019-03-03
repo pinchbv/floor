@@ -18,22 +18,18 @@ class DeleteMethodBodyWriter implements Writer {
   String _generateMethodBody() {
     _assertMethodReturnsNoList();
 
-    final entity = method.getEntity(library);
-    final entityName = entity.name;
-    final primaryKeyColumn = entity.primaryKeyColumn;
+    final entityName = method.getEntity(library).name;
     final methodSignatureParameterName = method.parameter.name;
 
     if (method.returnsInt) {
       return _generateIntReturnMethodBody(
         methodSignatureParameterName,
         entityName,
-        primaryKeyColumn,
       );
     } else if (method.returnsVoid) {
       return _generateVoidReturnMethodBody(
         methodSignatureParameterName,
         entityName,
-        primaryKeyColumn,
       );
     } else {
       throw InvalidGenerationSourceError(
@@ -46,44 +42,22 @@ class DeleteMethodBodyWriter implements Writer {
   String _generateVoidReturnMethodBody(
     final String methodSignatureParameterName,
     final String entityName,
-    final Column primaryKeyColumn,
   ) {
     if (method.changesMultipleItems) {
-      return '''
-      final batch = database.batch();
-      for (final item in $methodSignatureParameterName) {
-        batch.delete('$entityName', where: '${primaryKeyColumn.name} = ?', whereArgs: <int>[item.${primaryKeyColumn.field.displayName}]);
-      }
-      await batch.commit(noResult: true);
-      ''';
+      return 'await _${entityName}DeletionAdapter.deleteList($methodSignatureParameterName);';
     } else {
-      return '''
-      final item = $methodSignatureParameterName;
-      await database.delete('$entityName', where: '${primaryKeyColumn.name} = ?', whereArgs: <int>[item.${primaryKeyColumn.field.displayName}]);
-      ''';
+      return 'await _${entityName}DeletionAdapter.delete($methodSignatureParameterName);';
     }
   }
 
   String _generateIntReturnMethodBody(
     final String methodSignatureParameterName,
     final String entityName,
-    final Column primaryKeyColumn,
   ) {
     if (method.changesMultipleItems) {
-      return '''
-      final batch = database.batch();
-      for (final item in $methodSignatureParameterName) {
-        batch.delete('$entityName', where: '${primaryKeyColumn.name} = ?', whereArgs: <int>[item.${primaryKeyColumn.field.displayName}]);
-      }
-      return (await batch.commit(noResult: false))
-          .cast<int>()
-          .reduce((first, second) => first + second);
-      ''';
+      return 'return _${entityName}DeletionAdapter.deleteListAndReturnChangedRows($methodSignatureParameterName);';
     } else {
-      return '''
-      final item = $methodSignatureParameterName;
-      return database.delete('$entityName', where: '${primaryKeyColumn.name} = ?', whereArgs: <int>[item.${primaryKeyColumn.field.displayName}]);
-      ''';
+      return 'return _${entityName}DeletionAdapter.deleteAndReturnChangedRows($methodSignatureParameterName);';
     }
   }
 

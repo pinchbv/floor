@@ -57,7 +57,7 @@ class ChangeMethod {
         .any((entity) => entity == _flattenedParameterType.displayName);
   }
 
-  bool get requiresAsyncModifier => returnsVoid || changesMultipleItems;
+  bool get requiresAsyncModifier => returnsVoid;
 
   bool get returnsList {
     final type = method.returnType.flattenFutures(method.context.typeSystem);
