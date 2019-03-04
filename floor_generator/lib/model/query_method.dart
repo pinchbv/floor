@@ -49,8 +49,13 @@ class QueryMethod {
   /// E.g.
   /// Future<T> -> T,
   /// Future<List<T>> -> T
+  ///
+  /// Stream<T> -> T
+  /// Stream<List<T>> -> T
   DartType get flattenedReturnType {
-    final type = method.returnType.flattenFutures(method.context.typeSystem);
+    final type = returnsStream
+        ? flattenStream(method.returnType)
+        : method.returnType.flattenFutures(method.context.typeSystem);
     if (returnsList) {
       return flattenList(type);
     }
@@ -60,24 +65,33 @@ class QueryMethod {
   List<ParameterElement> get parameters => method.parameters;
 
   bool get returnsList {
-    final type = method.returnType.flattenFutures(method.context.typeSystem);
+    final type = returnsStream
+        ? flattenStream(method.returnType)
+        : method.returnType.flattenFutures(method.context.typeSystem);
+
     return isList(type);
   }
 
   bool get returnsVoid {
-    return method.returnType.flattenFutures(method.context.typeSystem).isVoid;
+    final type = returnsStream
+        ? flattenStream(method.returnType)
+        : method.returnType.flattenFutures(method.context.typeSystem);
+
+    return type.isVoid;
   }
 
+  bool get returnsStream => isStream(method.returnType);
+
+  Entity _entityCache;
+
   Entity getEntity(final LibraryReader library) {
+    if (_entityCache != null) return _entityCache;
+
     final entity = _getEntities(library).firstWhere(
         (entity) => entity.displayName == flattenedReturnType.displayName,
         orElse: () => null); // doesn't return an entity
 
-    if (entity != null) {
-      return Entity(entity);
-    } else {
-      return null;
-    }
+    return _entityCache ??= entity != null ? Entity(entity) : null;
   }
 
   bool returnsEntity(final LibraryReader library) {

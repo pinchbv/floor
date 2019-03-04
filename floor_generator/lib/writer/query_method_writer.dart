@@ -17,7 +17,7 @@ class QueryMethodWriter implements Writer {
   }
 
   Method _generateQueryMethod() {
-    _assertReturnsFuture();
+    _assertReturnsFutureOrStream();
     _assertQueryParameters();
 
     final builder = MethodBuilder()
@@ -27,7 +27,7 @@ class QueryMethodWriter implements Writer {
       ..requiredParameters.addAll(_generateMethodParameters())
       ..body = Code(_generateMethodBody());
 
-    if (queryMethod.returnsVoid) {
+    if (!queryMethod.returnsStream || queryMethod.returnsVoid) {
       builder..modifier = MethodModifier.async;
     }
 
@@ -57,14 +57,28 @@ class QueryMethodWriter implements Writer {
     _assertReturnsEntity();
     final mapper = '_${queryMethod.getEntity(library).name}Mapper';
 
-    if (queryMethod.returnsList) {
-      return '''
-        return _queryAdapter.queryList('${queryMethod.query}', $mapper);
-      ''';
+    if (queryMethod.returnsStream) {
+      return _generateStreamQuery(mapper);
     } else {
-      return '''
-        return _queryAdapter.query('${queryMethod.query}', $mapper);
-      ''';
+      return _generateQuery(mapper);
+    }
+  }
+
+  String _generateQuery(final String mapper) {
+    if (queryMethod.returnsList) {
+      return "return _queryAdapter.queryList('${queryMethod.query}', $mapper);";
+    } else {
+      return "return _queryAdapter.query('${queryMethod.query}', $mapper);";
+    }
+  }
+
+  String _generateStreamQuery(final String mapper) {
+    final entityName = queryMethod.getEntity(library).name;
+
+    if (queryMethod.returnsList) {
+      return "return _queryAdapter.queryListStream('${queryMethod.query}', '$entityName', $mapper);";
+    } else {
+      return "return _queryAdapter.queryStream('${queryMethod.query}', '$entityName', $mapper);";
     }
   }
 
@@ -88,10 +102,11 @@ class QueryMethodWriter implements Writer {
     }
   }
 
-  void _assertReturnsFuture() {
-    if (!queryMethod.rawReturnType.isDartAsyncFuture) {
+  void _assertReturnsFutureOrStream() {
+    if (!queryMethod.rawReturnType.isDartAsyncFuture &&
+        !queryMethod.returnsStream) {
       throw InvalidGenerationSourceError(
-        'All queries have to return a Future.',
+        'All queries have to return a Future or Stream.',
         element: queryMethod.method,
       );
     }

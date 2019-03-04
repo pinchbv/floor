@@ -32,6 +32,10 @@ bool isSupportedType(final DartType type) {
       _isDartCore(type);
 }
 
+bool isStream(final DartType type) {
+  return type.name == 'Stream';
+}
+
 bool isEntityAnnotation(final ElementAnnotation annotation) {
   return _getAnnotationName(annotation) == Annotation.ENTITY;
 }
@@ -69,6 +73,10 @@ bool isTransactionAnnotation(final ElementAnnotation annotation) {
 }
 
 DartType flattenList(final DartType type) {
+  return (type as ParameterizedType).typeArguments.first;
+}
+
+DartType flattenStream(final DartType type) {
   return (type as ParameterizedType).typeArguments.first;
 }
 

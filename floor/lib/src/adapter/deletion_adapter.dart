@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:sqflite/sqflite.dart';
 
 class DeletionAdapter<T> {
@@ -5,13 +7,15 @@ class DeletionAdapter<T> {
   final String _entityName;
   final String _primaryKeyColumnName;
   final Map<String, dynamic> Function(T) _valueMapper;
+  final StreamController<String> _changeListener;
 
   DeletionAdapter(
     final DatabaseExecutor database,
     final String entityName,
     final String primaryKeyColumnName,
-    final Map<String, dynamic> Function(T) valueMapper,
-  )   : assert(database != null),
+    final Map<String, dynamic> Function(T) valueMapper, [
+    final StreamController<String> changeListener,
+  ])  : assert(database != null),
         assert(entityName != null),
         assert(entityName.isNotEmpty),
         assert(primaryKeyColumnName != null),
@@ -20,7 +24,8 @@ class DeletionAdapter<T> {
         _database = database,
         _entityName = entityName,
         _primaryKeyColumnName = primaryKeyColumnName,
-        _valueMapper = valueMapper;
+        _valueMapper = valueMapper,
+        _changeListener = changeListener;
 
   Future<void> delete(final T item) async {
     await _delete(item);
@@ -28,10 +33,7 @@ class DeletionAdapter<T> {
 
   Future<void> deleteList(final List<T> items) async {
     if (items.isEmpty) return;
-
-    final batch = _database.batch();
-    _deleteList(batch, items);
-    await batch.commit(noResult: true);
+    await _deleteList(items);
   }
 
   Future<int> deleteAndReturnChangedRows(final T item) {
@@ -40,25 +42,25 @@ class DeletionAdapter<T> {
 
   Future<int> deleteListAndReturnChangedRows(final List<T> items) async {
     if (items.isEmpty) return 0;
-
-    final batch = _database.batch();
-    _deleteList(batch, items);
-    return (await batch.commit(noResult: false))
-        .cast<int>()
-        .reduce((sum, element) => sum + element);
+    return _deleteList(items);
   }
 
-  Future<int> _delete(final T item) {
+  Future<int> _delete(final T item) async {
     final int primaryKey = _valueMapper(item)[_primaryKeyColumnName];
 
-    return _database.delete(
+    final result = await _database.delete(
       _entityName,
       where: '$_primaryKeyColumnName = ?',
       whereArgs: <int>[primaryKey],
     );
+    if (_changeListener != null && result != 0) {
+      _changeListener.add(_entityName);
+    }
+    return result;
   }
 
-  void _deleteList(final Batch batch, final List items) {
+  Future<int> _deleteList(final List<T> items) async {
+    final batch = _database.batch();
     for (final item in items) {
       final int primaryKey = _valueMapper(item)[_primaryKeyColumnName];
 
@@ -68,5 +70,12 @@ class DeletionAdapter<T> {
         whereArgs: <int>[primaryKey],
       );
     }
+    final result = (await batch.commit(noResult: false)).cast<int>();
+    if (_changeListener != null && result.isNotEmpty) {
+      _changeListener.add(_entityName);
+    }
+    return result.isNotEmpty
+        ? result.reduce((sum, element) => sum + element)
+        : 0;
   }
 }
