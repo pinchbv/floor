@@ -15,6 +15,7 @@ This package is still in an early phase and the API will likely change.
 1. [How to use this library](#how-to-use-this-library)
 1. [Querying](#querying)
 1. [Persisting Data Changes](#persisting-data-changes)
+1. [Streams](#streams)
 1. [Transactions](#transactions)
 1. [Entities](#entities)
 1. [Foreign Keys](#foreign-keys)
@@ -133,7 +134,7 @@ For further examples take a look at the [example](https://github.com/vitusortner
 Method signatures turn into query methods by adding the `@Query()` annotation with the query in parenthesis to them.
 Be patient about the correctness of your SQL statements.
 They are only partly validated while generating the code.
-These queries have to return either a `Future` of an entity or `void`.
+These queries have to return either a `Future` or a `Stream` of an entity or `void`.
 Returning `Future<void>` comes in handy whenever you want to delete the full content of a table.
 
 ````dart
@@ -145,6 +146,9 @@ Future<Person> findPersonByIdAndName(int id, String name);
 
 @Query('SELECT * FROM Person')
 Future<List<Person>> findAllPersons(); // select multiple items
+
+@Query('SELECT * FROM Person')
+Stream<List<Person>> findAllPersonsAsStream(); // stream return
 
 @Query('DELETE FROM Person')
 Future<void> deleteAllPersons(); // query without returning an entity
@@ -191,6 +195,24 @@ Future<int> updatePersons(List<Person> person);
 
 @delete
 Future<int> deletePersons(List<Person> person);
+```
+
+## Streams
+As already mentioned, queries can not only return a value once when called, but also a continuous stream of query results.
+The returned stream keeps you in sync with the changes happening to the database table.
+This feature plays really well with the `StreamBuilder` widget.
+```dart
+// definition
+@Query('SELECT * FROM Person')
+Stream<List<Person>> findAllPersonsAsStream();
+
+// usage
+StreamBuilder<List<Person>>(
+  stream: database.findAllPersonsAsStream(),
+  builder: (BuildContext context, AsyncSnapshot<List<Person>> snapshot) {
+    // do something with the values here
+  },
+);
 ```
 
 ## Transactions

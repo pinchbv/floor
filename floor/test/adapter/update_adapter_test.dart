@@ -25,6 +25,9 @@ void main() {
 
   tearDown(() {
     clearInteractions(mockDatabaseExecutor);
+    clearInteractions(mockDatabaseBatch);
+    reset(mockDatabaseExecutor);
+    reset(mockDatabaseBatch);
   });
 
   group('update without return', () {
@@ -48,6 +51,8 @@ void main() {
       final person2 = Person(2, 'Frank');
       final persons = [person1, person2];
       when(mockDatabaseExecutor.batch()).thenReturn(mockDatabaseBatch);
+      when(mockDatabaseBatch.commit(noResult: false))
+          .thenAnswer((_) => Future(() => <int>[1, 1]));
 
       await underTest.updateList(persons, conflictAlgorithm);
 
@@ -69,7 +74,7 @@ void main() {
           whereArgs: <int>[person2.id],
           conflictAlgorithm: conflictAlgorithm,
         ),
-        mockDatabaseBatch.commit(noResult: true),
+        mockDatabaseBatch.commit(noResult: false),
       ]);
     });
 

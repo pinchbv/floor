@@ -5,7 +5,6 @@ import 'package:mockito/mockito.dart';
 import '../util/mocks.dart';
 import '../util/person.dart';
 
-
 void main() {
   final mockDatabaseExecutor = MockDatabaseExecutor();
   final mockDatabaseBatch = MockDatabaseBatch();
@@ -44,6 +43,8 @@ void main() {
       final person2 = Person(2, 'Frank');
       final persons = [person1, person2];
       when(mockDatabaseExecutor.batch()).thenReturn(mockDatabaseBatch);
+      when(mockDatabaseBatch.commit(noResult: false))
+          .thenAnswer((_) => Future(() => <int>[1, 1]));
 
       await underTest.deleteList(persons);
 
@@ -59,7 +60,7 @@ void main() {
           where: '$primaryKeyColumnName = ?',
           whereArgs: <int>[person2.id],
         ),
-        mockDatabaseBatch.commit(noResult: true),
+        mockDatabaseBatch.commit(noResult: false),
       ]);
     });
 

@@ -2,7 +2,7 @@ part of '../database.dart';
 
 @Entity(tableName: 'person')
 class Person {
-  @PrimaryKey()
+  @primaryKey
   final int id;
 
   @ColumnInfo(name: 'custom_name', nullable: false)

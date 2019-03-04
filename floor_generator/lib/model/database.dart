@@ -33,8 +33,10 @@ class Database {
 
   List<MethodElement> get methods => clazz.methods;
 
+  List<QueryMethod> _queryMethodsCache;
+
   List<QueryMethod> get queryMethods {
-    return methods
+    return _queryMethodsCache ??= methods
         .where((method) => method.metadata.any(isQueryAnnotation))
         .map((method) => QueryMethod(method))
         .toList();
@@ -73,6 +75,15 @@ class Database {
         .where((clazz) =>
             !clazz.isAbstract && clazz.metadata.any(isEntityAnnotation))
         .map((entity) => Entity(entity))
+        .toList();
+  }
+
+  List<Entity> _streamEntities;
+
+  List<Entity> getStreamEntities(final LibraryReader library) {
+    return _streamEntities ??= queryMethods
+        .where((method) => method.returnsStream)
+        .map((method) => method.getEntity(library))
         .toList();
   }
 }

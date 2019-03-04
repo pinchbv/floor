@@ -63,9 +63,7 @@ class Entity {
   String _createTableStatementsCache;
 
   String getCreateTableStatement(final LibraryReader library) {
-    if (_createTableStatementsCache != null) {
-      return _createTableStatementsCache;
-    }
+    if (_createTableStatementsCache != null) return _createTableStatementsCache;
 
     final databaseDefinition =
         columns.map((column) => column.definition).toList();
@@ -83,9 +81,7 @@ class Entity {
   String _constructorCache;
 
   String getConstructor(final LibraryReader library) {
-    if (_constructorCache != null) {
-      return _constructorCache;
-    }
+    if (_constructorCache != null) return _constructorCache;
 
     final columnNames = columns.map((column) => column.name).toList();
     final constructorParameters = clazz.constructors.first.parameters;
@@ -126,9 +122,7 @@ class Entity {
   String _valueMappingCache;
 
   String getValueMapping(final LibraryReader library) {
-    if (_valueMappingCache != null) {
-      return _valueMappingCache;
-    }
+    if (_valueMappingCache != null) return _valueMappingCache;
 
     final columnNames = columns.map((column) => column.name).toList();
     final constructorParameters = clazz.constructors.first.parameters;

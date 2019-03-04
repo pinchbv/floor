@@ -1,4 +1,5 @@
 import 'package:code_builder/code_builder.dart';
+import 'package:floor_generator/model/entity.dart';
 import 'package:floor_generator/model/insert_method.dart';
 import 'package:source_gen/source_gen.dart';
 
@@ -6,8 +7,14 @@ class InsertionAdaptersWriter {
   final LibraryReader library;
   final ClassBuilder builder;
   final List<InsertMethod> insertMethods;
+  final List<Entity> streamEntities;
 
-  InsertionAdaptersWriter(this.library, this.builder, this.insertMethods);
+  InsertionAdaptersWriter(
+    this.library,
+    this.builder,
+    this.insertMethods,
+    this.streamEntities,
+  );
 
   void write() {
     final insertEntities = insertMethods
@@ -30,12 +37,15 @@ class InsertionAdaptersWriter {
       final valueMapper =
           '(${entity.clazz.displayName} item) => ${entity.getValueMapping(library)}';
 
+      final requiresChangeListener =
+          streamEntities.any((streamEntity) => streamEntity == entity);
+
       final getAdapter = Method((builder) => builder
         ..type = MethodType.getter
         ..name = '_${entityName}InsertionAdapter'
         ..returns = type
         ..body = Code('''
-          return $cacheName ??= InsertionAdapter(database, '$entityName', $valueMapper);
+          return $cacheName ??= InsertionAdapter(database, '$entityName', $valueMapper${requiresChangeListener ? ', changeListener' : ''});
         '''));
 
       builder..methods.add(getAdapter);

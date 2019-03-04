@@ -18,8 +18,14 @@ abstract class TestDatabase extends FloorDatabase {
   @Query('SELECT * FROM person')
   Future<List<Person>> findAllPersons();
 
+  @Query('SELECT * FROM person')
+  Stream<List<Person>> findAllPersonsAsStream();
+
   @Query('SELECT * FROM person WHERE id = :id')
   Future<Person> findPersonById(int id);
+
+  @Query('SELECT * FROM person WHERE id = :id')
+  Stream<Person> findPersonByIdAsStream(int id);
 
   @Query('SELECT * FROM person WHERE id = :id AND custom_name = :name')
   Future<Person> findPersonByIdAndName(int id, String name);
