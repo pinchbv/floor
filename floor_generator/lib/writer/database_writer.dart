@@ -95,24 +95,34 @@ class DatabaseWriter implements Writer {
       ..name = '_\$$databaseName'
       ..extend = refer(databaseName);
 
+    final streamEntities = database.getStreamEntities(library);
+
     final queryMethods = database.queryMethods;
     if (queryMethods.isNotEmpty) {
-      QueryAdapterWriter(library, builder, queryMethods).write();
+      QueryAdapterWriter(
+        library,
+        builder,
+        queryMethods,
+        streamEntities.isNotEmpty,
+      ).write();
     }
 
     final insertMethods = database.insertMethods;
     if (insertMethods.isNotEmpty) {
-      InsertionAdaptersWriter(library, builder, insertMethods).write();
+      InsertionAdaptersWriter(library, builder, insertMethods, streamEntities)
+          .write();
     }
 
     final updateMethods = database.updateMethods;
     if (updateMethods.isNotEmpty) {
-      UpdateAdaptersWriter(library, builder, updateMethods).write();
+      UpdateAdaptersWriter(library, builder, updateMethods, streamEntities)
+          .write();
     }
 
     final deleteMethods = database.deleteMethods;
     if (deleteMethods.isNotEmpty) {
-      DeletionAdaptersWriter(library, builder, deleteMethods).write();
+      DeletionAdaptersWriter(library, builder, deleteMethods, streamEntities)
+          .write();
     }
 
     builder

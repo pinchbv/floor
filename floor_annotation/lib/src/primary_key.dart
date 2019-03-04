@@ -6,3 +6,6 @@ class PrimaryKey {
   /// Defaults [autoGenerate] to false.
   const PrimaryKey({this.autoGenerate = false});
 }
+
+/// Marks a field in an [Entity] as the primary key.
+const primaryKey = PrimaryKey();

@@ -217,6 +217,113 @@ void main() {
         expect(actual, isEmpty);
       });
     });
+
+    group('stream queries', () {
+      test('initially emit persistent data', () async {
+        final person = Person(1, 'Simon');
+        await database.insertPerson(person);
+
+        final actual = database.findAllPersonsAsStream();
+
+        expect(actual, emits([person]));
+      });
+
+      group('insert change', () {
+        test('find person by id as stream', () async {
+          final person = Person(1, 'Simon');
+
+          final actual = database.findPersonByIdAsStream(person.id);
+
+          await database.insertPerson(person);
+          expect(actual, emits(person));
+        });
+
+        test('find all persons as stream', () async {
+          final persons = [Person(1, 'Simon'), Person(2, 'Frank')];
+
+          final actual = database.findAllPersonsAsStream();
+
+          await database.insertPersons(persons);
+          expect(
+            actual,
+            emitsInOrder(<List<Person>>[[], persons]),
+          );
+        });
+
+        test('initially emits persistent data then new', () async {
+          final persons = [Person(1, 'Simon'), Person(2, 'Frank')];
+          final persons2 = [Person(3, 'Paul'), Person(4, 'George')];
+          await database.insertPersons(persons);
+
+          final actual = database.findAllPersonsAsStream();
+
+          await database.insertPersons(persons2);
+          expect(
+            actual,
+            emitsInOrder(<List<Person>>[persons, persons + persons2]),
+          );
+        });
+      });
+
+      group('update change', () {
+        test('update item', () async {
+          final person = Person(1, 'Simon');
+          await database.insertPerson(person);
+
+          final actual = database.findAllPersonsAsStream();
+
+          final updatedPerson = Person(person.id, 'Frank');
+          await database.updatePerson(updatedPerson);
+          expect(
+            actual,
+            emitsInOrder(<List<Person>>[
+              [person],
+              [updatedPerson]
+            ]),
+          );
+        });
+
+        test('update items', () async {
+          final persons = [Person(1, 'Simon'), Person(2, 'Frank')];
+          final updatedPersons =
+              persons.map((person) => Person(person.id, 'Nick')).toList();
+          await database.insertPersons(persons);
+
+          final actual = database.findAllPersonsAsStream();
+
+          await database.updatePersons(updatedPersons);
+          expect(actual, emitsInOrder(<List<Person>>[persons, updatedPersons]));
+        });
+      });
+
+      group('deletion change', () {
+        test('delete item', () async {
+          final person = Person(1, 'Simon');
+          await database.insertPerson(person);
+
+          final actual = database.findAllPersonsAsStream();
+
+          await database.deletePerson(person);
+          expect(
+            actual,
+            emitsInOrder(<List<Person>>[
+              [person],
+              []
+            ]),
+          );
+        });
+
+        test('delete items', () async {
+          final persons = [Person(1, 'Simon'), Person(2, 'Frank')];
+          await database.insertPersons(persons);
+
+          final actual = database.findAllPersonsAsStream();
+
+          await database.deletePersons(persons);
+          expect(actual, emitsInOrder(<List<Person>>[persons, []]));
+        });
+      });
+    });
   });
 }
 

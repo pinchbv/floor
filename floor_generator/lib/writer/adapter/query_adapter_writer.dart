@@ -6,8 +6,14 @@ class QueryAdapterWriter {
   final LibraryReader library;
   final ClassBuilder builder;
   final List<QueryMethod> queryMethods;
+  final bool requiresChangeListener;
 
-  QueryAdapterWriter(this.library, this.builder, this.queryMethods);
+  QueryAdapterWriter(
+    this.library,
+    this.builder,
+    this.queryMethods,
+    this.requiresChangeListener,
+  );
 
   void write() {
     final queryMappers = queryMethods
@@ -35,7 +41,8 @@ class QueryAdapterWriter {
       ..returns = refer('QueryAdapter')
       ..type = MethodType.getter
       ..lambda = true
-      ..body = const Code('$cacheName ??= QueryAdapter(database)'));
+      ..body = Code(
+          "$cacheName ??= QueryAdapter(database${requiresChangeListener ? ', changeListener' : ''})"));
 
     builder..fields.addAll(queryMappers);
     builder..fields.add(queryAdapterSingleton);
