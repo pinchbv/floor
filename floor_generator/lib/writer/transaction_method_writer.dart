@@ -32,7 +32,7 @@ class TransactionMethodWriter implements Writer {
     } else {
       await (database as sqflite.Database).transaction<void>((transaction) async {
         final transactionDatabase = _\$${method.databaseName}()..database = transaction;
-        await transactionDatabase.$methodCall;
+        await transactionDatabase.${method.daoFieldName}.$methodCall;
       });
     }
     ''';

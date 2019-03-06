@@ -10,10 +10,8 @@ abstract class FloorDatabase {
   final changeListener = StreamController<String>.broadcast();
 
   /// Use this whenever you want need direct access to the sqflite database.
-  @protected
   sqflite.DatabaseExecutor database;
 
-  // TODO remove this
   /// Opens the database to be able to query it.
   Future<sqflite.Database> open(List<Migration> migrations);
 

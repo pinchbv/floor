@@ -72,6 +72,10 @@ bool isTransactionAnnotation(final ElementAnnotation annotation) {
   return _getAnnotationName(annotation) == Annotation.TRANSACTION;
 }
 
+bool isDaoAnnotation(final ElementAnnotation annotation) {
+  return _getAnnotationName(annotation) == Annotation.DAO;
+}
+
 DartType flattenList(final DartType type) {
   return (type as ParameterizedType).typeArguments.first;
 }
