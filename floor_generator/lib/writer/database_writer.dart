@@ -67,7 +67,7 @@ class DatabaseWriter implements Writer {
       ..extend = refer(databaseName)
       ..methods.add(_generateOpenMethod(database))
       ..methods.addAll(_generateDaoGetters(database))
-      ..fields.addAll(_generateDaoCaches(database)));
+      ..fields.addAll(_generateDaoInstances(database)));
   }
 
   List<Method> _generateDaoGetters(final Database database) {
@@ -85,7 +85,7 @@ class DatabaseWriter implements Writer {
     }).toList();
   }
 
-  List<Field> _generateDaoCaches(final Database database) {
+  List<Field> _generateDaoInstances(final Database database) {
     return database.getDaos(library).map((dao) {
       final daoFieldName = dao.daoFieldName;
       final daoType = dao.clazz.displayName;
