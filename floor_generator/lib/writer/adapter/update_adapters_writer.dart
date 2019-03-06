@@ -1,6 +1,6 @@
 import 'package:code_builder/code_builder.dart';
-import 'package:floor_generator/model/entity.dart';
-import 'package:floor_generator/model/update_method.dart';
+import 'package:floor_generator/value_object/entity.dart';
+import 'package:floor_generator/value_object/update_method.dart';
 import 'package:source_gen/source_gen.dart';
 
 class UpdateAdaptersWriter {

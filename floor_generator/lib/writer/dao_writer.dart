@@ -1,10 +1,10 @@
 import 'package:code_builder/code_builder.dart';
-import 'package:floor_generator/model/dao.dart';
-import 'package:floor_generator/model/delete_method.dart';
-import 'package:floor_generator/model/insert_method.dart';
-import 'package:floor_generator/model/query_method.dart';
-import 'package:floor_generator/model/transaction_method.dart';
-import 'package:floor_generator/model/update_method.dart';
+import 'package:floor_generator/value_object/dao.dart';
+import 'package:floor_generator/value_object/delete_method.dart';
+import 'package:floor_generator/value_object/insert_method.dart';
+import 'package:floor_generator/value_object/query_method.dart';
+import 'package:floor_generator/value_object/transaction_method.dart';
+import 'package:floor_generator/value_object/update_method.dart';
 import 'package:floor_generator/writer/adapter/deletion_adapters_writer.dart';
 import 'package:floor_generator/writer/adapter/insertion_adapters_writer.dart';
 import 'package:floor_generator/writer/adapter/query_adapter_writer.dart';

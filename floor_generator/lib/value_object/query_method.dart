@@ -1,8 +1,8 @@
 import 'package:analyzer/dart/element/element.dart';
 import 'package:analyzer/dart/element/type.dart';
-import 'package:floor_generator/misc/type_utils.dart';
 import 'package:floor_generator/misc/constants.dart';
-import 'package:floor_generator/model/entity.dart';
+import 'package:floor_generator/misc/type_utils.dart';
+import 'package:floor_generator/value_object/entity.dart';
 import 'package:source_gen/source_gen.dart';
 
 /// Wraps a method annotated with Query
