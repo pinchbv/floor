@@ -1,12 +1,9 @@
 import 'package:analyzer/dart/element/element.dart';
 import 'package:floor_generator/misc/constants.dart';
 import 'package:floor_generator/misc/type_utils.dart';
-import 'package:floor_generator/model/delete_method.dart';
+import 'package:floor_generator/model/dao.dart';
 import 'package:floor_generator/model/entity.dart';
-import 'package:floor_generator/model/insert_method.dart';
 import 'package:floor_generator/model/query_method.dart';
-import 'package:floor_generator/model/transaction_method.dart';
-import 'package:floor_generator/model/update_method.dart';
 import 'package:source_gen/source_gen.dart';
 
 class Database {
@@ -14,16 +11,22 @@ class Database {
 
   Database(final this.clazz);
 
-  String get name => clazz.displayName;
+  String _nameCache;
+
+  String get name => _nameCache ??= clazz.displayName;
+
+  int _versionCache;
 
   int get version {
+    if (_versionCache != null) return _versionCache;
+
     final databaseVersion = clazz.metadata
         .firstWhere(isDatabaseAnnotation)
         .computeConstantValue()
         .getField(AnnotationField.DATABASE_VERSION)
         ?.toIntValue();
 
-    return databaseVersion != null
+    return _versionCache ??= databaseVersion != null
         ? databaseVersion
         : throw InvalidGenerationSourceError(
             'No version for this database specified even though it is required.',
@@ -31,44 +34,9 @@ class Database {
           );
   }
 
-  List<MethodElement> get methods => clazz.methods;
+  List<MethodElement> _methodsCache;
 
-  List<QueryMethod> _queryMethodsCache;
-
-  List<QueryMethod> get queryMethods {
-    return _queryMethodsCache ??= methods
-        .where((method) => method.metadata.any(isQueryAnnotation))
-        .map((method) => QueryMethod(method))
-        .toList();
-  }
-
-  List<InsertMethod> get insertMethods {
-    return methods
-        .where((method) => method.metadata.any(isInsertAnnotation))
-        .map((method) => InsertMethod(method))
-        .toList();
-  }
-
-  List<UpdateMethod> get updateMethods {
-    return methods
-        .where((method) => method.metadata.any(isUpdateAnnotation))
-        .map((method) => UpdateMethod(method))
-        .toList();
-  }
-
-  List<DeleteMethod> get deleteMethods {
-    return methods
-        .where((method) => method.metadata.any(isDeleteAnnotation))
-        .map((method) => DeleteMethod(method))
-        .toList();
-  }
-
-  List<TransactionMethod> get transactionMethods {
-    return methods
-        .where((method) => method.metadata.any(isTransactionAnnotation))
-        .map((method) => TransactionMethod(method, name))
-        .toList();
-  }
+  List<MethodElement> get methods => _methodsCache ??= clazz.methods;
 
   List<Entity> getEntities(final LibraryReader library) {
     return library.classes
@@ -78,12 +46,53 @@ class Database {
         .toList();
   }
 
+  List<QueryMethod> _queryMethodsCache;
+
+  List<QueryMethod> get _queryMethods {
+    return _queryMethodsCache ??= methods
+        .where((method) => method.metadata.any(isQueryAnnotation))
+        .map((method) => QueryMethod(method))
+        .toList();
+  }
+
   List<Entity> _streamEntities;
 
   List<Entity> getStreamEntities(final LibraryReader library) {
-    return _streamEntities ??= queryMethods
+    return _streamEntities ??= _queryMethods
         .where((method) => method.returnsStream)
         .map((method) => method.getEntity(library))
         .toList();
+  }
+
+  List<Dao> _daosCache;
+
+  List<Dao> getDaos(final LibraryReader library) {
+    return _daosCache ??= library.classes
+        .where(_isDaoClass)
+        .where(_isDefinedInDatabase)
+        .map((daoClass) => Dao(daoClass, _getDaoFieldName(daoClass), name))
+        .toList();
+  }
+
+  String _getDaoFieldName(final ClassElement daoClass) {
+    return clazz.fields
+        .firstWhere((field) => field.type.displayName == daoClass.displayName)
+        .displayName;
+  }
+
+  bool _isDaoClass(final ClassElement clazz) {
+    return clazz.metadata.any(isDaoAnnotation) && clazz.isAbstract;
+  }
+
+  List<String> _fieldTypeNamesCache;
+
+  List<String> get _fieldTypeNames {
+    return _fieldTypeNamesCache ??=
+        clazz.fields.map((field) => field.type.displayName).toList();
+  }
+
+  bool _isDefinedInDatabase(final ClassElement daoClass) {
+    return _fieldTypeNames
+        .any((fieldType) => daoClass.displayName == fieldType);
   }
 }

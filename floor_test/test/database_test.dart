@@ -9,6 +9,8 @@ import 'database.dart';
 void main() {
   group('database tests', () {
     TestDatabase database;
+    PersonDao personDao;
+    DogDao dogDao;
 
     setUpAll(() async {
       final migration1to2 = Migration(1, 2, (database) {
@@ -17,6 +19,8 @@ void main() {
       final allMigrations = [migration1to2];
 
       database = await TestDatabase.openDatabase(allMigrations);
+      personDao = database.personDao;
+      dogDao = database.dogDao;
 
       await database.database.execute('DELETE FROM dog');
       await database.database.execute('DELETE FROM person');
@@ -28,7 +32,7 @@ void main() {
     });
 
     test('database initially is empty', () async {
-      final actual = await database.findAllPersons();
+      final actual = await personDao.findAllPersons();
 
       expect(actual, isEmpty);
     });
@@ -36,31 +40,31 @@ void main() {
     group('change single item', () {
       test('insert person', () async {
         final person = Person(null, 'Simon');
-        await database.insertPerson(person);
+        await personDao.insertPerson(person);
 
-        final actual = await database.findAllPersons();
+        final actual = await personDao.findAllPersons();
 
         expect(actual, hasLength(1));
       });
 
       test('delete person', () async {
         final person = Person(1, 'Simon');
-        await database.insertPerson(person);
+        await personDao.insertPerson(person);
 
-        await database.deletePerson(person);
+        await personDao.deletePerson(person);
 
-        final actual = await database.findAllPersons();
+        final actual = await personDao.findAllPersons();
         expect(actual, isEmpty);
       });
 
       test('update person', () async {
         final person = Person(1, 'Simon');
-        await database.insertPerson(person);
+        await personDao.insertPerson(person);
         final updatedPerson = Person(person.id, _reverse(person.name));
 
-        await database.updatePerson(updatedPerson);
+        await personDao.updatePerson(updatedPerson);
 
-        final actual = await database.findPersonById(person.id);
+        final actual = await personDao.findPersonById(person.id);
         expect(actual, equals(updatedPerson));
       });
     });
@@ -69,32 +73,32 @@ void main() {
       test('insert persons', () async {
         final persons = [Person(1, 'Simon'), Person(2, 'Frank')];
 
-        await database.insertPersons(persons);
+        await personDao.insertPersons(persons);
 
-        final actual = await database.findAllPersons();
+        final actual = await personDao.findAllPersons();
         expect(actual, equals(persons));
       });
 
       test('delete persons', () async {
         final persons = [Person(1, 'Simon'), Person(2, 'Frank')];
-        await database.insertPersons(persons);
+        await personDao.insertPersons(persons);
 
-        await database.deletePersons(persons);
+        await personDao.deletePersons(persons);
 
-        final actual = await database.findAllPersons();
+        final actual = await personDao.findAllPersons();
         expect(actual, isEmpty);
       });
 
       test('update persons', () async {
         final persons = [Person(1, 'Simon'), Person(2, 'Frank')];
-        await database.insertPersons(persons);
+        await personDao.insertPersons(persons);
         final updatedPersons = persons
             .map((person) => Person(person.id, _reverse(person.name)))
             .toList();
 
-        await database.updatePersons(updatedPersons);
+        await personDao.updatePersons(updatedPersons);
 
-        final actual = await database.findAllPersons();
+        final actual = await personDao.findAllPersons();
         expect(actual, equals(updatedPersons));
       });
     });
@@ -102,12 +106,12 @@ void main() {
     group('transaction', () {
       test('replace persons in transaction', () async {
         final persons = [Person(1, 'Simon'), Person(2, 'Frank')];
-        await database.insertPersons(persons);
+        await personDao.insertPersons(persons);
         final newPersons = [Person(3, 'Paul'), Person(4, 'Karl')];
 
-        await database.replacePersons(newPersons);
+        await personDao.replacePersons(newPersons);
 
-        final actual = await database.findAllPersons();
+        final actual = await personDao.findAllPersons();
         expect(actual, equals(newPersons));
       });
     });
@@ -116,7 +120,7 @@ void main() {
       test('insert person and return id of inserted item', () async {
         final person = Person(1, 'Simon');
 
-        final actual = await database.insertPersonWithReturn(person);
+        final actual = await personDao.insertPersonWithReturn(person);
 
         expect(actual, equals(person.id));
       });
@@ -124,7 +128,7 @@ void main() {
       test('insert persons and return ids of inserted items', () async {
         final persons = [Person(1, 'Simon'), Person(2, 'Frank')];
 
-        final actual = await database.insertPersonsWithReturn(persons);
+        final actual = await personDao.insertPersonsWithReturn(persons);
 
         final expected = persons.map((person) => person.id).toList();
         expect(actual, equals(expected));
@@ -132,44 +136,44 @@ void main() {
 
       test('update person and return 1 (affected row count)', () async {
         final person = Person(1, 'Simon');
-        await database.insertPerson(person);
+        await personDao.insertPerson(person);
         final updatedPerson = Person(person.id, _reverse(person.name));
 
-        final actual = await database.updatePersonWithReturn(updatedPerson);
+        final actual = await personDao.updatePersonWithReturn(updatedPerson);
 
-        final persistentPerson = await database.findPersonById(person.id);
+        final persistentPerson = await personDao.findPersonById(person.id);
         expect(persistentPerson, equals(updatedPerson));
         expect(actual, equals(1));
       });
 
       test('update persons and return affected rows count', () async {
         final persons = [Person(1, 'Simon'), Person(2, 'Frank')];
-        await database.insertPersons(persons);
+        await personDao.insertPersons(persons);
         final updatedPersons = persons
             .map((person) => Person(person.id, _reverse(person.name)))
             .toList();
 
-        final actual = await database.updatePersonsWithReturn(updatedPersons);
+        final actual = await personDao.updatePersonsWithReturn(updatedPersons);
 
-        final persistentPersons = await database.findAllPersons();
+        final persistentPersons = await personDao.findAllPersons();
         expect(persistentPersons, equals(updatedPersons));
         expect(actual, equals(2));
       });
 
       test('delete person and return 1 (affected row count)', () async {
         final person = Person(1, 'Simon');
-        await database.insertPerson(person);
+        await personDao.insertPerson(person);
 
-        final actual = await database.deletePersonWithReturn(person);
+        final actual = await personDao.deletePersonWithReturn(person);
 
         expect(actual, equals(1));
       });
 
       test('delete persons and return affected rows count', () async {
         final persons = [Person(1, 'Simon'), Person(2, 'Frank')];
-        await database.insertPersons(persons);
+        await personDao.insertPersons(persons);
 
-        final actual = await database.deletePersonsWithReturn(persons);
+        final actual = await personDao.deletePersonsWithReturn(persons);
 
         expect(actual, equals(2));
       });
@@ -179,28 +183,28 @@ void main() {
       test('foreign key constraint failed exception', () {
         final dog = Dog(null, 'Peter', 'Pete', 2);
 
-        expect(() => database.insertDog(dog), _throwsDatabaseException);
+        expect(() => dogDao.insertDog(dog), _throwsDatabaseException);
       });
 
       test('find dog for person', () async {
         final person = Person(1, 'Simon');
-        await database.insertPerson(person);
+        await personDao.insertPerson(person);
         final dog = Dog(2, 'Peter', 'Pete', person.id);
-        await database.insertDog(dog);
+        await dogDao.insertDog(dog);
 
-        final actual = await database.findDogForPersonId(person.id);
+        final actual = await dogDao.findDogForPersonId(person.id);
 
         expect(actual, equals(dog));
       });
 
       test('cascade delete dog on deletion of person', () async {
         final person = Person(1, 'Simon');
-        await database.insertPerson(person);
+        await personDao.insertPerson(person);
         final dog = Dog(2, 'Peter', 'Pete', person.id);
-        await database.insertDog(dog);
+        await dogDao.insertDog(dog);
 
-        await database.deletePerson(person);
-        final actual = await database.findAllDogs();
+        await personDao.deletePerson(person);
+        final actual = await dogDao.findAllDogs();
 
         expect(actual, isEmpty);
       });
@@ -209,10 +213,10 @@ void main() {
     group('query with void return', () {
       test('delete all persons', () async {
         final persons = [Person(1, 'Simon'), Person(2, 'Frank')];
-        await database.insertPersons(persons);
+        await personDao.insertPersons(persons);
 
-        await database.deleteAllPersons();
-        final actual = await database.findAllPersons();
+        await personDao.deleteAllPersons();
+        final actual = await personDao.findAllPersons();
 
         expect(actual, isEmpty);
       });
@@ -221,9 +225,9 @@ void main() {
     group('stream queries', () {
       test('initially emit persistent data', () async {
         final person = Person(1, 'Simon');
-        await database.insertPerson(person);
+        await personDao.insertPerson(person);
 
-        final actual = database.findAllPersonsAsStream();
+        final actual = personDao.findAllPersonsAsStream();
 
         expect(actual, emits([person]));
       });
@@ -232,18 +236,18 @@ void main() {
         test('find person by id as stream', () async {
           final person = Person(1, 'Simon');
 
-          final actual = database.findPersonByIdAsStream(person.id);
+          final actual = personDao.findPersonByIdAsStream(person.id);
 
-          await database.insertPerson(person);
+          await personDao.insertPerson(person);
           expect(actual, emits(person));
         });
 
         test('find all persons as stream', () async {
           final persons = [Person(1, 'Simon'), Person(2, 'Frank')];
 
-          final actual = database.findAllPersonsAsStream();
+          final actual = personDao.findAllPersonsAsStream();
 
-          await database.insertPersons(persons);
+          await personDao.insertPersons(persons);
           expect(
             actual,
             emitsInOrder(<List<Person>>[[], persons]),
@@ -253,11 +257,11 @@ void main() {
         test('initially emits persistent data then new', () async {
           final persons = [Person(1, 'Simon'), Person(2, 'Frank')];
           final persons2 = [Person(3, 'Paul'), Person(4, 'George')];
-          await database.insertPersons(persons);
+          await personDao.insertPersons(persons);
 
-          final actual = database.findAllPersonsAsStream();
+          final actual = personDao.findAllPersonsAsStream();
 
-          await database.insertPersons(persons2);
+          await personDao.insertPersons(persons2);
           expect(
             actual,
             emitsInOrder(<List<Person>>[persons, persons + persons2]),
@@ -268,12 +272,12 @@ void main() {
       group('update change', () {
         test('update item', () async {
           final person = Person(1, 'Simon');
-          await database.insertPerson(person);
+          await personDao.insertPerson(person);
 
-          final actual = database.findAllPersonsAsStream();
+          final actual = personDao.findAllPersonsAsStream();
 
           final updatedPerson = Person(person.id, 'Frank');
-          await database.updatePerson(updatedPerson);
+          await personDao.updatePerson(updatedPerson);
           expect(
             actual,
             emitsInOrder(<List<Person>>[
@@ -287,11 +291,11 @@ void main() {
           final persons = [Person(1, 'Simon'), Person(2, 'Frank')];
           final updatedPersons =
               persons.map((person) => Person(person.id, 'Nick')).toList();
-          await database.insertPersons(persons);
+          await personDao.insertPersons(persons);
 
-          final actual = database.findAllPersonsAsStream();
+          final actual = personDao.findAllPersonsAsStream();
 
-          await database.updatePersons(updatedPersons);
+          await personDao.updatePersons(updatedPersons);
           expect(actual, emitsInOrder(<List<Person>>[persons, updatedPersons]));
         });
       });
@@ -299,11 +303,11 @@ void main() {
       group('deletion change', () {
         test('delete item', () async {
           final person = Person(1, 'Simon');
-          await database.insertPerson(person);
+          await personDao.insertPerson(person);
 
-          final actual = database.findAllPersonsAsStream();
+          final actual = personDao.findAllPersonsAsStream();
 
-          await database.deletePerson(person);
+          await personDao.deletePerson(person);
           expect(
             actual,
             emitsInOrder(<List<Person>>[
@@ -315,11 +319,11 @@ void main() {
 
         test('delete items', () async {
           final persons = [Person(1, 'Simon'), Person(2, 'Frank')];
-          await database.insertPersons(persons);
+          await personDao.insertPersons(persons);
 
-          final actual = database.findAllPersonsAsStream();
+          final actual = personDao.findAllPersonsAsStream();
 
-          await database.deletePersons(persons);
+          await personDao.deletePersons(persons);
           expect(actual, emitsInOrder(<List<Person>>[persons, []]));
         });
       });

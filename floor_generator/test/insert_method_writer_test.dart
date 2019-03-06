@@ -1,7 +1,7 @@
 import 'package:build_test/build_test.dart';
 import 'package:code_builder/code_builder.dart';
 import 'package:floor_generator/misc/type_utils.dart';
-import 'package:floor_generator/model/database.dart';
+import 'package:floor_generator/model/dao.dart';
 import 'package:floor_generator/writer/change_method_writer.dart';
 import 'package:floor_generator/writer/insert_method_body_writer.dart';
 import 'package:source_gen/source_gen.dart';
@@ -165,9 +165,8 @@ Future<Method> _generateInsertMethod(final String methodSignature) async {
       
       import 'package:floor_annotation/floor_annotation.dart';
       
-      @Database(version: 1)
-      abstract class TestDatabase extends FloorDatabase {
-        static Future<TestDatabase> openDatabase() async => _\$open();
+      @dao
+      abstract class PersonDao {
       
         $methodSignature
       }
@@ -186,13 +185,12 @@ Future<Method> _generateInsertMethod(final String methodSignature) async {
     return LibraryReader(await resolver.findLibraryByName('test'));
   });
 
-  final databaseClass = library.classes
-      .where((clazz) =>
-          clazz.isAbstract && clazz.metadata.any(isDatabaseAnnotation))
+  final daoClass = library.classes
+      .where((clazz) => clazz.isAbstract && clazz.metadata.any(isDaoAnnotation))
       .first;
-  final database = Database(databaseClass);
-  final insertMethod = database.insertMethods.first;
 
+  final dao = Dao(daoClass, 'personDao', 'TestDatabase');
+  final insertMethod = dao.insertMethods.first;
   final writer = InsertMethodBodyWriter(library, insertMethod);
   return ChangeMethodWriter(library, insertMethod, writer).write();
 }

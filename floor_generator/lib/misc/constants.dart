@@ -11,6 +11,7 @@ abstract class Annotation {
   static const COLUMN_INFO = 'ColumnInfo';
   static const PRIMARY_KEY = 'PrimaryKey';
   static const TRANSACTION = '_Transaction';
+  static const DAO = '_Dao';
 
   static const QUERY = 'Query';
   static const INSERT = 'Insert';
