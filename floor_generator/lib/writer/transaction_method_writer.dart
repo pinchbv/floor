@@ -1,6 +1,6 @@
 import 'package:code_builder/code_builder.dart';
 import 'package:floor_generator/misc/annotation_expression.dart';
-import 'package:floor_generator/model/transaction_method.dart';
+import 'package:floor_generator/value_object/transaction_method.dart';
 import 'package:floor_generator/writer/writer.dart';
 import 'package:source_gen/source_gen.dart';
 

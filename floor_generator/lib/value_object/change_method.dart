@@ -1,7 +1,7 @@
 import 'package:analyzer/dart/element/element.dart';
 import 'package:analyzer/dart/element/type.dart';
 import 'package:floor_generator/misc/type_utils.dart';
-import 'package:floor_generator/model/entity.dart';
+import 'package:floor_generator/value_object/entity.dart';
 import 'package:source_gen/source_gen.dart';
 
 /// Base class for change methods (insert, update, delete).

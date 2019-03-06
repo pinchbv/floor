@@ -1,9 +1,8 @@
-import 'package:analyzer/dart/element/element.dart';
 import 'package:code_builder/code_builder.dart';
 import 'package:floor_generator/misc/annotation_expression.dart';
 import 'package:floor_generator/misc/type_utils.dart';
-import 'package:floor_generator/model/database.dart';
-import 'package:floor_generator/model/entity.dart';
+import 'package:floor_generator/value_object/database.dart';
+import 'package:floor_generator/value_object/entity.dart';
 import 'package:floor_generator/writer/dao_writer.dart';
 import 'package:floor_generator/writer/writer.dart';
 import 'package:source_gen/source_gen.dart';
