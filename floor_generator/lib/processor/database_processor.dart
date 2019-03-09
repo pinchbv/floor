@@ -42,7 +42,6 @@ class DatabaseProcessor extends Processor<Database> {
               'Add version to annotation. e.g. @Database(version:1, entities: [Person, Dog])',
           element: _classElement,
         ));
-    ;
   }
 
   @nonNull
