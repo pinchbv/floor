@@ -1,7 +1,7 @@
 name: floor_test
 description: >
   A supportive SQLite abstraction for your Flutter applications.
-  This is the testing module.
+  This is a module for running integration tests.
 version: 0.1.0
 homepage: https://github.com/vitusortner/floor
 author: vitusortner

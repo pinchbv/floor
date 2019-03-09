@@ -5,7 +5,7 @@ class Database {
   /// The database version.
   final int version;
 
-  /// The entities the database manages-
+  /// The entities the database manages.
   final List<Type> entities;
 
   /// Marks a class as a FloorDatabase.
