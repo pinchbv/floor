@@ -1,8 +1,10 @@
 import 'dart:async';
 
+import 'package:analyzer/dart/element/element.dart';
 import 'package:build/build.dart';
 import 'package:code_builder/code_builder.dart';
 import 'package:floor_generator/misc/annotations.dart';
+import 'package:floor_generator/misc/constants.dart';
 import 'package:floor_generator/misc/type_utils.dart';
 import 'package:floor_generator/processor/database_processor.dart';
 import 'package:floor_generator/processor/entity_processor.dart';
@@ -52,20 +54,35 @@ class FloorGenerator implements Generator {
           ' There are too many classes annotated with @Database.',
           element: databaseClasses[2]);
     } else {
+      final databaseClassElement = databaseClasses.first;
+      final entities = _getEntities(databaseClassElement);
+
+      if (entities == null || entities.isEmpty) {
+        throw InvalidGenerationSourceError(
+            'There are no entities added to the database annotation.',
+            element: databaseClassElement);
+      }
+
       return DatabaseProcessor(
-        databaseClasses.first,
-        _getEntities(library),
+        databaseClassElement,
+        entities,
       ).process();
     }
   }
 
-  @nonNull
-  List<Entity> _getEntities(final LibraryReader library) {
-    return library.classes
-        .where((clazz) =>
-            !clazz.isAbstract && clazz.metadata.any(isEntityAnnotation))
-        .map((entity) => EntityProcessor(entity).process())
-        .toList();
+  List<Entity> _getEntities(final ClassElement databaseClassElement) {
+    return databaseClassElement.metadata
+        .firstWhere(isDatabaseAnnotation)
+        .computeConstantValue()
+        .getField(AnnotationField.DATABASE_ENTITIES)
+        ?.toListValue()
+        ?.map((object) => object.toTypeValue().element)
+        ?.whereType<ClassElement>()
+        ?.where((classElement) =>
+            !classElement.isAbstract &&
+            classElement.metadata.any(isEntityAnnotation))
+        ?.map((classElement) => EntityProcessor(classElement).process())
+        ?.toList();
   }
 
   @nonNull

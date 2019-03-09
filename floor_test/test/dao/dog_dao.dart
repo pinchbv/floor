@@ -1,4 +1,6 @@
-part of '../database.dart';
+import 'package:floor/floor.dart';
+
+import '../model/dog.dart';
 
 @dao
 abstract class DogDao {
