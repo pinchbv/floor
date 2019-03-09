@@ -42,8 +42,6 @@ This package is still in an early phase and the API will likely change.
       floor: ^0.1.0
     
     dev_dependencies:
-      flutter_test:
-        sdk: flutter
       floor_generator: ^0.1.0
       build_runner: ^1.1.3
     ````

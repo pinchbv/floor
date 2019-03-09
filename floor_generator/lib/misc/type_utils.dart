@@ -1,13 +1,28 @@
 import 'package:analyzer/dart/element/element.dart';
 import 'package:analyzer/dart/element/type.dart';
+import 'package:floor_generator/misc/annotations.dart';
 import 'package:floor_generator/misc/constants.dart';
+import 'package:source_gen/source_gen.dart';
+
+@nonNull
+TypeChecker typeChecker(final Type type) => TypeChecker.fromRuntime(type);
+
+final _stringTypeChecker = typeChecker(String);
+
+final _boolTypeChecker = typeChecker(bool);
+
+final _intTypeChecker = typeChecker(int);
+
+final _doubleTypeChecker = typeChecker(double);
+
+final _streamTypeChecker = typeChecker(Stream);
 
 bool isString(final DartType type) {
-  return type.displayName == SupportedType.STRING && _isDartCore(type);
+  return _stringTypeChecker.isExactlyType(type);
 }
 
 bool isBool(final DartType type) {
-  return type.displayName == SupportedType.BOOL && _isDartCore(type);
+  return _boolTypeChecker.isExactlyType(type);
 }
 
 bool isInt(final DartType type) {
@@ -15,33 +30,29 @@ bool isInt(final DartType type) {
 }
 
 bool isDouble(final DartType type) {
-  return type.displayName == SupportedType.DOUBLE && _isDartCore(type);
+  return _doubleTypeChecker.isExactlyType(type);
 }
 
 bool isList(final DartType type) {
+  // TODO this weirdly fails when using a TypeChecker
   return type.name == 'List' && _isDartCore(type);
 }
 
 bool isSupportedType(final DartType type) {
-  return [
-        SupportedType.STRING,
-        SupportedType.BOOL,
-        SupportedType.INT,
-        SupportedType.DOUBLE
-      ].any((typeName) => typeName == type.displayName) &&
-      _isDartCore(type);
+  return TypeChecker.any([
+    _stringTypeChecker,
+    _boolTypeChecker,
+    _intTypeChecker,
+    _doubleTypeChecker
+  ]).isExactlyType(type);
 }
 
 bool isStream(final DartType type) {
-  return type.name == 'Stream';
+  return _streamTypeChecker.isExactlyType(type);
 }
 
 bool isEntityAnnotation(final ElementAnnotation annotation) {
   return _getAnnotationName(annotation) == Annotation.ENTITY;
-}
-
-bool isDatabaseAnnotation(final ElementAnnotation annotation) {
-  return _getAnnotationName(annotation) == Annotation.DATABASE;
 }
 
 bool isColumnInfoAnnotation(final ElementAnnotation annotation) {
@@ -70,10 +81,6 @@ bool isDeleteAnnotation(final ElementAnnotation annotation) {
 
 bool isTransactionAnnotation(final ElementAnnotation annotation) {
   return _getAnnotationName(annotation) == Annotation.TRANSACTION;
-}
-
-bool isDaoAnnotation(final ElementAnnotation annotation) {
-  return _getAnnotationName(annotation) == Annotation.DAO;
 }
 
 DartType flattenList(final DartType type) {
