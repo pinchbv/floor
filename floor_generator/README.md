@@ -1,7 +1,7 @@
 # Floor
 **A supportive SQLite abstraction for your Flutter applications.**
 
-This is the dev dependency and contains the code generator.
+This is the dev dependency and contains the annotation processor.
 
 ---
 

@@ -39,18 +39,12 @@ This package is still in an early phase and the API will likely change.
     dependencies:
       flutter:
         sdk: flutter
-      floor:
-        git: 
-          url: https://github.com/vitusortner/floor.git
-          path: /floor/
+      floor: ^0.1.0
     
     dev_dependencies:
       flutter_test:
         sdk: flutter
-      floor_generator:
-        git: 
-            url: https://github.com/vitusortner/floor.git
-            path: /floor_generator/
+      floor_generator: ^0.1.0
       build_runner: ^1.1.3
     ````
 
