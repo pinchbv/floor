@@ -3,7 +3,6 @@ import 'package:test/test.dart';
 
 import '../test_utils.dart';
 
-
 void main() {
   group('assert type', () {
     test('is string', () async {

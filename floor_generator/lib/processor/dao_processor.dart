@@ -89,8 +89,7 @@ class DaoProcessor extends Processor<Dao> {
         .toList();
   }
 
-  List<TransactionMethod> _getTransactionMethods(
-      List<MethodElement> methods) {
+  List<TransactionMethod> _getTransactionMethods(List<MethodElement> methods) {
     return methods
         .where((method) => method.metadata.any(isTransactionAnnotation))
         .map((method) =>
