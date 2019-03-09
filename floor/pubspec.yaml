@@ -4,18 +4,18 @@ description: >
   This library is the runtime dependency.
 version: 0.1.0
 homepage: https://github.com/vitusortner/floor
-author: vitusortner
+author: Vitus Ortner <vitusortner.dev@gmail.com>
 
 environment:
   sdk: '>=2.1.0 <3.0.0'
 
 dependencies:
-  flutter:
-    sdk: flutter
   path: ^1.6.2
   sqflite: ^1.1.1
   floor_annotation:
     path: ../floor_annotation/
+  flutter:
+    sdk: flutter
 
 dev_dependencies:
   mockito: ^4.0.0
