@@ -2,13 +2,11 @@ import 'package:code_builder/code_builder.dart';
 import 'package:floor_generator/misc/annotation_expression.dart';
 import 'package:floor_generator/value_object/transaction_method.dart';
 import 'package:floor_generator/writer/writer.dart';
-import 'package:source_gen/source_gen.dart';
 
 class TransactionMethodWriter implements Writer {
-  final LibraryReader library;
   final TransactionMethod method;
 
-  TransactionMethodWriter(final this.library, final this.method);
+  TransactionMethodWriter(final this.method);
 
   @override
   Method write() {
@@ -23,7 +21,7 @@ class TransactionMethodWriter implements Writer {
 
   String _generateMethodBody() {
     final parameters =
-        method.parameters.map((parameter) => parameter.name).join(', ');
+        method.parameterElements.map((parameter) => parameter.name).join(', ');
     final methodCall = '${method.name}($parameters)';
 
     return '''
@@ -39,7 +37,7 @@ class TransactionMethodWriter implements Writer {
   }
 
   List<Parameter> _generateParameters() {
-    return method.parameters.map((parameter) {
+    return method.parameterElements.map((parameter) {
       return Parameter((builder) => builder
         ..name = parameter.name
         ..type = refer(parameter.type.displayName));

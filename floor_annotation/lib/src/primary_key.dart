@@ -8,4 +8,6 @@ class PrimaryKey {
 }
 
 /// Marks a field in an [Entity] as the primary key.
+///
+/// Defaults the automatic generation of the primary key to `false`.
 const primaryKey = PrimaryKey();

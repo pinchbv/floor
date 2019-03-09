@@ -1,13 +1,14 @@
 import 'package:build_test/build_test.dart';
 import 'package:code_builder/code_builder.dart';
 import 'package:floor_generator/misc/type_utils.dart';
-import 'package:floor_generator/value_object/dao.dart';
-import 'package:floor_generator/writer/change_method_writer.dart';
-import 'package:floor_generator/writer/insert_method_body_writer.dart';
+import 'package:floor_generator/processor/dao_processor.dart';
+import 'package:floor_generator/processor/entity_processor.dart';
+import 'package:floor_generator/writer/insertion_method_writer.dart';
 import 'package:source_gen/source_gen.dart';
 import 'package:test/test.dart';
 
-import 'test_utils.dart';
+import '../test_utils.dart';
+
 
 void main() {
   useDartfmt();
@@ -189,8 +190,13 @@ Future<Method> _generateInsertMethod(final String methodSignature) async {
       .where((clazz) => clazz.isAbstract && clazz.metadata.any(isDaoAnnotation))
       .first;
 
-  final dao = Dao(daoClass, 'personDao', 'TestDatabase');
-  final insertMethod = dao.insertMethods.first;
-  final writer = InsertMethodBodyWriter(library, insertMethod);
-  return ChangeMethodWriter(library, insertMethod, writer).write();
+  final entities = library.classes
+      .where((classElement) => classElement.metadata.any(isEntityAnnotation))
+      .map((classElement) => EntityProcessor(classElement).process())
+      .toList();
+
+  final dao =
+      DaoProcessor(daoClass, 'personDao', 'TestDatabase', entities).process();
+  final insertMethod = dao.insertionMethods.first;
+  return InsertionMethodWriter(insertMethod).write();
 }

@@ -1,4 +1,3 @@
-/// Marks a method as a transaction method.
 class _Transaction {
   const _Transaction();
 }

@@ -38,6 +38,9 @@ class QueryAdapter {
   }
 
   Future<void> queryNoReturn(final String sql) async {
+    // TODO differentiate between different query kinds (select, update, delete, insert)
+    //  this enables to notify the observers
+    //  also requires extracting the table name :(
     await _database.rawQuery(sql);
   }
 

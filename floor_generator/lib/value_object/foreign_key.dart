@@ -1,97 +1,59 @@
 import 'package:analyzer/dart/constant/value.dart';
 import 'package:analyzer/dart/element/element.dart';
-import 'package:floor_generator/misc/constants.dart';
-import 'package:floor_generator/misc/type_utils.dart';
-import 'package:floor_generator/value_object/entity.dart';
-import 'package:source_gen/source_gen.dart';
+import 'package:floor_generator/misc/annotations.dart';
 
 class ForeignKey {
-  final ClassElement entityClass;
+  final ClassElement classElement;
   final DartObject object;
+  final String parentName;
+  final List<String> parentColumns;
+  final List<String> childColumns;
+  final String onUpdate;
+  final String onDelete;
 
-  ForeignKey(this.entityClass, this.object);
+  ForeignKey(
+    this.classElement,
+    this.object,
+    this.parentName,
+    this.parentColumns,
+    this.childColumns,
+    this.onUpdate,
+    this.onDelete,
+  );
 
-  String getDefinition(final LibraryReader library) {
-    final onUpdateAction = _getAction(_onUpdate);
-    final onDeleteAction = _getAction(_onDelete);
-
-    return 'FOREIGN KEY (${_childColumns.join(', ')}) '
-        ' REFERENCES `${_getParentName(library)}` (${_parentColumns.join(', ')})'
-        ' ON UPDATE $onUpdateAction'
-        ' ON DELETE $onDeleteAction';
+  @nonNull
+  String getDefinition() {
+    return 'FOREIGN KEY (${childColumns.join(', ')}) '
+        ' REFERENCES `$parentName` (${parentColumns.join(', ')})'
+        ' ON UPDATE $onUpdate'
+        ' ON DELETE $onDelete';
   }
 
-  /// Returns the parent column name referenced with this foreign key.
-  String _getParentName(final LibraryReader library) {
-    final entityClassName =
-        object.getField(ForeignKeyField.ENTITY)?.toTypeValue()?.displayName ??
-            (throw InvalidGenerationSourceError(
-              'No entity defined for foreign key',
-              element: entityClass,
-            ));
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is ForeignKey &&
+          runtimeType == other.runtimeType &&
+          classElement == other.classElement &&
+          object == other.object &&
+          parentName == other.parentName &&
+          parentColumns == other.parentColumns &&
+          childColumns == other.childColumns &&
+          onUpdate == other.onUpdate &&
+          onDelete == other.onDelete;
 
-    return library.classes
-        .where((clazz) =>
-            !clazz.isAbstract && clazz.metadata.any(isEntityAnnotation))
-        .map((clazz) => Entity(clazz))
-        .firstWhere(
-          (entity) => entity.clazz.displayName == entityClassName,
-          orElse: () => throw InvalidGenerationSourceError(
-                '$entityClassName is not an entity. Did you miss annotating the class with @Entity?',
-                element: entityClass,
-              ),
-        )
-        .name;
-  }
+  @override
+  int get hashCode =>
+      classElement.hashCode ^
+      object.hashCode ^
+      parentName.hashCode ^
+      parentColumns.hashCode ^
+      childColumns.hashCode ^
+      onUpdate.hashCode ^
+      onDelete.hashCode;
 
-  List<String> get _childColumns {
-    final columns = _getColumns(ForeignKeyField.CHILD_COLUMNS);
-    if (columns.isEmpty) {
-      throw InvalidGenerationSourceError(
-        'No child columns defined for foreign key',
-        element: entityClass,
-      );
-    }
-    return columns;
-  }
-
-  List<String> get _parentColumns {
-    final columns = _getColumns(ForeignKeyField.PARENT_COLUMNS);
-    if (columns.isEmpty) {
-      throw InvalidGenerationSourceError(
-        'No parent columns defined for foreign key',
-        element: entityClass,
-      );
-    }
-    return columns;
-  }
-
-  int get _onUpdate => object.getField(ForeignKeyField.ON_UPDATE)?.toIntValue();
-
-  int get _onDelete => object.getField(ForeignKeyField.ON_DELETE)?.toIntValue();
-
-  String _getAction(final int action) {
-    switch (action) {
-      case ForeignKeyAction.RESTRICT:
-        return 'RESTRICT';
-      case ForeignKeyAction.SET_NULL:
-        return 'SET_NULL';
-      case ForeignKeyAction.SET_DEFAULT:
-        return 'SET_DEFAULT';
-      case ForeignKeyAction.CASCADE:
-        return 'CASCADE';
-      case ForeignKeyAction.NO_ACTION:
-      default:
-        return 'NO ACTION';
-    }
-  }
-
-  List<String> _getColumns(final String foreignKeyField) {
-    return object
-            .getField(foreignKeyField)
-            ?.toListValue()
-            ?.map((object) => object.toStringValue())
-            ?.toList() ??
-        [];
+  @override
+  String toString() {
+    return 'ForeignKey{classElement: $classElement, object: $object, parentName: $parentName, parentColumns: $parentColumns, childColumns: $childColumns, onUpdate: $onUpdate, onDelete: $onDelete}';
   }
 }
