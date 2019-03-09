@@ -52,19 +52,6 @@ class DatabaseProcessor extends Processor<Database> {
   }
 
   List<DaoGetter> _getDaoGetters(final String databaseName) {
-    // TODO decide for either implementing this approach (include adding
-    //  entities to the database annotation) or keep it like it is now
-    //  another option would be to get the libraryElement form the classElement
-    //  e.g. _classElement.library;
-
-//    final entities = _classElement.metadata
-//        .firstWhere(isDatabaseAnnotation)
-//        .computeConstantValue()
-//        .getField(AnnotationField.DATABASE_ENTITIES)
-//        ?.toListValue()
-//        ?.map((object) => object.toTypeValue().element)
-//        ?.whereType<ClassElement>();
-
     return _classElement.fields.where(_isDao).map((field) {
       final classElement = field.type.element as ClassElement;
       final name = field.displayName;

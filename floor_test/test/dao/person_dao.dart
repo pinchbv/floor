@@ -1,4 +1,6 @@
-part of '../database.dart';
+import 'package:floor/floor.dart';
+
+import '../model/person.dart';
 
 @dao
 abstract class PersonDao {

@@ -3,7 +3,11 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:matcher/matcher.dart';
 import 'package:sqflite/sqflite.dart';
 
+import 'dao/dog_dao.dart';
+import 'dao/person_dao.dart';
 import 'database.dart';
+import 'model/dog.dart';
+import 'model/person.dart';
 
 // run test with 'flutter run test/database_test.dart'
 void main() {
