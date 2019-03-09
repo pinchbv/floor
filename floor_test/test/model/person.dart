@@ -1,4 +1,4 @@
-part of '../database.dart';
+import 'package:floor/floor.dart';
 
 @Entity(tableName: 'person')
 class Person {
