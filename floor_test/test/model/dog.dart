@@ -12,7 +12,7 @@ part of '../database.dart';
   ],
 )
 class Dog {
-  @PrimaryKey()
+  @primaryKey
   final int id;
 
   final String name;

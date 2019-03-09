@@ -1,28 +1,23 @@
 import 'package:code_builder/code_builder.dart';
+import 'package:floor_generator/misc/string_utils.dart';
 import 'package:floor_generator/value_object/dao.dart';
-import 'package:floor_generator/value_object/delete_method.dart';
-import 'package:floor_generator/value_object/insert_method.dart';
+import 'package:floor_generator/value_object/deletion_method.dart';
+import 'package:floor_generator/value_object/insertion_method.dart';
 import 'package:floor_generator/value_object/query_method.dart';
 import 'package:floor_generator/value_object/transaction_method.dart';
 import 'package:floor_generator/value_object/update_method.dart';
-import 'package:floor_generator/writer/adapter/deletion_adapters_writer.dart';
-import 'package:floor_generator/writer/adapter/insertion_adapters_writer.dart';
-import 'package:floor_generator/writer/adapter/query_adapter_writer.dart';
-import 'package:floor_generator/writer/adapter/update_adapters_writer.dart';
-import 'package:floor_generator/writer/change_method_writer.dart';
-import 'package:floor_generator/writer/delete_method_body_writer.dart';
-import 'package:floor_generator/writer/insert_method_body_writer.dart';
+import 'package:floor_generator/writer/deletion_method_writer.dart';
+import 'package:floor_generator/writer/insertion_method_writer.dart';
 import 'package:floor_generator/writer/query_method_writer.dart';
 import 'package:floor_generator/writer/transaction_method_writer.dart';
-import 'package:floor_generator/writer/update_method_body_writer.dart';
+import 'package:floor_generator/writer/update_method_writer.dart';
 import 'package:floor_generator/writer/writer.dart';
-import 'package:source_gen/source_gen.dart';
 
+/// Creates the implementation of a DAO.
 class DaoWriter extends Writer {
-  final LibraryReader library;
   final Dao dao;
 
-  DaoWriter(this.library, this.dao);
+  DaoWriter(this.dao);
 
   @override
   Class write() {
@@ -30,69 +25,149 @@ class DaoWriter extends Writer {
     const changeListenerFieldName = 'changeListener';
 
     final daoName = dao.name;
-    final builder = ClassBuilder()
+    final classBuilder = ClassBuilder()
       ..name = '_\$$daoName'
       ..extend = refer(daoName)
-      ..constructors
-          .add(_createConstructor(databaseFieldName, changeListenerFieldName))
       ..fields
           .addAll(_createFields(databaseFieldName, changeListenerFieldName));
 
-    final streamEntities = dao.getStreamEntities(library);
+    final databaseParameter = Parameter((builder) => builder
+      ..name = databaseFieldName
+      ..toThis = true);
+
+    final changeListenerParameter = Parameter((builder) => builder
+      ..name = changeListenerFieldName
+      ..toThis = true);
+
+    final constructorBuilder = ConstructorBuilder()
+      ..requiredParameters.addAll([databaseParameter, changeListenerParameter]);
+
+    final streamEntities = dao.streamEntities;
 
     final queryMethods = dao.queryMethods;
     if (queryMethods.isNotEmpty) {
-      QueryAdapterWriter(
-        library,
-        builder,
-        queryMethods,
-        streamEntities.isNotEmpty,
-      ).write();
+      classBuilder
+        ..fields.add(Field((builder) => builder
+          ..modifier = FieldModifier.final$
+          ..name = '_queryAdapter'
+          ..type = refer('QueryAdapter')));
+
+      final requiresChangeListener = streamEntities.isNotEmpty;
+
+      constructorBuilder
+        ..initializers.add(Code(
+            "_queryAdapter = QueryAdapter(database${requiresChangeListener ? ', changeListener' : ''})"));
+
+      final queryMapperFields = queryMethods
+          .map((method) => method.entity)
+          .where((entity) => entity != null)
+          .toSet()
+          .map((entity) {
+        final constructor = entity.constructor;
+        final name = '_${decapitalize(entity.name)}Mapper';
+
+        return Field((builder) => builder
+          ..name = name
+          ..modifier = FieldModifier.final$
+          ..assignment = Code('(Map<String, dynamic> row) => $constructor'));
+      });
+
+      classBuilder.fields.addAll(queryMapperFields);
     }
 
-    final insertMethods = dao.insertMethods;
-    if (insertMethods.isNotEmpty) {
-      InsertionAdaptersWriter(library, builder, insertMethods, streamEntities)
-          .write();
+    final insertionMethods = dao.insertionMethods;
+    if (insertionMethods.isNotEmpty) {
+      final entities = insertionMethods.map((method) => method.entity).toSet();
+
+      for (final entity in entities) {
+        final name = entity.classElement.displayName;
+        final fieldName = '_${decapitalize(name)}InsertionAdapter';
+        final type = refer('InsertionAdapter<$name>');
+
+        final field = Field((builder) => builder
+          ..name = fieldName
+          ..type = type
+          ..modifier = FieldModifier.final$);
+
+        classBuilder..fields.add(field);
+
+        final valueMapper =
+            '(${entity.classElement.displayName} item) => ${entity.getValueMapping()}';
+
+        final requiresChangeListener =
+            streamEntities.any((streamEntity) => streamEntity == entity);
+
+        constructorBuilder
+          ..initializers.add(Code(
+              "$fieldName = InsertionAdapter(database, '${entity.name}', $valueMapper${requiresChangeListener ? ', changeListener' : ''})"));
+      }
     }
 
     final updateMethods = dao.updateMethods;
     if (updateMethods.isNotEmpty) {
-      UpdateAdaptersWriter(library, builder, updateMethods, streamEntities)
-          .write();
+      final entities = updateMethods.map((method) => method.entity).toSet();
+
+      for (final entity in entities) {
+        final name = entity.classElement.displayName;
+        final fieldName = '_${decapitalize(name)}UpdateAdapter';
+        final type = refer('UpdateAdapter<$name>');
+
+        final field = Field((builder) => builder
+          ..name = fieldName
+          ..type = type
+          ..modifier = FieldModifier.final$);
+
+        classBuilder..fields.add(field);
+
+        final valueMapper =
+            '(${entity.classElement.displayName} item) => ${entity.getValueMapping()}';
+
+        final requiresChangeListener =
+            streamEntities.any((streamEntity) => streamEntity == entity);
+
+        constructorBuilder
+          ..initializers.add(Code(
+              "$fieldName = UpdateAdapter(database, '${entity.name}', '${entity.primaryKey.field.columnName}', $valueMapper${requiresChangeListener ? ', changeListener' : ''})"));
+      }
     }
 
-    final deleteMethods = dao.deleteMethods;
+    final deleteMethods = dao.deletionMethods;
     if (deleteMethods.isNotEmpty) {
-      DeletionAdaptersWriter(library, builder, deleteMethods, streamEntities)
-          .write();
+      final entities = deleteMethods.map((method) => method.entity).toSet();
+
+      for (final entity in entities) {
+        final name = entity.classElement.displayName;
+        final fieldName = '_${decapitalize(name)}DeletionAdapter';
+        final type = refer('DeletionAdapter<$name>');
+
+        final field = Field((builder) => builder
+          ..name = fieldName
+          ..type = type
+          ..modifier = FieldModifier.final$);
+
+        classBuilder..fields.add(field);
+
+        final valueMapper =
+            '(${entity.classElement.displayName} item) => ${entity.getValueMapping()}';
+
+        final requiresChangeListener =
+            streamEntities.any((streamEntity) => streamEntity == entity);
+
+        constructorBuilder
+          ..initializers.add(Code(
+              "$fieldName = DeletionAdapter(database, '${entity.name}', '${entity.primaryKey.field.columnName}', $valueMapper${requiresChangeListener ? ', changeListener' : ''})"));
+      }
     }
 
-    builder
+    classBuilder
+      ..constructors.add(constructorBuilder.build())
       ..methods.addAll(_generateQueryMethods(queryMethods))
-      ..methods.addAll(_generateInsertMethods(insertMethods))
+      ..methods.addAll(_generateInsertionMethods(insertionMethods))
       ..methods.addAll(_generateUpdateMethods(updateMethods))
-      ..methods.addAll(_generateDeleteMethods(deleteMethods))
+      ..methods.addAll(_generateDeletionMethods(deleteMethods))
       ..methods.addAll(_generateTransactionMethods(dao.transactionMethods));
 
-    return builder.build();
-  }
-
-  Constructor _createConstructor(
-    final String databaseName,
-    final String changeListenerName,
-  ) {
-    final databaseParameter = Parameter((builder) => builder
-      ..name = databaseName
-      ..toThis = true);
-
-    final changeListenerParameter = Parameter((builder) => builder
-      ..name = changeListenerName
-      ..toThis = true);
-
-    return Constructor((builder) => builder
-      ..requiredParameters
-          .addAll([databaseParameter, changeListenerParameter]));
+    return classBuilder.build();
   }
 
   List<Field> _createFields(
@@ -112,30 +187,33 @@ class DaoWriter extends Writer {
     return [databaseField, changeListenerField];
   }
 
-  List<Method> _generateInsertMethods(final List<InsertMethod> insertMethods) {
-    return insertMethods.map((method) {
-      final writer = InsertMethodBodyWriter(library, method);
-      return ChangeMethodWriter(library, method, writer).write();
-    }).toList();
+  List<Method> _generateInsertionMethods(
+    final List<InsertionMethod> insertionMethods,
+  ) {
+    return insertionMethods
+        .map((method) => InsertionMethodWriter(method).write())
+        .toList();
   }
 
-  List<Method> _generateUpdateMethods(final List<UpdateMethod> updateMethods) {
-    return updateMethods.map((method) {
-      final writer = UpdateMethodBodyWriter(library, method);
-      return ChangeMethodWriter(library, method, writer).write();
-    }).toList();
+  List<Method> _generateUpdateMethods(
+    final List<UpdateMethod> updateMethods,
+  ) {
+    return updateMethods
+        .map((method) => UpdateMethodWriter(method).write())
+        .toList();
   }
 
-  List<Method> _generateDeleteMethods(final List<DeleteMethod> deleteMethods) {
-    return deleteMethods.map((method) {
-      final writer = DeleteMethodBodyWriter(library, method);
-      return ChangeMethodWriter(library, method, writer).write();
-    }).toList();
+  List<Method> _generateDeletionMethods(
+    final List<DeletionMethod> deletionMethods,
+  ) {
+    return deletionMethods
+        .map((method) => DeletionMethodWriter(method).write())
+        .toList();
   }
 
   List<Method> _generateQueryMethods(final List<QueryMethod> queryMethods) {
     return queryMethods
-        .map((method) => QueryMethodWriter(library, method).write())
+        .map((method) => QueryMethodWriter(method).write())
         .toList();
   }
 
@@ -143,7 +221,7 @@ class DaoWriter extends Writer {
     final List<TransactionMethod> transactionMethods,
   ) {
     return transactionMethods
-        .map((method) => TransactionMethodWriter(library, method).write())
+        .map((method) => TransactionMethodWriter(method).write())
         .toList();
   }
 }

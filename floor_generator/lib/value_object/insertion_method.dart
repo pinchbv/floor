@@ -3,10 +3,10 @@ import 'package:analyzer/dart/element/type.dart';
 import 'package:floor_generator/value_object/change_method.dart';
 import 'package:floor_generator/value_object/entity.dart';
 
-class UpdateMethod extends ChangeMethod {
+class InsertionMethod extends ChangeMethod {
   final String onConflict;
 
-  UpdateMethod(
+  InsertionMethod(
     final MethodElement methodElement,
     final String name,
     final DartType returnType,
@@ -27,7 +27,7 @@ class UpdateMethod extends ChangeMethod {
   bool operator ==(Object other) =>
       identical(this, other) ||
       super == other &&
-          other is UpdateMethod &&
+          other is InsertionMethod &&
           runtimeType == other.runtimeType &&
           onConflict == other.onConflict;
 
@@ -36,6 +36,6 @@ class UpdateMethod extends ChangeMethod {
 
   @override
   String toString() {
-    return 'NewUpdateMethod{onConflict: $onConflict}';
+    return 'InsertionMethod{onConflict: $onConflict}';
   }
 }

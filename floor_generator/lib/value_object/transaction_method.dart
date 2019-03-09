@@ -2,19 +2,45 @@ import 'package:analyzer/dart/element/element.dart';
 import 'package:analyzer/dart/element/type.dart';
 
 class TransactionMethod {
-  final MethodElement method;
+  final MethodElement methodElement;
+  final String name;
+  final DartType returnType;
+  final List<ParameterElement> parameterElements;
   final String daoFieldName;
   final String databaseName;
 
   TransactionMethod(
-    final this.method,
-    final this.daoFieldName,
-    final this.databaseName,
+    this.methodElement,
+    this.name,
+    this.returnType,
+    this.parameterElements,
+    this.daoFieldName,
+    this.databaseName,
   );
 
-  DartType get returnType => method.returnType;
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is TransactionMethod &&
+          runtimeType == other.runtimeType &&
+          methodElement == other.methodElement &&
+          name == other.name &&
+          returnType == other.returnType &&
+          parameterElements == other.parameterElements &&
+          daoFieldName == other.daoFieldName &&
+          databaseName == other.databaseName;
 
-  String get name => method.displayName;
+  @override
+  int get hashCode =>
+      methodElement.hashCode ^
+      name.hashCode ^
+      returnType.hashCode ^
+      parameterElements.hashCode ^
+      daoFieldName.hashCode ^
+      databaseName.hashCode;
 
-  List<ParameterElement> get parameters => method.parameters;
+  @override
+  String toString() {
+    return 'NewTransactionMethod{methodElement: $methodElement, name: $name, returnType: $returnType, parameterElements: $parameterElements, daoFieldName: $daoFieldName, databaseName: $databaseName}';
+  }
 }

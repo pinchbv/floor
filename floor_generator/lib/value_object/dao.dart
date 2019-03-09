@@ -1,79 +1,59 @@
 import 'package:analyzer/dart/element/element.dart';
-import 'package:floor_generator/misc/type_utils.dart';
-import 'package:floor_generator/value_object/delete_method.dart';
+import 'package:floor_generator/value_object/deletion_method.dart';
 import 'package:floor_generator/value_object/entity.dart';
-import 'package:floor_generator/value_object/insert_method.dart';
+import 'package:floor_generator/value_object/insertion_method.dart';
 import 'package:floor_generator/value_object/query_method.dart';
 import 'package:floor_generator/value_object/transaction_method.dart';
 import 'package:floor_generator/value_object/update_method.dart';
-import 'package:source_gen/source_gen.dart';
 
 class Dao {
-  final ClassElement clazz;
-  final String daoFieldName;
-  final String databaseName;
+  final ClassElement classElement;
+  final String name;
+  final List<QueryMethod> queryMethods;
+  final List<InsertionMethod> insertionMethods;
+  final List<UpdateMethod> updateMethods;
+  final List<DeletionMethod> deletionMethods;
+  final List<TransactionMethod> transactionMethods;
+  final List<Entity> streamEntities;
 
-  Dao(final this.clazz, final this.daoFieldName, final this.databaseName);
+  Dao(
+    this.classElement,
+    this.name,
+    this.queryMethods,
+    this.insertionMethods,
+    this.updateMethods,
+    this.deletionMethods,
+    this.transactionMethods,
+    this.streamEntities,
+  );
 
-  String get name => _nameCache ??= clazz.displayName;
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is Dao &&
+          runtimeType == other.runtimeType &&
+          classElement == other.classElement &&
+          name == other.name &&
+          queryMethods == other.queryMethods &&
+          insertionMethods == other.insertionMethods &&
+          updateMethods == other.updateMethods &&
+          deletionMethods == other.deletionMethods &&
+          transactionMethods == other.transactionMethods &&
+          streamEntities == other.streamEntities;
 
-  String _nameCache;
+  @override
+  int get hashCode =>
+      classElement.hashCode ^
+      name.hashCode ^
+      queryMethods.hashCode ^
+      insertionMethods.hashCode ^
+      updateMethods.hashCode ^
+      deletionMethods.hashCode ^
+      transactionMethods.hashCode ^
+      streamEntities.hashCode;
 
-  List<MethodElement> get methods => _methodsCache ??= clazz.methods;
-
-  List<MethodElement> _methodsCache;
-
-  List<QueryMethod> get queryMethods {
-    return _queryMethodsCache ??= methods
-        .where((method) => method.metadata.any(isQueryAnnotation))
-        .map((method) => QueryMethod(method))
-        .toList();
+  @override
+  String toString() {
+    return 'NewDao{classElement: $classElement, name: $name, queryMethods: $queryMethods, insertionMethods: $insertionMethods, updateMethods: $updateMethods, deletionMethods: $deletionMethods, transactionMethods: $transactionMethods, streamEntities: $streamEntities}';
   }
-
-  List<QueryMethod> _queryMethodsCache;
-
-  List<InsertMethod> get insertMethods {
-    return _insertMethodCache ??= methods
-        .where((method) => method.metadata.any(isInsertAnnotation))
-        .map((method) => InsertMethod(method))
-        .toList();
-  }
-
-  List<InsertMethod> _insertMethodCache;
-
-  List<UpdateMethod> get updateMethods {
-    return _updateMethodCache ??= methods
-        .where((method) => method.metadata.any(isUpdateAnnotation))
-        .map((method) => UpdateMethod(method))
-        .toList();
-  }
-
-  List<UpdateMethod> _updateMethodCache;
-
-  List<DeleteMethod> get deleteMethods {
-    return _deleteMethodCache ??= methods
-        .where((method) => method.metadata.any(isDeleteAnnotation))
-        .map((method) => DeleteMethod(method))
-        .toList();
-  }
-
-  List<DeleteMethod> _deleteMethodCache;
-
-  List<TransactionMethod> get transactionMethods {
-    return _transactionMethodCache ??= methods
-        .where((method) => method.metadata.any(isTransactionAnnotation))
-        .map((method) => TransactionMethod(method, daoFieldName, databaseName))
-        .toList();
-  }
-
-  List<TransactionMethod> _transactionMethodCache;
-
-  List<Entity> getStreamEntities(final LibraryReader library) {
-    return _streamEntitiesCache ??= queryMethods
-        .where((method) => method.returnsStream)
-        .map((method) => method.getEntity(library))
-        .toList();
-  }
-
-  List<Entity> _streamEntitiesCache;
 }

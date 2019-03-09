@@ -3,17 +3,14 @@ import 'package:analyzer/dart/element/type.dart';
 import 'package:floor_generator/value_object/change_method.dart';
 import 'package:floor_generator/value_object/entity.dart';
 
-class UpdateMethod extends ChangeMethod {
-  final String onConflict;
-
-  UpdateMethod(
+class DeletionMethod extends ChangeMethod {
+  DeletionMethod(
     final MethodElement methodElement,
     final String name,
     final DartType returnType,
     final DartType flattenedReturnType,
     final ParameterElement parameterElement,
     final Entity entity,
-    this.onConflict,
   ) : super(
           methodElement,
           name,
@@ -22,20 +19,4 @@ class UpdateMethod extends ChangeMethod {
           parameterElement,
           entity,
         );
-
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      super == other &&
-          other is UpdateMethod &&
-          runtimeType == other.runtimeType &&
-          onConflict == other.onConflict;
-
-  @override
-  int get hashCode => super.hashCode ^ onConflict.hashCode;
-
-  @override
-  String toString() {
-    return 'NewUpdateMethod{onConflict: $onConflict}';
-  }
 }

@@ -1,7 +1,6 @@
-/// Marks a method as a delete method.
-class Delete {
-  const Delete();
+class _Delete {
+  const _Delete();
 }
 
-/// Marks a method as a delete method.
-const delete = Delete();
+/// Marks a method as a deletion method.
+const delete = _Delete();

@@ -1,63 +1,23 @@
 import 'package:code_builder/code_builder.dart';
 import 'package:floor_generator/misc/annotation_expression.dart';
-import 'package:floor_generator/misc/type_utils.dart';
+import 'package:floor_generator/misc/annotations.dart';
 import 'package:floor_generator/value_object/database.dart';
 import 'package:floor_generator/value_object/entity.dart';
-import 'package:floor_generator/writer/dao_writer.dart';
 import 'package:floor_generator/writer/writer.dart';
 import 'package:source_gen/source_gen.dart';
 
 /// Takes care of generating the database implementation.
 class DatabaseWriter implements Writer {
-  final LibraryReader library;
+  final Database database;
 
-  DatabaseWriter(final this.library);
+  DatabaseWriter(final this.database);
 
   @override
-  Spec write() {
-    final database = _getDatabase();
-    if (database == null) return null;
-
-    return Library((builder) => builder
-      ..body.addAll([
-        _generateOpenDatabaseFunction(database.name),
-        _generateDatabaseImplementation(database),
-      ])
-      ..body.addAll(_generateDaos(database)));
+  Class write() {
+    return _generateDatabaseImplementation(database);
   }
 
-  Database _getDatabase() {
-    final databaseClasses = library.classes.where((clazz) =>
-        clazz.isAbstract && clazz.metadata.any(isDatabaseAnnotation));
-
-    if (databaseClasses.isEmpty) {
-      return null;
-    } else if (databaseClasses.length > 1) {
-      throw InvalidGenerationSourceError(
-          'Only one database is allowed. There are too many classes annotated with @Database.');
-    } else {
-      return Database(databaseClasses.first);
-    }
-  }
-
-  Method _generateOpenDatabaseFunction(final String databaseName) {
-    final migrationsParameter = Parameter((builder) => builder
-      ..name = 'migrations'
-      ..type = refer('List<Migration>')
-      ..defaultTo = const Code('const []'));
-
-    return Method((builder) => builder
-      ..returns = refer('Future<$databaseName>')
-      ..name = '_\$open'
-      ..modifier = MethodModifier.async
-      ..optionalParameters.add(migrationsParameter)
-      ..body = Code('''
-            final database = _\$$databaseName();
-            database.database = await database.open(migrations);
-            return database;
-            '''));
-  }
-
+  @nonNull
   Class _generateDatabaseImplementation(final Database database) {
     final databaseName = database.name;
 
@@ -69,35 +29,38 @@ class DatabaseWriter implements Writer {
       ..fields.addAll(_generateDaoInstances(database)));
   }
 
+  @nonNull
   List<Method> _generateDaoGetters(final Database database) {
-    return database.getDaos(library).map((dao) {
-      final daoFieldName = dao.daoFieldName;
-      final daoType = dao.clazz.displayName;
+    return database.daoGetters.map((daoGetter) {
+      final daoGetterName = daoGetter.name;
+      final daoTypeName = daoGetter.dao.classElement.displayName;
 
       return Method((builder) => builder
         ..annotations.add(overrideAnnotationExpression)
         ..type = MethodType.getter
-        ..returns = refer(daoType)
-        ..name = daoFieldName
+        ..returns = refer(daoTypeName)
+        ..name = daoGetterName
         ..body = Code(
-            'return _${daoFieldName}Instance ??= _\$$daoType(database, changeListener);'));
+            'return _${daoGetterName}Instance ??= _\$$daoTypeName(database, changeListener);'));
     }).toList();
   }
 
+  @nonNull
   List<Field> _generateDaoInstances(final Database database) {
-    return database.getDaos(library).map((dao) {
-      final daoFieldName = dao.daoFieldName;
-      final daoType = dao.clazz.displayName;
+    return database.daoGetters.map((daoGetter) {
+      final daoGetterName = daoGetter.name;
+      final daoTypeName = daoGetter.dao.classElement.displayName;
 
       return Field((builder) => builder
-        ..type = refer(daoType)
-        ..name = '_${daoFieldName}Instance');
+        ..type = refer(daoTypeName)
+        ..name = '_${daoGetterName}Instance');
     }).toList();
   }
 
+  @nonNull
   Method _generateOpenMethod(final Database database) {
     final createTableStatements =
-        _generateCreateTableSqlStatements(database.getEntities(library))
+        _generateCreateTableSqlStatements(database.entities)
             .map((statement) => 'await database.execute($statement);')
             .join('\n');
 
@@ -135,16 +98,8 @@ class DatabaseWriter implements Writer {
           '''));
   }
 
+  @nonNull
   List<String> _generateCreateTableSqlStatements(final List<Entity> entities) {
-    return entities
-        .map((entity) => entity.getCreateTableStatement(library))
-        .toList();
-  }
-
-  List<Class> _generateDaos(final Database database) {
-    return database
-        .getDaos(library)
-        .map((dao) => DaoWriter(library, dao).write())
-        .toList();
+    return entities.map((entity) => entity.getCreateTableStatement()).toList();
   }
 }
