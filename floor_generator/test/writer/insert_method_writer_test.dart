@@ -1,5 +1,6 @@
 import 'package:build_test/build_test.dart';
 import 'package:code_builder/code_builder.dart';
+import 'package:floor_annotation/floor_annotation.dart' as annotations;
 import 'package:floor_generator/misc/type_utils.dart';
 import 'package:floor_generator/processor/dao_processor.dart';
 import 'package:floor_generator/processor/entity_processor.dart';
@@ -8,7 +9,6 @@ import 'package:source_gen/source_gen.dart';
 import 'package:test/test.dart';
 
 import '../test_utils.dart';
-
 
 void main() {
   useDartfmt();
@@ -186,12 +186,13 @@ Future<Method> _generateInsertMethod(final String methodSignature) async {
     return LibraryReader(await resolver.findLibraryByName('test'));
   });
 
-  final daoClass = library.classes
-      .where((clazz) => clazz.isAbstract && clazz.metadata.any(isDaoAnnotation))
-      .first;
+  final daoClass = library.classes.firstWhere((classElement) =>
+      typeChecker(annotations.dao.runtimeType)
+          .hasAnnotationOfExact(classElement));
 
   final entities = library.classes
-      .where((classElement) => classElement.metadata.any(isEntityAnnotation))
+      .where((classElement) =>
+          typeChecker(annotations.Entity).hasAnnotationOfExact(classElement))
       .map((classElement) => EntityProcessor(classElement).process())
       .toList();
 

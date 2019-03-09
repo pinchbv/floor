@@ -1,10 +1,3 @@
-abstract class SupportedType {
-  static const STRING = 'String';
-  static const BOOL = 'bool';
-  static const INT = 'int';
-  static const DOUBLE = 'double';
-}
-
 abstract class Annotation {
   static const ENTITY = 'Entity';
   static const DATABASE = 'Database';

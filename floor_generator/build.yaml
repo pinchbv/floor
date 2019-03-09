@@ -14,4 +14,5 @@ builders:
     auto_apply: dependents
     build_to: cache
     # To copy the '.g.dart' content into '.g.dart' in the source tree
+    # Combine the output of multiple builders into one output (combining_builder)
     applies_builders: ["source_gen|combining_builder"]

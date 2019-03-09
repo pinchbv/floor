@@ -1,7 +1,10 @@
 import 'package:analyzer/dart/element/element.dart';
+import 'package:floor_annotation/floor_annotation.dart' as annotations;
+import 'package:floor_generator/misc/annotations.dart';
 import 'package:floor_generator/misc/constants.dart';
 import 'package:floor_generator/misc/type_utils.dart';
 import 'package:floor_generator/processor/dao_processor.dart';
+import 'package:floor_generator/processor/entity_processor.dart';
 import 'package:floor_generator/processor/processor.dart';
 import 'package:floor_generator/value_object/dao_getter.dart';
 import 'package:floor_generator/value_object/database.dart';
@@ -10,48 +13,43 @@ import 'package:source_gen/source_gen.dart';
 
 class DatabaseProcessor extends Processor<Database> {
   final ClassElement _classElement;
-  final List<Entity> _entities;
 
   DatabaseProcessor(
     final ClassElement classElement,
-    final List<Entity> entities,
   )   : assert(classElement != null),
-        assert(entities != null),
-        _classElement = classElement,
-        _entities = entities;
+        _classElement = classElement;
 
+  @nonNull
   @override
   Database process() {
     final databaseName = _classElement.displayName;
-    final daoGetters = _getDaoGetters(databaseName);
+    final entities = _getEntities(_classElement);
+    final daoGetters = _getDaoGetters(databaseName, entities);
     final version = _getDatabaseVersion();
 
-    return Database(
-      _classElement,
-      databaseName,
-      _entities,
-      daoGetters,
-      version,
-    );
+    return Database(_classElement, databaseName, entities, daoGetters, version);
   }
 
+  @nonNull
   int _getDatabaseVersion() {
-    final version = _classElement.metadata
-        .firstWhere(isDatabaseAnnotation)
-        .computeConstantValue()
-        .getField(AnnotationField.DATABASE_VERSION)
-        ?.toIntValue();
-
-    if (version == null) {
-      throw InvalidGenerationSourceError(
-        'No version for this database specified even though it is required.',
-        element: _classElement,
-      );
-    }
-    return version;
+    return typeChecker(annotations.Database)
+            .firstAnnotationOfExact(_classElement)
+            .getField(AnnotationField.DATABASE_VERSION)
+            ?.toIntValue() ??
+        (throw InvalidGenerationSourceError(
+          'No version for this database specified even though it is required.',
+          todo:
+              'Add version to annotation. e.g. @Database(version:1, entities: [Person, Dog])',
+          element: _classElement,
+        ));
+    ;
   }
 
-  List<DaoGetter> _getDaoGetters(final String databaseName) {
+  @nonNull
+  List<DaoGetter> _getDaoGetters(
+    final String databaseName,
+    final List<Entity> entities,
+  ) {
     return _classElement.fields.where(_isDao).map((field) {
       final classElement = field.type.element as ClassElement;
       final name = field.displayName;
@@ -60,19 +58,47 @@ class DatabaseProcessor extends Processor<Database> {
         classElement,
         name,
         databaseName,
-        _entities,
+        entities,
       ).process();
 
       return DaoGetter(field, name, dao);
     }).toList();
   }
 
+  @nonNull
   bool _isDao(final FieldElement fieldElement) {
     final element = fieldElement.type.element;
-    if (element is ClassElement) {
-      return element.metadata.any(isDaoAnnotation) && element.isAbstract;
-    } else {
-      return false;
-    }
+    return element is ClassElement ? _isDaoClass(element) : false;
+  }
+
+  @nonNull
+  bool _isDaoClass(final ClassElement classElement) {
+    return typeChecker(annotations.dao.runtimeType)
+            .hasAnnotationOfExact(classElement) &&
+        classElement.isAbstract;
+  }
+
+  @nonNull
+  List<Entity> _getEntities(final ClassElement databaseClassElement) {
+    return typeChecker(annotations.Database)
+            .firstAnnotationOfExact(_classElement)
+            .getField(AnnotationField.DATABASE_ENTITIES)
+            ?.toListValue()
+            ?.map((object) => object.toTypeValue().element)
+            ?.whereType<ClassElement>()
+            ?.where(_isEntity)
+            ?.map((classElement) => EntityProcessor(classElement).process())
+            ?.toList() ??
+        (throw InvalidGenerationSourceError(
+            'There are no entities added to the database annotation.',
+            todo:
+                'Add entities the annotation. e.g. @Database(version:1, entities: [Person, Dog])',
+            element: _classElement));
+  }
+
+  @nonNull
+  bool _isEntity(final ClassElement classElement) {
+    return !classElement.isAbstract &&
+        typeChecker(annotations.Entity).hasAnnotationOfExact(classElement);
   }
 }
