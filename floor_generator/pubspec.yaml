@@ -4,7 +4,7 @@ description: >
   This library is the dev dependency.
 version: 0.1.0
 homepage: https://github.com/vitusortner/floor
-author: vitusortner
+author: Vitus Ortner <vitusortner.dev@gmail.com>
 
 environment:
   sdk: '>=2.1.0 <3.0.0'
@@ -22,3 +22,5 @@ dependencies:
 dev_dependencies:
   test: ^1.5.3
   build_test: ^0.10.6
+  path: ^1.6.2
+  dart_style: ^1.2.3

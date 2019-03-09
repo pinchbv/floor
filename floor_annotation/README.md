@@ -1,10 +1,9 @@
 # Floor
 **A supportive SQLite abstraction for your Flutter applications.**
 
-This library holds all the annotations.
-
-Run the generator with `flutter packages pub run build_runner build`.
-To automatically run it, whenever a file changes, use `flutter packages pub run build_runner watch`.
+Don't import this package!
+You should be using the [floor](https://pub.dartlang.org/packages/floor) package, which comes with all the annotations.
+Separating the packages brings some benefits for developing the library but not for the users of it.
 
 *Floor - the bottom layer of a [Room](https://developer.android.com/topic/libraries/architecture/room).*
 
