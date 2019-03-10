@@ -25,6 +25,7 @@ abstract class AnnotationField {
 
   static const ENTITY_TABLE_NAME = 'tableName';
   static const ENTITY_FOREIGN_KEYS = 'foreignKeys';
+  static const ENTITY_INDICES = 'indices';
 }
 
 abstract class ForeignKeyField {
@@ -33,6 +34,12 @@ abstract class ForeignKeyField {
   static const PARENT_COLUMNS = 'parentColumns';
   static const ON_UPDATE = 'onUpdate';
   static const ON_DELETE = 'onDelete';
+}
+
+abstract class IndexField {
+  static const NAME = 'name';
+  static const UNIQUE = 'unique';
+  static const VALUE = 'value';
 }
 
 abstract class ForeignKeyAction {

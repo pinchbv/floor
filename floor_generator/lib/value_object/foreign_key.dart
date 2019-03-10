@@ -1,10 +1,6 @@
-import 'package:analyzer/dart/constant/value.dart';
-import 'package:analyzer/dart/element/element.dart';
 import 'package:floor_generator/misc/annotations.dart';
 
 class ForeignKey {
-  final ClassElement classElement;
-  final DartObject object;
   final String parentName;
   final List<String> parentColumns;
   final List<String> childColumns;
@@ -12,8 +8,6 @@ class ForeignKey {
   final String onDelete;
 
   ForeignKey(
-    this.classElement,
-    this.object,
     this.parentName,
     this.parentColumns,
     this.childColumns,
@@ -34,8 +28,6 @@ class ForeignKey {
       identical(this, other) ||
       other is ForeignKey &&
           runtimeType == other.runtimeType &&
-          classElement == other.classElement &&
-          object == other.object &&
           parentName == other.parentName &&
           parentColumns == other.parentColumns &&
           childColumns == other.childColumns &&
@@ -44,8 +36,6 @@ class ForeignKey {
 
   @override
   int get hashCode =>
-      classElement.hashCode ^
-      object.hashCode ^
       parentName.hashCode ^
       parentColumns.hashCode ^
       childColumns.hashCode ^
@@ -54,6 +44,6 @@ class ForeignKey {
 
   @override
   String toString() {
-    return 'ForeignKey{classElement: $classElement, object: $object, parentName: $parentName, parentColumns: $parentColumns, childColumns: $childColumns, onUpdate: $onUpdate, onDelete: $onDelete}';
+    return 'ForeignKey{parentName: $parentName, parentColumns: $parentColumns, childColumns: $childColumns, onUpdate: $onUpdate, onDelete: $onDelete}';
   }
 }

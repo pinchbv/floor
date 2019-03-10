@@ -2,7 +2,7 @@ import 'package:analyzer/dart/element/element.dart';
 import 'package:floor_annotation/floor_annotation.dart' as annotations;
 import 'package:floor_generator/misc/annotations.dart';
 import 'package:floor_generator/misc/constants.dart';
-import 'package:floor_generator/misc/processor_error.dart';
+import 'package:floor_generator/misc/database_processor_error.dart';
 import 'package:floor_generator/misc/type_utils.dart';
 import 'package:floor_generator/processor/dao_processor.dart';
 import 'package:floor_generator/processor/entity_processor.dart';
@@ -12,14 +12,14 @@ import 'package:floor_generator/value_object/database.dart';
 import 'package:floor_generator/value_object/entity.dart';
 
 class DatabaseProcessor extends Processor<Database> {
-  final ProcessorError _processorError;
+  final DatabaseProcessorError _processorError;
 
   final ClassElement _classElement;
 
   DatabaseProcessor(final ClassElement classElement)
       : assert(classElement != null),
         _classElement = classElement,
-        _processorError = ProcessorError(classElement);
+        _processorError = DatabaseProcessorError(classElement);
 
   @nonNull
   @override
@@ -39,8 +39,8 @@ class DatabaseProcessor extends Processor<Database> {
         .getField(AnnotationField.DATABASE_VERSION)
         ?.toIntValue();
 
-    if (version == null) throw _processorError.DATABASE_VERSION_IS_MISSING;
-    if (version < 1) throw _processorError.DATABASE_VERSION_IS_BELOW_ONE;
+    if (version == null) throw _processorError.VERSION_IS_MISSING;
+    if (version < 1) throw _processorError.VERSION_IS_BELOW_ONE;
 
     return version;
   }
@@ -91,7 +91,7 @@ class DatabaseProcessor extends Processor<Database> {
         ?.toList();
 
     if (entities == null || entities.isEmpty) {
-      throw _processorError.DATABASE_NO_ENTITIES_DEFINED;
+      throw _processorError.NO_ENTITIES_DEFINED;
     }
 
     return entities;

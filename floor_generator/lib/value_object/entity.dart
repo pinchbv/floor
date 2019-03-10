@@ -3,6 +3,7 @@ import 'package:floor_generator/misc/annotations.dart';
 import 'package:floor_generator/misc/type_utils.dart';
 import 'package:floor_generator/value_object/field.dart';
 import 'package:floor_generator/value_object/foreign_key.dart';
+import 'package:floor_generator/value_object/index.dart';
 import 'package:floor_generator/value_object/primary_key.dart';
 
 class Entity {
@@ -11,6 +12,7 @@ class Entity {
   final List<Field> fields;
   final PrimaryKey primaryKey;
   final List<ForeignKey> foreignKeys;
+  final List<Index> indices;
   final String constructor;
 
   Entity(
@@ -19,6 +21,7 @@ class Entity {
     this.fields,
     this.primaryKey,
     this.foreignKeys,
+    this.indices,
     this.constructor,
   );
 
@@ -34,7 +37,7 @@ class Entity {
 
     databaseDefinition.addAll(foreignKeyDefinitions);
 
-    return "'CREATE TABLE IF NOT EXISTS `$name` (${databaseDefinition.join(', ')})'";
+    return 'CREATE TABLE IF NOT EXISTS `$name` (${databaseDefinition.join(', ')})';
   }
 
   @nonNull
@@ -70,6 +73,7 @@ class Entity {
           fields == other.fields &&
           primaryKey == other.primaryKey &&
           foreignKeys == other.foreignKeys &&
+          indices == other.indices &&
           constructor == other.constructor;
 
   @override
@@ -79,10 +83,11 @@ class Entity {
       fields.hashCode ^
       primaryKey.hashCode ^
       foreignKeys.hashCode ^
+      indices.hashCode ^
       constructor.hashCode;
 
   @override
   String toString() {
-    return 'Entity{classElement: $classElement, name: $name, fields: $fields, primaryKey: $primaryKey, foreignKeys: $foreignKeys, constructor: $constructor}';
+    return 'Entity{classElement: $classElement, name: $name, fields: $fields, primaryKey: $primaryKey, foreignKeys: $foreignKeys, indices: $indices, constructor: $constructor}';
   }
 }

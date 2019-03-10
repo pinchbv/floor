@@ -4,7 +4,6 @@ import 'package:floor_generator/misc/annotations.dart';
 import 'package:floor_generator/value_object/database.dart';
 import 'package:floor_generator/value_object/entity.dart';
 import 'package:floor_generator/writer/writer.dart';
-import 'package:source_gen/source_gen.dart';
 
 /// Takes care of generating the database implementation.
 class DatabaseWriter implements Writer {
@@ -61,13 +60,14 @@ class DatabaseWriter implements Writer {
   Method _generateOpenMethod(final Database database) {
     final createTableStatements =
         _generateCreateTableSqlStatements(database.entities)
-            .map((statement) => 'await database.execute($statement);')
+            .map((statement) => "await database.execute('$statement');")
             .join('\n');
 
-    if (createTableStatements.isEmpty) {
-      throw InvalidGenerationSourceError(
-          'There are no entities defined. Use the @Entity annotation on persistent classes to do so.');
-    }
+    final createIndexStatements = database.entities
+        .map((entity) => entity.indices.map((index) => index.createQuery()))
+        .expand((statements) => statements)
+        .map((statement) => "await database.execute('$statement');")
+        .join('\n');
 
     final migrationsParameter = Parameter((builder) => builder
       ..name = 'migrations'
@@ -93,6 +93,7 @@ class DatabaseWriter implements Writer {
             },
             onCreate: (database, version) async {
               $createTableStatements
+              $createIndexStatements
             },
           );
           '''));

@@ -14,8 +14,8 @@ import 'package:test/test.dart';
 Future<LibraryReader> resolveCompilationUnit(String sourceFile) async {
   final files = [File(sourceFile)];
 
-  final fileMap = Map<String, String>.fromEntries(files.map(
-      (f) => MapEntry('a|lib/${path.basename(f.path)}', f.readAsStringSync())));
+  final fileMap = Map<String, String>.fromEntries(files.map((file) =>
+      MapEntry('a|lib/${path.basename(file.path)}', file.readAsStringSync())));
 
   final library = await resolveSources(fileMap, (item) async {
     final assetId = AssetId.parse(fileMap.keys.first);
