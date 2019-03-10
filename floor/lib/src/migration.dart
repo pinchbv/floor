@@ -21,6 +21,7 @@ class Migration {
       : assert(startVersion != null),
         assert(endVersion != null),
         assert(migrate != null),
+        assert(startVersion > 0),
         assert(startVersion < endVersion);
 
   @override

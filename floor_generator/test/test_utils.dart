@@ -8,6 +8,7 @@ import 'package:code_builder/code_builder.dart';
 import 'package:dart_style/dart_style.dart';
 import 'package:path/path.dart' as path;
 import 'package:source_gen/source_gen.dart';
+import 'package:test/test.dart';
 
 /// Creates a [LibraryReader] of the [sourceFile].
 Future<LibraryReader> resolveCompilationUnit(String sourceFile) async {
@@ -47,3 +48,14 @@ String _format(final String source) {
 
 /// Should be invoked in `main()` of every test in `test/**_test.dart`.
 void useDartfmt() => EqualsDart.format = _format;
+
+Matcher throwsInvalidGenerationSourceError(
+  final InvalidGenerationSourceError error,
+) {
+  return throwsA(
+    const TypeMatcher<InvalidGenerationSourceError>()
+        .having((e) => e.message, 'message', error.message)
+        .having((e) => e.todo, 'todo', error.todo)
+        .having((e) => e.element, 'element', error.element),
+  );
+}
