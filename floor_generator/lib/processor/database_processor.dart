@@ -2,6 +2,7 @@ import 'package:analyzer/dart/element/element.dart';
 import 'package:floor_annotation/floor_annotation.dart' as annotations;
 import 'package:floor_generator/misc/annotations.dart';
 import 'package:floor_generator/misc/constants.dart';
+import 'package:floor_generator/misc/processor_error.dart';
 import 'package:floor_generator/misc/type_utils.dart';
 import 'package:floor_generator/processor/dao_processor.dart';
 import 'package:floor_generator/processor/entity_processor.dart';
@@ -9,15 +10,16 @@ import 'package:floor_generator/processor/processor.dart';
 import 'package:floor_generator/value_object/dao_getter.dart';
 import 'package:floor_generator/value_object/database.dart';
 import 'package:floor_generator/value_object/entity.dart';
-import 'package:source_gen/source_gen.dart';
 
 class DatabaseProcessor extends Processor<Database> {
+  final ProcessorError _processorError;
+
   final ClassElement _classElement;
 
-  DatabaseProcessor(
-    final ClassElement classElement,
-  )   : assert(classElement != null),
-        _classElement = classElement;
+  DatabaseProcessor(final ClassElement classElement)
+      : assert(classElement != null),
+        _classElement = classElement,
+        _processorError = ProcessorError(classElement);
 
   @nonNull
   @override
@@ -32,16 +34,15 @@ class DatabaseProcessor extends Processor<Database> {
 
   @nonNull
   int _getDatabaseVersion() {
-    return typeChecker(annotations.Database)
-            .firstAnnotationOfExact(_classElement)
-            .getField(AnnotationField.DATABASE_VERSION)
-            ?.toIntValue() ??
-        (throw InvalidGenerationSourceError(
-          'No version for this database specified even though it is required.',
-          todo:
-              'Add version to annotation. e.g. @Database(version:1, entities: [Person, Dog])',
-          element: _classElement,
-        ));
+    final version = typeChecker(annotations.Database)
+        .firstAnnotationOfExact(_classElement)
+        .getField(AnnotationField.DATABASE_VERSION)
+        ?.toIntValue();
+
+    if (version == null) throw _processorError.DATABASE_VERSION_IS_MISSING;
+    if (version < 1) throw _processorError.DATABASE_VERSION_IS_BELOW_ONE;
+
+    return version;
   }
 
   @nonNull
@@ -79,20 +80,21 @@ class DatabaseProcessor extends Processor<Database> {
 
   @nonNull
   List<Entity> _getEntities(final ClassElement databaseClassElement) {
-    return typeChecker(annotations.Database)
-            .firstAnnotationOfExact(_classElement)
-            .getField(AnnotationField.DATABASE_ENTITIES)
-            ?.toListValue()
-            ?.map((object) => object.toTypeValue().element)
-            ?.whereType<ClassElement>()
-            ?.where(_isEntity)
-            ?.map((classElement) => EntityProcessor(classElement).process())
-            ?.toList() ??
-        (throw InvalidGenerationSourceError(
-            'There are no entities added to the database annotation.',
-            todo:
-                'Add entities the annotation. e.g. @Database(version:1, entities: [Person, Dog])',
-            element: _classElement));
+    final entities = typeChecker(annotations.Database)
+        .firstAnnotationOfExact(_classElement)
+        .getField(AnnotationField.DATABASE_ENTITIES)
+        ?.toListValue()
+        ?.map((object) => object.toTypeValue().element)
+        ?.whereType<ClassElement>()
+        ?.where(_isEntity)
+        ?.map((classElement) => EntityProcessor(classElement).process())
+        ?.toList();
+
+    if (entities == null || entities.isEmpty) {
+      throw _processorError.DATABASE_NO_ENTITIES_DEFINED;
+    }
+
+    return entities;
   }
 
   @nonNull

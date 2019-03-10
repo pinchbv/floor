@@ -86,13 +86,6 @@ void main() {
       }      
     '''));
   });
-
-  test('exception when no entitiy defined', () async {
-    expect(
-      () => _generateDatabase(''),
-      throwsInvalidGenerationSourceError,
-    );
-  });
 }
 
 Future<Spec> _generateDatabase(final String entity) async {
@@ -114,6 +107,3 @@ Future<Spec> _generateDatabase(final String entity) async {
   final database = DatabaseProcessor(library.classes.first).process();
   return DatabaseWriter(database).write();
 }
-
-final throwsInvalidGenerationSourceError =
-    throwsA(const TypeMatcher<InvalidGenerationSourceError>());
