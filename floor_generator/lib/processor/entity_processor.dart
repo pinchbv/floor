@@ -1,44 +1,51 @@
 import 'package:analyzer/dart/constant/value.dart';
 import 'package:analyzer/dart/element/element.dart';
 import 'package:analyzer/dart/element/type.dart';
+import 'package:floor_annotation/floor_annotation.dart' as annotations;
 import 'package:floor_generator/misc/annotations.dart';
 import 'package:floor_generator/misc/constants.dart';
+import 'package:floor_generator/misc/entity_processor_error.dart';
 import 'package:floor_generator/misc/type_utils.dart';
 import 'package:floor_generator/processor/field_processor.dart';
 import 'package:floor_generator/processor/processor.dart';
-import 'package:floor_generator/value_object/field.dart';
 import 'package:floor_generator/value_object/entity.dart';
+import 'package:floor_generator/value_object/field.dart';
 import 'package:floor_generator/value_object/foreign_key.dart';
+import 'package:floor_generator/value_object/index.dart';
 import 'package:floor_generator/value_object/primary_key.dart';
-import 'package:source_gen/source_gen.dart';
 
 class EntityProcessor extends Processor<Entity> {
+  final EntityProcessorError _processorError;
+
   final ClassElement _classElement;
 
   EntityProcessor(final ClassElement classElement)
       : assert(classElement != null),
-        _classElement = classElement;
+        _classElement = classElement,
+        _processorError = EntityProcessorError(classElement);
 
   @nonNull
   @override
   Entity process() {
     final fields = _getFields();
+    final name = _getName();
+    final indices = _getIndices(fields, name);
 
     return Entity(
       _classElement,
-      _getName(),
+      name,
       fields,
-      _getPrimaryKey(fields),
+      _getPrimaryKey(_getFields()),
       _getForeignKeys(),
-      _getConstructor(fields),
+      indices,
+      _getConstructor(_getFields()),
     );
   }
 
   @nonNull
   String _getName() {
-    return _classElement.metadata
-            .firstWhere(isEntityAnnotation)
-            .computeConstantValue()
+    return typeChecker(annotations.Entity)
+            .firstAnnotationOfExact(_classElement)
             .getField(AnnotationField.ENTITY_TABLE_NAME)
             .toStringValue() ??
         _classElement.displayName;
@@ -59,51 +66,35 @@ class EntityProcessor extends Processor<Entity> {
 
   @nonNull
   List<ForeignKey> _getForeignKeys() {
-    return _classElement.metadata
-            .firstWhere(isEntityAnnotation)
-            .computeConstantValue()
+    return typeChecker(annotations.Entity)
+            .firstAnnotationOfExact(_classElement)
             .getField(AnnotationField.ENTITY_FOREIGN_KEYS)
             ?.toListValue()
             ?.map((foreignKeyObject) {
           final parentType = foreignKeyObject
                   .getField(ForeignKeyField.ENTITY)
                   ?.toTypeValue() ??
-              (throw InvalidGenerationSourceError(
-                'No entity defined for foreign key',
-                element: _classElement,
-              ));
+              (throw _processorError.FOREIGN_KEY_NO_ENTITY);
 
           final parentElement = parentType.element;
           final parentName = parentElement is ClassElement
-              ? parentElement.metadata
-                      .firstWhere(isEntityAnnotation,
-                          orElse: () => throw InvalidGenerationSourceError(
-                              'The foreign key is not referencing an enttity.',
-                              element: _classElement))
-                      .computeConstantValue()
+              ? typeChecker(annotations.Entity)
+                      .firstAnnotationOfExact(parentElement)
                       .getField(AnnotationField.ENTITY_TABLE_NAME)
                       ?.toStringValue() ??
                   parentType.displayName
-              : throw InvalidGenerationSourceError(
-                  "The foreign key doesn't reference an entity class.",
-                  element: _classElement);
+              : throw _processorError.FOREIGN_KEY_DOES_NOT_REFERENCE_ENTITY;
 
           final childColumns =
               _getColumns(foreignKeyObject, ForeignKeyField.CHILD_COLUMNS);
           if (childColumns.isEmpty) {
-            throw InvalidGenerationSourceError(
-              'No child columns defined for foreign key',
-              element: _classElement,
-            );
+            throw _processorError.MISSING_CHILD_COLUMNS;
           }
 
           final parentColumns =
               _getColumns(foreignKeyObject, ForeignKeyField.PARENT_COLUMNS);
           if (parentColumns.isEmpty) {
-            throw InvalidGenerationSourceError(
-              'No parent columns defined for foreign key',
-              element: _classElement,
-            );
+            throw _processorError.MISSING_PARENT_COLUMNS;
           }
 
           final onUpdateAnnotationValue = foreignKeyObject
@@ -117,8 +108,6 @@ class EntityProcessor extends Processor<Entity> {
           final onDelete = _getAction(onDeleteAnnotationValue);
 
           return ForeignKey(
-            _classElement,
-            foreignKeyObject,
             parentName,
             parentColumns,
             childColumns,
@@ -127,6 +116,50 @@ class EntityProcessor extends Processor<Entity> {
           );
         })?.toList() ??
         [];
+  }
+
+  @nonNull
+  List<Index> _getIndices(final List<Field> fields, final String tableName) {
+    return typeChecker(annotations.Entity)
+            .firstAnnotationOfExact(_classElement)
+            .getField(AnnotationField.ENTITY_INDICES)
+            ?.toListValue()
+            ?.map((indexObject) {
+          final unique = indexObject.getField(IndexField.UNIQUE)?.toBoolValue();
+
+          final values = indexObject
+              .getField(IndexField.VALUE)
+              ?.toListValue()
+              ?.map((valueObject) => valueObject.toStringValue())
+              ?.toList();
+
+          if (values == null || values.isEmpty) {
+            throw _processorError.MISSING_INDEX_COLUMN_NAME;
+          }
+
+          final indexColumnNames = fields
+              .map((field) => field.columnName)
+              .where((columnName) => values.any((value) => value == columnName))
+              .toList();
+
+          if (indexColumnNames.isEmpty) {
+            throw _processorError.noMatchingColumn(values);
+          }
+
+          final name = indexObject.getField(IndexField.NAME)?.toStringValue() ??
+              _generateIndexName(tableName, indexColumnNames);
+
+          return Index(name, tableName, unique, indexColumnNames);
+        })?.toList() ??
+        [];
+  }
+
+  @nonNull
+  String _generateIndexName(
+    final String tableName,
+    final List<String> columnNames,
+  ) {
+    return Index.DEFAULT_PREFIX + tableName + '_' + columnNames.join('_');
   }
 
   @nonNull
@@ -163,15 +196,11 @@ class EntityProcessor extends Processor<Entity> {
   PrimaryKey _getPrimaryKey(final List<Field> fields) {
     final primaryKeyField = fields.firstWhere(
       (field) => field.isPrimaryKey,
-      orElse: () => throw InvalidGenerationSourceError(
-            'There is no primary key defined on the entity ${_classElement.displayName}.',
-            element: _classElement,
-          ),
+      orElse: () => throw _processorError.MISSING_PRIMARY_KEY,
     );
 
-    final autoGenerate = primaryKeyField.fieldElement.metadata
-            .firstWhere(isPrimaryKeyAnnotation)
-            .computeConstantValue()
+    final autoGenerate = typeChecker(annotations.PrimaryKey)
+            .firstAnnotationOfExact(primaryKeyField.fieldElement)
             .getField(AnnotationField.PRIMARY_KEY_AUTO_GENERATE)
             .toBoolValue() ??
         false;
