@@ -1,6 +1,6 @@
 import 'package:analyzer/dart/element/element.dart';
 import 'package:build_test/build_test.dart';
-import 'package:floor_generator/misc/processor_error.dart';
+import 'package:floor_generator/misc/database_processor_error.dart';
 import 'package:floor_generator/processor/database_processor.dart';
 import 'package:source_gen/source_gen.dart';
 import 'package:test/test.dart';
@@ -16,7 +16,7 @@ void main() {
 
     final actual = () => DatabaseProcessor(classElement).process();
 
-    final error = ProcessorError(classElement).DATABASE_VERSION_IS_BELOW_ONE;
+    final error = DatabaseProcessorError(classElement).VERSION_IS_BELOW_ONE;
     expect(actual, throwsInvalidGenerationSourceError(error));
   });
 
@@ -28,7 +28,7 @@ void main() {
 
     final actual = () => DatabaseProcessor(classElement).process();
 
-    final error = ProcessorError(classElement).DATABASE_VERSION_IS_MISSING;
+    final error = DatabaseProcessorError(classElement).VERSION_IS_MISSING;
     expect(actual, throwsInvalidGenerationSourceError(error));
   });
 
@@ -42,7 +42,7 @@ void main() {
 
       final actual = () => DatabaseProcessor(classElement).process();
 
-      final error = ProcessorError(classElement).DATABASE_NO_ENTITIES_DEFINED;
+      final error = DatabaseProcessorError(classElement).NO_ENTITIES_DEFINED;
       expect(actual, throwsInvalidGenerationSourceError(error));
     },
   );
@@ -55,7 +55,7 @@ void main() {
 
     final actual = () => DatabaseProcessor(classElement).process();
 
-    final error = ProcessorError(classElement).DATABASE_NO_ENTITIES_DEFINED;
+    final error = DatabaseProcessorError(classElement).NO_ENTITIES_DEFINED;
     expect(actual, throwsInvalidGenerationSourceError(error));
   });
 }
