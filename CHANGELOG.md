@@ -1,5 +1,24 @@
 # Changelog
 
+# 0.2.0
+
+### Changes
+
+* Add database adapters
+* Run floor Flutter tests
+* Move value objects to value_objects directory
+* Map source elements into value objects in processors
+* Use GeneratorForAnnotation and TypeChecker to verify annotations
+* Throw more specific errors on obfuscated database annotation
+
+### 🚀 Features
+
+* Add support for migrations
+* Add support for returning Streams as query result
+* Support accessing data from Data Access Objects
+* Add entity classes to database annotation
+* Add support for indices
+
 # 0.1.0
 
 ### 🚀 Features

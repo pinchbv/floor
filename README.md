@@ -13,12 +13,14 @@ This package is still in an early phase and the API will likely change.
 ### Table of contents
 
 1. [How to use this library](#how-to-use-this-library)
+1. [Architecture](#architecture)
 1. [Querying](#querying)
 1. [Persisting Data Changes](#persisting-data-changes)
 1. [Streams](#streams)
 1. [Transactions](#transactions)
 1. [Entities](#entities)
 1. [Foreign Keys](#foreign-keys)
+1. [Indices](#indices)
 1. [Migrations](#migrations)
 1. [Examples](#examples)
 1. [Naming](#naming)
@@ -39,31 +41,27 @@ This package is still in an early phase and the API will likely change.
     dependencies:
       flutter:
         sdk: flutter
-      floor: ^0.1.0
+      floor: ^0.2.0
     
     dev_dependencies:
-      floor_generator: ^0.1.0
-      build_runner: ^1.1.3
+      floor_generator: ^0.2.0
+      build_runner: ^1.2.8
     ````
 
-1. Make sure to import the following libraries.
-    
-    ```dart
-    import 'package:floor/floor.dart';
-    import 'package:path/path.dart';
-    import 'package:sqflite/sqflite.dart' as sqflite;
-    ```
+1. Creating an *Entity*
 
-1. Create an `Entity`.
     It will represent a database table as well as the scaffold of your business object.
-    `@Entity()` marks the class as a persistent class.
+    `@entity` marks the class as a persistent class.
     It's required to add a primary key to your table.
-    You can do so by adding the `@PrimarKey()` annotation to an `int` property.
+    You can do so by adding the `@primaryKey` annotation to an `int` property.
+    There is no restriction on where you put the file containing the entity.
 
     ````dart
-    @Entity()
+    import 'package:floor/floor.dart';
+    
+    @entity
     class Person {
-      @PrimaryKey()
+      @primaryKey
       final int id;
     
       final String name;
@@ -71,28 +69,23 @@ This package is still in an early phase and the API will likely change.
       Person(this.id, this.name);
     }
     ````
-    
-1. Create the `Database`.
-    This component is responsible for managing the access to the underlying SQLite database.
-    It has to be an abstract class which extends `FloorDatabase`.
-    Furthermore, it's required to add `@Database()` to the signature of the class.
 
-    This class contains the method signatures for querying the database which have to return a `Future`.
-    It, moreover, holds functionality for opening the database.
-    `_$open()` is a function that will get implemented by running the code generator.
-    The warning, of it not being implemented, will go away then.
-     
+1. Creating a *DAO*
+
+    This component is responsible for managing the access to the underlying SQLite database.
+    The abstract class contains the method signatures for querying the database which have to return a `Future`.
+
     - You can define queries by adding the `@Query` annotation to a method.
         The SQL statement has to get added in parenthesis.
         The method must return a `Future` of the `Entity` you're querying for.
         
     - `@insert` marks a method as an insertion method.
-        
+    
     ```dart
-    @Database(version: 1)
-    abstract class AppDatabase extends FloorDatabase {
-      static Future<AppDatabase> openDatabase() async => _$open();
-      
+    import 'package:floor/floor.dart';
+
+    @dao
+    abstract class PersonDao {
       @Query('SELECT * FROM Person')
       Future<List<Person>> findAllPersons();
       
@@ -103,8 +96,33 @@ This package is still in an early phase and the API will likely change.
       Future<void> insertPerson(Person person);
     }
     ```
+    
+1. Creating the *Database*
 
-1. Add `part 'database.g.dart';` beneath the imports of this file.
+    It has to be an abstract class which extends `FloorDatabase`.
+    Furthermore, it's required to add `@Database()` to the signature of the class.
+    Make sure to add the created entity to the `entities` attribute of the `@Database` annotation.
+
+    The class holds functionality for opening the database.
+    `_$open()` is a function that will get implemented by running the code generator.
+    The warning, of it not being implemented, will go away then.
+        
+    ```dart
+    import 'package:floor/floor.dart';
+    import 'package:path/path.dart';
+    import 'package:sqflite/sqflite.dart' as sqflite;
+ 
+    part 'database.g.dart'; // the generated code will be there
+ 
+    @Database(version: 1, entities: [Person])
+    abstract class AppDatabase extends FloorDatabase {
+      static Future<AppDatabase> openDatabase() async => _$open();   
+    
+      PersonDao get personDao;
+    }
+    ```
+
+1. Make sure to add `part 'database.g.dart';` beneath the imports of this file.
     It's important to note, that 'database' has to get exchanged with the name of the file the entity and database is defined in.
     In this case the file is named `database.dart`.
 
@@ -121,6 +139,19 @@ This package is still in an early phase and the API will likely change.
     ```
     
 For further examples take a look at the [example](https://github.com/vitusortner/floor/tree/develop/example) and [floor_test](https://github.com/vitusortner/floor/tree/develop/floor_test) directories.
+
+## Architecture
+The components for storing and accessing data are *Entity*, *Data Access Object (DAO)* and *Database*.
+
+The first, *Entity*, represents a persistent class and thus a database table.
+*DAOs* manage the access to *Entities* and take care of the mapping between in-memory objects and table rows.
+Lastly, *Database*, is the central access point to the underlying SQLite database.
+It holds the *DAOs* and, beyond that, takes care of initializing the database and its schema.
+[Room](https://developer.android.com/topic/libraries/architecture/room) serves as the source of inspiration for this composition, because it allows to create a clean separation of the component's responsibilities.
+
+The figure shows the relationship between *Entity*, *DAO* and *Database*.
+
+![Floor Architecture](img/floor-architecture.png)
 
 ## Querying
 Method signatures turn into query methods by adding the `@Query()` annotation with the query in parenthesis to them.
@@ -226,6 +257,9 @@ It's possible to supply custom metadata to Floor by adding optional values to th
 It has the additional attribute of `tableName` which opens up the possibility to use a custom name for that specific entity instead of using the class name.
 Another attribute `foreignKeys` allows to add foreign keys to the entity.
 More information on how to use these can be found in the [Foreign Keys](#foreign-keys) section.
+Indices are supported as well.
+They can be used by adding an `Index` to the `indices` value of the entity.
+For further information of these, please refer to the [Indices](#indices) section. 
 
 `@PrimaryKey` marks a property of a class as the primary key column.
 This property has to be of type int.
@@ -276,6 +310,27 @@ class Dog {
 }
 ```
 
+## Indices
+Indices help speeding up query, join and grouping operations.
+For more information on SQLite indices please refer to the official [documentation](https://sqlite.org/lang_createindex.html).
+To create an index with floor, add a list of indices to the `@Entity` annotation.
+The example below shows how to create an index on the `custom_name` column of the entity.
+
+The index, moreover, can be named by using its `name` attribute.
+To set an index to be unique, use the `unique` attribute.
+```dart
+@Entity(tableName: 'person', indices: [Index(value: ['custom_name'])])
+class Person {
+  @primaryKey
+  final int id;
+
+  @ColumnInfo(name: 'custom_name', nullable: false)
+  final String name;
+
+  Person(this.id, this.name);
+}
+```
+
 ## Migrations
 Whenever are doing changes to your entities, you're required to also migrate the old data.
 
@@ -287,7 +342,7 @@ Lastly, call `openDatabase` with your newly created `Migration`.
 Don't forget to trigger the code generator again, to create the code for handling the new entity.
 
 ```dart
-// Update entity with new 'nickname' field
+// update entity with new 'nickname' field
 @Entity(tableName: 'person')
 class Person {
   @PrimaryKey(autoGenerate: true)
@@ -301,14 +356,14 @@ class Person {
   Person(this.id, this.name, this.nickname);
 }
 
-// Bump up database version
+// bump up database version
 @Database(version: 2)
 abstract class AppDatabase extends FloorDatabase {
   static Future<AppDatabase> openDatabase(List<Migration> migrations) async =>
       _$open(migrations);
 }
 
-// Create migration
+// create migration
 final migration1to2 = Migration(1, 2, (database) {
   database.execute('ALTER TABLE person ADD COLUMN nickname TEXT');
 });
