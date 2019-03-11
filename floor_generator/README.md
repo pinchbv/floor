@@ -2,6 +2,7 @@
 **A supportive SQLite abstraction for your Flutter applications.**
 
 This is the dev dependency and contains the annotation processor.
+Please refer to the [floor](https://pub.dartlang.org/packages/floor) package on pub or visit [Github](https://github.com/vitusortner/floor) for more information.
 
 ---
 
