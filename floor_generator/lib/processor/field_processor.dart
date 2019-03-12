@@ -1,4 +1,6 @@
 import 'package:analyzer/dart/element/element.dart';
+import 'package:floor_annotation/floor_annotation.dart' as annotations
+    show ColumnInfo, PrimaryKey;
 import 'package:floor_generator/misc/constants.dart';
 import 'package:floor_generator/misc/type_utils.dart';
 import 'package:floor_generator/processor/processor.dart';
@@ -8,6 +10,8 @@ import 'package:source_gen/source_gen.dart';
 class FieldProcessor extends Processor<Field> {
   final FieldElement _fieldElement;
 
+  final _columnInfoTypeChecker = typeChecker(annotations.ColumnInfo);
+
   FieldProcessor(final FieldElement fieldElement)
       : assert(fieldElement != null),
         _fieldElement = fieldElement;
@@ -16,10 +20,11 @@ class FieldProcessor extends Processor<Field> {
   Field process() {
     final name = _fieldElement.name;
     final hasColumnInfoAnnotation =
-        _fieldElement.metadata.any(isColumnInfoAnnotation);
+        _columnInfoTypeChecker.hasAnnotationOfExact(_fieldElement);
     final columnName = _getColumnName(hasColumnInfoAnnotation, name);
     final isNullable = _getIsNullable(hasColumnInfoAnnotation);
-    final isPrimaryKey = _fieldElement.metadata.any(isPrimaryKeyAnnotation);
+    final isPrimaryKey =
+        typeChecker(annotations.PrimaryKey).hasAnnotationOfExact(_fieldElement);
 
     return Field(
       _fieldElement,
@@ -33,22 +38,20 @@ class FieldProcessor extends Processor<Field> {
 
   String _getColumnName(bool hasColumnInfoAnnotation, String name) {
     return hasColumnInfoAnnotation
-        ? _fieldElement.metadata
-                .firstWhere(isColumnInfoAnnotation)
-                .computeConstantValue()
+        ? _columnInfoTypeChecker
+                .firstAnnotationOfExact(_fieldElement)
                 .getField(AnnotationField.COLUMN_INFO_NAME)
-                .toStringValue() ??
+                ?.toStringValue() ??
             name
         : name;
   }
 
   bool _getIsNullable(bool hasColumnInfoAnnotation) {
     return hasColumnInfoAnnotation
-        ? _fieldElement.metadata
-                .firstWhere(isColumnInfoAnnotation)
-                .computeConstantValue()
+        ? _columnInfoTypeChecker
+                .firstAnnotationOfExact(_fieldElement)
                 .getField(AnnotationField.COLUMN_INFO_NULLABLE)
-                .toBoolValue() ??
+                ?.toBoolValue() ??
             true
         : true; // all Dart fields are nullable by default
   }
