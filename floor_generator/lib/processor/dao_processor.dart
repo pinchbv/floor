@@ -1,4 +1,6 @@
 import 'package:analyzer/dart/element/element.dart';
+import 'package:floor_annotation/floor_annotation.dart' as annotations
+    show Query, Insert, Update, delete, transaction;
 import 'package:floor_generator/misc/type_utils.dart';
 import 'package:floor_generator/processor/deletion_method_processor.dart';
 import 'package:floor_generator/processor/insertion_method_processor.dart';
@@ -61,7 +63,8 @@ class DaoProcessor extends Processor<Dao> {
 
   List<QueryMethod> _getQueryMethods(List<MethodElement> methods) {
     return methods
-        .where((method) => method.metadata.any(isQueryAnnotation))
+        .where((method) =>
+            typeChecker(annotations.Query).hasAnnotationOfExact(method))
         .map((method) => QueryMethodProcessor(method, _entities).process())
         .toList();
   }
@@ -70,28 +73,32 @@ class DaoProcessor extends Processor<Dao> {
     List<MethodElement> methodElements,
   ) {
     return methodElements
-        .where((method) => method.metadata.any(isInsertAnnotation))
+        .where((method) =>
+            typeChecker(annotations.Insert).hasAnnotationOfExact(method))
         .map((method) => InsertionMethodProcessor(method, _entities).process())
         .toList();
   }
 
   List<UpdateMethod> _getUpdateMethods(List<MethodElement> methods) {
     return methods
-        .where((method) => method.metadata.any(isUpdateAnnotation))
+        .where((method) =>
+            typeChecker(annotations.Update).hasAnnotationOfExact(method))
         .map((method) => UpdateMethodProcessor(method, _entities).process())
         .toList();
   }
 
   List<DeletionMethod> _getDeletionMethods(List<MethodElement> methods) {
     return methods
-        .where((method) => method.metadata.any(isDeleteAnnotation))
+        .where((method) => typeChecker(annotations.delete.runtimeType)
+            .hasAnnotationOfExact(method))
         .map((method) => DeletionMethodProcessor(method, _entities).process())
         .toList();
   }
 
   List<TransactionMethod> _getTransactionMethods(List<MethodElement> methods) {
     return methods
-        .where((method) => method.metadata.any(isTransactionAnnotation))
+        .where((method) => typeChecker(annotations.transaction.runtimeType)
+            .hasAnnotationOfExact(method))
         .map((method) =>
             TransactionMethodProcessor(method, _daoGetterName, _databaseName)
                 .process())

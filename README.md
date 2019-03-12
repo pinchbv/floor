@@ -151,7 +151,7 @@ It holds the *DAOs* and, beyond that, takes care of initializing the database an
 
 The figure shows the relationship between *Entity*, *DAO* and *Database*.
 
-![Floor Architecture](img/floor-architecture.png)
+![Floor Architecture](https://raw.githubusercontent.com/vitusortner/floor/develop/img/floor-architecture.png)
 
 ## Querying
 Method signatures turn into query methods by adding the `@Query()` annotation with the query in parenthesis to them.
@@ -184,7 +184,7 @@ All these methods accept single or multiple entity instances.
 - **Insert**
 
     `@insert` marks a method as an insertion method.
-    WHen using the capitalized `@Insert` you can specify a conflict strategy.
+    When using the capitalized `@Insert` you can specify a conflict strategy.
     Else it just defaults to aborting the insert.
     These methods can return a `Future` of either `void`, `int` or `List<int>`.
     - `void` return nothing

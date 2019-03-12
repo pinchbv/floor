@@ -1,5 +1,7 @@
 import 'package:analyzer/dart/element/element.dart';
 import 'package:analyzer/dart/element/type.dart';
+import 'package:floor_annotation/floor_annotation.dart' as annotations
+    show Update;
 import 'package:floor_generator/misc/annotations.dart';
 import 'package:floor_generator/misc/change_method_processor_helper.dart';
 import 'package:floor_generator/misc/constants.dart';
@@ -63,9 +65,8 @@ class UpdateMethodProcessor implements Processor<UpdateMethod> {
 
   @nonNull
   String _getOnConflictStrategy() {
-    final strategy = _methodElement.metadata
-        .firstWhere(isUpdateAnnotation)
-        .computeConstantValue()
+    final strategy = typeChecker(annotations.Update)
+        .firstAnnotationOfExact(_methodElement)
         .getField(AnnotationField.ON_CONFLICT)
         .toIntValue();
 

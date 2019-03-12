@@ -1,6 +1,10 @@
 import 'package:analyzer/dart/element/element.dart';
 import 'package:analyzer/dart/element/type.dart';
+import 'package:floor_annotation/floor_annotation.dart' as annotations
+    show Query;
+import 'package:floor_generator/misc/annotations.dart';
 import 'package:floor_generator/misc/constants.dart';
+import 'package:floor_generator/misc/query_method_processor_error.dart';
 import 'package:floor_generator/misc/type_utils.dart';
 import 'package:floor_generator/processor/processor.dart';
 import 'package:floor_generator/value_object/entity.dart';
@@ -8,6 +12,8 @@ import 'package:floor_generator/value_object/query_method.dart';
 import 'package:source_gen/source_gen.dart';
 
 class QueryMethodProcessor extends Processor<QueryMethod> {
+  final QueryMethodProcessorError _processorError;
+
   final MethodElement _methodElement;
   final List<Entity> _entities;
 
@@ -17,8 +23,10 @@ class QueryMethodProcessor extends Processor<QueryMethod> {
   )   : assert(methodElement != null),
         assert(entities != null),
         _methodElement = methodElement,
-        _entities = entities;
+        _entities = entities,
+        _processorError = QueryMethodProcessorError(methodElement);
 
+  @nonNull
   @override
   QueryMethod process() {
     final name = _methodElement.displayName;
@@ -52,19 +60,17 @@ class QueryMethodProcessor extends Processor<QueryMethod> {
     );
   }
 
+  @nonNull
   String _getQuery() {
-    final query = _methodElement.metadata
-        .firstWhere(isQueryAnnotation)
-        .computeConstantValue()
+    final query = typeChecker(annotations.Query)
+        .firstAnnotationOfExact(_methodElement)
         .getField(AnnotationField.QUERY_VALUE)
-        .toStringValue();
+        ?.toStringValue();
 
-    if (query.isEmpty || query == null) {
-      throw InvalidGenerationSourceError(
-        "You didn't define a query.",
-        element: _methodElement,
-      );
-    }
+    if (query.isEmpty || query == null) throw _processorError.NO_QUERY_DEFINED;
+
+    // TODO parse query
+
     return query.replaceAll(RegExp(':'), r'$');
   }
 
@@ -75,6 +81,7 @@ class QueryMethodProcessor extends Processor<QueryMethod> {
         .toList();
   }
 
+  @nonNull
   DartType _getFlattenedReturnType(
     final DartType rawReturnType,
     final bool returnsStream,
@@ -90,6 +97,7 @@ class QueryMethodProcessor extends Processor<QueryMethod> {
     return type;
   }
 
+  @nonNull
   bool _getReturnsList(final DartType returnType, final bool returnsStream) {
     final type = returnsStream
         ? flattenStream(returnType)
@@ -103,10 +111,7 @@ class QueryMethodProcessor extends Processor<QueryMethod> {
     final bool returnsStream,
   ) {
     if (!rawReturnType.isDartAsyncFuture && !returnsStream) {
-      throw InvalidGenerationSourceError(
-        'All queries have to return a Future or Stream.',
-        element: _methodElement,
-      );
+      throw _processorError.DOES_NOT_RETURN_FUTURE_NOR_STREAM;
     }
   }
 
