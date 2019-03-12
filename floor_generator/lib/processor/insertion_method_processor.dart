@@ -1,12 +1,14 @@
 import 'package:analyzer/dart/element/element.dart';
 import 'package:analyzer/dart/element/type.dart';
+import 'package:floor_annotation/floor_annotation.dart' as annotations
+    show Insert;
 import 'package:floor_generator/misc/annotations.dart';
 import 'package:floor_generator/misc/change_method_processor_helper.dart';
 import 'package:floor_generator/misc/constants.dart';
+import 'package:floor_generator/misc/type_utils.dart';
 import 'package:floor_generator/processor/processor.dart';
 import 'package:floor_generator/value_object/entity.dart';
 import 'package:floor_generator/value_object/insertion_method.dart';
-import 'package:floor_generator/misc/type_utils.dart';
 import 'package:source_gen/source_gen.dart';
 
 class InsertionMethodProcessor implements Processor<InsertionMethod> {
@@ -81,9 +83,8 @@ class InsertionMethodProcessor implements Processor<InsertionMethod> {
 
   @nonNull
   String _getOnConflictStrategy() {
-    final strategy = _methodElement.metadata
-        .firstWhere(isInsertAnnotation)
-        .computeConstantValue()
+    final strategy = typeChecker(annotations.Insert)
+        .firstAnnotationOfExact(_methodElement)
         .getField(AnnotationField.ON_CONFLICT)
         .toIntValue();
 

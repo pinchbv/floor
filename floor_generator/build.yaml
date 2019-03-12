@@ -11,6 +11,7 @@ builders:
     builder_factories: ["floorBuilder"]
     # The 'partId' argument to 'SharedPartBuilder' is 'floor'
     build_extensions: {".dart": [".floor.g.part"]}
+    # Apply the Builder to the package with a direct dependency on the package exposing the builder
     auto_apply: dependents
     build_to: cache
     # To copy the '.g.dart' content into '.g.dart' in the source tree
