@@ -1,17 +1,3 @@
-abstract class Annotation {
-  static const ENTITY = 'Entity';
-  static const DATABASE = 'Database';
-  static const COLUMN_INFO = 'ColumnInfo';
-  static const PRIMARY_KEY = 'PrimaryKey';
-  static const TRANSACTION = '_Transaction';
-  static const DAO = '_Dao';
-
-  static const QUERY = 'Query';
-  static const INSERT = 'Insert';
-  static const UPDATE = 'Update';
-  static const DELETE = '_Delete';
-}
-
 abstract class AnnotationField {
   static const QUERY_VALUE = 'value';
   static const PRIMARY_KEY_AUTO_GENERATE = 'autoGenerate';
