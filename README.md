@@ -231,7 +231,7 @@ Stream<List<Person>> findAllPersonsAsStream();
 
 // usage
 StreamBuilder<List<Person>>(
-  stream: database.findAllPersonsAsStream(),
+  stream: dao.findAllPersonsAsStream(),
   builder: (BuildContext context, AsyncSnapshot<List<Person>> snapshot) {
     // do something with the values here
   },

@@ -11,6 +11,7 @@ class DatabaseWriter implements Writer {
 
   DatabaseWriter(final this.database);
 
+  @nonNull
   @override
   Class write() {
     return _generateDatabaseImplementation(database);
@@ -91,7 +92,7 @@ class DatabaseWriter implements Writer {
             onUpgrade: (database, startVersion, endVersion) async {
               MigrationAdapter.runMigrations(database, startVersion, endVersion, migrations);
             },
-            onCreate: (database, version) async {
+            onCreate: (database, _) async {
               $createTableStatements
               $createIndexStatements
             },

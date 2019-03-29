@@ -42,23 +42,19 @@ class Entity {
 
   @nonNull
   String getValueMapping() {
-    final columnNames = fields.map((field) => field.columnName).toList();
-    final constructorParameters = classElement.constructors.first.parameters;
-
-    final keyValueList = <String>[];
-
-    for (var i = 0; i < constructorParameters.length; i++) {
-      final valueMapping = _getValueMapping(constructorParameters[i]);
-      keyValueList.add("'${columnNames[i]}': $valueMapping");
-    }
+    final keyValueList = fields.map((field) {
+      final columnName = field.columnName;
+      final value = _getValue(field.fieldElement);
+      return "'$columnName': $value";
+    }).toList();
 
     return '<String, dynamic>{${keyValueList.join(', ')}}';
   }
 
   @nonNull
-  String _getValueMapping(final ParameterElement parameter) {
-    final parameterName = parameter.displayName;
-    return isBool(parameter.type)
+  String _getValue(final FieldElement fieldElement) {
+    final parameterName = fieldElement.displayName;
+    return isBool(fieldElement.type)
         ? 'item.$parameterName ? 1 : 0'
         : 'item.$parameterName';
   }

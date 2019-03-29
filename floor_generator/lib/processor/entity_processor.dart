@@ -27,18 +27,17 @@ class EntityProcessor extends Processor<Entity> {
   @nonNull
   @override
   Entity process() {
-    final fields = _getFields();
     final name = _getName();
-    final indices = _getIndices(fields, name);
+    final fields = _getFields();
 
     return Entity(
       _classElement,
       name,
       fields,
-      _getPrimaryKey(_getFields()),
+      _getPrimaryKey(fields),
       _getForeignKeys(),
-      indices,
-      _getConstructor(_getFields()),
+      _getIndices(fields, name),
+      _getConstructor(fields),
     );
   }
 
@@ -202,7 +201,7 @@ class EntityProcessor extends Processor<Entity> {
     final autoGenerate = typeChecker(annotations.PrimaryKey)
             .firstAnnotationOfExact(primaryKeyField.fieldElement)
             .getField(AnnotationField.PRIMARY_KEY_AUTO_GENERATE)
-            .toBoolValue() ??
+            ?.toBoolValue() ??
         false;
 
     return PrimaryKey(primaryKeyField, autoGenerate);
@@ -210,6 +209,8 @@ class EntityProcessor extends Processor<Entity> {
 
   @nonNull
   String _getConstructor(final List<Field> fields) {
+    // Person(row['id'] as int, row['custom_name'] as String);
+
     final columnNames = fields.map((field) => field.columnName).toList();
     final constructorParameters = _classElement.constructors.first.parameters;
 
