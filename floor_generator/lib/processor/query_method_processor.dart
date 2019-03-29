@@ -69,8 +69,6 @@ class QueryMethodProcessor extends Processor<QueryMethod> {
 
     if (query.isEmpty || query == null) throw _processorError.NO_QUERY_DEFINED;
 
-    // TODO parse query
-
     return query.replaceAll(RegExp(':'), r'$');
   }
 
