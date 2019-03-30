@@ -38,7 +38,7 @@ void main() {
             onUpgrade: (database, startVersion, endVersion) async {
               MigrationAdapter.runMigrations(database, startVersion, endVersion, migrations);
             },
-            onCreate: (database, version) async {
+            onCreate: (database, _) async {
               await database.execute(
                   'CREATE TABLE IF NOT EXISTS `Person` (`id` INTEGER PRIMARY KEY NOT NULL, `name` TEXT)');
             },
@@ -77,7 +77,7 @@ void main() {
             onUpgrade: (database, startVersion, endVersion) async {
               MigrationAdapter.runMigrations(database, startVersion, endVersion, migrations);
             },
-            onCreate: (database, version) async {
+            onCreate: (database, _) async {
               await database.execute(
                   'CREATE TABLE IF NOT EXISTS `custom_table_name` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `custom_name` TEXT NOT NULL)');
             },
