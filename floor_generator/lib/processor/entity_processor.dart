@@ -218,12 +218,15 @@ class EntityProcessor extends Processor<Entity> {
 
     for (var i = 0; i < constructorParameters.length; i++) {
       final parameterValue = "row['${columnNames[i]}']";
+      final constructorParameter = constructorParameters[i];
       final castedParameterValue =
-          _castParameterValue(constructorParameters[i].type, parameterValue);
+          _castParameterValue(constructorParameter.type, parameterValue);
 
-      if (castedParameterValue != null) {
-        parameterValues.add(castedParameterValue);
+      if (castedParameterValue == null) {
+        throw _processorError.parameterTypeNotSupported(constructorParameter);
       }
+
+      parameterValues.add(castedParameterValue);
     }
 
     return '${_classElement.displayName}(${parameterValues.join(', ')})';
