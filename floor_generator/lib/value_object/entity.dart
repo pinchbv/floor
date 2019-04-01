@@ -44,15 +44,15 @@ class Entity {
   String getValueMapping() {
     final keyValueList = fields.map((field) {
       final columnName = field.columnName;
-      final value = _getValue(field.fieldElement);
-      return "'$columnName': $value";
+      final attributeValue = _getAttributeValue(field.fieldElement);
+      return "'$columnName': $attributeValue";
     }).toList();
 
     return '<String, dynamic>{${keyValueList.join(', ')}}';
   }
 
   @nonNull
-  String _getValue(final FieldElement fieldElement) {
+  String _getAttributeValue(final FieldElement fieldElement) {
     final parameterName = fieldElement.displayName;
     return isBool(fieldElement.type)
         ? 'item.$parameterName ? 1 : 0'

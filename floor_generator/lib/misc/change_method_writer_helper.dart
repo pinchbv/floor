@@ -10,7 +10,7 @@ class ChangeMethodWriterHelper {
       : assert(changeMethod != null),
         _changeMethod = changeMethod;
 
-  /// Returns a [MethodBuilder] that is already populated with
+  /// Adds the change method signature to the [MethodBuilder].
   void addChangeMethodSignature(final MethodBuilder methodBuilder) {
     methodBuilder
       ..annotations.add(overrideAnnotationExpression)

@@ -53,12 +53,12 @@ class QueryAdapter {
 
     final controller = StreamController<T>();
 
-    () async {
+    controller.onListen = () async {
       final result = await query(sql, mapper);
       if (result != null) {
         controller.add(result);
       }
-    }();
+    };
 
     final subscription = _changeListener.stream
         .where((listener) => listener == entityName)
@@ -71,9 +71,7 @@ class QueryAdapter {
       controller.close();
     });
 
-    controller.onCancel = () {
-      subscription.cancel();
-    };
+    controller.onCancel = () => subscription.cancel();
 
     return controller.stream;
   }
@@ -87,10 +85,10 @@ class QueryAdapter {
 
     final controller = StreamController<List<T>>();
 
-    () async {
+    controller.onListen = () async {
       final result = await queryList(sql, mapper);
       controller.add(result);
-    }();
+    };
 
     final subscription = _changeListener.stream
         .where((listener) => listener == entityName)
@@ -101,9 +99,7 @@ class QueryAdapter {
       controller.close();
     });
 
-    controller.onCancel = () {
-      subscription.cancel();
-    };
+    controller.onCancel = () => subscription.cancel();
 
     return controller.stream;
   }
