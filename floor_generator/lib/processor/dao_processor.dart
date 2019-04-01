@@ -95,7 +95,9 @@ class DaoProcessor extends Processor<Dao> {
         .toList();
   }
 
-  List<TransactionMethod> _getTransactionMethods(final List<MethodElement> methods) {
+  List<TransactionMethod> _getTransactionMethods(
+    final List<MethodElement> methods,
+  ) {
     return methods
         .where((method) => typeChecker(annotations.transaction.runtimeType)
             .hasAnnotationOfExact(method))
