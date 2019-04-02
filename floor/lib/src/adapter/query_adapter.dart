@@ -51,7 +51,7 @@ class QueryAdapter {
   ) {
     assert(_changeListener != null);
 
-    final controller = StreamController<T>();
+    final controller = StreamController<T>.broadcast();
 
     controller.onListen = () async {
       final result = await query(sql, mapper);
@@ -83,7 +83,7 @@ class QueryAdapter {
   ) {
     assert(_changeListener != null);
 
-    final controller = StreamController<List<T>>();
+    final controller = StreamController<List<T>>.broadcast();
 
     controller.onListen = () async {
       final result = await queryList(sql, mapper);
