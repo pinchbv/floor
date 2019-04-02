@@ -250,12 +250,10 @@ void main() {
           final persons = [Person(1, 'Simon'), Person(2, 'Frank')];
 
           final actual = personDao.findAllPersonsAsStream();
+          expect(actual, emits(<List<Person>>[]));
 
           await personDao.insertPersons(persons);
-          expect(
-            actual,
-            emitsInOrder(<List<Person>>[[], persons]),
-          );
+          expect(actual, emits(persons));
         });
 
         test('initially emits persistent data then new', () async {
@@ -264,12 +262,10 @@ void main() {
           await personDao.insertPersons(persons);
 
           final actual = personDao.findAllPersonsAsStream();
+          expect(actual, emits(persons));
 
           await personDao.insertPersons(persons2);
-          expect(
-            actual,
-            emitsInOrder(<List<Person>>[persons, persons + persons2]),
-          );
+          expect(actual, emits(persons + persons2));
         });
       });
 
@@ -279,28 +275,25 @@ void main() {
           await personDao.insertPerson(person);
 
           final actual = personDao.findAllPersonsAsStream();
+          expect(actual, emits([person]));
 
           final updatedPerson = Person(person.id, 'Frank');
           await personDao.updatePerson(updatedPerson);
-          expect(
-            actual,
-            emitsInOrder(<List<Person>>[
-              [person],
-              [updatedPerson]
-            ]),
-          );
+          expect(actual, emits([updatedPerson]));
         });
 
         test('update items', () async {
           final persons = [Person(1, 'Simon'), Person(2, 'Frank')];
-          final updatedPersons =
-              persons.map((person) => Person(person.id, 'Nick')).toList();
+          final updatedPersons = persons
+              .map((person) => Person(person.id, _reverse(person.name)))
+              .toList();
           await personDao.insertPersons(persons);
 
           final actual = personDao.findAllPersonsAsStream();
+          expect(actual, emits(persons));
 
           await personDao.updatePersons(updatedPersons);
-          expect(actual, emitsInOrder(<List<Person>>[persons, updatedPersons]));
+          expect(actual, emits(updatedPersons));
         });
       });
 
@@ -310,15 +303,10 @@ void main() {
           await personDao.insertPerson(person);
 
           final actual = personDao.findAllPersonsAsStream();
+          expect(actual, emits([person]));
 
           await personDao.deletePerson(person);
-          expect(
-            actual,
-            emitsInOrder(<List<Person>>[
-              [person],
-              []
-            ]),
-          );
+          expect(actual, emits(<Person>[]));
         });
 
         test('delete items', () async {
@@ -326,9 +314,10 @@ void main() {
           await personDao.insertPersons(persons);
 
           final actual = personDao.findAllPersonsAsStream();
+          expect(actual, emits(persons));
 
           await personDao.deletePersons(persons);
-          expect(actual, emitsInOrder(<List<Person>>[persons, []]));
+          expect(actual, emits(<Person>[]));
         });
       });
     });

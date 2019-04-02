@@ -61,7 +61,7 @@ class DaoProcessor extends Processor<Dao> {
     );
   }
 
-  List<QueryMethod> _getQueryMethods(List<MethodElement> methods) {
+  List<QueryMethod> _getQueryMethods(final List<MethodElement> methods) {
     return methods
         .where((method) =>
             typeChecker(annotations.Query).hasAnnotationOfExact(method))
@@ -70,7 +70,7 @@ class DaoProcessor extends Processor<Dao> {
   }
 
   List<InsertionMethod> _getInsertionMethods(
-    List<MethodElement> methodElements,
+    final List<MethodElement> methodElements,
   ) {
     return methodElements
         .where((method) =>
@@ -79,7 +79,7 @@ class DaoProcessor extends Processor<Dao> {
         .toList();
   }
 
-  List<UpdateMethod> _getUpdateMethods(List<MethodElement> methods) {
+  List<UpdateMethod> _getUpdateMethods(final List<MethodElement> methods) {
     return methods
         .where((method) =>
             typeChecker(annotations.Update).hasAnnotationOfExact(method))
@@ -87,7 +87,7 @@ class DaoProcessor extends Processor<Dao> {
         .toList();
   }
 
-  List<DeletionMethod> _getDeletionMethods(List<MethodElement> methods) {
+  List<DeletionMethod> _getDeletionMethods(final List<MethodElement> methods) {
     return methods
         .where((method) => typeChecker(annotations.delete.runtimeType)
             .hasAnnotationOfExact(method))
@@ -95,7 +95,9 @@ class DaoProcessor extends Processor<Dao> {
         .toList();
   }
 
-  List<TransactionMethod> _getTransactionMethods(List<MethodElement> methods) {
+  List<TransactionMethod> _getTransactionMethods(
+    final List<MethodElement> methods,
+  ) {
     return methods
         .where((method) => typeChecker(annotations.transaction.runtimeType)
             .hasAnnotationOfExact(method))
