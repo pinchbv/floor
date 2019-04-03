@@ -26,19 +26,20 @@ class InsertionMethodWriter implements Writer {
 
   @nonNull
   String _generateMethodBody() {
-    final decapitalizedEntityName = decapitalize(_method.entity.name);
+    final entityClassName =
+        decapitalize(_method.entity.classElement.displayName);
     final methodSignatureParameterName = _method.parameterElement.displayName;
 
     if (_method.flattenedReturnType.isVoid) {
       return _generateVoidReturnMethodBody(
         methodSignatureParameterName,
-        decapitalizedEntityName,
+        entityClassName,
       );
     } else {
       // if not void then must be int return
       return _generateIntReturnMethodBody(
         methodSignatureParameterName,
-        decapitalizedEntityName,
+        entityClassName,
       );
     }
   }
@@ -46,24 +47,24 @@ class InsertionMethodWriter implements Writer {
   @nonNull
   String _generateVoidReturnMethodBody(
     final String methodSignatureParameterName,
-    final String entityName,
+    final String entityClassName,
   ) {
     if (_method.changesMultipleItems) {
-      return 'await _${entityName}InsertionAdapter.insertList($methodSignatureParameterName, ${_method.onConflict});';
+      return 'await _${entityClassName}InsertionAdapter.insertList($methodSignatureParameterName, ${_method.onConflict});';
     } else {
-      return 'await _${entityName}InsertionAdapter.insert($methodSignatureParameterName, ${_method.onConflict});';
+      return 'await _${entityClassName}InsertionAdapter.insert($methodSignatureParameterName, ${_method.onConflict});';
     }
   }
 
   @nonNull
   String _generateIntReturnMethodBody(
     final String methodSignatureParameterName,
-    final String entityName,
+    final String entityClassName,
   ) {
     if (_method.changesMultipleItems) {
-      return 'return _${entityName}InsertionAdapter.insertListAndReturnIds($methodSignatureParameterName, ${_method.onConflict});';
+      return 'return _${entityClassName}InsertionAdapter.insertListAndReturnIds($methodSignatureParameterName, ${_method.onConflict});';
     } else {
-      return 'return _${entityName}InsertionAdapter.insertAndReturnId($methodSignatureParameterName, ${_method.onConflict});';
+      return 'return _${entityClassName}InsertionAdapter.insertAndReturnId($methodSignatureParameterName, ${_method.onConflict});';
     }
   }
 }

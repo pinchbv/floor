@@ -80,9 +80,9 @@ class DaoWriter extends Writer {
       final entities = insertionMethods.map((method) => method.entity).toSet();
 
       for (final entity in entities) {
-        final name = entity.classElement.displayName;
-        final fieldName = '_${decapitalize(name)}InsertionAdapter';
-        final type = refer('InsertionAdapter<$name>');
+        final entityClassName = entity.classElement.displayName;
+        final fieldName = '_${decapitalize(entityClassName)}InsertionAdapter';
+        final type = refer('InsertionAdapter<$entityClassName>');
 
         final field = Field((builder) => builder
           ..name = fieldName
@@ -108,9 +108,9 @@ class DaoWriter extends Writer {
       final entities = updateMethods.map((method) => method.entity).toSet();
 
       for (final entity in entities) {
-        final name = entity.classElement.displayName;
-        final fieldName = '_${decapitalize(name)}UpdateAdapter';
-        final type = refer('UpdateAdapter<$name>');
+        final entityClassName = entity.classElement.displayName;
+        final fieldName = '_${decapitalize(entityClassName)}UpdateAdapter';
+        final type = refer('UpdateAdapter<$entityClassName>');
 
         final field = Field((builder) => builder
           ..name = fieldName
@@ -136,9 +136,9 @@ class DaoWriter extends Writer {
       final entities = deleteMethods.map((method) => method.entity).toSet();
 
       for (final entity in entities) {
-        final name = entity.classElement.displayName;
-        final fieldName = '_${decapitalize(name)}DeletionAdapter';
-        final type = refer('DeletionAdapter<$name>');
+        final entityClassName = entity.classElement.displayName;
+        final fieldName = '_${decapitalize(entityClassName)}DeletionAdapter';
+        final type = refer('DeletionAdapter<$entityClassName>');
 
         final field = Field((builder) => builder
           ..name = fieldName

@@ -26,19 +26,20 @@ class UpdateMethodWriter implements Writer {
 
   @nonNull
   String _generateMethodBody() {
-    final entityName = decapitalize(_method.entity.name);
+    final entityClassName =
+        decapitalize(_method.entity.classElement.displayName);
     final methodSignatureParameterName = _method.parameterElement.displayName;
 
     if (_method.flattenedReturnType.isVoid) {
       return _generateVoidReturnMethodBody(
         methodSignatureParameterName,
-        entityName,
+        entityClassName,
       );
     } else {
       // if not void then must be int return
       return _generateIntReturnMethodBody(
         methodSignatureParameterName,
-        entityName,
+        entityClassName,
       );
     }
   }
@@ -46,24 +47,24 @@ class UpdateMethodWriter implements Writer {
   @nonNull
   String _generateIntReturnMethodBody(
     final String methodSignatureParameterName,
-    final String entityName,
+    final String entityClassName,
   ) {
     if (_method.changesMultipleItems) {
-      return 'return _${entityName}UpdateAdapter.updateListAndReturnChangedRows($methodSignatureParameterName, ${_method.onConflict});';
+      return 'return _${entityClassName}UpdateAdapter.updateListAndReturnChangedRows($methodSignatureParameterName, ${_method.onConflict});';
     } else {
-      return 'return _${entityName}UpdateAdapter.updateAndReturnChangedRows($methodSignatureParameterName, ${_method.onConflict});';
+      return 'return _${entityClassName}UpdateAdapter.updateAndReturnChangedRows($methodSignatureParameterName, ${_method.onConflict});';
     }
   }
 
   @nonNull
   String _generateVoidReturnMethodBody(
     final String methodSignatureParameterName,
-    final String entityName,
+    final String entityClassName,
   ) {
     if (_method.changesMultipleItems) {
-      return 'await _${entityName}UpdateAdapter.updateList($methodSignatureParameterName, ${_method.onConflict});';
+      return 'await _${entityClassName}UpdateAdapter.updateList($methodSignatureParameterName, ${_method.onConflict});';
     } else {
-      return 'await _${entityName}UpdateAdapter.update($methodSignatureParameterName, ${_method.onConflict});';
+      return 'await _${entityClassName}UpdateAdapter.update($methodSignatureParameterName, ${_method.onConflict});';
     }
   }
 }

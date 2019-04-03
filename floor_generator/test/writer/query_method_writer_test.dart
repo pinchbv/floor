@@ -15,7 +15,7 @@ void main() {
   useDartfmt();
 
   test('query no return', () async {
-    final queryMethod = await _generateQueryMethod('''
+    final queryMethod = await _createQueryMethod('''
       @Query('DELETE FROM Person')
       Future<void> deleteAll();
     ''');
@@ -31,7 +31,7 @@ void main() {
   });
 
   test('query item', () async {
-    final queryMethod = await _generateQueryMethod('''
+    final queryMethod = await _createQueryMethod('''
       @Query('SELECT * FROM Person WHERE id = :id')
       Future<Person> findById(int id);
     ''');
@@ -47,7 +47,7 @@ void main() {
   });
 
   test('query list', () async {
-    final queryMethod = await _generateQueryMethod('''
+    final queryMethod = await _createQueryMethod('''
       @Query('SELECT * FROM Person')
       Future<List<Person>> findAll();
     ''');
@@ -63,7 +63,7 @@ void main() {
   });
 
   test('query item stream', () async {
-    final queryMethod = await _generateQueryMethod('''
+    final queryMethod = await _createQueryMethod('''
       @Query('SELECT * FROM Person WHERE id = :id')
       Stream<Person> findByIdAsStream(int id);
     ''');
@@ -79,7 +79,7 @@ void main() {
   });
 
   test('query list stream', () async {
-    final queryMethod = await _generateQueryMethod('''
+    final queryMethod = await _createQueryMethod('''
       @Query('SELECT * FROM Person')
       Stream<List<Person>> findAllAsStream();
     ''');
@@ -95,7 +95,7 @@ void main() {
   });
 }
 
-Future<QueryMethod> _generateQueryMethod(final String method) async {
+Future<QueryMethod> _createQueryMethod(final String method) async {
   final library = await resolveSource('''
       library test;
       
