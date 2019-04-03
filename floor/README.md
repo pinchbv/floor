@@ -3,7 +3,7 @@
 
 The Floor library provides a lightweight SQLite abstraction with automatic mapping between in-memory objects and database rows while still offering full control of the database with the use of SQL.
 
-It's important to note that this library is not a full-featured ORM like Hibernate and will never be.
+It's important to note that this library is not a full featured ORM like Hibernate and will never be.
 Thus not supporting automatic relationship mapping is intentional.
 
 This package is still in an early phase and the API will likely change.
@@ -57,8 +57,6 @@ This package is still in an early phase and the API will likely change.
     There is no restriction on where you put the file containing the entity.
 
     ````dart
-    // model/person.dart
- 
     import 'package:floor/floor.dart';
     
     @entity
@@ -74,7 +72,7 @@ This package is still in an early phase and the API will likely change.
 
 1. Creating a *DAO*
 
-    This component is responsible for managing access to the underlying SQLite database.
+    This component is responsible for managing the access to the underlying SQLite database.
     The abstract class contains the method signatures for querying the database which have to return a `Future`.
 
     - You can define queries by adding the `@Query` annotation to a method.
@@ -84,8 +82,6 @@ This package is still in an early phase and the API will likely change.
     - `@insert` marks a method as an insertion method.
     
     ```dart
-    // dao/person_dao.dart   
- 
     import 'package:floor/floor.dart';
 
     @dao
@@ -112,14 +108,9 @@ This package is still in an early phase and the API will likely change.
     The warning, of it not being implemented, will go away then.
         
     ```dart
-    // database.dart   
- 
-    import 'dart:async';
     import 'package:floor/floor.dart';
     import 'package:path/path.dart';
     import 'package:sqflite/sqflite.dart' as sqflite;
-    import 'dao/person_dao.dart';
-    import 'model/person.dart';
  
     part 'database.g.dart'; // the generated code will be there
  
@@ -133,7 +124,7 @@ This package is still in an early phase and the API will likely change.
 
 1. Make sure to add `part 'database.g.dart';` beneath the imports of this file.
     It's important to note, that 'database' has to get exchanged with the name of the file the entity and database is defined in.
-    In this case, the file is named `database.dart`.
+    In this case the file is named `database.dart`.
 
 1. Run the generator with `flutter packages pub run build_runner build`.
     To automatically run it, whenever a file changes, use `flutter packages pub run build_runner watch`.
@@ -156,7 +147,7 @@ The first, *Entity*, represents a persistent class and thus a database table.
 *DAOs* manage the access to *Entities* and take care of the mapping between in-memory objects and table rows.
 Lastly, *Database*, is the central access point to the underlying SQLite database.
 It holds the *DAOs* and, beyond that, takes care of initializing the database and its schema.
-[Room](https://developer.android.com/topic/libraries/architecture/room) serves as the source of inspiration for this composition, because it allows creating a clean separation of the component's responsibilities.
+[Room](https://developer.android.com/topic/libraries/architecture/room) serves as the source of inspiration for this composition, because it allows to create a clean separation of the component's responsibilities.
 
 The figure shows the relationship between *Entity*, *DAO* and *Database*.
 
@@ -230,7 +221,7 @@ Future<int> deletePersons(List<Person> person);
 ```
 
 ## Streams
-As already mentioned, queries can not only return a value once when called but also a continuous stream of query results.
+As already mentioned, queries can not only return a value once when called, but also a continuous stream of query results.
 The returned stream keeps you in sync with the changes happening to the database table.
 This feature plays really well with the `StreamBuilder` widget.
 ```dart
@@ -264,18 +255,18 @@ An entity is a persistent class.
 Floor automatically creates the mappings between the in-memory objects and database table rows.
 It's possible to supply custom metadata to Floor by adding optional values to the `Entity` annotation.
 It has the additional attribute of `tableName` which opens up the possibility to use a custom name for that specific entity instead of using the class name.
-Another attribute `foreignKeys` allows adding foreign keys to the entity.
+Another attribute `foreignKeys` allows to add foreign keys to the entity.
 More information on how to use these can be found in the [Foreign Keys](#foreign-keys) section.
 Indices are supported as well.
 They can be used by adding an `Index` to the `indices` value of the entity.
 For further information of these, please refer to the [Indices](#indices) section. 
 
-`@PrimaryKey` marks property of a class as the primary key column.
+`@PrimaryKey` marks a property of a class as the primary key column.
 This property has to be of type int.
 The value can be automatically generated by SQLite when `autoGenerate` is enabled.
 
 `@ColumnInfo` enables custom mapping of single table columns.
-With the annotation, it's possible to give columns a custom name and define if the column is able to store `null`.
+With the annotation it's possible to give columns a custom name and define if the column is able to store `null`.
 
 ```dart
 @Entity(tableName: 'person')
