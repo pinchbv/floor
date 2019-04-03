@@ -1,5 +1,6 @@
 import 'package:code_builder/code_builder.dart';
 import 'package:floor_generator/misc/annotation_expression.dart';
+import 'package:floor_generator/misc/string_utils.dart';
 import 'package:floor_generator/misc/type_utils.dart';
 import 'package:floor_generator/value_object/query_method.dart';
 import 'package:floor_generator/writer/writer.dart';
@@ -52,7 +53,7 @@ class QueryMethodWriter implements Writer {
       return "await _queryAdapter.queryNoReturn('${_queryMethod.query}');";
     }
 
-    final mapper = '_${_queryMethod.entity.name}Mapper';
+    final mapper = '_${decapitalize(_queryMethod.entity.name)}Mapper';
 
     if (_queryMethod.returnsStream) {
       return _generateStreamQuery(mapper);
