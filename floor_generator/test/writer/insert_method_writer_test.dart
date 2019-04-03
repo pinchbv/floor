@@ -4,6 +4,7 @@ import 'package:floor_annotation/floor_annotation.dart' as annotations;
 import 'package:floor_generator/misc/type_utils.dart';
 import 'package:floor_generator/processor/dao_processor.dart';
 import 'package:floor_generator/processor/entity_processor.dart';
+import 'package:floor_generator/value_object/insertion_method.dart';
 import 'package:floor_generator/writer/insertion_method_writer.dart';
 import 'package:source_gen/source_gen.dart';
 import 'package:test/test.dart';
@@ -15,10 +16,12 @@ void main() {
 
   group('void return insert', () {
     test('insert single person', () async {
-      final actual = await _generateInsertMethod('''
+      final insertionMethod = await _createInsertionMethod('''
         @insert
         Future<void> insertPerson(Person person);
       ''');
+
+      final actual = InsertionMethodWriter(insertionMethod).write();
 
       expect(actual, equalsDart(r'''
         @override
@@ -29,10 +32,12 @@ void main() {
     });
 
     test('insert person list', () async {
-      final actual = await _generateInsertMethod('''
+      final insertionMethod = await _createInsertionMethod('''
         @insert
         Future<void> insertPersons(List<Person> persons);
       ''');
+
+      final actual = InsertionMethodWriter(insertionMethod).write();
 
       expect(actual, equalsDart('''
         @override
@@ -45,10 +50,12 @@ void main() {
 
   group('int return insert', () {
     test('insert single person', () async {
-      final actual = await _generateInsertMethod('''
+      final insertionMethod = await _createInsertionMethod('''
         @insert
         Future<int> insertPersonWithReturn(Person person);
       ''');
+
+      final actual = InsertionMethodWriter(insertionMethod).write();
 
       expect(actual, equalsDart('''
         @override
@@ -59,10 +66,12 @@ void main() {
     });
 
     test('insert person list', () async {
-      final actual = await _generateInsertMethod('''
+      final insertionMethod = await _createInsertionMethod('''
         @insert
         Future<List<int>> insertPersonsWithReturn(List<Person> persons);
       ''');
+
+      final actual = InsertionMethodWriter(insertionMethod).write();
 
       expect(actual, equalsDart('''
         @override
@@ -73,94 +82,25 @@ void main() {
     });
   });
 
-  group('on conflic strategy', () {
-    test('insert method on conflict default (abort)', () async {
-      final actual = await _generateInsertMethod('''
-        @insert
-        Future<void> insertPerson(Person person);
-      ''');
-
-      expect(actual, equalsDart(r'''
-        @override
-        Future<void> insertPerson(Person person) async {
-          await _personInsertionAdapter.insert(person, sqflite.ConflictAlgorithm.abort);
-        }
-       '''));
-    });
-
-    test('insert method on conflict replace', () async {
-      final actual = await _generateInsertMethod('''
+  test('insert method on conflict replace', () async {
+    final insertionMethod = await _createInsertionMethod('''
         @Insert(onConflict: OnConflictStrategy.REPLACE)
         Future<void> insertPerson(Person person);
       ''');
 
-      expect(actual, equalsDart(r'''
+    final actual = InsertionMethodWriter(insertionMethod).write();
+
+    expect(actual, equalsDart(r'''
         @override
         Future<void> insertPerson(Person person) async {
           await _personInsertionAdapter.insert(person, sqflite.ConflictAlgorithm.replace);
         }
       '''));
-    });
-
-    test('insert method on conflict rollback', () async {
-      final actual = await _generateInsertMethod('''
-        @Insert(onConflict: OnConflictStrategy.ROLLBACK)
-        Future<void> insertPerson(Person person);
-      ''');
-
-      expect(actual, equalsDart(r'''
-         @override
-         Future<void> insertPerson(Person person) async {
-           await _personInsertionAdapter.insert(person, sqflite.ConflictAlgorithm.rollback);
-         }
-      '''));
-    });
-
-    test('insert method on conflict abort', () async {
-      final actual = await _generateInsertMethod('''
-        @Insert(onConflict: OnConflictStrategy.ABORT)
-        Future<void> insertPerson(Person person);
-     ''');
-
-      expect(actual, equalsDart(r'''
-        @override
-        Future<void> insertPerson(Person person) async {
-          await _personInsertionAdapter.insert(person, sqflite.ConflictAlgorithm.abort);
-        }
-      '''));
-    });
-
-    test('insert method on conflict fail', () async {
-      final actual = await _generateInsertMethod('''
-        @Insert(onConflict: OnConflictStrategy.FAIL)
-        Future<void> insertPerson(Person person);
-      ''');
-
-      expect(actual, equalsDart(r'''
-        @override
-        Future<void> insertPerson(Person person) async {
-          await _personInsertionAdapter.insert(person, sqflite.ConflictAlgorithm.fail);
-        }
-      '''));
-    });
-
-    test('insert method on conflict ignore', () async {
-      final actual = await _generateInsertMethod('''
-        @Insert(onConflict: OnConflictStrategy.IGNORE)
-        Future<void> insertPerson(Person person);
-      ''');
-
-      expect(actual, equalsDart(r'''
-        @override
-        Future<void> insertPerson(Person person) async {
-        await _personInsertionAdapter.insert(person, sqflite.ConflictAlgorithm.ignore);
-        }
-      '''));
-    });
   });
 }
 
-Future<Method> _generateInsertMethod(final String methodSignature) async {
+Future<InsertionMethod> _createInsertionMethod(
+    final String methodSignature) async {
   final library = await resolveSource('''
       library test;
       
@@ -172,12 +112,11 @@ Future<Method> _generateInsertMethod(final String methodSignature) async {
         $methodSignature
       }
       
-      @Entity(tableName: 'person')
+      @entity
       class Person {
-        @PrimaryKey()
+        @primaryKey
         final int id;
       
-        @ColumnInfo(name: 'custom_name', nullable: false)
         final String name;
       
         Person(this.id, this.name);
@@ -198,6 +137,5 @@ Future<Method> _generateInsertMethod(final String methodSignature) async {
 
   final dao =
       DaoProcessor(daoClass, 'personDao', 'TestDatabase', entities).process();
-  final insertMethod = dao.insertionMethods.first;
-  return InsertionMethodWriter(insertMethod).write();
+  return dao.insertionMethods.first;
 }

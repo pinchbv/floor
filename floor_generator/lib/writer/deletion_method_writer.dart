@@ -26,19 +26,20 @@ class DeletionMethodWriter implements Writer {
 
   @nonNull
   String _generateMethodBody() {
-    final entityName = decapitalize(_method.entity.name);
+    final entityClassName =
+        decapitalize(_method.entity.classElement.displayName);
     final methodSignatureParameterName = _method.parameterElement.name;
 
     if (_method.flattenedReturnType.isVoid) {
       return _generateVoidReturnMethodBody(
         methodSignatureParameterName,
-        entityName,
+        entityClassName,
       );
     } else {
       // if not void then must be int return
       return _generateIntReturnMethodBody(
         methodSignatureParameterName,
-        entityName,
+        entityClassName,
       );
     }
   }
@@ -46,24 +47,24 @@ class DeletionMethodWriter implements Writer {
   @nonNull
   String _generateVoidReturnMethodBody(
     final String methodSignatureParameterName,
-    final String entityName,
+    final String entityClassName,
   ) {
     if (_method.changesMultipleItems) {
-      return 'await _${entityName}DeletionAdapter.deleteList($methodSignatureParameterName);';
+      return 'await _${entityClassName}DeletionAdapter.deleteList($methodSignatureParameterName);';
     } else {
-      return 'await _${entityName}DeletionAdapter.delete($methodSignatureParameterName);';
+      return 'await _${entityClassName}DeletionAdapter.delete($methodSignatureParameterName);';
     }
   }
 
   @nonNull
   String _generateIntReturnMethodBody(
     final String methodSignatureParameterName,
-    final String entityName,
+    final String entityClassName,
   ) {
     if (_method.changesMultipleItems) {
-      return 'return _${entityName}DeletionAdapter.deleteListAndReturnChangedRows($methodSignatureParameterName);';
+      return 'return _${entityClassName}DeletionAdapter.deleteListAndReturnChangedRows($methodSignatureParameterName);';
     } else {
-      return 'return _${entityName}DeletionAdapter.deleteAndReturnChangedRows($methodSignatureParameterName);';
+      return 'return _${entityClassName}DeletionAdapter.deleteAndReturnChangedRows($methodSignatureParameterName);';
     }
   }
 }
