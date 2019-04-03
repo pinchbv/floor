@@ -14,7 +14,39 @@ import '../test_utils.dart';
 void main() {
   useDartfmt();
 
-  test('query all persons', () async {
+  test('query no return', () async {
+    final queryMethod = await _generateQueryMethod('''
+      @Query('DELETE FROM Person')
+      Future<void> deleteAll();
+    ''');
+
+    final actual = QueryMethodWriter(queryMethod).write();
+
+    expect(actual, equalsDart(r'''
+      @override
+      Future<void> deleteAll() async {
+        await _queryAdapter.queryNoReturn('DELETE FROM Person');
+      }
+    '''));
+  });
+
+  test('query item', () async {
+    final queryMethod = await _generateQueryMethod('''
+      @Query('SELECT * FROM Person WHERE id = :id')
+      Future<Person> findById(int id);
+    ''');
+
+    final actual = QueryMethodWriter(queryMethod).write();
+
+    expect(actual, equalsDart(r'''
+      @override
+      Future<Person> findById(int id) async {
+        return _queryAdapter.query('SELECT * FROM Person WHERE id = $id', _personMapper);
+      }
+    '''));
+  });
+
+  test('query list', () async {
     final queryMethod = await _generateQueryMethod('''
       @Query('SELECT * FROM Person')
       Future<List<Person>> findAll();
@@ -26,6 +58,38 @@ void main() {
       @override
       Future<List<Person>> findAll() async {
         return _queryAdapter.queryList('SELECT * FROM Person', _personMapper);
+      }
+    '''));
+  });
+
+  test('query item stream', () async {
+    final queryMethod = await _generateQueryMethod('''
+      @Query('SELECT * FROM Person WHERE id = :id')
+      Stream<Person> findByIdAsStream(int id);
+    ''');
+
+    final actual = QueryMethodWriter(queryMethod).write();
+
+    expect(actual, equalsDart(r'''
+      @override
+      Stream<Person> findByIdAsStream(int id) {
+        return _queryAdapter.queryStream('SELECT * FROM Person WHERE id = $id', 'Person', _personMapper);
+      }
+    '''));
+  });
+
+  test('query list stream', () async {
+    final queryMethod = await _generateQueryMethod('''
+      @Query('SELECT * FROM Person')
+      Stream<List<Person>> findAllAsStream();
+    ''');
+
+    final actual = QueryMethodWriter(queryMethod).write();
+
+    expect(actual, equalsDart(r'''
+      @override
+      Stream<List<Person>> findAllAsStream() {
+        return _queryAdapter.queryListStream('SELECT * FROM Person', 'Person', _personMapper);
       }
     '''));
   });
@@ -42,12 +106,11 @@ Future<QueryMethod> _generateQueryMethod(final String method) async {
         $method 
       }
       
-      @Entity(tableName: 'person')
+      @entity
       class Person {
-        @PrimaryKey()
+        @primaryKey
         final int id;
       
-        @ColumnInfo(name: 'custom_name', nullable: false)
         final String name;
       
         Person(this.id, this.name);
