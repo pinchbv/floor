@@ -1,5 +1,24 @@
 # Changelog
 
+# 0.3.0
+
+### Changes
+
+* Use TypeChecker for all annotations
+* Add publishing instructions
+* Remove unused annotation names
+* Simplify the mapping from an entity to a map
+* Fix database writer test
+* Make stream emit query result on subscription
+* Update example to use StreamBuilder
+* Update README
+
+### 🐛 Bug Fixes
+
+* Correct mapper instance name referenced by generated query methods
+* Fix adapter instances naming
+
+
 # 0.2.0
 
 ### Changes
