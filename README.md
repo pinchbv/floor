@@ -41,11 +41,11 @@ This package is still in an early phase and the API will likely change.
     dependencies:
       flutter:
         sdk: flutter
-      floor: ^0.2.0
+      floor: ^0.3.0
     
     dev_dependencies:
-      floor_generator: ^0.2.0
-      build_runner: ^1.2.8
+      floor_generator: ^0.3.0
+      build_runner: ^1.3.1
     ````
 
 1. Creating an *Entity*
@@ -233,6 +233,9 @@ Future<int> deletePersons(List<Person> person);
 As already mentioned, queries can not only return a value once when called but also a continuous stream of query results.
 The returned stream keeps you in sync with the changes happening to the database table.
 This feature plays really well with the `StreamBuilder` widget.
+
+These methods return a broadcast stream.
+Thus, it can have multiple listeners.
 ```dart
 // definition
 @Query('SELECT * FROM Person')
