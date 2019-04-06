@@ -10,19 +10,11 @@ if [ "$#" == "0" ]; then
   exit 1
 fi
 
-escapedPath="$(echo $PWD | sed 's/\//\\\//g')"
-path="$(echo $PWD)"
-# TODO remove this
-echo "Escaped path: $escapedPath"
-
-pushd $PKG
+cd $PKG;
 
 EXIT_CODE=0
 
-escapedPathAfter="$(echo $PWD | sed 's/\//\\\//g')"
-#escapedPathAfter="$(echo $PWD)"
-echo "Path after: $escapedPathAfter"
-
+escapedPath="$(echo $PKG | sed 's/\//\\\//g')"
 
 while (( "$#" )); do
   TASK=$1
@@ -48,8 +40,7 @@ while (( "$#" )); do
     pub global run coverage:format_coverage --packages=.packages -i coverage.json --report-on lib --lcov --out lcov.info
     if [ -f "lcov.info" ]; then
       # combine line coverage info from package tests to a common file
-#      sed s/^SF:.*lib/SF:${escapedPathAfter}\/lib/g lcov.info >> ${escapedPath}/lcov.info
-      sed "s/^SF:.*lib/SF:$escapedPathAfter\/lib/g" lcov.info >> "$path/lcov.info"
+      sed "s/^SF:.*lib/SF:$escapedPath\/lib/g" lcov.info >> "../lcov.info"
       rm lcov.info
     fi
     rm -f coverage.json
@@ -66,7 +57,7 @@ while (( "$#" )); do
     flutter test --coverage || EXIT_CODE=$?
     if [ -d "coverage" ]; then
       # combine line coverage info from package tests to a common file
-      sed "s/^SF:lib/SF:$escapedPathAfter\/lib/g" coverage/lcov.info >> "$path/lcov.info"
+      sed "s/^SF:lib/SF:$escapedPath\/lib/g" coverage/lcov.info >> "../lcov.info"
       rm -rf "coverage"
     fi
     ;;
