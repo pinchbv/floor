@@ -1,4 +1,3 @@
-# Created with package:mono_repo v1.2.1
 before_install:
   - chmod +x tool/travis.sh
 

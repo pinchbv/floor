@@ -14,7 +14,8 @@ pushd $PKG
 
 EXIT_CODE=0
 
-escapedPath="$(echo $PWD | sed 's/\//\\\//g')"
+#escapedPath="$(echo $PWD | sed 's/\//\\\//g')"
+escapedPath="$(echo $1 | sed 's/\//\\\//g')"
 
 while (( "$#" )); do
   TASK=$1
