@@ -48,7 +48,8 @@ while (( "$#" )); do
     pub global run coverage:format_coverage --packages=.packages -i coverage.json --report-on lib --lcov --out lcov.info
     if [ -f "lcov.info" ]; then
       # combine line coverage info from package tests to a common file
-      sed "s/^SF:.*lib/SF:$escapedPathAfter\/lib/g" lcov.info >> ${escapedPath}/lcov.info
+#      sed "s/^SF:.*lib/SF:$escapedPathAfter\/lib/g" lcov.info >> ${escapedPath}/lcov.info
+      lcov.info >> ${escapedPath}/lcov.info
       rm lcov.info
     fi
     rm -f coverage.json
@@ -65,7 +66,8 @@ while (( "$#" )); do
     flutter test --coverage || EXIT_CODE=$?
     if [ -d "coverage" ]; then
       # combine line coverage info from package tests to a common file
-      sed "s/^SF:lib/SF:$escapedPathAfter\/lib/g" coverage/lcov.info >> ${escapedPath}/lcov.info
+#      sed "s/^SF:lib/SF:$escapedPathAfter\/lib/g" coverage/lcov.info >> ${escapedPath}/lcov.info
+      coverage/lcov.info >> ${escapedPath}/lcov.info
       rm -rf "coverage"
     fi
     ;;
