@@ -52,8 +52,8 @@ while (( "$#" )); do
     echo -e '\033[1mTASK: flutter test\033[22m'
     echo -e 'flutter test'
     flutter test --coverage || EXIT_CODE=$?
-    sed "s/^SF:lib/SF:$escapedPath\/lib/g" coverage/lcov.info >> $2/lcov.info
-    rm -rf "coverage"
+#    sed "s/^SF:lib/SF:$escapedPath\/lib/g" coverage/lcov.info >> $2/lcov.info
+#    rm -rf "coverage"
     ;;
   *) echo -e "\033[31mNot expecting TASK '${TASK}'. Error!\033[0m"
     EXIT_CODE=1
