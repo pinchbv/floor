@@ -48,13 +48,12 @@ jobs:
         - flutter doctor -v
       script:
         - ./tool/travis.sh flutter_analyze
-      cache:
-        directories:
-          - $HOME/.pub-cache
 
     - stage: unit_test
       language: dart
       name: "floor_generator - pub run test"
+      before_script:
+        - pub global activate coverage
       script: ./tool/travis.sh test
       env: PKG="floor_generator"
       dart: stable
@@ -73,11 +72,11 @@ jobs:
         - export PATH="$PATH":"$HOME/.pub-cache/bin"
         - export PATH=$PWD/flutter/bin:$PWD/flutter/bin/cache/dart-sdk/bin:$PATH
         - flutter doctor -v
+        - pub global activate coverage
       script:
         - ./tool/travis.sh flutter_test
-      cache:
-        directories:
-          - $HOME/.pub-cache
+      after_success:
+        - bash <(curl -s https://codecov.io/bash) -f lcov.info
 
 stages:
   - analyze
@@ -85,4 +84,4 @@ stages:
 
 cache:
   directories:
-    - "$HOME/.pub-cache"
+    - $HOME/.pub-cache
