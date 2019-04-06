@@ -49,7 +49,7 @@ while (( "$#" )); do
     if [ -f "lcov.info" ]; then
       # combine line coverage info from package tests to a common file
 #      sed s/^SF:.*lib/SF:${escapedPathAfter}\/lib/g lcov.info >> ${escapedPath}/lcov.info
-      sed "s/^SF:.*lib/SF:${escapedPathAfter}\/lib/g" lcov.info
+      sed "s/^SF:.*lib/SF:$escapedPathAfter\/lib/g" lcov.info
       cat lcov.info >> ${path}/lcov.info
       rm lcov.info
     fi
@@ -67,7 +67,7 @@ while (( "$#" )); do
     flutter test --coverage || EXIT_CODE=$?
     if [ -d "coverage" ]; then
       # combine line coverage info from package tests to a common file
-      sed "s/^SF:lib/SF:${escapedPathAfter}\/lib/g" coverage/lcov.info
+      sed "s/^SF:lib/SF:$escapedPathAfter\/lib/g" coverage/lcov.info
       cat coverage/lcov.info >> ${path}/lcov.info
       rm -rf "coverage"
     fi
