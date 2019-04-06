@@ -74,7 +74,7 @@ jobs:
         - pub global activate coverage
       script: ./tool/travis.sh flutter_test
       after_success:
-        - bash <(curl -s https://codecov.io/bash) -f lcov.info
+        - bash <(curl -s https://codecov.io/bash) -f /home/travis/build/vitusortner/floor/lcov.info
 
 # TODO
 stages:
