@@ -50,7 +50,7 @@ while (( "$#" )); do
       # combine line coverage info from package tests to a common file
 #      sed s/^SF:.*lib/SF:${escapedPathAfter}\/lib/g lcov.info >> ${escapedPath}/lcov.info
       sed "s/^SF:.*lib/SF:$escapedPathAfter\/lib/g" lcov.info
-      cat lcov.info >> ${path}/lcov.info
+      cat lcov.info >> "$path/lcov.info"
       rm lcov.info
     fi
     rm -f coverage.json
@@ -68,7 +68,7 @@ while (( "$#" )); do
     if [ -d "coverage" ]; then
       # combine line coverage info from package tests to a common file
       sed "s/^SF:lib/SF:$escapedPathAfter\/lib/g" coverage/lcov.info
-      cat coverage/lcov.info >> ${path}/lcov.info
+      cat coverage/lcov.info >> "$path/lcov.info"
       rm -rf "coverage"
     fi
     ;;
