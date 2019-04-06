@@ -10,12 +10,12 @@ if [ "$#" == "0" ]; then
   exit 1
 fi
 
+escapedPath="$(echo $PWD | sed 's/\//\\\//g')"
+#escapedPath="$(echo $1 | sed 's/\//\\\//g')"
+
 pushd $PKG
 
 EXIT_CODE=0
-
-escapedPath="$(echo $PWD | sed 's/\//\\\//g')"
-#escapedPath="$(echo $1 | sed 's/\//\\\//g')"
 
 # TODO remove this
 echo "Escaped path: $escapedPath"

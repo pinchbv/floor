@@ -3,50 +3,50 @@ before_install:
 
 jobs:
   include:
-    - stage: analyze
-      language: dart
-      name: "floor_annotation - dartfmt"
-      script: ./tool/travis.sh dartfmt
-      env: PKG="floor_annotation"
-      dart: stable
-
-    - stage: analyze
-      language: dart
-      name: "floor_annotation - dartanalyzer"
-      script: ./tool/travis.sh dartanalyzer
-      env: PKG="floor_annotation"
-      dart: stable
-
-    - stage: analyze
-      language: dart
-      name: "floor_generator - dartfmt"
-      script: ./tool/travis.sh dartfmt
-      env: PKG="floor_generator"
-      dart: stable
-
-    - stage: analyze
-      language: dart
-      name: "floor_generator - dartanalyzer"
-      script: ./tool/travis.sh dartanalyzer
-      env: PKG="floor_generator"
-      dart: stable
-
-    - stage: analyze
-      language: generic
-      name: "floor - flutter analyze"
-      env: PKG="floor"
-      os: linux
-      before_script:
-        - sudo apt-get install -y --no-install-recommends lib32stdc++6 libstdc++6 > /dev/null
-        # install pre-compiled flutter
-        - FLUTTER_CHANNEL=stable
-        - FLUTTER_VERSION=1.2.1-${FLUTTER_CHANNEL}
-        - wget --quiet --output-document=flutter.tar.xz https://storage.googleapis.com/flutter_infra/releases/${FLUTTER_CHANNEL}/linux/flutter_linux_v${FLUTTER_VERSION}.tar.xz && tar xf flutter.tar.xz > /dev/null && rm flutter.tar.xz
-        - export PATH="$PATH":"$HOME/.pub-cache/bin"
-        - export PATH=$PWD/flutter/bin:$PWD/flutter/bin/cache/dart-sdk/bin:$PATH
-        - flutter doctor -v
-      script:
-        - ./tool/travis.sh flutter_analyze
+#    - stage: analyze
+#      language: dart
+#      name: "floor_annotation - dartfmt"
+#      script: ./tool/travis.sh dartfmt
+#      env: PKG="floor_annotation"
+#      dart: stable
+#
+#    - stage: analyze
+#      language: dart
+#      name: "floor_annotation - dartanalyzer"
+#      script: ./tool/travis.sh dartanalyzer
+#      env: PKG="floor_annotation"
+#      dart: stable
+#
+#    - stage: analyze
+#      language: dart
+#      name: "floor_generator - dartfmt"
+#      script: ./tool/travis.sh dartfmt
+#      env: PKG="floor_generator"
+#      dart: stable
+#
+#    - stage: analyze
+#      language: dart
+#      name: "floor_generator - dartanalyzer"
+#      script: ./tool/travis.sh dartanalyzer
+#      env: PKG="floor_generator"
+#      dart: stable
+#
+#    - stage: analyze
+#      language: generic
+#      name: "floor - flutter analyze"
+#      env: PKG="floor"
+#      os: linux
+#      before_script:
+#        - sudo apt-get install -y --no-install-recommends lib32stdc++6 libstdc++6 > /dev/null
+#        # install pre-compiled flutter
+#        - FLUTTER_CHANNEL=stable
+#        - FLUTTER_VERSION=1.2.1-${FLUTTER_CHANNEL}
+#        - wget --quiet --output-document=flutter.tar.xz https://storage.googleapis.com/flutter_infra/releases/${FLUTTER_CHANNEL}/linux/flutter_linux_v${FLUTTER_VERSION}.tar.xz && tar xf flutter.tar.xz > /dev/null && rm flutter.tar.xz
+#        - export PATH="$PATH":"$HOME/.pub-cache/bin"
+#        - export PATH=$PWD/flutter/bin:$PWD/flutter/bin/cache/dart-sdk/bin:$PATH
+#        - flutter doctor -v
+#      script:
+#        - ./tool/travis.sh flutter_analyze
 
     - stage: unit_test
       language: dart
@@ -76,8 +76,9 @@ jobs:
       after_success:
         - bash <(curl -s https://codecov.io/bash) -f lcov.info
 
+# TODO
 stages:
-  - analyze
+#  - analyze
   - unit_test
 
 cache:
