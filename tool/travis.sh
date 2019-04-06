@@ -39,7 +39,6 @@ while (( "$#" )); do
     dart --pause-isolates-on-exit --enable-vm-service=8111 "test/all_tests.dart" || EXIT_CODE=$?
     pub global run coverage:format_coverage --packages=.packages -i coverage.json --report-on lib --lcov --out lcov.info
     if [ -f "lcov.info" ]; then
-      # combine line coverage info from package tests to a common file
       sed "s/^SF:.*lib/SF:$escapedPath\/lib/g" lcov.info >> "../lcov.info"
       rm lcov.info
     fi
@@ -56,7 +55,6 @@ while (( "$#" )); do
     echo -e 'flutter test'
     flutter test --coverage || EXIT_CODE=$?
     if [ -d "coverage" ]; then
-      # combine line coverage info from package tests to a common file
       sed "s/^SF:lib/SF:$escapedPath\/lib/g" coverage/lcov.info >> "../lcov.info"
       rm -rf "coverage"
     fi
