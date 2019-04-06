@@ -1,4 +1,3 @@
-# Created with package:mono_repo v1.2.1
 before_install:
   - chmod +x tool/travis.sh
 
@@ -48,14 +47,15 @@ jobs:
         - flutter doctor -v
       script:
         - ./tool/travis.sh flutter_analyze
-      cache:
-        directories:
-          - $HOME/.pub-cache
 
     - stage: unit_test
       language: dart
       name: "floor_generator - pub run test"
+      before_script:
+        - pub global activate coverage
       script: ./tool/travis.sh test
+      after_success:
+        - bash <(curl -s https://codecov.io/bash) -f lcov.info
       env: PKG="floor_generator"
       dart: stable
 
@@ -73,11 +73,10 @@ jobs:
         - export PATH="$PATH":"$HOME/.pub-cache/bin"
         - export PATH=$PWD/flutter/bin:$PWD/flutter/bin/cache/dart-sdk/bin:$PATH
         - flutter doctor -v
-      script:
-        - ./tool/travis.sh flutter_test
-      cache:
-        directories:
-          - $HOME/.pub-cache
+        - pub global activate coverage
+      script: ./tool/travis.sh flutter_test
+      after_success:
+        - bash <(curl -s https://codecov.io/bash) -f lcov.info
 
 stages:
   - analyze
@@ -85,4 +84,4 @@ stages:
 
 cache:
   directories:
-    - "$HOME/.pub-cache"
+    - $HOME/.pub-cache

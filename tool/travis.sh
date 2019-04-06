@@ -10,9 +10,11 @@ if [ "$#" == "0" ]; then
   exit 1
 fi
 
-pushd $PKG
+cd $PKG;
 
 EXIT_CODE=0
+
+escapedPath="$(echo $PKG | sed 's/\//\\\//g')"
 
 while (( "$#" )); do
   TASK=$1
@@ -33,7 +35,14 @@ while (( "$#" )); do
     pub upgrade || exit $?
     echo -e '\033[1mTASK: test\033[22m'
     echo -e 'pub run test'
-    pub run test || EXIT_CODE=$?
+    nohup pub global run coverage:collect_coverage --port=8111 -o coverage.json --resume-isolates --wait-paused &
+    dart --pause-isolates-on-exit --enable-vm-service=8111 "test/all_tests.dart" || EXIT_CODE=$?
+    pub global run coverage:format_coverage --packages=.packages -i coverage.json --report-on lib --lcov --out lcov.info
+    if [ -f "lcov.info" ]; then
+      sed "s/^SF:.*lib/SF:$escapedPath\/lib/g" lcov.info >> "../lcov.info"
+      rm lcov.info
+    fi
+    rm -f coverage.json
     ;;
   flutter_analyze) echo
     echo -e '\033[1mTASK: flutter analyze\033[22m'
@@ -44,7 +53,11 @@ while (( "$#" )); do
     flutter packages get || exit $?
     echo -e '\033[1mTASK: flutter test\033[22m'
     echo -e 'flutter test'
-    flutter test || EXIT_CODE=$?
+    flutter test --coverage || EXIT_CODE=$?
+    if [ -d "coverage" ]; then
+      sed "s/^SF:lib/SF:$escapedPath\/lib/g" coverage/lcov.info >> "../lcov.info"
+      rm -rf "coverage"
+    fi
     ;;
   *) echo -e "\033[31mNot expecting TASK '${TASK}'. Error!\033[0m"
     EXIT_CODE=1
