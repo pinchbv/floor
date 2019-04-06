@@ -70,18 +70,21 @@ class DatabaseWriter implements Writer {
         .map((statement) => "await database.execute('$statement');")
         .join('\n');
 
+    final nameParameter = Parameter((builder) => builder
+      ..name = 'name'
+      ..type = refer('String'));
+
     final migrationsParameter = Parameter((builder) => builder
       ..name = 'migrations'
       ..type = refer('List<Migration>'));
 
     return Method((builder) => builder
       ..name = 'open'
-      ..annotations.add(overrideAnnotationExpression)
       ..returns = refer('Future<sqflite.Database>')
       ..modifier = MethodModifier.async
-      ..requiredParameters.add(migrationsParameter)
+      ..requiredParameters.addAll([nameParameter, migrationsParameter])
       ..body = Code('''
-          final path = join(await sqflite.getDatabasesPath(), '${database.name.toLowerCase()}.db');
+          final path = join(await sqflite.getDatabasesPath(), name);
 
           return sqflite.openDatabase(
             path,

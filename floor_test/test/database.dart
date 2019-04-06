@@ -13,9 +13,6 @@ part 'database.g.dart';
 
 @Database(version: 2, entities: [Person, Dog])
 abstract class TestDatabase extends FloorDatabase {
-  static Future<TestDatabase> openDatabase(List<Migration> migrations) async =>
-      _$open(migrations);
-
   PersonDao get personDao;
 
   DogDao get dogDao;

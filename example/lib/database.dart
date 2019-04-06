@@ -10,7 +10,5 @@ part 'database.g.dart';
 
 @Database(version: 1, entities: [Task])
 abstract class FlutterDatabase extends FloorDatabase {
-  static Future<FlutterDatabase> openDatabase() async => _$open();
-
   TaskDao get taskDao;
 }

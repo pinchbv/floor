@@ -25,9 +25,8 @@ void main() {
 
     expect(actual, equalsDart(r'''
       class _$TestDatabase extends TestDatabase {
-        @override
-        Future<sqflite.Database> open(List<Migration> migrations) async {
-          final path = join(await sqflite.getDatabasesPath(), 'testdatabase.db');
+        Future<sqflite.Database> open(String name, List<Migration> migrations) async {
+          final path = join(await sqflite.getDatabasesPath(), name);
       
           return sqflite.openDatabase(
             path,
@@ -64,9 +63,8 @@ void main() {
 
     expect(actual, equalsDart(r'''
       class _$TestDatabase extends TestDatabase {
-        @override
-        Future<sqflite.Database> open(List<Migration> migrations) async {
-          final path = join(await sqflite.getDatabasesPath(), 'testdatabase.db');
+        Future<sqflite.Database> open(String name, List<Migration> migrations) async {
+          final path = join(await sqflite.getDatabasesPath(), name);
       
           return sqflite.openDatabase(
             path,
@@ -95,9 +93,7 @@ Future<Spec> _generateDatabase(final String entity) async {
       import 'package:floor_annotation/floor_annotation.dart';
       
       @Database(version: 1, entities: [Person])
-      abstract class TestDatabase extends FloorDatabase {
-        static Future<TestDatabase> openDatabase() async => _\$open();
-      }
+      abstract class TestDatabase extends FloorDatabase {}
       
       $entity
       ''', (resolver) async {

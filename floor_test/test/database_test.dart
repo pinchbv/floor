@@ -22,12 +22,13 @@ void main() {
       });
       final allMigrations = [migration1to2];
 
-      database = await TestDatabase.openDatabase(allMigrations);
+      database = await $Floor
+          .inMemoryDatabaseBuilder()
+          .addMigrations(allMigrations)
+          .build();
+
       personDao = database.personDao;
       dogDao = database.dogDao;
-
-      await database.database.execute('DELETE FROM dog');
-      await database.database.execute('DELETE FROM person');
     });
 
     tearDown(() async {
