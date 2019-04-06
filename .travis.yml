@@ -54,6 +54,8 @@ jobs:
       before_script:
         - pub global activate coverage
       script: ./tool/travis.sh test
+      after_success:
+        - bash <(curl -s https://codecov.io/bash) -f lcov.info
       env: PKG="floor_generator"
       dart: stable
 
@@ -74,7 +76,7 @@ jobs:
         - pub global activate coverage
       script: ./tool/travis.sh flutter_test
       after_success:
-        - bash <(curl -s https://codecov.io/bash) -f "../lcov.info"
+        - bash <(curl -s https://codecov.io/bash) -f lcov.info
 
 # TODO
 stages:
