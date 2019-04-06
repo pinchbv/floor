@@ -1,6 +1,5 @@
 before_install:
   - chmod +x tool/travis.sh
-  - chmod +x tool/runTests.sh
 
 jobs:
   include:
@@ -54,7 +53,7 @@ jobs:
       name: "floor_generator - pub run test"
       before_script:
         - pub global activate coverage
-      script: ./tool/runTests.sh
+      script: ./tool/travis.sh test
       env: PKG="floor_generator"
       dart: stable
 
@@ -73,8 +72,7 @@ jobs:
         - export PATH=$PWD/flutter/bin:$PWD/flutter/bin/cache/dart-sdk/bin:$PATH
         - flutter doctor -v
         - pub global activate coverage
-      script:
-        - ./tool/runTests.sh
+      script: ./tool/travis.sh flutter_test
       after_success:
         - bash <(curl -s https://codecov.io/bash) -f lcov.info
 
