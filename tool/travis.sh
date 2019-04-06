@@ -14,11 +14,12 @@ pushd $PKG
 
 EXIT_CODE=0
 
-# TODO remove this
-echo "WTF: $1"
+escapedPath="$(echo $PWD | sed 's/\//\\\//g')"
+#escapedPath="$(echo $1 | sed 's/\//\\\//g')"
 
-#escapedPath="$(echo $PWD | sed 's/\//\\\//g')"
-escapedPath="$(echo $1 | sed 's/\//\\\//g')"
+# TODO remove this
+echo "Escaped path: $escapedPath"
+echo "Path: $PWD"
 
 while (( "$#" )); do
   TASK=$1
