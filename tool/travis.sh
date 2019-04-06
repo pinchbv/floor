@@ -14,6 +14,9 @@ pushd $PKG
 
 EXIT_CODE=0
 
+# TODO remove this
+echo $1
+
 #escapedPath="$(echo $PWD | sed 's/\//\\\//g')"
 escapedPath="$(echo $1 | sed 's/\//\\\//g')"
 
@@ -37,7 +40,10 @@ while (( "$#" )); do
     echo -e '\033[1mTASK: test\033[22m'
     echo -e 'pub run test'
     pub run test || EXIT_CODE=$?
+
+    pub global run coverage:collect_coverage --port=8111 --out=coverage.json --wait-paused --resume-isolates
     pub global run coverage:format_coverage --packages=.packages -i coverage.json --report-on lib --lcov --out lcov.info
+
     sed "s/^SF:.*lib/SF:$escapedPath\/lib/g" lcov.info >> $2/lcov.info
     rm lcov.info
     rm -f coverage.json
