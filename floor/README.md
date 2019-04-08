@@ -8,6 +8,7 @@ Thus not supporting automatic relationship mapping is intentional.
 
 This package is still in an early phase and the API will likely change.
 
+[![pub package](https://img.shields.io/pub/v/floor.svg)](https://pub.dartlang.org/packages/floor)
 [![Build Status](https://travis-ci.org/vitusortner/floor.svg?branch=develop)](https://travis-ci.org/vitusortner/floor)
 [![codecov](https://codecov.io/gh/vitusortner/floor/branch/develop/graph/badge.svg)](https://codecov.io/gh/vitusortner/floor)
 
@@ -23,6 +24,7 @@ This package is still in an early phase and the API will likely change.
 1. [Foreign Keys](#foreign-keys)
 1. [Indices](#indices)
 1. [Migrations](#migrations)
+1. [In-Memory Database](#in-memory-database)
 1. [Examples](#examples)
 1. [Naming](#naming)
 1. [Bugs and Feedback](#bugs-and-feedback)
@@ -58,7 +60,7 @@ This package is still in an early phase and the API will likely change.
     There is no restriction on where you put the file containing the entity.
 
     ````dart
-    // model/person.dart
+    // entity/person.dart
  
     import 'package:floor/floor.dart';
     
@@ -108,10 +110,6 @@ This package is still in an early phase and the API will likely change.
     Furthermore, it's required to add `@Database()` to the signature of the class.
     Make sure to add the created entity to the `entities` attribute of the `@Database` annotation.
 
-    The class holds functionality for opening the database.
-    `_$open()` is a function that will get implemented by running the code generator.
-    The warning, of it not being implemented, will go away then.
-        
     ```dart
     // database.dart   
  
@@ -126,8 +124,6 @@ This package is still in an early phase and the API will likely change.
  
     @Database(version: 1, entities: [Person])
     abstract class AppDatabase extends FloorDatabase {
-      static Future<AppDatabase> openDatabase() async => _$open();   
-    
       PersonDao get personDao;
     }
     ```
@@ -140,9 +136,13 @@ This package is still in an early phase and the API will likely change.
     To automatically run it, whenever a file changes, use `flutter packages pub run build_runner watch`.
     
 1. Use the generated code.
+    For obtaining an instance of the database, use the generated `$FloorAppDatabase` class, which allows access to a database builder.
+    The name is composited from `$Floor` and the database class name.
+    The string passed to `databaseBuilder()` will be the database file name.
+    For initializing the database, call `build()`.
 
     ```dart
-    final database = await AppDatabase.openDatabase();
+    final database = await $FloorAppDatabase.databaseBuilder('app_database.db').build();
 
     final person = await database.findPersonById(1);
     await database.insertPerson(person);
@@ -348,10 +348,9 @@ class Person {
 Whenever are doing changes to your entities, you're required to also migrate the old data.
 
 First, update your entity.
-Increase the database version and change the `openDatabase` method to take in a list of `Migration`s.
-This parameter has to get passed to the `_$open()` method.
+Next, Increase the database version.
 Define a `Migration` which specifies a `startVersion`, an `endVersion` and a function that executes SQL to migrate the data.
-Lastly, call `openDatabase` with your newly created `Migration`.
+At last, use `addMigrations()` on the obtained database builder to add migrations. 
 Don't forget to trigger the code generator again, to create the code for handling the new entity.
 
 ```dart
@@ -372,8 +371,7 @@ class Person {
 // bump up database version
 @Database(version: 2)
 abstract class AppDatabase extends FloorDatabase {
-  static Future<AppDatabase> openDatabase(List<Migration> migrations) async =>
-      _$open(migrations);
+  PersonDao get personDao;
 }
 
 // create migration
@@ -381,8 +379,18 @@ final migration1to2 = Migration(1, 2, (database) {
   database.execute('ALTER TABLE person ADD COLUMN nickname TEXT');
 });
 
-final database = await AppDatabase.openDatabase([migration1to2]);
+final database = await $Floor
+    .databaseBuilder('app_database.db')
+    .addMigrations([migration1to2])
+    .build();
 ```
+
+## In-Memory Database
+To instantiate an in-memory database, use the static `inMemoryDatabaseBuilder()` method of the generated `$Floor` class instead of `databaseBuilder()`.
+
+```dart
+final database = await $Floor.inMemoryDatabaseBuilder('app_database.db').build();
+``` 
 
 ## Examples
 For further examples take a look at the [example](https://github.com/vitusortner/floor/tree/develop/example) and [floor_test](https://github.com/vitusortner/floor/tree/develop/floor_test) directories.

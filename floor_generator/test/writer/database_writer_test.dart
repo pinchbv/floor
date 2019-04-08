@@ -1,6 +1,7 @@
 import 'package:build_test/build_test.dart';
 import 'package:code_builder/code_builder.dart';
 import 'package:floor_generator/processor/database_processor.dart';
+import 'package:floor_generator/value_object/database.dart';
 import 'package:floor_generator/writer/database_writer.dart';
 import 'package:source_gen/source_gen.dart';
 import 'package:test/test.dart';
@@ -11,7 +12,7 @@ void main() {
   useDartfmt();
 
   test('open database for simple entity', () async {
-    final actual = await _generateDatabase('''
+    final database = await _createDatabase('''
       @entity
       class Person {
         @PrimaryKey()
@@ -23,11 +24,12 @@ void main() {
       }
     ''');
 
+    final actual = DatabaseWriter(database).write();
+
     expect(actual, equalsDart(r'''
       class _$TestDatabase extends TestDatabase {
-        @override
-        Future<sqflite.Database> open(List<Migration> migrations) async {
-          final path = join(await sqflite.getDatabasesPath(), 'testdatabase.db');
+        Future<sqflite.Database> open(String name, List<Migration> migrations) async {
+          final path = join(await sqflite.getDatabasesPath(), name);
       
           return sqflite.openDatabase(
             path,
@@ -49,7 +51,7 @@ void main() {
   });
 
   test('open database for complex entity', () async {
-    final actual = await _generateDatabase('''
+    final database = await _createDatabase('''
       @Entity(tableName: 'custom_table_name')
       class Person {
         @PrimaryKey(autoGenerate: true)
@@ -62,11 +64,12 @@ void main() {
       }
     ''');
 
+    final actual = DatabaseWriter(database).write();
+
     expect(actual, equalsDart(r'''
       class _$TestDatabase extends TestDatabase {
-        @override
-        Future<sqflite.Database> open(List<Migration> migrations) async {
-          final path = join(await sqflite.getDatabasesPath(), 'testdatabase.db');
+        Future<sqflite.Database> open(String name, List<Migration> migrations) async {
+          final path = join(await sqflite.getDatabasesPath(), name);
       
           return sqflite.openDatabase(
             path,
@@ -88,22 +91,19 @@ void main() {
   });
 }
 
-Future<Spec> _generateDatabase(final String entity) async {
+Future<Database> _createDatabase(final String entity) async {
   final library = await resolveSource('''
       library test;
       
       import 'package:floor_annotation/floor_annotation.dart';
       
       @Database(version: 1, entities: [Person])
-      abstract class TestDatabase extends FloorDatabase {
-        static Future<TestDatabase> openDatabase() async => _\$open();
-      }
+      abstract class TestDatabase extends FloorDatabase {}
       
       $entity
       ''', (resolver) async {
     return LibraryReader(await resolver.findLibraryByName('test'));
   });
 
-  final database = DatabaseProcessor(library.classes.first).process();
-  return DatabaseWriter(database).write();
+  return DatabaseProcessor(library.classes.first).process();
 }
