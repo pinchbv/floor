@@ -11,6 +11,8 @@ class DatabaseBuilderWriter extends Writer {
   @nonNull
   @override
   Class write() {
+    final databaseBuilderName = '_\$${_databaseName}Builder';
+
     final nameField = Field((builder) => builder
       ..name = 'name'
       ..type = refer('String')
@@ -29,7 +31,7 @@ class DatabaseBuilderWriter extends Writer {
 
     final addMigrationsMethod = Method((builder) => builder
       ..name = 'addMigrations'
-      ..returns = refer(r'_$DatabaseBuilder')
+      ..returns = refer(databaseBuilderName)
       ..body = const Code('''
         _migrations.addAll(migrations);
         return this;
@@ -51,7 +53,7 @@ class DatabaseBuilderWriter extends Writer {
       '''));
 
     return Class((builder) => builder
-      ..name = r'_$DatabaseBuilder'
+      ..name = databaseBuilderName
       ..fields.addAll([nameField, migrationsField])
       ..constructors.add(constructor)
       ..methods.addAll([addMigrationsMethod, buildMethod]));

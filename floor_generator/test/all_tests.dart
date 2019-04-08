@@ -5,8 +5,11 @@ import 'processor/transaction_method_processor_test.dart'
 import 'utils/type_utils_test.dart' as type_utils_test;
 import 'value_object/index_test.dart' as index_test;
 import 'writer/dao_writer_test.dart' as dao_writer_test;
+import 'writer/database_builder_writer_test.dart'
+    as database_builder_writer_test;
 import 'writer/database_writer_test.dart' as database_writer_test;
 import 'writer/deletion_method_writer_test.dart' as deletion_method_writer_test;
+import 'writer/floor_writer_test.dart' as floor_writer_test;
 import 'writer/insert_method_writer_test.dart' as insert_method_writer_test;
 import 'writer/query_method_writer_test.dart' as query_method_writer_test;
 import 'writer/update_method_writer_test.dart' as update_method_writer_test;
@@ -25,8 +28,10 @@ void main() {
 
   // Writer
   dao_writer_test.main();
+  database_builder_writer_test.main();
   database_writer_test.main();
   deletion_method_writer_test.main();
+  floor_writer_test.main();
   insert_method_writer_test.main();
   query_method_writer_test.main();
   update_method_writer_test.main();

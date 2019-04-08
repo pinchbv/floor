@@ -30,7 +30,7 @@ class FloorGenerator extends GeneratorForAnnotation<annotations.Database> {
         daoGetters.map((daoGetter) => DaoWriter(daoGetter.dao).write());
 
     final library = Library((builder) => builder
-      ..body.add(FloorWriter().write())
+      ..body.add(FloorWriter(database.name).write())
       ..body.add(DatabaseBuilderWriter(database.name).write())
       ..body.add(databaseClass)
       ..body.addAll(daoClasses));

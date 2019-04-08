@@ -4,7 +4,9 @@ import 'package:example/task_dao.dart';
 import 'package:flutter/material.dart';
 
 Future<void> main() async {
-  final database = await $Floor.databaseBuilder('flutter_database.db').build();
+  final database = await $FloorFlutterDatabase
+      .databaseBuilder('flutter_database.db')
+      .build();
   final dao = database.taskDao;
 
   runApp(FloorApp(dao));

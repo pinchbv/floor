@@ -22,7 +22,7 @@ void main() {
       });
       final allMigrations = [migration1to2];
 
-      database = await $Floor
+      database = await $FloorTestDatabase
           .inMemoryDatabaseBuilder()
           .addMigrations(allMigrations)
           .build();

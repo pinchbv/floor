@@ -8,6 +8,7 @@ Thus not supporting automatic relationship mapping is intentional.
 
 This package is still in an early phase and the API will likely change.
 
+[![pub package](https://img.shields.io/pub/v/floor.svg)](https://pub.dartlang.org/packages/floor)
 [![Build Status](https://travis-ci.org/vitusortner/floor.svg?branch=develop)](https://travis-ci.org/vitusortner/floor)
 [![codecov](https://codecov.io/gh/vitusortner/floor/branch/develop/graph/badge.svg)](https://codecov.io/gh/vitusortner/floor)
 
@@ -135,12 +136,13 @@ This package is still in an early phase and the API will likely change.
     To automatically run it, whenever a file changes, use `flutter packages pub run build_runner watch`.
     
 1. Use the generated code.
-    For obtaining an instance of the database, use the generated `$Floor` class, which allows access to a database builder.
+    For obtaining an instance of the database, use the generated `$FloorAppDatabase` class, which allows access to a database builder.
+    The name is composited from `$Floor` and the database class name.
     The string passed to `databaseBuilder()` will be the database file name.
-    For initializing the database call `build()`.
+    For initializing the database, call `build()`.
 
     ```dart
-    final database = await $Floor.databaseBuilder('app_database.db').build();
+    final database = await $FloorAppDatabase.databaseBuilder('app_database.db').build();
 
     final person = await database.findPersonById(1);
     await database.insertPerson(person);
