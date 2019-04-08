@@ -7,6 +7,6 @@ void main() {
 
     final actual = decapitalize(string);
 
-    expect(actual, 'foo');
+    expect(actual, 'bar');
   });
 }
