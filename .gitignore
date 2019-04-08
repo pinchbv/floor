@@ -1,3 +1,6 @@
+# Test files
+.test_coverage.dart
+
 # Exclude generated Dart files
 *.g.dart
 
