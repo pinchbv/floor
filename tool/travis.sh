@@ -35,7 +35,7 @@ while (( "$#" )); do
     pub upgrade || exit $?
     echo -e '\033[1mTASK: test\033[22m'
     echo -e 'pub run test'
-    pub run test_coverage
+    pub run test_coverage || EXIT_CODE=$?
     if [ -f "coverage" ]; then
       sed "s/^SF:lib/SF:$escapedPath\/lib/g" coverage/lcov.info >> "../lcov.info"
       rm -rf "coverage"
