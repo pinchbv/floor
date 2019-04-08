@@ -386,10 +386,10 @@ final database = await $Floor
 ```
 
 ## In-Memory Database
-To instantiate an in-memory database, use the static `inMemoryDatabaseBuilder()` method of the generated `$Floor` class instead of `databaseBuilder()`.
+To instantiate an in-memory database, use the static `inMemoryDatabaseBuilder()` method of the generated `$FloorAppDatabase` class instead of `databaseBuilder()`.
 
 ```dart
-final database = await $Floor.inMemoryDatabaseBuilder('app_database.db').build();
+final database = await $FloorAppDatabase.inMemoryDatabaseBuilder('app_database.db').build();
 ``` 
 
 ## Examples

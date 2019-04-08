@@ -92,5 +92,39 @@ void main() {
 
       expect(actual, isTrue);
     });
+
+    test('is stream', () async {
+      final type = await getDartTypeFromString('Stream<String>.empty()');
+
+      final actual = type_utils.isStream(type);
+
+      expect(actual, isTrue);
+    });
+
+    test('it not stream', () async {
+      final type = await getDartType(1);
+
+      final actual = type_utils.isStream(type);
+
+      expect(actual, isFalse);
+    });
+  });
+
+  group('flatten', () {
+    test('flatten list', () async {
+      final type = await getDartTypeFromString('<int>[]');
+
+      final actual = type_utils.flattenList(type);
+
+      expect(actual.isDartCoreInt, isTrue);
+    });
+
+    test('flatten stream', () async {
+      final type = await getDartTypeFromString('Stream<int>.empty()');
+
+      final actual = type_utils.flattenStream(type);
+
+      expect(actual.isDartCoreInt, isTrue);
+    });
   });
 }

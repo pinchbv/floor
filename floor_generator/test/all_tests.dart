@@ -2,7 +2,7 @@ import 'processor/database_processor_test.dart' as database_processor_test;
 import 'processor/field_processor_test.dart' as field_processor_test;
 import 'processor/transaction_method_processor_test.dart'
     as transaction_method_processor_test;
-import 'utils/type_utils_test.dart' as type_utils_test;
+import 'misc/type_utils_test.dart' as type_utils_test;
 import 'value_object/index_test.dart' as index_test;
 import 'writer/dao_writer_test.dart' as dao_writer_test;
 import 'writer/database_builder_writer_test.dart'
