@@ -1,4 +1,5 @@
 import 'package:analyzer/dart/element/element.dart';
+import 'package:collection/collection.dart';
 import 'package:floor_generator/misc/annotations.dart';
 import 'package:floor_generator/misc/type_utils.dart';
 import 'package:floor_generator/value_object/field.dart';
@@ -66,10 +67,11 @@ class Entity {
           runtimeType == other.runtimeType &&
           classElement == other.classElement &&
           name == other.name &&
-          fields == other.fields &&
+          const ListEquality<Field>().equals(fields, other.fields) &&
           primaryKey == other.primaryKey &&
-          foreignKeys == other.foreignKeys &&
-          indices == other.indices &&
+          const ListEquality<ForeignKey>()
+              .equals(foreignKeys, other.foreignKeys) &&
+          const ListEquality<Index>().equals(indices, other.indices) &&
           constructor == other.constructor;
 
   @override

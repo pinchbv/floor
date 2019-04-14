@@ -17,6 +17,16 @@ class QueryMethodProcessorError {
     );
   }
 
+  InvalidGenerationSourceError
+      // ignore: non_constant_identifier_names
+      get QUERY_ARGUMENTS_AND_METHOD_PARAMETERS_DO_NOT_MATCH {
+    return InvalidGenerationSourceError(
+      'SQL query arguments and method parameters have to match.',
+      todo: 'Make sure to supply one parameter per SQL query argument.',
+      element: _methodElement,
+    );
+  }
+
   // ignore: non_constant_identifier_names
   InvalidGenerationSourceError get DOES_NOT_RETURN_FUTURE_NOR_STREAM {
     return InvalidGenerationSourceError(

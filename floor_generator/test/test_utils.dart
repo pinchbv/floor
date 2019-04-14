@@ -28,11 +28,38 @@ Future<LibraryReader> resolveCompilationUnit(String sourceFile) async {
 Future<DartType> getDartType(dynamic value) async {
   final source = '''
   library test;
+  
   final value = $value;
   ''';
   return resolveSource(source, (item) async {
     final libraryReader = LibraryReader(await item.findLibraryByName('test'));
     return (libraryReader.allElements.elementAt(1) as VariableElement).type;
+  });
+}
+
+Future<DartType> getDartTypeWithPerson(String value) async {
+  final source = '''
+  library test;
+  
+  import 'package:floor_annotation/floor_annotation.dart';
+  
+  $value value;
+  
+  @entity
+  class Person {
+    @primaryKey
+    final int id;
+  
+    final String name;
+  
+    Person(this.id, this.name);
+  }
+  ''';
+  return resolveSource(source, (item) async {
+    final libraryReader = LibraryReader(await item.findLibraryByName('test'));
+    return (libraryReader.allElements.first as PropertyAccessorElement)
+        .type
+        .returnType;
   });
 }
 

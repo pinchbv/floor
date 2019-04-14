@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:meta/meta.dart';
 import 'package:sqflite/sqflite.dart';
 
 /// This class knows how to execute database queries.
@@ -14,11 +15,13 @@ class QueryAdapter {
         _database = database,
         _changeListener = changeListener;
 
+  /// Executes a SQLite query that may return a single value.
   Future<T> query<T>(
-    final String sql,
-    final T Function(Map<String, dynamic>) mapper,
-  ) async {
-    final rows = await _database.rawQuery(sql);
+    final String sql, {
+    final List<dynamic> arguments,
+    @required final T Function(Map<String, dynamic>) mapper,
+  }) async {
+    final rows = await _database.rawQuery(sql, arguments);
 
     if (rows.isEmpty) {
       return null;
@@ -29,11 +32,13 @@ class QueryAdapter {
     return mapper(rows.first);
   }
 
+  /// Executes a SQLite query that may return multiple values.
   Future<List<T>> queryList<T>(
-    final String sql,
-    final T Function(Map<String, dynamic>) mapper,
-  ) async {
-    final rows = await _database.rawQuery(sql);
+    final String sql, {
+    final List<dynamic> arguments,
+    @required final T Function(Map<String, dynamic>) mapper,
+  }) async {
+    final rows = await _database.rawQuery(sql, arguments);
     return rows.map((row) => mapper(row)).toList();
   }
 
@@ -44,60 +49,60 @@ class QueryAdapter {
     await _database.rawQuery(sql);
   }
 
+  /// Executes a SQLite query that returns a stream of single query results.
   Stream<T> queryStream<T>(
-    final String sql,
-    final String entityName,
-    final T Function(Map<String, dynamic>) mapper,
-  ) {
+    final String sql, {
+    final List<dynamic> arguments,
+    @required final String tableName,
+    @required final T Function(Map<String, dynamic>) mapper,
+  }) {
     assert(_changeListener != null);
 
     final controller = StreamController<T>.broadcast();
 
-    controller.onListen = () async {
-      final result = await query(sql, mapper);
-      if (result != null) {
-        controller.add(result);
-      }
-    };
+    Future<void> executeQueryAndNotifyController() async {
+      final result = await query(sql, arguments: arguments, mapper: mapper);
+      if (result != null) controller.add(result);
+    }
+
+    controller.onListen = () async => executeQueryAndNotifyController();
 
     final subscription = _changeListener.stream
-        .where((listener) => listener == entityName)
-        .listen((listener) async {
-      final result = await query(sql, mapper);
-      if (result != null) {
-        controller.add(result);
-      }
-    }, onDone: () {
-      controller.close();
-    });
+        .where((updatedTable) => updatedTable == tableName)
+        .listen(
+          (_) async => executeQueryAndNotifyController(),
+          onDone: () => controller.close(),
+        );
 
     controller.onCancel = () => subscription.cancel();
 
     return controller.stream;
   }
 
+  /// Executes a SQLite query that returns a stream of multiple query results.
   Stream<List<T>> queryListStream<T>(
-    final String sql,
-    final String entityName,
-    final T Function(Map<String, dynamic>) mapper,
-  ) {
+    final String sql, {
+    final List<dynamic> arguments,
+    @required final String tableName,
+    @required final T Function(Map<String, dynamic>) mapper,
+  }) {
     assert(_changeListener != null);
 
     final controller = StreamController<List<T>>.broadcast();
 
-    controller.onListen = () async {
-      final result = await queryList(sql, mapper);
+    Future<void> executeQueryAndNotifyController() async {
+      final result = await queryList(sql, arguments: arguments, mapper: mapper);
       controller.add(result);
-    };
+    }
+
+    controller.onListen = () async => executeQueryAndNotifyController();
 
     final subscription = _changeListener.stream
-        .where((listener) => listener == entityName)
-        .listen((listener) async {
-      final result = await queryList(sql, mapper);
-      controller.add(result);
-    }, onDone: () {
-      controller.close();
-    });
+        .where((updatedTable) => updatedTable == tableName)
+        .listen(
+          (_) async => executeQueryAndNotifyController(),
+          onDone: () => controller.close(),
+        );
 
     controller.onCancel = () => subscription.cancel();
 

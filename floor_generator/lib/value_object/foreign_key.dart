@@ -1,3 +1,4 @@
+import 'package:collection/collection.dart';
 import 'package:floor_generator/misc/annotations.dart';
 
 class ForeignKey {
@@ -23,14 +24,16 @@ class ForeignKey {
         ' ON DELETE $onDelete';
   }
 
+  final _listEquality = const ListEquality<String>();
+
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
       other is ForeignKey &&
           runtimeType == other.runtimeType &&
           parentName == other.parentName &&
-          parentColumns == other.parentColumns &&
-          childColumns == other.childColumns &&
+          _listEquality.equals(parentColumns, other.parentColumns) &&
+          _listEquality.equals(childColumns, other.childColumns) &&
           onUpdate == other.onUpdate &&
           onDelete == other.onDelete;
 
