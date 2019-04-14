@@ -33,13 +33,13 @@ class FloorApp extends StatelessWidget {
 class TasksWidget extends StatelessWidget {
   final String title;
   final TaskDao dao;
-  final TextEditingController textEditingController;
+  final TextEditingController _textEditingController;
 
   TasksWidget({
     Key key,
     @required this.title,
     @required this.dao,
-  })  : textEditingController = TextEditingController(),
+  })  : _textEditingController = TextEditingController(),
         super(key: key);
 
   @override
@@ -51,39 +51,39 @@ class TasksWidget extends StatelessWidget {
           Expanded(
             child: StreamBuilder<List<Task>>(
               stream: dao.findAllTasksAsStream(),
-              builder: (context, snapshot) {
-                if (snapshot.hasData) {
-                  final tasks = snapshot.data;
+              builder: (_, snapshot) {
+                if (!snapshot.hasData) return Container();
 
-                  return ListView.builder(
-                    itemCount: tasks.length,
-                    itemBuilder: (_, index) {
-                      return Padding(
-                        padding: const EdgeInsets.symmetric(
-                          vertical: 8,
-                          horizontal: 16,
-                        ),
-                        child: Text(tasks[index].message),
-                      );
-                    },
-                  );
-                }
+                final tasks = snapshot.data;
+
+                return ListView.builder(
+                  itemCount: tasks.length,
+                  itemBuilder: (_, index) {
+                    return Padding(
+                      padding: const EdgeInsets.symmetric(
+                        vertical: 8,
+                        horizontal: 16,
+                      ),
+                      child: Text(tasks[index].message),
+                    );
+                  },
+                );
               },
             ),
           ),
           TextField(
-            controller: textEditingController,
+            controller: _textEditingController,
             decoration: const InputDecoration(
               contentPadding: EdgeInsets.all(8),
               border: InputBorder.none,
               hintText: 'Type task here',
             ),
             onSubmitted: (input) async {
-              final message = textEditingController.text;
+              final message = _textEditingController.text;
               final task = Task(null, message);
               await dao.insertTask(task);
 
-              textEditingController.clear();
+              _textEditingController.clear();
             },
           )
         ],

@@ -108,6 +108,17 @@ void main() {
       });
     });
 
+    group('querying', () {
+      test('query with two parameters (int, String)', () async {
+        final person = Person(1, 'Frank');
+        await personDao.insertPerson(person);
+
+        final actual = await personDao.findPersonByIdAndName(1, 'Frank');
+
+        expect(actual, equals(person));
+      });
+    });
+
     group('transaction', () {
       test('replace persons in transaction', () async {
         final persons = [Person(1, 'Simon'), Person(2, 'Frank')];

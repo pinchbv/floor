@@ -41,7 +41,23 @@ void main() {
     expect(actual, equalsDart(r'''
       @override
       Future<Person> findById(int id) async {
-        return _queryAdapter.query('SELECT * FROM Person WHERE id = $id', _personMapper);
+        return _queryAdapter.query('SELECT * FROM Person WHERE id = ?', arguments: <dynamic>[id], mapper: _personMapper);
+      }
+    '''));
+  });
+
+  test('query item multiple parameters', () async {
+    final queryMethod = await _createQueryMethod('''
+      @Query('SELECT * FROM Person WHERE id = :id AND name = :name')
+      Future<Person> findById(int id, String name);
+    ''');
+
+    final actual = QueryMethodWriter(queryMethod).write();
+
+    expect(actual, equalsDart(r'''
+      @override
+      Future<Person> findById(int id, String name) async {
+        return _queryAdapter.query('SELECT * FROM Person WHERE id = ? AND name = ?', arguments: <dynamic>[id, name], mapper: _personMapper);
       }
     '''));
   });
@@ -57,7 +73,7 @@ void main() {
     expect(actual, equalsDart('''
       @override
       Future<List<Person>> findAll() async {
-        return _queryAdapter.queryList('SELECT * FROM Person', _personMapper);
+        return _queryAdapter.queryList('SELECT * FROM Person', mapper: _personMapper);
       }
     '''));
   });
@@ -73,7 +89,7 @@ void main() {
     expect(actual, equalsDart(r'''
       @override
       Stream<Person> findByIdAsStream(int id) {
-        return _queryAdapter.queryStream('SELECT * FROM Person WHERE id = $id', 'Person', _personMapper);
+        return _queryAdapter.queryStream('SELECT * FROM Person WHERE id = ?', arguments: <dynamic>[id], tableName: 'Person', mapper: _personMapper);
       }
     '''));
   });
@@ -89,7 +105,7 @@ void main() {
     expect(actual, equalsDart(r'''
       @override
       Stream<List<Person>> findAllAsStream() {
-        return _queryAdapter.queryListStream('SELECT * FROM Person', 'Person', _personMapper);
+        return _queryAdapter.queryListStream('SELECT * FROM Person', tableName: 'Person', mapper: _personMapper);
       }
     '''));
   });
