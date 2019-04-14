@@ -111,7 +111,7 @@ class QueryMethodProcessor extends Processor<QueryMethod> {
   ) {
     final queryParameterCount = RegExp(r'\?').allMatches(query).length;
 
-    if (!(queryParameterCount == parameterElements.length)) {
+    if (queryParameterCount != parameterElements.length) {
       throw _processorError.QUERY_ARGUMENTS_AND_METHOD_PARAMETERS_DO_NOT_MATCH;
     }
   }
