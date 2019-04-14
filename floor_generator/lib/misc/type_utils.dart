@@ -12,7 +12,7 @@ bool isString(final DartType type) {
 
 @nonNull
 bool isBool(final DartType type) {
-  return _boolTypeChecker.isExactlyType(type);
+  return type.isDartCoreBool;
 }
 
 @nonNull
@@ -22,12 +22,11 @@ bool isInt(final DartType type) {
 
 @nonNull
 bool isDouble(final DartType type) {
-  return _doubleTypeChecker.isExactlyType(type);
+  return type.isDartCoreDouble;
 }
 
 @nonNull
 bool isList(final DartType type) {
-  // TODO this weirdly fails when using a TypeChecker
   return type.name == 'List' && type.element.library.isDartCore;
 }
 

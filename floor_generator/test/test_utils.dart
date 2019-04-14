@@ -11,7 +11,7 @@ import 'package:source_gen/source_gen.dart';
 import 'package:test/test.dart';
 
 /// Creates a [LibraryReader] of the [sourceFile].
-Future<LibraryReader> resolveCompilationUnit(String sourceFile) async {
+Future<LibraryReader> resolveCompilationUnit(final String sourceFile) async {
   final files = [File(sourceFile)];
 
   final fileMap = Map<String, String>.fromEntries(files.map((file) =>
@@ -25,7 +25,7 @@ Future<LibraryReader> resolveCompilationUnit(String sourceFile) async {
   return LibraryReader(library);
 }
 
-Future<DartType> getDartType(dynamic value) async {
+Future<DartType> getDartType(final dynamic value) async {
   final source = '''
   library test;
   
@@ -35,6 +35,10 @@ Future<DartType> getDartType(dynamic value) async {
     final libraryReader = LibraryReader(await item.findLibraryByName('test'));
     return (libraryReader.allElements.elementAt(1) as VariableElement).type;
   });
+}
+
+Future<DartType> getDartTypeFromString(final String value) {
+  return getDartType(value);
 }
 
 Future<DartType> getDartTypeWithPerson(String value) async {
