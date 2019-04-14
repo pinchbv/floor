@@ -1,5 +1,6 @@
 import 'package:code_builder/code_builder.dart';
 import 'package:floor_generator/misc/annotation_expression.dart';
+import 'package:floor_generator/misc/annotations.dart';
 import 'package:floor_generator/misc/string_utils.dart';
 import 'package:floor_generator/misc/type_utils.dart';
 import 'package:floor_generator/value_object/query_method.dart';
@@ -53,30 +54,49 @@ class QueryMethodWriter implements Writer {
       return "await _queryAdapter.queryNoReturn('${_queryMethod.query}');";
     }
 
+    final parameters =
+        _queryMethod.parameters.map((parameter) => parameter.displayName);
+    final arguments =
+        parameters.isNotEmpty ? '<dynamic>[${parameters.join(', ')}]' : null;
+
     final mapper = '_${decapitalize(_queryMethod.entity.name)}Mapper';
 
     if (_queryMethod.returnsStream) {
-      return _generateStreamQuery(mapper);
+      return _generateStreamQuery(arguments, mapper);
     } else {
-      return _generateQuery(mapper);
+      return _generateQuery(arguments, mapper);
     }
   }
 
-  String _generateQuery(final String mapper) {
+  @nonNull
+  String _generateQuery(
+      @nullable final String arguments, @nonNull final String mapper) {
+    final parameters = StringBuffer()..write("'${_queryMethod.query}', ");
+    if (arguments != null) parameters.write('arguments: $arguments, ');
+    parameters.write('mapper: $mapper');
+
     if (_queryMethod.returnsList) {
-      return "return _queryAdapter.queryList('${_queryMethod.query}', $mapper);";
+      return 'return _queryAdapter.queryList($parameters);';
     } else {
-      return "return _queryAdapter.query('${_queryMethod.query}', $mapper);";
+      return 'return _queryAdapter.query($parameters);';
     }
   }
 
-  String _generateStreamQuery(final String mapper) {
+  @nonNull
+  String _generateStreamQuery(
+    @nullable final String arguments,
+    @nonNull final String mapper,
+  ) {
     final entityName = _queryMethod.entity.name;
 
+    final parameters = StringBuffer()..write("'${_queryMethod.query}', ");
+    if (arguments != null) parameters.write('arguments: $arguments, ');
+    parameters..write("tableName: '$entityName', ")..write('mapper: $mapper');
+
     if (_queryMethod.returnsList) {
-      return "return _queryAdapter.queryListStream('${_queryMethod.query}', '$entityName', $mapper);";
+      return 'return _queryAdapter.queryListStream($parameters);';
     } else {
-      return "return _queryAdapter.queryStream('${_queryMethod.query}', '$entityName', $mapper);";
+      return 'return _queryAdapter.queryStream($parameters);';
     }
   }
 }

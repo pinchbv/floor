@@ -1,5 +1,6 @@
 import 'package:analyzer/dart/element/element.dart';
 import 'package:analyzer/dart/element/type.dart';
+import 'package:collection/collection.dart';
 import 'package:floor_generator/misc/type_utils.dart';
 import 'package:floor_generator/value_object/entity.dart';
 
@@ -61,7 +62,8 @@ class QueryMethod {
           query == other.query &&
           rawReturnType == other.rawReturnType &&
           flattenedReturnType == other.flattenedReturnType &&
-          parameters == other.parameters &&
+          const ListEquality<ParameterElement>()
+              .equals(parameters, other.parameters) &&
           entity == other.entity;
 
   @override

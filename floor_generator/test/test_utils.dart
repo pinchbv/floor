@@ -28,6 +28,7 @@ Future<LibraryReader> resolveCompilationUnit(final String sourceFile) async {
 Future<DartType> getDartType(final dynamic value) async {
   final source = '''
   library test;
+  
   final value = $value;
   ''';
   return resolveSource(source, (item) async {
@@ -38,6 +39,32 @@ Future<DartType> getDartType(final dynamic value) async {
 
 Future<DartType> getDartTypeFromString(final String value) {
   return getDartType(value);
+}
+
+Future<DartType> getDartTypeWithPerson(String value) async {
+  final source = '''
+  library test;
+  
+  import 'package:floor_annotation/floor_annotation.dart';
+  
+  $value value;
+  
+  @entity
+  class Person {
+    @primaryKey
+    final int id;
+  
+    final String name;
+  
+    Person(this.id, this.name);
+  }
+  ''';
+  return resolveSource(source, (item) async {
+    final libraryReader = LibraryReader(await item.findLibraryByName('test'));
+    return (libraryReader.allElements.first as PropertyAccessorElement)
+        .type
+        .returnType;
+  });
 }
 
 final _dartfmt = DartFormatter();
@@ -57,7 +84,7 @@ Matcher throwsInvalidGenerationSourceError(
   final InvalidGenerationSourceError error,
 ) {
   return throwsA(
-    isA<InvalidGenerationSourceError>()
+    const TypeMatcher<InvalidGenerationSourceError>()
         .having((e) => e.message, 'message', error.message)
         .having((e) => e.todo, 'todo', error.todo)
         .having((e) => e.element, 'element', error.element),
