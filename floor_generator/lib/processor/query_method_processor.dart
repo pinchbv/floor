@@ -4,7 +4,7 @@ import 'package:floor_annotation/floor_annotation.dart' as annotations
     show Query;
 import 'package:floor_generator/misc/annotations.dart';
 import 'package:floor_generator/misc/constants.dart';
-import 'package:floor_generator/misc/query_method_processor_error.dart';
+import 'package:floor_generator/processor/error/query_method_processor_error.dart';
 import 'package:floor_generator/misc/type_utils.dart';
 import 'package:floor_generator/processor/processor.dart';
 import 'package:floor_generator/value_object/entity.dart';
@@ -66,7 +66,7 @@ class QueryMethodProcessor extends Processor<QueryMethod> {
         .getField(AnnotationField.QUERY_VALUE)
         ?.toStringValue();
 
-    if (query.isEmpty || query == null) throw _processorError.NO_QUERY_DEFINED;
+    if (query == null || query.isEmpty) throw _processorError.NO_QUERY_DEFINED;
 
     return query.replaceAll(RegExp(r'(:[^\s]+)'), '?');
   }
