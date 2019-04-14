@@ -12,8 +12,10 @@ import 'package:test/test.dart';
 
 import '../test_utils.dart';
 
-Future<void> main() async {
-  final entities = await _getEntities();
+void main() {
+  List<Entity> entities;
+
+  setUpAll(() async => entities = await _getEntities());
 
   test('create query method', () async {
     final methodElement = await _createQueryMethodClassElement('''
