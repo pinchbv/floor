@@ -18,7 +18,7 @@ void main() {
   setUpAll(() async => entities = await _getEntities());
 
   test('create query method', () async {
-    final methodElement = await _createQueryMethodClassElement('''
+    final methodElement = await _createQueryMethodElement('''
       @Query('SELECT * FROM Person')
       Future<List<Person>> findAllPersons();      
     ''');
@@ -41,9 +41,33 @@ void main() {
     );
   });
 
+  group('query parsing', () {
+    test('parse query', () async {
+      final methodElement = await _createQueryMethodElement('''
+      @Query('SELECT * FROM Person WHERE id = :id')
+      Future<Person> findPerson(int id);
+    ''');
+
+      final actual = QueryMethodProcessor(methodElement, []).process().query;
+
+      expect(actual, equals('SELECT * FROM Person WHERE id = ?'));
+    });
+
+    test('parse advanced query', () async {
+      final methodElement = await _createQueryMethodElement('''
+      @Query('update sports set rated = 1 where id in (:ids)')
+      Future<void> setRated(List<int> ids);
+    ''');
+
+      final actual = QueryMethodProcessor(methodElement, []).process().query;
+
+      expect(actual, equals('update sports set rated = 1 where id in (?)'));
+    });
+  });
+
   group('errors', () {
     test('exception when method does not return future', () async {
-      final methodElement = await _createQueryMethodClassElement('''
+      final methodElement = await _createQueryMethodElement('''
       @Query('SELECT * FROM Person')
       List<Person> findAllPersons();
     ''');
@@ -57,7 +81,7 @@ void main() {
     });
 
     test('exception when query is empty string', () async {
-      final methodElement = await _createQueryMethodClassElement('''
+      final methodElement = await _createQueryMethodElement('''
       @Query('')
       Future<List<Person>> findAllPersons();
     ''');
@@ -70,7 +94,7 @@ void main() {
     });
 
     test('exception when query is null', () async {
-      final methodElement = await _createQueryMethodClassElement('''
+      final methodElement = await _createQueryMethodElement('''
       @Query()
       Future<List<Person>> findAllPersons();
     ''');
@@ -84,7 +108,7 @@ void main() {
 
     test('exception when query arguments do not match method parameters',
         () async {
-      final methodElement = await _createQueryMethodClassElement('''
+      final methodElement = await _createQueryMethodElement('''
       @Query('SELECT * FROM Person WHERE id = :id AND name = :name')
       Future<Person> findPersonByIdAndName(int id);
     ''');
@@ -99,7 +123,7 @@ void main() {
 
     test('exception when query arguments do not match method parameters',
         () async {
-      final methodElement = await _createQueryMethodClassElement('''
+      final methodElement = await _createQueryMethodElement('''
       @Query('SELECT * FROM Person WHERE id = :id')
       Future<Person> findPersonByIdAndName(int id, String name);
     ''');
@@ -114,7 +138,7 @@ void main() {
   });
 }
 
-Future<MethodElement> _createQueryMethodClassElement(
+Future<MethodElement> _createQueryMethodElement(
   final String method,
 ) async {
   final library = await resolveSource('''
