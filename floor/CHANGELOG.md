@@ -1,5 +1,11 @@
 # Changelog
 
+# 0.4.1
+
+### 🐛 Bug Fixes
+
+* Fix query parameter substitution regex
+
 # 0.4.0
 
 ### Changes

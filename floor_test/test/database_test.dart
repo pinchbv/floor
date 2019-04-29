@@ -10,6 +10,7 @@ import 'model/dog.dart';
 import 'model/person.dart';
 
 // run test with 'flutter run test/database_test.dart'
+// trigger generator with 'flutter packages pub run build_runner build'
 void main() {
   group('database tests', () {
     TestDatabase database;
