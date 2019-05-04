@@ -64,7 +64,10 @@ class QueryMethodProcessor extends Processor<QueryMethod> {
     final query = typeChecker(annotations.Query)
         .firstAnnotationOfExact(_methodElement)
         .getField(AnnotationField.QUERY_VALUE)
-        ?.toStringValue();
+        ?.toStringValue()
+        ?.replaceAll('\n', ' ')
+        ?.replaceAll(RegExp(r'[ ]{2,}'), ' ')
+        ?.trim();
 
     if (query == null || query.isEmpty) throw _processorError.NO_QUERY_DEFINED;
 
