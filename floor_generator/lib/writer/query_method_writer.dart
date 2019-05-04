@@ -50,14 +50,14 @@ class QueryMethodWriter implements Writer {
   }
 
   String _generateMethodBody() {
-    if (_queryMethod.returnsVoid) {
-      return "await _queryAdapter.queryNoReturn('${_queryMethod.query}');";
-    }
-
     final parameters =
         _queryMethod.parameters.map((parameter) => parameter.displayName);
     final arguments =
         parameters.isNotEmpty ? '<dynamic>[${parameters.join(', ')}]' : null;
+
+    if (_queryMethod.returnsVoid) {
+      return _generateNoReturnQuery(arguments);
+    }
 
     final mapper = '_${decapitalize(_queryMethod.entity.name)}Mapper';
 
@@ -69,8 +69,17 @@ class QueryMethodWriter implements Writer {
   }
 
   @nonNull
+  String _generateNoReturnQuery(String arguments) {
+    final parameters = StringBuffer()..write("'${_queryMethod.query}'");
+    if (arguments != null) parameters.write(', arguments: $arguments');
+    return 'await _queryAdapter.queryNoReturn($parameters);';
+  }
+
+  @nonNull
   String _generateQuery(
-      @nullable final String arguments, @nonNull final String mapper) {
+    @nullable final String arguments,
+    @nonNull final String mapper,
+  ) {
     final parameters = StringBuffer()..write("'${_queryMethod.query}', ");
     if (arguments != null) parameters.write('arguments: $arguments, ');
     parameters.write('mapper: $mapper');

@@ -42,11 +42,14 @@ class QueryAdapter {
     return rows.map((row) => mapper(row)).toList();
   }
 
-  Future<void> queryNoReturn(final String sql) async {
+  Future<void> queryNoReturn(
+    final String sql, {
+    final List<dynamic> arguments,
+  }) async {
     // TODO differentiate between different query kinds (select, update, delete, insert)
     //  this enables to notify the observers
     //  also requires extracting the table name :(
-    await _database.rawQuery(sql);
+    await _database.rawQuery(sql, arguments);
   }
 
   /// Executes a SQLite query that returns a stream of single query results.

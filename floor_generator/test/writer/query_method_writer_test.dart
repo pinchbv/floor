@@ -30,6 +30,22 @@ void main() {
     '''));
   });
 
+  test('query no return with parameter', () async {
+    final queryMethod = await _createQueryMethod('''
+      @Query('DELETE FROM Person WHERE id = :id')
+      Future<void> deletePersonById(int id);
+    ''');
+
+    final actual = QueryMethodWriter(queryMethod).write();
+
+    expect(actual, equalsDart(r'''
+      @override
+      Future<void> deletePersonById(int id) async {
+        await _queryAdapter.queryNoReturn('DELETE FROM Person WHERE id = ?', arguments: <dynamic>[id]);
+      }
+    '''));
+  });
+
   test('query item', () async {
     final queryMethod = await _createQueryMethod('''
       @Query('SELECT * FROM Person WHERE id = :id')
