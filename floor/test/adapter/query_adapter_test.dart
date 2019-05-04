@@ -126,6 +126,14 @@ void main() {
 
         verify(mockDatabaseExecutor.rawQuery(sql));
       });
+
+      test('executes query with argument', () async {
+        final arguments = [123];
+
+        await underTest.queryNoReturn(sql, arguments: arguments);
+
+        verify(mockDatabaseExecutor.rawQuery(sql, arguments));
+      });
     });
   });
 
