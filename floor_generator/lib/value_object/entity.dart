@@ -29,6 +29,7 @@ class Entity {
   @nonNull
   String getCreateTableStatement() {
     final databaseDefinition = fields
+        .where((f) => !f.readOnly)
         .map((field) => field.getDatabaseDefinition(
             field == primaryKey.field && primaryKey.autoGenerateId))
         .toList();
@@ -43,7 +44,7 @@ class Entity {
 
   @nonNull
   String getValueMapping() {
-    final keyValueList = fields.map((field) {
+    final keyValueList = fields.where((f) => !f.readOnly).map((field) {
       final columnName = field.columnName;
       final attributeValue = _getAttributeValue(field.fieldElement);
       return "'$columnName': $attributeValue";

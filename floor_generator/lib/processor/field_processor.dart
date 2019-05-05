@@ -23,6 +23,7 @@ class FieldProcessor extends Processor<Field> {
         _columnInfoTypeChecker.hasAnnotationOfExact(_fieldElement);
     final columnName = _getColumnName(hasColumnInfoAnnotation, name);
     final isNullable = _getIsNullable(hasColumnInfoAnnotation);
+    final readOnly = _getReadOnly(hasColumnInfoAnnotation);
     final isPrimaryKey =
         typeChecker(annotations.PrimaryKey).hasAnnotationOfExact(_fieldElement);
 
@@ -31,6 +32,7 @@ class FieldProcessor extends Processor<Field> {
       name,
       columnName,
       isNullable,
+      readOnly,
       isPrimaryKey,
       _getSqlType(),
     );
@@ -54,6 +56,16 @@ class FieldProcessor extends Processor<Field> {
                 ?.toBoolValue() ??
             true
         : true; // all Dart fields are nullable by default
+  }
+
+  bool _getReadOnly(bool hasColumnInfoAnnotation) {
+    return hasColumnInfoAnnotation
+        ? _columnInfoTypeChecker
+                .firstAnnotationOfExact(_fieldElement)
+                .getField(AnnotationField.COLUMN_INFO_READ_ONLY)
+                ?.toBoolValue() ??
+            false
+        : false; // all Dart fields are not read only by default
   }
 
   String _getSqlType() {

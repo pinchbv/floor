@@ -6,5 +6,7 @@ class ColumnInfo {
   /// Defines if the associated column is allowed to contain 'null'.
   final bool nullable;
 
-  const ColumnInfo({this.name, this.nullable = true});
+  final bool readOnly;
+
+  const ColumnInfo({this.name, this.nullable = true, this.readOnly = false});
 }
