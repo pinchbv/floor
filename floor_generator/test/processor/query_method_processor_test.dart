@@ -63,6 +63,38 @@ void main() {
 
       expect(actual, equals('update sports set rated = 1 where id in (?)'));
     });
+
+    test('parse multiline query', () async {
+      final methodElement = await _createQueryMethodElement("""
+        @Query('''
+          SELECT * FROM person
+          WHERE id = :id AND custom_name = :name
+        ''')
+        Future<Person> findPersonByIdAndName(int id, String name);
+      """);
+
+      final actual = QueryMethodProcessor(methodElement, []).process().query;
+
+      expect(
+        actual,
+        equals('SELECT * FROM person WHERE id = ? AND custom_name = ?'),
+      );
+    });
+
+    test('parse concatenated string query', () async {
+      final methodElement = await _createQueryMethodElement('''
+        @Query('SELECT * FROM person '
+            'WHERE id = :id AND custom_name = :name')
+        Future<Person> findPersonByIdAndName(int id, String name);    
+      ''');
+
+      final actual = QueryMethodProcessor(methodElement, []).process().query;
+
+      expect(
+        actual,
+        equals('SELECT * FROM person WHERE id = ? AND custom_name = ?'),
+      );
+    });
   });
 
   group('errors', () {
