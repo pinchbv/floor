@@ -33,6 +33,7 @@ void main() {
     const foreignKeys = <ForeignKey>[];
     const indices = <Index>[];
     const constructor = "Person(row['id'] as int, row['name'] as String)";
+    const readOnly = false;
 
     expect(
       actual,
@@ -40,6 +41,7 @@ void main() {
         Entity(
           classElement,
           name,
+          readOnly,
           fields,
           primaryKey,
           foreignKeys,

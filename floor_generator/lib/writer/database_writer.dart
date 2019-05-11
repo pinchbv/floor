@@ -105,6 +105,9 @@ class DatabaseWriter implements Writer {
 
   @nonNull
   List<String> _generateCreateTableSqlStatements(final List<Entity> entities) {
-    return entities.map((entity) => entity.getCreateTableStatement()).toList();
+    return entities
+        .where((entity) => !entity.readOnly)
+        .map((entity) => entity.getCreateTableStatement())
+        .toList();
   }
 }

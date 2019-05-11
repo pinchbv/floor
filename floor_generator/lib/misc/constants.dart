@@ -11,6 +11,7 @@ abstract class AnnotationField {
   static const COLUMN_INFO_READ_ONLY = 'readOnly';
 
   static const ENTITY_TABLE_NAME = 'tableName';
+  static const ENTITY_READ_ONLY = 'readOnly';
   static const ENTITY_FOREIGN_KEYS = 'foreignKeys';
   static const ENTITY_INDICES = 'indices';
 }

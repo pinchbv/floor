@@ -10,6 +10,7 @@ import 'package:floor_generator/value_object/primary_key.dart';
 class Entity {
   final ClassElement classElement;
   final String name;
+  final bool readOnly;
   final List<Field> fields;
   final PrimaryKey primaryKey;
   final List<ForeignKey> foreignKeys;
@@ -19,6 +20,7 @@ class Entity {
   Entity(
     this.classElement,
     this.name,
+    this.readOnly,
     this.fields,
     this.primaryKey,
     this.foreignKeys,

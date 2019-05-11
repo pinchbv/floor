@@ -20,6 +20,8 @@ void main() {
     const isNullable = true;
     const isPrimaryKey = true;
     const sqlType = SqlType.INTEGER;
+    const readOnly = false;
+
     expect(
       actual,
       equals(Field(
@@ -27,6 +29,7 @@ void main() {
         name,
         columnName,
         isNullable,
+        readOnly,
         isPrimaryKey,
         sqlType,
       )),

@@ -6,6 +6,8 @@ class Entity {
   /// The table name of the SQLite table.
   final String tableName;
 
+  final bool readOnly;
+
   /// List of indices on the table.
   final List<Index> indices;
 
@@ -15,6 +17,7 @@ class Entity {
   /// Marks a class as a database entity (table).
   const Entity({
     this.tableName,
+    this.readOnly,
     this.indices = const [],
     this.foreignKeys = const [],
   });

@@ -29,12 +29,14 @@ class EntityProcessor extends Processor<Entity> {
   Entity process() {
     final name = _getName();
     final fields = _getFields();
+    final readOnly = _getReadOnly();
 
     return Entity(
       _classElement,
       name,
+      readOnly,
       fields,
-      _getPrimaryKey(fields),
+      !readOnly ? _getPrimaryKey(fields) : PrimaryKey(null, false),
       _getForeignKeys(),
       _getIndices(fields, name),
       _getConstructor(fields),
@@ -48,6 +50,15 @@ class EntityProcessor extends Processor<Entity> {
             .getField(AnnotationField.ENTITY_TABLE_NAME)
             .toStringValue() ??
         _classElement.displayName;
+  }
+
+  @nonNull
+  bool _getReadOnly() {
+    return typeChecker(annotations.Entity)
+            .firstAnnotationOfExact(_classElement)
+            .getField(AnnotationField.ENTITY_READ_ONLY)
+            ?.toBoolValue() ??
+        false;
   }
 
   @nonNull
