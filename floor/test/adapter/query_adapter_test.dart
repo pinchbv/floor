@@ -165,7 +165,7 @@ void main() {
           underTest.queryStream(sql, tableName: entityName, mapper: mapper);
 
       expect(actual, emits(person));
-    }, skip: true);
+    });
 
     test('query item and emit persistent item with arguments', () {
       final person = Person(1, 'Frank');
@@ -184,7 +184,7 @@ void main() {
       );
 
       expect(actual, emits(person));
-    }, skip: true);
+    });
 
     test('query item and emit persistent item and new', () {
       final person = Person(1, 'Frank');
@@ -198,7 +198,7 @@ void main() {
       streamController.add(entityName);
 
       expect(actual, emitsInOrder(<Person>[person, person]));
-    }, skip: true);
+    });
 
     test('query items and emit persistent items without arguments', () async {
       final person = Person(1, 'Frank');
@@ -213,7 +213,7 @@ void main() {
           underTest.queryListStream(sql, tableName: entityName, mapper: mapper);
 
       expect(actual, emits([person, person2]));
-    }, skip: true);
+    });
 
     test('query items and emit persistent items with arguments', () async {
       final person = Person(1, 'Frank');
@@ -234,7 +234,7 @@ void main() {
       );
 
       expect(actual, emits([person, person2]));
-    }, skip: true);
+    });
 
     test('query items and emit persistent items and new items', () async {
       final person = Person(1, 'Frank');
@@ -256,6 +256,6 @@ void main() {
           <Person>[person, person2]
         ]),
       );
-    }, skip: true);
+    });
   });
 }
