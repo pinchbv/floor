@@ -35,7 +35,7 @@ while (( "$#" )); do
     pub upgrade || exit $?
     echo -e '\033[1mTASK: test\033[22m'
     echo -e 'pub run test'
-    pub global run coverage:collect_coverage --port=8111 -o coverage.json --resume-isolates --wait-paused &
+    nohup pub global run coverage:collect_coverage --port=8111 -o coverage.json --resume-isolates --wait-paused &
     dart --pause-isolates-on-exit --enable-vm-service=8111 "test/all_tests.dart" || EXIT_CODE=$?
     pub global run coverage:format_coverage --packages=.packages -i coverage.json --report-on lib --lcov --out lcov.info
     if [ -f "lcov.info" ]; then
