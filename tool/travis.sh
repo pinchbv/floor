@@ -38,9 +38,13 @@ while (( "$#" )); do
     nohup pub global run coverage:collect_coverage --port=8111 -o coverage.json --resume-isolates --wait-paused &
     dart --pause-isolates-on-exit --enable-vm-service=8111 "test/all_tests.dart" || EXIT_CODE=$?
     pub global run coverage:format_coverage --packages=.packages -i coverage.json --report-on lib --lcov --out lcov.info
-    if [ -f "lcov.info" ]; then
+    if [ -f "lcov.info" ]
+    then
       sed "s/^SF:.*lib/SF:$escapedPath\/lib/g" lcov.info >> "../lcov.info"
       rm lcov.info
+    else
+      echo "lcov.info file not found"
+      EXIT_CODE=1
     fi
     rm -f coverage.json
     ;;
