@@ -69,7 +69,7 @@ class QueryMethodWriter implements Writer {
   }
 
   @nonNull
-  String _generateNoReturnQuery(String arguments) {
+  String _generateNoReturnQuery(@nullable final String arguments) {
     final parameters = StringBuffer()..write("'${_queryMethod.query}'");
     if (arguments != null) parameters.write(', arguments: $arguments');
     return 'await _queryAdapter.queryNoReturn($parameters);';
