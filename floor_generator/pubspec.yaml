@@ -7,22 +7,22 @@ homepage: https://github.com/vitusortner/floor
 author: Vitus Ortner <vitusortner.dev@gmail.com>
 
 environment:
-  sdk: '>=2.1.0 <3.0.0'
+  sdk: '>=2.3.0-dev <3.0.0'
 
 dependencies:
-  analyzer: ^0.36.2
+  analyzer: ^0.36.3
   build: ^1.1.4
   code_builder: ^3.2.0
   meta: ^1.1.6
   source_gen: ^0.9.4+2
-  build_config: ^0.3.2
+  build_config: ^0.4.0
   collection: ^1.14.11
   floor_annotation:
     path: ../floor_annotation/
 
 dev_dependencies:
-  test: ^1.6.1
-  build_test: ^0.10.6
+  test: ^1.6.3
+  build_test: ^0.10.7+3
   path: ^1.6.2
   dart_style: ^1.2.7
   test_cov: ^0.1.0
