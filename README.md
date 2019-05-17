@@ -48,7 +48,7 @@ This package is still in an early phase and the API will likely change.
     
     dev_dependencies:
       floor_generator: ^0.4.2
-      build_runner: ^1.3.3
+      build_runner: ^1.4.0
     ````
 
 1. Creating an *Entity*

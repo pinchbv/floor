@@ -38,5 +38,7 @@ This document describes step-by-step how to release a new version of the library
   	1. **floor_generator**
   	
 1. Update README (with updated library versions) 	
+
+1. Update CHANGELOG
   	
 1. Push changes to repository  	 
