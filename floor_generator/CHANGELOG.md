@@ -1,5 +1,16 @@
 # Changelog
 
+# 0.5.0
+
+### Changes
+
+* Make tasks deletable in example app
+
+### 🚀 Features
+
+* Allow multiline string queries
+* Allow void-return queries with arguments
+
 # 0.4.2
 
 ### 🐛 Bug Fixes
