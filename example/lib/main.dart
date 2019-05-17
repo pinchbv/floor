@@ -59,12 +59,9 @@ class TasksWidget extends StatelessWidget {
                 return ListView.builder(
                   itemCount: tasks.length,
                   itemBuilder: (_, index) {
-                    return Padding(
-                      padding: const EdgeInsets.symmetric(
-                        vertical: 8,
-                        horizontal: 16,
-                      ),
-                      child: Text(tasks[index].message),
+                    return ListCell(
+                      task: tasks[index],
+                      dao: dao,
                     );
                   },
                 );
@@ -73,8 +70,10 @@ class TasksWidget extends StatelessWidget {
           ),
           TextField(
             controller: _textEditingController,
-            decoration: const InputDecoration(
-              contentPadding: EdgeInsets.all(8),
+            decoration: InputDecoration(
+              fillColor: Theme.of(context).inputDecorationTheme.fillColor,
+              filled: true,
+              contentPadding: const EdgeInsets.all(16),
               border: InputBorder.none,
               hintText: 'Type task here',
             ),
@@ -88,6 +87,39 @@ class TasksWidget extends StatelessWidget {
           )
         ],
       ),
+    );
+  }
+}
+
+class ListCell extends StatelessWidget {
+  const ListCell({
+    Key key,
+    @required this.task,
+    @required this.dao,
+  }) : super(key: key);
+
+  final Task task;
+  final TaskDao dao;
+
+  @override
+  Widget build(BuildContext context) {
+    return Dismissible(
+      key: Key('${task.hashCode}'),
+      background: Container(color: Colors.red),
+      direction: DismissDirection.endToStart,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(
+          vertical: 8,
+          horizontal: 16,
+        ),
+        child: Text(task.message),
+      ),
+      onDismissed: (_) async {
+        await dao.deleteTask(task);
+        Scaffold.of(context).showSnackBar(
+          SnackBar(content: const Text('Removed task')),
+        );
+      },
     );
   }
 }
