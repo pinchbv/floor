@@ -25,4 +25,4 @@ dev_dependencies:
   build_test: ^0.10.6
   path: ^1.6.2
   dart_style: ^1.2.7
-  test_coverage: ^0.2.0
+  test_cov: ^0.1.0
