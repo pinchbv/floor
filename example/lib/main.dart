@@ -114,8 +114,8 @@ class ListCell extends StatelessWidget {
         ),
         child: Text(task.message),
       ),
-      onDismissed: (_) {
-        dao.deleteTask(task);
+      onDismissed: (_) async {
+        await dao.deleteTask(task);
         Scaffold.of(context).showSnackBar(
           SnackBar(content: const Text('Removed task')),
         );
