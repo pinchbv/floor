@@ -1,25 +1,26 @@
+import 'package:collection/collection.dart';
 import 'package:floor_generator/value_object/field.dart';
 
 /// Primary key representation of an Entity
 class PrimaryKey {
-  final Field field;
+  final List<Field> fields;
   final bool autoGenerateId;
 
-  PrimaryKey(this.field, this.autoGenerateId);
+  PrimaryKey(this.fields, this.autoGenerateId);
 
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
       other is PrimaryKey &&
           runtimeType == other.runtimeType &&
-          field == other.field &&
+          const ListEquality<Field>().equals(fields, other.fields) &&
           autoGenerateId == other.autoGenerateId;
 
   @override
-  int get hashCode => field.hashCode ^ autoGenerateId.hashCode;
+  int get hashCode => fields.hashCode ^ autoGenerateId.hashCode;
 
   @override
   String toString() {
-    return 'PrimaryKey{field: $field, autoGenerateId: $autoGenerateId}';
+    return 'PrimaryKey{fields: $fields, autoGenerateId: $autoGenerateId}';
   }
 }

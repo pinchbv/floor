@@ -7,9 +7,8 @@ import 'package:source_gen/source_gen.dart';
 import 'package:test/test.dart';
 
 void main() {
-  test('successfully process field', () async {
+  test('Process field', () async {
     final fieldElement = await _generateFieldElement('''
-      @PrimaryKey()
       final int id;
     ''');
 
@@ -18,19 +17,15 @@ void main() {
     const name = 'id';
     const columnName = 'id';
     const isNullable = true;
-    const isPrimaryKey = true;
     const sqlType = SqlType.INTEGER;
-    expect(
-      actual,
-      equals(Field(
-        fieldElement,
-        name,
-        columnName,
-        isNullable,
-        isPrimaryKey,
-        sqlType,
-      )),
+    final expected = Field(
+      fieldElement,
+      name,
+      columnName,
+      isNullable,
+      sqlType,
     );
+    expect(actual, equals(expected));
   });
 }
 

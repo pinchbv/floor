@@ -15,9 +15,10 @@ import 'package:floor_generator/value_object/index.dart';
 import 'package:floor_generator/value_object/primary_key.dart';
 
 class EntityProcessor extends Processor<Entity> {
+  final ClassElement _classElement;
   final EntityProcessorError _processorError;
 
-  final ClassElement _classElement;
+  final _entityTypeChecker = typeChecker(annotations.Entity);
 
   EntityProcessor(final ClassElement classElement)
       : assert(classElement != null),
@@ -29,6 +30,10 @@ class EntityProcessor extends Processor<Entity> {
   Entity process() {
     final name = _getName();
     final fields = _getFields();
+
+    // TODO #105 make sure that either one primary key exists that is set up
+    //  by using the @PrimaryKey annotation or only primary keys by using the
+    //  @Entity annotation
 
     return Entity(
       _classElement,
@@ -43,7 +48,7 @@ class EntityProcessor extends Processor<Entity> {
 
   @nonNull
   String _getName() {
-    return typeChecker(annotations.Entity)
+    return _entityTypeChecker
             .firstAnnotationOfExact(_classElement)
             .getField(AnnotationField.ENTITY_TABLE_NAME)
             .toStringValue() ??
@@ -65,7 +70,7 @@ class EntityProcessor extends Processor<Entity> {
 
   @nonNull
   List<ForeignKey> _getForeignKeys() {
-    return typeChecker(annotations.Entity)
+    return _entityTypeChecker
             .firstAnnotationOfExact(_classElement)
             .getField(AnnotationField.ENTITY_FOREIGN_KEYS)
             ?.toListValue()
@@ -77,7 +82,7 @@ class EntityProcessor extends Processor<Entity> {
 
           final parentElement = parentType.element;
           final parentName = parentElement is ClassElement
-              ? typeChecker(annotations.Entity)
+              ? _entityTypeChecker
                       .firstAnnotationOfExact(parentElement)
                       .getField(AnnotationField.ENTITY_TABLE_NAME)
                       ?.toStringValue() ??
@@ -119,7 +124,7 @@ class EntityProcessor extends Processor<Entity> {
 
   @nonNull
   List<Index> _getIndices(final List<Field> fields, final String tableName) {
-    return typeChecker(annotations.Entity)
+    return _entityTypeChecker
             .firstAnnotationOfExact(_classElement)
             .getField(AnnotationField.ENTITY_INDICES)
             ?.toListValue()
@@ -193,10 +198,32 @@ class EntityProcessor extends Processor<Entity> {
 
   @nonNull
   PrimaryKey _getPrimaryKey(final List<Field> fields) {
-    final primaryKeyField = fields.firstWhere(
-      (field) => field.isPrimaryKey,
-      orElse: () => throw _processorError.MISSING_PRIMARY_KEY,
-    );
+    // TODO #105 field doesn't have to be a primary key anymore
+
+    final compoundPrimaryKeys = _entityTypeChecker
+        .firstAnnotationOfExact(_classElement)
+        .getField(AnnotationField.ENTITY_PRIMARY_KEYS)
+        ?.toListValue()
+        ?.map((object) => object.toStringValue());
+
+    if (compoundPrimaryKeys != null && compoundPrimaryKeys.isNotEmpty) {
+      final compoundPrimaryKeyFields = fields
+          .where((field) => compoundPrimaryKeys.any((primaryKeyColumnName) =>
+              field.columnName == primaryKeyColumnName))
+          .toList();
+
+      if (compoundPrimaryKeyFields.isEmpty) {
+        // TODO #105 more precise error
+        throw _processorError.MISSING_PRIMARY_KEY;
+      }
+
+      return PrimaryKey(compoundPrimaryKeyFields, false);
+    }
+
+    final primaryKeyField = fields.firstWhere((field) {
+      return typeChecker(annotations.PrimaryKey)
+          .hasAnnotationOfExact(field.fieldElement);
+    }, orElse: () => throw _processorError.MISSING_PRIMARY_KEY);
 
     final autoGenerate = typeChecker(annotations.PrimaryKey)
             .firstAnnotationOfExact(primaryKeyField.fieldElement)
@@ -204,7 +231,7 @@ class EntityProcessor extends Processor<Entity> {
             ?.toBoolValue() ??
         false;
 
-    return PrimaryKey(primaryKeyField, autoGenerate);
+    return PrimaryKey([primaryKeyField], autoGenerate);
   }
 
   @nonNull

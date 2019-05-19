@@ -26,3 +26,4 @@ dev_dependencies:
   path: ^1.6.2
   dart_style: ^1.2.7
   test_cov: ^0.1.0
+  mockito: ^4.0.0

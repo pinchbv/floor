@@ -1,4 +1,5 @@
 import 'package:analyzer/dart/element/element.dart';
+import 'package:floor_generator/misc/annotations.dart';
 
 /// Represents an Entity field and thus a table column.
 class Field {
@@ -6,7 +7,6 @@ class Field {
   final String name;
   final String columnName;
   final bool isNullable;
-  final bool isPrimaryKey;
   final String sqlType;
 
   Field(
@@ -14,21 +14,18 @@ class Field {
     this.name,
     this.columnName,
     this.isNullable,
-    this.isPrimaryKey,
     this.sqlType,
   );
 
   /// The database column definition.
+  @nonNull
   String getDatabaseDefinition(final bool autoGenerate) {
     final columnSpecification = StringBuffer();
 
-    if (isPrimaryKey) {
-      columnSpecification.write(' PRIMARY KEY');
-    }
     if (autoGenerate) {
-      columnSpecification.write(' AUTOINCREMENT');
+      columnSpecification.write(' PRIMARY KEY AUTOINCREMENT');
     }
-    if (!isNullable || isPrimaryKey) {
+    if (!isNullable) {
       columnSpecification.write(' NOT NULL');
     }
 
@@ -44,7 +41,6 @@ class Field {
           name == other.name &&
           columnName == other.columnName &&
           isNullable == other.isNullable &&
-          isPrimaryKey == other.isPrimaryKey &&
           sqlType == other.sqlType;
 
   @override
@@ -53,11 +49,10 @@ class Field {
       name.hashCode ^
       columnName.hashCode ^
       isNullable.hashCode ^
-      isPrimaryKey.hashCode ^
       sqlType.hashCode;
 
   @override
   String toString() {
-    return 'Field{fieldElement: $fieldElement, name: $name, columnName: $columnName, isNullable: $isNullable, isPrimaryKey: $isPrimaryKey, sqlType: $sqlType}';
+    return 'Field{fieldElement: $fieldElement, name: $name, columnName: $columnName, isNullable: $isNullable, sqlType: $sqlType}';
   }
 }

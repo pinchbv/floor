@@ -12,11 +12,15 @@ class Entity {
   /// List of [ForeignKey] constraints on this entity.
   final List<ForeignKey> foreignKeys;
 
+  /// List of primary key column names.
+  final List<String> primaryKeys;
+
   /// Marks a class as a database entity (table).
   const Entity({
     this.tableName,
     this.indices = const [],
     this.foreignKeys = const [],
+    this.primaryKeys = const [],
   });
 }
 

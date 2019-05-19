@@ -28,17 +28,33 @@ class Entity {
 
   @nonNull
   String getCreateTableStatement() {
-    final databaseDefinition = fields
-        .map((field) => field.getDatabaseDefinition(
-            field == primaryKey.field && primaryKey.autoGenerateId))
-        .toList();
+    final databaseDefinition = fields.map((field) {
+      final autoIncrement =
+          primaryKey.fields.contains(field) && primaryKey.autoGenerateId;
+      return field.getDatabaseDefinition(autoIncrement);
+    }).toList();
 
     final foreignKeyDefinitions =
         foreignKeys.map((foreignKey) => foreignKey.getDefinition()).toList();
-
     databaseDefinition.addAll(foreignKeyDefinitions);
 
+    final primaryKeyDefinition = _createPrimaryKeyDefinition();
+    if (primaryKeyDefinition != null) {
+      databaseDefinition.add(primaryKeyDefinition);
+    }
+
     return 'CREATE TABLE IF NOT EXISTS `$name` (${databaseDefinition.join(', ')})';
+  }
+
+  @nullable
+  String _createPrimaryKeyDefinition() {
+    if (primaryKey.autoGenerateId) {
+      return null;
+    } else {
+      final columns =
+          primaryKey.fields.map((field) => '`${field.columnName}`').join(', ');
+      return 'PRIMARY KEY ($columns)';
+    }
   }
 
   @nonNull

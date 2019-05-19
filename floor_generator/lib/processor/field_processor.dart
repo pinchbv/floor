@@ -1,6 +1,7 @@
 import 'package:analyzer/dart/element/element.dart';
 import 'package:floor_annotation/floor_annotation.dart' as annotations
-    show ColumnInfo, PrimaryKey;
+    show ColumnInfo;
+import 'package:floor_generator/misc/annotations.dart';
 import 'package:floor_generator/misc/constants.dart';
 import 'package:floor_generator/misc/type_utils.dart';
 import 'package:floor_generator/processor/processor.dart';
@@ -16,6 +17,7 @@ class FieldProcessor extends Processor<Field> {
       : assert(fieldElement != null),
         _fieldElement = fieldElement;
 
+  @nonNull
   @override
   Field process() {
     final name = _fieldElement.name;
@@ -23,19 +25,17 @@ class FieldProcessor extends Processor<Field> {
         _columnInfoTypeChecker.hasAnnotationOfExact(_fieldElement);
     final columnName = _getColumnName(hasColumnInfoAnnotation, name);
     final isNullable = _getIsNullable(hasColumnInfoAnnotation);
-    final isPrimaryKey =
-        typeChecker(annotations.PrimaryKey).hasAnnotationOfExact(_fieldElement);
 
     return Field(
       _fieldElement,
       name,
       columnName,
       isNullable,
-      isPrimaryKey,
       _getSqlType(),
     );
   }
 
+  @nonNull
   String _getColumnName(bool hasColumnInfoAnnotation, String name) {
     return hasColumnInfoAnnotation
         ? _columnInfoTypeChecker
@@ -46,6 +46,7 @@ class FieldProcessor extends Processor<Field> {
         : name;
   }
 
+  @nonNull
   bool _getIsNullable(bool hasColumnInfoAnnotation) {
     return hasColumnInfoAnnotation
         ? _columnInfoTypeChecker
@@ -56,6 +57,7 @@ class FieldProcessor extends Processor<Field> {
         : true; // all Dart fields are nullable by default
   }
 
+  @nonNull
   String _getSqlType() {
     final type = _fieldElement.type;
     if (isInt(type)) {
