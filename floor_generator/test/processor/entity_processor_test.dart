@@ -30,8 +30,8 @@ void main() {
         .map((fieldElement) => FieldProcessor(fieldElement).process())
         .toList();
     final primaryKey = PrimaryKey([fields[0]], false);
-    final foreignKeys = <ForeignKey>[];
-    final indices = <Index>[];
+    const foreignKeys = <ForeignKey>[];
+    const indices = <Index>[];
     const constructor = "Person(row['id'] as int, row['name'] as String)";
     final expected = Entity(
       classElement,
@@ -45,7 +45,7 @@ void main() {
     expect(actual, equals(expected));
   });
 
-  test('Process entity with comound primary key', () async {
+  test('Process entity with compound primary key', () async {
     final classElement = await _createClassElement('''
       @Entity(primaryKeys: ['id', 'name'])
       class Person {
@@ -64,8 +64,8 @@ void main() {
         .map((fieldElement) => FieldProcessor(fieldElement).process())
         .toList();
     final primaryKey = PrimaryKey(fields, false);
-    final foreignKeys = <ForeignKey>[];
-    final indices = <Index>[];
+    const foreignKeys = <ForeignKey>[];
+    const indices = <Index>[];
     const constructor = "Person(row['id'] as int, row['name'] as String)";
     final expected = Entity(
       classElement,

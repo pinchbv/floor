@@ -4,8 +4,8 @@ import 'package:analyzer/dart/element/type.dart';
 import 'package:floor_annotation/floor_annotation.dart' as annotations;
 import 'package:floor_generator/misc/annotations.dart';
 import 'package:floor_generator/misc/constants.dart';
-import 'package:floor_generator/processor/error/entity_processor_error.dart';
 import 'package:floor_generator/misc/type_utils.dart';
+import 'package:floor_generator/processor/error/entity_processor_error.dart';
 import 'package:floor_generator/processor/field_processor.dart';
 import 'package:floor_generator/processor/processor.dart';
 import 'package:floor_generator/value_object/entity.dart';
@@ -30,10 +30,6 @@ class EntityProcessor extends Processor<Entity> {
   Entity process() {
     final name = _getName();
     final fields = _getFields();
-
-    // TODO #105 make sure that either one primary key exists that is set up
-    //  by using the @PrimaryKey annotation or only primary keys by using the
-    //  @Entity annotation
 
     return Entity(
       _classElement,
@@ -198,19 +194,18 @@ class EntityProcessor extends Processor<Entity> {
 
   @nonNull
   PrimaryKey _getPrimaryKey(final List<Field> fields) {
-    // TODO #105 field doesn't have to be a primary key anymore
-
-    final compoundPrimaryKeys = _entityTypeChecker
+    final compoundPrimaryKeyColumnNames = _entityTypeChecker
         .firstAnnotationOfExact(_classElement)
         .getField(AnnotationField.ENTITY_PRIMARY_KEYS)
         ?.toListValue()
         ?.map((object) => object.toStringValue());
 
-    if (compoundPrimaryKeys != null && compoundPrimaryKeys.isNotEmpty) {
-      final compoundPrimaryKeyFields = fields
-          .where((field) => compoundPrimaryKeys.any((primaryKeyColumnName) =>
-              field.columnName == primaryKeyColumnName))
-          .toList();
+    if (compoundPrimaryKeyColumnNames != null &&
+        compoundPrimaryKeyColumnNames.isNotEmpty) {
+      final compoundPrimaryKeyFields = fields.where((field) {
+        return compoundPrimaryKeyColumnNames.any(
+            (primaryKeyColumnName) => field.columnName == primaryKeyColumnName);
+      }).toList();
 
       if (compoundPrimaryKeyFields.isEmpty) {
         // TODO #105 more precise error
@@ -220,10 +215,10 @@ class EntityProcessor extends Processor<Entity> {
       return PrimaryKey(compoundPrimaryKeyFields, false);
     }
 
-    final primaryKeyField = fields.firstWhere((field) {
-      return typeChecker(annotations.PrimaryKey)
-          .hasAnnotationOfExact(field.fieldElement);
-    }, orElse: () => throw _processorError.MISSING_PRIMARY_KEY);
+    final primaryKeyField = fields.firstWhere(
+        (field) => typeChecker(annotations.PrimaryKey)
+            .hasAnnotationOfExact(field.fieldElement),
+        orElse: () => throw _processorError.MISSING_PRIMARY_KEY);
 
     final autoGenerate = typeChecker(annotations.PrimaryKey)
             .firstAnnotationOfExact(primaryKeyField.fieldElement)
@@ -236,8 +231,6 @@ class EntityProcessor extends Processor<Entity> {
 
   @nonNull
   String _getConstructor(final List<Field> fields) {
-    // Person(row['id'] as int, row['custom_name'] as String);
-
     final columnNames = fields.map((field) => field.columnName).toList();
     final constructorParameters = _classElement.constructors.first.parameters;
 

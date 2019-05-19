@@ -48,6 +48,6 @@ class ChangeMethod {
 
   @override
   String toString() {
-    return 'NewChangeMethod{methodElement: $methodElement, name: $name, returnType: $returnType, flattenedReturnType: $flattenedReturnType, parameterElement: $parameterElement, entity: $entity}';
+    return 'ChangeMethod{methodElement: $methodElement, name: $name, returnType: $returnType, flattenedReturnType: $flattenedReturnType, parameterElement: $parameterElement, entity: $entity}';
   }
 }
