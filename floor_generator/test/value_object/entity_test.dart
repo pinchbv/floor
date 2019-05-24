@@ -106,7 +106,7 @@ void main() {
   });
 
   group('Foreign key', () {
-    test('Create table statement with foreing key', () {
+    test('Create table statement with foreign key', () {
       final foreignKey = ForeignKey(
         'parentName',
         ['parentColumn'],

@@ -194,27 +194,42 @@ class EntityProcessor extends Processor<Entity> {
 
   @nonNull
   PrimaryKey _getPrimaryKey(final List<Field> fields) {
+    final compoundPrimaryKey = _getCompoundPrimaryKey(fields);
+
+    if (compoundPrimaryKey != null) {
+      return compoundPrimaryKey;
+    } else {
+      return _getPrimaryKeyFromAnnotation(fields);
+    }
+  }
+
+  @nullable
+  PrimaryKey _getCompoundPrimaryKey(final List<Field> fields) {
     final compoundPrimaryKeyColumnNames = _entityTypeChecker
         .firstAnnotationOfExact(_classElement)
         .getField(AnnotationField.ENTITY_PRIMARY_KEYS)
         ?.toListValue()
         ?.map((object) => object.toStringValue());
 
-    if (compoundPrimaryKeyColumnNames != null &&
-        compoundPrimaryKeyColumnNames.isNotEmpty) {
-      final compoundPrimaryKeyFields = fields.where((field) {
-        return compoundPrimaryKeyColumnNames.any(
-            (primaryKeyColumnName) => field.columnName == primaryKeyColumnName);
-      }).toList();
-
-      if (compoundPrimaryKeyFields.isEmpty) {
-        // TODO #105 more precise error
-        throw _processorError.MISSING_PRIMARY_KEY;
-      }
-
-      return PrimaryKey(compoundPrimaryKeyFields, false);
+    if (compoundPrimaryKeyColumnNames == null ||
+        compoundPrimaryKeyColumnNames.isEmpty) {
+      return null;
     }
 
+    final compoundPrimaryKeyFields = fields.where((field) {
+      return compoundPrimaryKeyColumnNames.any(
+          (primaryKeyColumnName) => field.columnName == primaryKeyColumnName);
+    }).toList();
+
+    if (compoundPrimaryKeyFields.isEmpty) {
+      throw _processorError.MISSING_PRIMARY_KEY;
+    }
+
+    return PrimaryKey(compoundPrimaryKeyFields, false);
+  }
+
+  @nonNull
+  PrimaryKey _getPrimaryKeyFromAnnotation(final List<Field> fields) {
     final primaryKeyField = fields.firstWhere(
         (field) => typeChecker(annotations.PrimaryKey)
             .hasAnnotationOfExact(field.fieldElement),
