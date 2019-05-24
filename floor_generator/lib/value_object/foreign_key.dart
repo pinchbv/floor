@@ -18,8 +18,13 @@ class ForeignKey {
 
   @nonNull
   String getDefinition() {
-    return 'FOREIGN KEY (${childColumns.join(', ')}) '
-        ' REFERENCES `$parentName` (${parentColumns.join(', ')})'
+    final escapedChildColumns =
+        childColumns.map((column) => '`$column`').join(', ');
+    final escapedParentColumns =
+        parentColumns.map((column) => '`$column`').join(', ');
+
+    return 'FOREIGN KEY ($escapedChildColumns)'
+        ' REFERENCES `$parentName` ($escapedParentColumns)'
         ' ON UPDATE $onUpdate'
         ' ON DELETE $onDelete';
   }

@@ -127,7 +127,7 @@ class DaoWriter extends Writer {
 
         constructorBuilder
           ..initializers.add(Code(
-              "$fieldName = UpdateAdapter(database, '${entity.name}', '${entity.primaryKey.field.columnName}', $valueMapper${requiresChangeListener ? ', changeListener' : ''})"));
+              "$fieldName = UpdateAdapter(database, '${entity.name}', '${entity.primaryKey.fields[0].columnName}', $valueMapper${requiresChangeListener ? ', changeListener' : ''})"));
       }
     }
 
@@ -155,7 +155,7 @@ class DaoWriter extends Writer {
 
         constructorBuilder
           ..initializers.add(Code(
-              "$fieldName = DeletionAdapter(database, '${entity.name}', '${entity.primaryKey.field.columnName}', $valueMapper${requiresChangeListener ? ', changeListener' : ''})"));
+              "$fieldName = DeletionAdapter(database, '${entity.name}', '${entity.primaryKey.fields[0].columnName}', $valueMapper${requiresChangeListener ? ', changeListener' : ''})"));
       }
     }
 

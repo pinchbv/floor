@@ -15,7 +15,7 @@ void main() {
     final database = await _createDatabase('''
       @entity
       class Person {
-        @PrimaryKey()
+        @primaryKey
         final int id;
       
         final String name;
@@ -42,7 +42,7 @@ void main() {
             },
             onCreate: (database, _) async {
               await database.execute(
-                  'CREATE TABLE IF NOT EXISTS `Person` (`id` INTEGER PRIMARY KEY NOT NULL, `name` TEXT)');
+                  'CREATE TABLE IF NOT EXISTS `Person` (`id` INTEGER, `name` TEXT, PRIMARY KEY (`id`))');
             },
           );
         }
@@ -82,7 +82,7 @@ void main() {
             },
             onCreate: (database, _) async {
               await database.execute(
-                  'CREATE TABLE IF NOT EXISTS `custom_table_name` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `custom_name` TEXT NOT NULL)');
+                  'CREATE TABLE IF NOT EXISTS `custom_table_name` (`id` INTEGER PRIMARY KEY AUTOINCREMENT, `custom_name` TEXT NOT NULL)');
             },
           );
         }

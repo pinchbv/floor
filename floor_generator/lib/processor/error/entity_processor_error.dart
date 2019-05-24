@@ -13,7 +13,8 @@ class EntityProcessorError {
     return InvalidGenerationSourceError(
       'There is no primary key defined on the entity ${_classElement.displayName}.',
       todo:
-          'Define a primary key for this entity with @primaryKey/@PrimaryKey().',
+          'Define a primary key for this entity with @primaryKey/@PrimaryKey() '
+          'or by using the primaryKeys field of @Entity().',
       element: _classElement,
     );
   }

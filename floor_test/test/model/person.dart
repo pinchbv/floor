@@ -1,6 +1,11 @@
 import 'package:floor/floor.dart';
 
-@Entity(tableName: 'person', indices: [Index(value: ['custom_name'])])
+@Entity(
+  tableName: 'person',
+  indices: [
+    Index(value: ['custom_name'])
+  ],
+)
 class Person {
   @primaryKey
   final int id;

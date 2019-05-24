@@ -10,7 +10,7 @@ import 'package:source_gen/source_gen.dart';
 import 'package:test/test.dart';
 
 void main() {
-  test('successfully process entity', () async {
+  test('Process entity', () async {
     final classElement = await _createClassElement('''
       @entity
       class Person {
@@ -29,25 +29,54 @@ void main() {
     final fields = classElement.fields
         .map((fieldElement) => FieldProcessor(fieldElement).process())
         .toList();
-    final primaryKey = PrimaryKey(fields.first, false);
+    final primaryKey = PrimaryKey([fields[0]], false);
     const foreignKeys = <ForeignKey>[];
     const indices = <Index>[];
     const constructor = "Person(row['id'] as int, row['name'] as String)";
-
-    expect(
-      actual,
-      equals(
-        Entity(
-          classElement,
-          name,
-          fields,
-          primaryKey,
-          foreignKeys,
-          indices,
-          constructor,
-        ),
-      ),
+    final expected = Entity(
+      classElement,
+      name,
+      fields,
+      primaryKey,
+      foreignKeys,
+      indices,
+      constructor,
     );
+    expect(actual, equals(expected));
+  });
+
+  test('Process entity with compound primary key', () async {
+    final classElement = await _createClassElement('''
+      @Entity(primaryKeys: ['id', 'name'])
+      class Person {
+        final int id;
+      
+        final String name;
+      
+        Person(this.id, this.name);
+      }
+    ''');
+
+    final actual = EntityProcessor(classElement).process();
+
+    const name = 'Person';
+    final fields = classElement.fields
+        .map((fieldElement) => FieldProcessor(fieldElement).process())
+        .toList();
+    final primaryKey = PrimaryKey(fields, false);
+    const foreignKeys = <ForeignKey>[];
+    const indices = <Index>[];
+    const constructor = "Person(row['id'] as int, row['name'] as String)";
+    final expected = Entity(
+      classElement,
+      name,
+      fields,
+      primaryKey,
+      foreignKeys,
+      indices,
+      constructor,
+    );
+    expect(actual, equals(expected));
   });
 }
 
