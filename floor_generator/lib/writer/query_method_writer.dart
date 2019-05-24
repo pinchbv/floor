@@ -50,8 +50,14 @@ class QueryMethodWriter implements Writer {
   }
 
   String _generateMethodBody() {
-    final parameters =
-        _queryMethod.parameters.map((parameter) => parameter.displayName);
+    final parameters = _queryMethod.parameters.map((parameter) {
+      final displayName = parameter.displayName;
+      if (isList(parameter.type)) {
+        return '...$displayName';
+      } else {
+        return displayName;
+      }
+    });
     final arguments =
         parameters.isNotEmpty ? '<dynamic>[${parameters.join(', ')}]' : null;
 

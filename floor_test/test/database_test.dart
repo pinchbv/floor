@@ -334,6 +334,22 @@ void main() {
         });
       });
     });
+
+    final person1 = Person(1, 'Simon');
+    final person2 = Person(2, 'Frank');
+    final person3 = Person(3, 'Paul');
+    final allPersons = [person1, person2, person3];
+
+    group('IN clause', () {
+      test('Find persons with IDs', () async {
+        await personDao.insertPersons(allPersons);
+        final ids = [person1.id, person2.id];
+
+        final actual = await personDao.findPersonWithIds(ids);
+
+        expect(actual, equals([person1, person2]));
+      });
+    });
   });
 }
 

@@ -125,6 +125,23 @@ void main() {
       }
     '''));
   });
+
+  test('Query with IN clause', () async {
+    final queryMethod = await _createQueryMethod('''
+      @Query('SELECT * FROM Person WHERE id IN (:ids)')
+      Future<List<Person>> findWithIds(List<int> ids);
+    ''');
+
+    final actual = QueryMethodWriter(queryMethod).write();
+
+    expect(actual, equalsDart(r'''
+      @override
+      Future<List<Person>> findWithIds(List<int> ids) async {
+        final valueList1 = ids.map((_) => '?').join(', ');
+        return _queryAdapter.queryList('SELECT * FROM Person WHERE id IN (valueList1)', arguments: <dynamic>[...ids], mapper: _personMapper);
+      }
+    '''));
+  });
 }
 
 Future<QueryMethod> _createQueryMethod(final String method) async {
