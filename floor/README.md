@@ -22,6 +22,7 @@ This package is still in an early phase and the API will likely change.
 1. [Transactions](#transactions)
 1. [Entities](#entities)
 1. [Foreign Keys](#foreign-keys)
+1. [Primary Keys](#primary-keys)
 1. [Indices](#indices)
 1. [Migrations](#migrations)
 1. [In-Memory Database](#in-memory-database)
