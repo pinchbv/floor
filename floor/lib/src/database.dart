@@ -8,7 +8,7 @@ abstract class FloorDatabase {
   @protected
   final changeListener = StreamController<String>.broadcast();
 
-  /// Use this whenever you want need direct access to the sqflite database.
+  /// Use this whenever you need direct access to the sqflite database.
   sqflite.DatabaseExecutor database;
 
   /// Closes the database.

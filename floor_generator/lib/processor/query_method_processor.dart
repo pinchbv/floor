@@ -36,7 +36,6 @@ class QueryMethodProcessor extends Processor<QueryMethod> {
     final returnsStream = isStream(rawReturnType);
 
     _assertReturnsFutureOrStream(rawReturnType, returnsStream);
-    _assertQueryParameters(query, parameters);
 
     final flattenedReturnType = _getFlattenedReturnType(
       rawReturnType,
@@ -71,7 +70,25 @@ class QueryMethodProcessor extends Processor<QueryMethod> {
 
     if (query == null || query.isEmpty) throw _processorError.NO_QUERY_DEFINED;
 
-    return query.replaceAll(RegExp(r':[^\s)]+'), '?');
+    final substitutedQuery = query.replaceAll(RegExp(r':[^\s)]+'), '?');
+    _assertQueryParameters(substitutedQuery, _methodElement.parameters);
+    return _replaceInClauseArguments(substitutedQuery);
+  }
+
+  @nonNull
+  String _replaceInClauseArguments(final String query) {
+    var counter = 0;
+    return query.replaceAllMapped(
+      RegExp(r'( in )\([?]\)', caseSensitive: false),
+      (match) {
+        counter++;
+        final matchedString = match.input.substring(match.start, match.end);
+        return matchedString.replaceFirst(
+          RegExp(r'(\?)'),
+          '\$valueList$counter',
+        );
+      },
+    );
   }
 
   @nonNull

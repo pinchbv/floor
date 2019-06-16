@@ -137,8 +137,26 @@ void main() {
     expect(actual, equalsDart(r'''
       @override
       Future<List<Person>> findWithIds(List<int> ids) async {
-        final valueList1 = ids.map((_) => '?').join(', ');
-        return _queryAdapter.queryList('SELECT * FROM Person WHERE id IN (valueList1)', arguments: <dynamic>[...ids], mapper: _personMapper);
+        final valueList1 = ids.map((value) => '$value').join(', ');
+        return _queryAdapter.queryList('SELECT * FROM Person WHERE id IN ($valueList1)', mapper: _personMapper);
+      }
+    '''));
+  });
+
+  test('Query with multiple IN clauses', () async {
+    final queryMethod = await _createQueryMethod('''
+      @Query('SELECT * FROM Person WHERE id IN (:ids) AND id IN (:idx)')
+      Future<List<Person>> findWithIds(List<int> ids, List<int> idx);
+    ''');
+
+    final actual = QueryMethodWriter(queryMethod).write();
+
+    expect(actual, equalsDart(r'''
+      @override
+      Future<List<Person>> findWithIds(List<int> ids, List<int> idx) async {
+        final valueList1 = ids.map((value) => '$value').join(', ');
+        final valueList2 = idx.map((value) => '$value').join(', ');
+        return _queryAdapter.queryList('SELECT * FROM Person WHERE id IN ($valueList1) AND id IN ($valueList2)', mapper: _personMapper);
       }
     '''));
   });
