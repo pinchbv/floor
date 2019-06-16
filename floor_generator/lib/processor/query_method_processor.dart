@@ -77,15 +77,15 @@ class QueryMethodProcessor extends Processor<QueryMethod> {
 
   @nonNull
   String _replaceInClauseArguments(final String query) {
-    var counter = 0;
+    var index = 0;
     return query.replaceAllMapped(
       RegExp(r'( in )\([?]\)', caseSensitive: false),
       (match) {
-        counter++;
+        index++;
         final matchedString = match.input.substring(match.start, match.end);
         return matchedString.replaceFirst(
           RegExp(r'(\?)'),
-          '\$valueList$counter',
+          '\$valueList$index',
         );
       },
     );
