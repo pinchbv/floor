@@ -53,17 +53,6 @@ void main() {
       expect(actual, equals('SELECT * FROM Person WHERE id = ?'));
     });
 
-    test('parse advanced query', () async {
-      final methodElement = await _createQueryMethodElement('''
-      @Query('update sports set rated = 1 where id in (:ids)')
-      Future<void> setRated(List<int> ids);
-    ''');
-
-      final actual = QueryMethodProcessor(methodElement, []).process().query;
-
-      expect(actual, equals('update sports set rated = 1 where id in (?)'));
-    });
-
     test('parse multiline query', () async {
       final methodElement = await _createQueryMethodElement("""
         @Query('''
@@ -93,6 +82,54 @@ void main() {
       expect(
         actual,
         equals('SELECT * FROM person WHERE id = ? AND custom_name = ?'),
+      );
+    });
+
+    test('Parse IN clause', () async {
+      final methodElement = await _createQueryMethodElement('''
+      @Query('update sports set rated = 1 where id in (:ids)')
+      Future<void> setRated(List<int> ids);
+    ''');
+
+      final actual = QueryMethodProcessor(methodElement, []).process().query;
+
+      expect(
+        actual,
+        equals(r'update sports set rated = 1 where id in ($valueList1)'),
+      );
+    });
+
+    test('Parse query with multiple IN clauses', () async {
+      final methodElement = await _createQueryMethodElement('''
+      @Query('update sports set rated = 1 where id in (:ids) and where foo in (:bar)')
+      Future<void> setRated(List<int> ids, List<int> bar);
+    ''');
+
+      final actual = QueryMethodProcessor(methodElement, []).process().query;
+
+      expect(
+        actual,
+        equals(
+          r'update sports set rated = 1 where id in ($valueList1) '
+          r'and where foo in ($valueList2)',
+        ),
+      );
+    });
+
+    test('Parse query with IN clause and other parameter', () async {
+      final methodElement = await _createQueryMethodElement('''
+      @Query('update sports set rated = 1 where id in (:ids) AND foo = :bar')
+      Future<void> setRated(List<int> ids, int bar);
+    ''');
+
+      final actual = QueryMethodProcessor(methodElement, []).process().query;
+
+      expect(
+        actual,
+        equals(
+          r'update sports set rated = 1 where id in ($valueList1) '
+          r'AND foo = ?',
+        ),
       );
     });
   });

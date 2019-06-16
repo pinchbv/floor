@@ -50,22 +50,57 @@ class QueryMethodWriter implements Writer {
   }
 
   String _generateMethodBody() {
-    final parameters =
-        _queryMethod.parameters.map((parameter) => parameter.displayName);
-    final arguments =
-        parameters.isNotEmpty ? '<dynamic>[${parameters.join(', ')}]' : null;
+    final _methodBody = StringBuffer();
 
+    final valueLists = _generateInClauseValueLists();
+    if (valueLists.isNotEmpty) {
+      _methodBody.write(valueLists.join(''));
+    }
+
+    final arguments = _generateArguments();
     if (_queryMethod.returnsVoid) {
-      return _generateNoReturnQuery(arguments);
+      _methodBody.write(_generateNoReturnQuery(arguments));
+      return _methodBody.toString();
     }
 
     final mapper = '_${decapitalize(_queryMethod.entity.name)}Mapper';
-
     if (_queryMethod.returnsStream) {
-      return _generateStreamQuery(arguments, mapper);
+      _methodBody.write(_generateStreamQuery(arguments, mapper));
     } else {
-      return _generateQuery(arguments, mapper);
+      _methodBody.write(_generateQuery(arguments, mapper));
     }
+
+    return _methodBody.toString();
+  }
+
+  @nonNull
+  List<String> _generateInClauseValueLists() {
+    var index = 0;
+    return _queryMethod.parameters
+        .map((parameter) {
+          if (isList(parameter.type)) {
+            index++;
+            return "final valueList$index = ${parameter.displayName}.map((value) => '\$value').join(', ');";
+          }
+        })
+        .where((string) => string != null)
+        .toList();
+  }
+
+  @nonNull
+  List<String> _generateParameters() {
+    return _queryMethod.parameters
+        .map((parameter) {
+          if (!isList(parameter.type)) return parameter.displayName;
+        })
+        .where((string) => string != null)
+        .toList();
+  }
+
+  @nullable
+  String _generateArguments() {
+    final parameters = _generateParameters();
+    return parameters.isNotEmpty ? '<dynamic>[${parameters.join(', ')}]' : null;
   }
 
   @nonNull
