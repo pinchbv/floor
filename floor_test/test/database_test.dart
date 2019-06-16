@@ -344,7 +344,7 @@ void main() {
         await personDao.insertPersons(allPersons);
         final ids = [person1.id, person2.id];
 
-        final actual = await personDao.findPersonWithIds(ids);
+        final actual = await personDao.findPersonsWithIds(ids);
 
         expect(actual, equals([person1, person2]));
       });

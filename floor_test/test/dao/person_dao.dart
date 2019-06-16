@@ -20,7 +20,7 @@ abstract class PersonDao {
   Future<Person> findPersonByIdAndName(int id, String name);
 
   @Query('SELECT * FROM person WHERE id IN (:ids)')
-  Future<List<Person>> findPersonWithIds(List<int> ids);
+  Future<List<Person>> findPersonsWithIds(List<int> ids);
 
   @Insert(onConflict: OnConflictStrategy.REPLACE)
   Future<void> insertPerson(Person person);
