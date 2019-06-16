@@ -188,7 +188,7 @@ Stream<List<Person>> findAllPersonsAsStream(); // stream return
 Future<void> deleteAllPersons(); // query without returning an entity
 
 @Query('SELECT * FROM Person WHERE id IN (:ids)')
-Future<Person> findPersonsWithIds(List<int> ids); // query with IN clause
+Future<List<Person>> findPersonsWithIds(List<int> ids); // query with IN clause
 ````
 
 ## Persisting Data Changes
