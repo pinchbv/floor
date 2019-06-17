@@ -131,6 +131,18 @@ void main() {
         final actual = await personDao.findAllPersons();
         expect(actual, equals(newPersons));
       });
+
+      test('Reactivity is retained when using transactions', () async {
+        final persons = [Person(1, 'Simon'), Person(2, 'Frank')];
+        await personDao.insertPersons(persons);
+        final newPersons = [Person(3, 'Paul'), Person(4, 'Karl')];
+
+        final actual = personDao.findAllPersonsAsStream();
+        expect(actual, emits(persons));
+        await personDao.replacePersons(newPersons);
+
+        expect(actual, emits(newPersons));
+      });
     });
 
     group('change items and return int/list of int', () {

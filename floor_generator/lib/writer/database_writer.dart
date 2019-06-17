@@ -26,7 +26,23 @@ class DatabaseWriter implements Writer {
       ..extend = refer(databaseName)
       ..methods.add(_generateOpenMethod(database))
       ..methods.addAll(_generateDaoGetters(database))
-      ..fields.addAll(_generateDaoInstances(database)));
+      ..fields.addAll(_generateDaoInstances(database))
+      ..constructors.add(_generateConstructor()));
+  }
+
+  @nonNull
+  Constructor _generateConstructor() {
+    return Constructor((builder) {
+      final parameter = Parameter((builder) => builder
+        ..name = 'listener'
+        ..type = refer('StreamController<String>'));
+
+      return builder
+        ..body = const Code(
+          'changeListener = listener ?? StreamController<String>.broadcast();',
+        )
+        ..optionalParameters.add(parameter);
+    });
   }
 
   @nonNull

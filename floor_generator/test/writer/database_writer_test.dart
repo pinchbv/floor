@@ -28,6 +28,10 @@ void main() {
 
     expect(actual, equalsDart(r'''
       class _$TestDatabase extends TestDatabase {
+        _$TestDatabase([StreamController<String> listener]) {
+         changeListener = listener ?? StreamController<String>.broadcast();
+        }
+      
         Future<sqflite.Database> open(String name, List<Migration> migrations) async {
           final path = join(await sqflite.getDatabasesPath(), name);
       
@@ -68,6 +72,10 @@ void main() {
 
     expect(actual, equalsDart(r'''
       class _$TestDatabase extends TestDatabase {
+        _$TestDatabase([StreamController<String> listener]) {
+          changeListener = listener ?? StreamController<String>.broadcast();
+        }
+        
         Future<sqflite.Database> open(String name, List<Migration> migrations) async {
           final path = join(await sqflite.getDatabasesPath(), name);
       
