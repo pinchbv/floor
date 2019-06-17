@@ -86,41 +86,6 @@ void main() {
 Future<DeletionMethod> _createDeletionMethod(
   final String methodSignature,
 ) async {
-  final library = await resolveSource('''
-      library test;
-      
-      import 'package:floor_annotation/floor_annotation.dart';
-      
-      @dao
-      abstract class PersonDao {
-      
-        $methodSignature
-      }
-      
-      @entity
-      class Person {
-        @primaryKey
-        final int id;
-      
-        final String name;
-      
-        Person(this.id, this.name);
-      }
-      ''', (resolver) async {
-    return LibraryReader(await resolver.findLibraryByName('test'));
-  });
-
-  final daoClass = library.classes.firstWhere((classElement) =>
-      typeChecker(annotations.dao.runtimeType)
-          .hasAnnotationOfExact(classElement));
-
-  final entities = library.classes
-      .where((classElement) =>
-          typeChecker(annotations.Entity).hasAnnotationOfExact(classElement))
-      .map((classElement) => EntityProcessor(classElement).process())
-      .toList();
-
-  final dao =
-      DaoProcessor(daoClass, 'personDao', 'TestDatabase', entities).process();
+  final dao = await createDao(methodSignature);
   return dao.deletionMethods.first;
 }
