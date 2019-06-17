@@ -45,7 +45,7 @@ This package is still in an early phase and the API will likely change.
     dependencies:
       flutter:
         sdk: flutter
-      floor: ^0.5.0
+      floor: ^0.6.0
     
     dev_dependencies:
       floor_generator: ^0.5.0
@@ -400,7 +400,7 @@ final migration1to2 = Migration(1, 2, (database) {
   database.execute('ALTER TABLE person ADD COLUMN nickname TEXT');
 });
 
-final database = await $Floor
+final database = await $FloorAppDatabase
     .databaseBuilder('app_database.db')
     .addMigrations([migration1to2])
     .build();

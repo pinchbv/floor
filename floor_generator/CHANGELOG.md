@@ -1,5 +1,12 @@
 # Changelog
 
+# 0.6.0
+
+### 🚀 Features
+
+* Add support for IN clauses in query statements
+* Enable compound primary keys
+
 # 0.5.0
 
 ### Changes
