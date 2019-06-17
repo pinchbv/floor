@@ -2,7 +2,7 @@ name: floor_annotation
 description: >
   A supportive SQLite abstraction for your Flutter applications.
   Don't use this package. Import the floor package.
-version: 0.3.1
+version: 0.4.0
 homepage: https://github.com/vitusortner/floor
 author: Vitus Ortner <vitusortner.dev@gmail.com>
 

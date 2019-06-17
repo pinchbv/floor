@@ -1,5 +1,9 @@
 # Changelog
 
+# 0.4.0
+
+* Add primary key field to @Entity annotation
+
 # 0.3.1
 
 ### Changes
