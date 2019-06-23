@@ -364,13 +364,14 @@ void main() {
 
     group('LIKE operator', () {
       test('Find persons with name LIKE', () async {
-        final person1 = Person(1, 'Simon');
-        final person2 = Person(2, 'Frank');
-        final person3 = Person(3, 'Paul');
-        final persons = [person1, person2, person3];
+        final persons = [
+          Person(1, 'Simon'),
+          Person(2, 'Frank'),
+          Person(3, 'Paul')
+        ];
         await personDao.insertPersons(persons);
 
-        final actual = await personDao.findPersonsWithNameLike('%a%');
+        final actual = await personDao.findPersonsWithNamesLike('%a%');
 
         final expectedPersons =
             persons.where((person) => person.name.contains('a'));

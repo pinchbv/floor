@@ -23,7 +23,7 @@ abstract class PersonDao {
   Future<List<Person>> findPersonsWithIds(List<int> ids);
 
   @Query('SELECT * FROM person WHERE custom_name LIKE :name')
-  Future<List<Person>> findPersonsWithNameLike(String name);
+  Future<List<Person>> findPersonsWithNamesLike(String name);
 
   @Insert(onConflict: OnConflictStrategy.REPLACE)
   Future<void> insertPerson(Person person);
