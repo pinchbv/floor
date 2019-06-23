@@ -169,9 +169,10 @@ Method signatures turn into query methods by adding the `@Query()` annotation wi
 Be patient about the correctness of your SQL statements.
 They are only partly validated while generating the code.
 These queries have to return either a `Future` or a `Stream` of an entity or `void`.
-Returning `Future<void>` comes in handy whenever you want to delete the full content of a table.
+Returning `Future<void>` comes in handy whenever you want to delete the full content of a table, for instance.
+Some query method examples can be seen in the following.
 
-````dart
+```dart
 @Query('SELECT * FROM Person WHERE id = :id')
 Future<Person> findPersonById(int id);
 
@@ -189,7 +190,20 @@ Future<void> deleteAllPersons(); // query without returning an entity
 
 @Query('SELECT * FROM Person WHERE id IN (:ids)')
 Future<List<Person>> findPersonsWithIds(List<int> ids); // query with IN clause
-````
+```
+
+Query arguments, when using SQLite's `LIKE` operator, have to be supplied by the input of a method.
+It's not possible to define a pattern matching argument like `%foo%` in the query itself.
+
+```dart
+// dao
+@Query('SELECT * FROM Person WHERE name LIKE :name')
+Future<List<City>> findPersonsWithNameLike(String name);
+
+// usage
+final name = '%foo%';
+await dao.findPersonsWithNameLike(name);
+``` 
 
 ## Persisting Data Changes
 Use the `@insert`, `@update` and `@delete` annotations for inserting and changing persistent data.

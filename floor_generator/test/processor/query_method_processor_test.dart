@@ -132,6 +132,17 @@ void main() {
         ),
       );
     });
+
+    test('Parse query with LIKE operator', () async {
+      final methodElement = await _createQueryMethodElement('''
+      @Query('SELECT * FROM Persons WHERE name LIKE :name')
+      Future<List<Person>> findPersonsWhereNameLike(String name);
+    ''');
+
+      final actual = QueryMethodProcessor(methodElement, []).process().query;
+
+      expect(actual, equals('SELECT * FROM Persons WHERE name LIKE ?'));
+    });
   });
 
   group('errors', () {
