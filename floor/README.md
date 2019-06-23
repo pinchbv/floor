@@ -45,10 +45,10 @@ This package is still in an early phase and the API will likely change.
     dependencies:
       flutter:
         sdk: flutter
-      floor: ^0.6.0
+      floor: ^0.7.0
     
     dev_dependencies:
-      floor_generator: ^0.5.0
+      floor_generator: ^0.7.0
       build_runner: ^1.4.0
     ````
 

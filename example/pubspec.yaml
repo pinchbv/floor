@@ -12,12 +12,10 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  floor:
-    path: ../floor/
+  floor: ^0.7.0
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  floor_generator:
-    path: ../floor_generator/
+  floor_generator: ^0.7.0
   build_runner: ^1.4.0
