@@ -361,6 +361,23 @@ void main() {
         expect(actual, equals([person1, person2]));
       });
     });
+
+    group('LIKE operator', () {
+      test('Find persons with name LIKE', () async {
+        final persons = [
+          Person(1, 'Simon'),
+          Person(2, 'Frank'),
+          Person(3, 'Paul')
+        ];
+        await personDao.insertPersons(persons);
+
+        final actual = await personDao.findPersonsWithNamesLike('%a%');
+
+        final expectedPersons =
+            persons.where((person) => person.name.contains('a'));
+        expect(actual, equals(expectedPersons));
+      });
+    });
   });
 }
 
