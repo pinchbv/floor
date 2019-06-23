@@ -1,5 +1,11 @@
 # Changelog
 
+# 0.7.0
+
+### 🐛 Bug Fixes
+
+* Retain reactivity when using transactions
+
 # 0.6.0
 
 ### 🚀 Features
