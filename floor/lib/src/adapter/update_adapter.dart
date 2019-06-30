@@ -62,13 +62,13 @@ class UpdateAdapter<T> {
     final ConflictAlgorithm conflictAlgorithm,
   ) async {
     final values = _valueMapper(item);
-    final int primaryKey = values[_primaryKeyColumnName];
+    final dynamic primaryKey = values[_primaryKeyColumnName];
 
     final result = await _database.update(
       _entityName,
       values,
       where: '$_primaryKeyColumnName = ?',
-      whereArgs: <int>[primaryKey],
+      whereArgs: <dynamic>[primaryKey],
       conflictAlgorithm: conflictAlgorithm,
     );
     if (_changeListener != null && result != 0) {
@@ -84,13 +84,13 @@ class UpdateAdapter<T> {
     final batch = _database.batch();
     for (final item in items) {
       final values = _valueMapper(item);
-      final int primaryKey = values[_primaryKeyColumnName];
+      final dynamic primaryKey = values[_primaryKeyColumnName];
 
       batch.update(
         _entityName,
         values,
         where: '$_primaryKeyColumnName = ?',
-        whereArgs: <int>[primaryKey],
+        whereArgs: <dynamic>[primaryKey],
         conflictAlgorithm: conflictAlgorithm,
       );
     }

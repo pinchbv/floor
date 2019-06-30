@@ -46,12 +46,12 @@ class DeletionAdapter<T> {
   }
 
   Future<int> _delete(final T item) async {
-    final int primaryKey = _valueMapper(item)[_primaryKeyColumnName];
+    final dynamic primaryKey = _valueMapper(item)[_primaryKeyColumnName];
 
     final result = await _database.delete(
       _entityName,
       where: '$_primaryKeyColumnName = ?',
-      whereArgs: <int>[primaryKey],
+      whereArgs: <dynamic>[primaryKey],
     );
     if (_changeListener != null && result != 0) {
       _changeListener.add(_entityName);
@@ -62,12 +62,12 @@ class DeletionAdapter<T> {
   Future<int> _deleteList(final List<T> items) async {
     final batch = _database.batch();
     for (final item in items) {
-      final int primaryKey = _valueMapper(item)[_primaryKeyColumnName];
+      final dynamic primaryKey = _valueMapper(item)[_primaryKeyColumnName];
 
       batch.delete(
         _entityName,
         where: '$_primaryKeyColumnName = ?',
-        whereArgs: <int>[primaryKey],
+        whereArgs: <dynamic>[primaryKey],
       );
     }
     final result = (await batch.commit(noResult: false)).cast<int>();
