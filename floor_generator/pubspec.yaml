@@ -21,9 +21,9 @@ dependencies:
     path: ../floor_annotation/
 
 dev_dependencies:
-  test: ^1.6.3
-  build_test: ^0.10.7+3
+  test: ^1.6.4
+  build_test: ^0.10.8
   path: ^1.6.2
   dart_style: ^1.2.7
   test_cov: ^0.2.0
-  mockito: ^4.0.0
+  mockito: ^4.1.0

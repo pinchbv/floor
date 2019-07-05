@@ -81,6 +81,8 @@ class QueryMethodWriter implements Writer {
           if (isList(parameter.type)) {
             index++;
             return "final valueList$index = ${parameter.displayName}.map((value) => '\$value').join(', ');";
+          } else {
+            return null;
           }
         })
         .where((string) => string != null)
@@ -91,7 +93,11 @@ class QueryMethodWriter implements Writer {
   List<String> _generateParameters() {
     return _queryMethod.parameters
         .map((parameter) {
-          if (!isList(parameter.type)) return parameter.displayName;
+          if (!isList(parameter.type)) {
+            return parameter.displayName;
+          } else {
+            return null;
+          }
         })
         .where((string) => string != null)
         .toList();
