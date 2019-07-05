@@ -20,4 +20,4 @@ dev_dependencies:
     sdk: flutter
   floor_generator:
     path: ../floor_generator/
-  build_runner: ^1.4.0
+  build_runner: ^1.6.1
