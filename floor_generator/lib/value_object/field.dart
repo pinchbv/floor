@@ -11,7 +11,8 @@ class Field {
   final String checkCondition;
 
   Field(this.fieldElement, this.name, this.columnName, this.isNullable,
-      this.sqlType, [this.checkCondition]);
+      this.sqlType,
+      [this.checkCondition]);
 
   /// The database column definition.
   @nonNull
