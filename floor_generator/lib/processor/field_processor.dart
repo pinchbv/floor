@@ -25,6 +25,7 @@ class FieldProcessor extends Processor<Field> {
         _columnInfoTypeChecker.hasAnnotationOfExact(_fieldElement);
     final columnName = _getColumnName(hasColumnInfoAnnotation, name);
     final isNullable = _getIsNullable(hasColumnInfoAnnotation);
+    final checkCondition = _getCheckCondition(hasColumnInfoAnnotation);
 
     return Field(
       _fieldElement,
@@ -32,6 +33,7 @@ class FieldProcessor extends Processor<Field> {
       columnName,
       isNullable,
       _getSqlType(),
+      checkCondition
     );
   }
 
@@ -55,6 +57,16 @@ class FieldProcessor extends Processor<Field> {
                 ?.toBoolValue() ??
             true
         : true; // all Dart fields are nullable by default
+  }
+
+    @nonNull
+  String _getCheckCondition(bool hasColumnInfoAnnotation) {
+    return hasColumnInfoAnnotation
+        ? _columnInfoTypeChecker
+                .firstAnnotationOfExact(_fieldElement)
+                .getField(AnnotationField.COLUMN_INFO_CHECK_CONSTRAINT)
+                ?.toStringValue() 
+        : null; // all Dart fields are nullable by default
   }
 
   @nonNull

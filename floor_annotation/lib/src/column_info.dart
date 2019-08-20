@@ -6,5 +6,8 @@ class ColumnInfo {
   /// Defines if the associated column is allowed to contain 'null'.
   final bool nullable;
 
-  const ColumnInfo({this.name, this.nullable = true});
+  /// If non null, defines a statement to include with a check parameter on the column.
+  final String checkCondition;
+
+  const ColumnInfo({this.name, this.nullable = true, this.checkCondition});
 }

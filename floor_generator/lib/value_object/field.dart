@@ -8,14 +8,10 @@ class Field {
   final String columnName;
   final bool isNullable;
   final String sqlType;
+  final String checkCondition;
 
-  Field(
-    this.fieldElement,
-    this.name,
-    this.columnName,
-    this.isNullable,
-    this.sqlType,
-  );
+  Field(this.fieldElement, this.name, this.columnName, this.isNullable,
+      this.sqlType, [this.checkCondition]);
 
   /// The database column definition.
   @nonNull
@@ -27,6 +23,9 @@ class Field {
     }
     if (!isNullable) {
       columnSpecification.write(' NOT NULL');
+    }
+    if (checkCondition != null) {
+      columnSpecification.write(' CHECK ($checkCondition)');
     }
 
     return '`$columnName` $sqlType$columnSpecification';
@@ -41,7 +40,8 @@ class Field {
           name == other.name &&
           columnName == other.columnName &&
           isNullable == other.isNullable &&
-          sqlType == other.sqlType;
+          sqlType == other.sqlType &&
+          checkCondition == other.checkCondition;
 
   @override
   int get hashCode =>
@@ -49,10 +49,11 @@ class Field {
       name.hashCode ^
       columnName.hashCode ^
       isNullable.hashCode ^
-      sqlType.hashCode;
+      sqlType.hashCode ^
+      checkCondition.hashCode;
 
   @override
   String toString() {
-    return 'Field{fieldElement: $fieldElement, name: $name, columnName: $columnName, isNullable: $isNullable, sqlType: $sqlType}';
+    return 'Field{fieldElement: $fieldElement, name: $name, columnName: $columnName, isNullable: $isNullable, checkCondition: $checkCondition, sqlType: $sqlType}';
   }
 }
