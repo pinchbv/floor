@@ -50,17 +50,12 @@ void main() {
     const autoGenerate = false;
     const fieldName = 'fieldName';
     const checkConstraint = '$fieldName > 0 AND $fieldName < 5';
-    final field = Field(
-      mockFieldElement,
-      fieldName,
-      'field1ColumnName',
-      true,
-      SqlType.INTEGER,
-      checkConstraint
-    );
+    final field = Field(mockFieldElement, fieldName, 'field1ColumnName', true,
+        SqlType.INTEGER, checkConstraint);
 
     final actual = field.getDatabaseDefinition(autoGenerate);
-    final expected = '`${field.columnName}` ${field.sqlType} CHECK ($checkConstraint)';
+    final expected =
+        '`${field.columnName}` ${field.sqlType} CHECK ($checkConstraint)';
     expect(actual, equals(expected));
   });
 }
