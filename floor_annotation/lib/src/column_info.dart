@@ -7,7 +7,7 @@ class ColumnInfo {
   final bool nullable;
 
   /// If non null, defines a statement to include with a check parameter on the column.
-  final String checkCondition;
+  final String checkConstraint;
 
-  const ColumnInfo({this.name, this.nullable = true, this.checkCondition});
+  const ColumnInfo({this.name, this.nullable = true, this.checkConstraint});
 }

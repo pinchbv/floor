@@ -63,8 +63,11 @@ void main() {
       
         @ColumnInfo(name: 'custom_name', nullable: false)
         final String name;
+
+        @ColumnInfo(name: 'enum_col', checkConstraint: 'enum_col >= 0 AND enum_col < 3')
+        final int enumCol;
       
-        Person(this.id, this.name);
+        Person(this.id, this.name, this.enumCol);
       }
     ''');
 
@@ -90,7 +93,7 @@ void main() {
             },
             onCreate: (database, _) async {
               await database.execute(
-                  'CREATE TABLE IF NOT EXISTS `custom_table_name` (`id` INTEGER PRIMARY KEY AUTOINCREMENT, `custom_name` TEXT NOT NULL)');
+                  'CREATE TABLE IF NOT EXISTS `custom_table_name` (`id` INTEGER PRIMARY KEY AUTOINCREMENT, `custom_name` TEXT NOT NULL, `enum_col` INTEGER CHECK (enum_col >= 0 AND enum_col < 3))');
             },
           );
         }
