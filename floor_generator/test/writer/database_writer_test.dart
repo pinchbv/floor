@@ -32,19 +32,31 @@ void main() {
          changeListener = listener ?? StreamController<String>.broadcast();
         }
       
-        Future<sqflite.Database> open(String name, List<Migration> migrations) async {
+        Future<sqflite.Database> open(String name, List<Migration> migrations,
+            {sqflite.OnDatabaseConfigureFn onConfigure,
+            sqflite.OnDatabaseCreateFn onCreate,
+            sqflite.OnDatabaseVersionChangeFn onUpgrade}) async {
           final path = join(await sqflite.getDatabasesPath(), name);
       
           return sqflite.openDatabase(
             path,
             version: 1,
             onConfigure: (database) async {
+              if (onConfigure != null) {
+                await onConfigure(database);
+              }
               await database.execute('PRAGMA foreign_keys = ON');
             },
             onUpgrade: (database, startVersion, endVersion) async {
+              if (onUpgrade != null) {
+                await onUpgrade(database, startVersion, endVersion);
+              }
               MigrationAdapter.runMigrations(database, startVersion, endVersion, migrations);
             },
-            onCreate: (database, _) async {
+            onCreate: (database, version) async {
+              if (onCreate != null) {
+                await onCreate(database, version);
+              }
               await database.execute(
                   'CREATE TABLE IF NOT EXISTS `Person` (`id` INTEGER, `name` TEXT, PRIMARY KEY (`id`))');
             },

@@ -94,11 +94,27 @@ class DatabaseWriter implements Writer {
       ..name = 'migrations'
       ..type = refer('List<Migration>'));
 
+    final onConfigureParameter = Parameter((builder) => builder
+      ..name = 'onConfigure'
+      ..named = true
+      ..type = refer('sqflite.OnDatabaseConfigureFn'));
+
+    final onCreateParameter = Parameter((builder) => builder
+      ..name = 'onCreate'
+      ..named = true
+      ..type = refer('sqflite.OnDatabaseCreateFn'));
+
+    final onUpgradeParameter = Parameter((builder) => builder
+      ..name = 'onUpgrade'
+      ..named = true
+      ..type = refer('sqflite.OnDatabaseVersionChangeFn'));
+
     return Method((builder) => builder
       ..name = 'open'
       ..returns = refer('Future<sqflite.Database>')
       ..modifier = MethodModifier.async
       ..requiredParameters.addAll([nameParameter, migrationsParameter])
+      ..optionalParameters.addAll([onConfigureParameter, onCreateParameter, onUpgradeParameter])
       ..body = Code('''
           final path = join(await sqflite.getDatabasesPath(), name);
 
@@ -106,12 +122,21 @@ class DatabaseWriter implements Writer {
             path,
             version: ${database.version},
             onConfigure: (database) async {
+              if (onConfigure != null) {
+                await onConfigure(database);
+              }
               await database.execute('PRAGMA foreign_keys = ON');
             },
             onUpgrade: (database, startVersion, endVersion) async {
+              if (onUpgrade != null) {
+                await onUpgrade(database, startVersion, endVersion);
+              }
               MigrationAdapter.runMigrations(database, startVersion, endVersion, migrations);
             },
-            onCreate: (database, _) async {
+            onCreate: (database, version) async {
+              if (onCreate != null) {
+                await onCreate(database, version);
+              }
               $createTableStatements
               $createIndexStatements
             },

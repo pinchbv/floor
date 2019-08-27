@@ -41,14 +41,40 @@ class DatabaseBuilderWriter extends Writer {
         ..name = 'migrations'
         ..type = refer('List<Migration>'))));
 
+    final onConfigureParameter = Parameter((builder) => builder
+      ..name = 'onConfigure'
+      ..named = true
+      ..type = refer('sqflite.OnDatabaseConfigureFn'));
+
+    final onCreateParameter = Parameter((builder) => builder
+      ..name = 'onCreate'
+      ..named = true
+      ..type = refer('sqflite.OnDatabaseCreateFn'));
+
+    final onUpgradeParameter = Parameter((builder) => builder
+      ..name = 'onUpgrade'
+      ..named = true
+      ..type = refer('sqflite.OnDatabaseVersionChangeFn'));
+
     final buildMethod = Method((builder) => builder
       ..returns = refer('Future<$_databaseName>')
       ..name = 'build'
+      ..optionalParameters.addAll([
+        onConfigureParameter,
+        onCreateParameter,
+        onUpgradeParameter,
+      ])
       ..modifier = MethodModifier.async
       ..docs.add('/// Creates the database and initializes it.')
       ..body = Code('''
         final database = _\$$_databaseName();
-        database.database = await database.open(name ?? ':memory:', _migrations);
+        database.database = await database.open(
+          name ?? ':memory:',
+          _migrations,
+          onConfigure: onConfigure,
+          onCreate: onCreate,
+          onUpgrade: onUpgrade,
+        );
         return database;
       '''));
 

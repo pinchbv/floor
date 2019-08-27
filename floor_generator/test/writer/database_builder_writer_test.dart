@@ -27,9 +27,18 @@ void main() {
         }
       
         /// Creates the database and initializes it.
-        Future<FooBar> build() async {
+        Future<FooBar> build(
+            {sqflite.OnDatabaseConfigureFn onConfigure,
+            sqflite.OnDatabaseCreateFn onCreate,
+            sqflite.OnDatabaseVersionChangeFn onUpgrade}) async {
           final database = _$FooBar();
-          database.database = await database.open(name ?? ':memory:', _migrations);
+          database.database = await database.open(
+            name ?? ':memory:',
+            _migrations,
+            onConfigure: onConfigure,
+            onCreate: onCreate,
+            onUpgrade: onUpgrade,
+          );
           return database;
         }
       }      
