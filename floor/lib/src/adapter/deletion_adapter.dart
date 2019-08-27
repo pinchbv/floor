@@ -1,18 +1,19 @@
 import 'dart:async';
 
+import 'package:floor/src/util/query_formatter.dart';
 import 'package:sqflite/sqflite.dart';
 
 class DeletionAdapter<T> {
   final DatabaseExecutor _database;
   final String _entityName;
-  final String _primaryKeyColumnName;
+  final List<String> _primaryKeyColumnName;
   final Map<String, dynamic> Function(T) _valueMapper;
   final StreamController<String> _changeListener;
 
   DeletionAdapter(
     final DatabaseExecutor database,
     final String entityName,
-    final String primaryKeyColumnName,
+    final List<String> primaryKeyColumnName,
     final Map<String, dynamic> Function(T) valueMapper, [
     final StreamController<String> changeListener,
   ])  : assert(database != null),
@@ -46,12 +47,13 @@ class DeletionAdapter<T> {
   }
 
   Future<int> _delete(final T item) async {
-    final int primaryKey = _valueMapper(item)[_primaryKeyColumnName];
-
     final result = await _database.delete(
       _entityName,
-      where: '$_primaryKeyColumnName = ?',
-      whereArgs: <int>[primaryKey],
+      where: QueryFormatter.getGroupPrimaryKeyQuery(_primaryKeyColumnName),
+      whereArgs: QueryFormatter.getGroupPrimaryKeyArgs(
+        _valueMapper(item),
+        _primaryKeyColumnName,
+      ),
     );
     if (_changeListener != null && result != 0) {
       _changeListener.add(_entityName);
@@ -62,12 +64,13 @@ class DeletionAdapter<T> {
   Future<int> _deleteList(final List<T> items) async {
     final batch = _database.batch();
     for (final item in items) {
-      final int primaryKey = _valueMapper(item)[_primaryKeyColumnName];
-
       batch.delete(
         _entityName,
-        where: '$_primaryKeyColumnName = ?',
-        whereArgs: <int>[primaryKey],
+        where: QueryFormatter.getGroupPrimaryKeyQuery(_primaryKeyColumnName),
+        whereArgs: QueryFormatter.getGroupPrimaryKeyArgs(
+          _valueMapper(item),
+          _primaryKeyColumnName,
+        ),
       );
     }
     final result = (await batch.commit(noResult: false)).cast<int>();
