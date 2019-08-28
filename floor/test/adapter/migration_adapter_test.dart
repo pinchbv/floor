@@ -75,11 +75,11 @@ void main() {
     ];
 
     final actual = () => MigrationAdapter.runMigrations(
-      mockMigrationDatabase,
-      startVersion,
-      endVersion,
-      migrations,
-    );
+          mockMigrationDatabase,
+          startVersion,
+          endVersion,
+          migrations,
+        );
 
     expect(actual, throwsStateError);
     verifyZeroInteractions(mockMigrationDatabase);
@@ -96,11 +96,11 @@ void main() {
     ];
 
     final actual = () => MigrationAdapter.runMigrations(
-      mockMigrationDatabase,
-      startVersion,
-      endVersion,
-      migrations,
-    );
+          mockMigrationDatabase,
+          startVersion,
+          endVersion,
+          migrations,
+        );
 
     expect(actual, throwsStateError);
     verifyZeroInteractions(mockMigrationDatabase);

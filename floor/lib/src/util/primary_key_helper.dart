@@ -7,9 +7,9 @@ class PrimaryKeyHelper {
 
   /// Obtains the primary key values
   static List<dynamic> getPrimaryKeyValues(
-      final List<String> primaryKeys,
-      final Map<String, dynamic> values,
-      ) {
+    final List<String> primaryKeys,
+    final Map<String, dynamic> values,
+  ) {
     return primaryKeys.map<dynamic>((key) => values[key]).toList();
   }
 }

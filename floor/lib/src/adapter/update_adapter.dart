@@ -11,12 +11,12 @@ class UpdateAdapter<T> {
   final StreamController<String> _changeListener;
 
   UpdateAdapter(
-      final DatabaseExecutor database,
-      final String entityName,
-      final List<String> primaryKeyColumnName,
-      final Map<String, dynamic> Function(T) valueMapper, [
-        final StreamController<String> changeListener,
-      ])  : assert(database != null),
+    final DatabaseExecutor database,
+    final String entityName,
+    final List<String> primaryKeyColumnName,
+    final Map<String, dynamic> Function(T) valueMapper, [
+    final StreamController<String> changeListener,
+  ])  : assert(database != null),
         assert(entityName != null),
         assert(entityName.isNotEmpty),
         assert(primaryKeyColumnName != null),
@@ -29,39 +29,39 @@ class UpdateAdapter<T> {
         _changeListener = changeListener;
 
   Future<void> update(
-      final T item,
-      final ConflictAlgorithm conflictAlgorithm,
-      ) async {
+    final T item,
+    final ConflictAlgorithm conflictAlgorithm,
+  ) async {
     await _update(item, conflictAlgorithm);
   }
 
   Future<void> updateList(
-      final List<T> items,
-      final ConflictAlgorithm conflictAlgorithm,
-      ) async {
+    final List<T> items,
+    final ConflictAlgorithm conflictAlgorithm,
+  ) async {
     if (items.isEmpty) return;
     await _updateList(items, conflictAlgorithm);
   }
 
   Future<int> updateAndReturnChangedRows(
-      final T item,
-      final ConflictAlgorithm conflictAlgorithm,
-      ) {
+    final T item,
+    final ConflictAlgorithm conflictAlgorithm,
+  ) {
     return _update(item, conflictAlgorithm);
   }
 
   Future<int> updateListAndReturnChangedRows(
-      final List<T> items,
-      final ConflictAlgorithm conflictAlgorithm,
-      ) async {
+    final List<T> items,
+    final ConflictAlgorithm conflictAlgorithm,
+  ) async {
     if (items.isEmpty) return 0;
     return _updateList(items, conflictAlgorithm);
   }
 
   Future<int> _update(
-      final T item,
-      final ConflictAlgorithm conflictAlgorithm,
-      ) async {
+    final T item,
+    final ConflictAlgorithm conflictAlgorithm,
+  ) async {
     final values = _valueMapper(item);
 
     final result = await _database.update(
@@ -81,9 +81,9 @@ class UpdateAdapter<T> {
   }
 
   Future<int> _updateList(
-      final List<T> items,
-      final ConflictAlgorithm conflictAlgorithm,
-      ) async {
+    final List<T> items,
+    final ConflictAlgorithm conflictAlgorithm,
+  ) async {
     final batch = _database.batch();
     for (final item in items) {
       final values = _valueMapper(item);

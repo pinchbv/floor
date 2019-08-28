@@ -13,7 +13,7 @@ void main() {
   const entityName = 'person';
   const primaryKeyColumnName = 'id';
   final valueMapper = (Person person) =>
-  <String, dynamic>{'id': person.id, 'name': person.name};
+      <String, dynamic>{'id': person.id, 'name': person.name};
   const conflictAlgorithm = ConflictAlgorithm.abort;
 
   final underTest = UpdateAdapter(
@@ -98,7 +98,7 @@ void main() {
       )).thenAnswer((_) => Future(() => 1));
 
       final actual =
-      await underTest.updateAndReturnChangedRows(person, conflictAlgorithm);
+          await underTest.updateAndReturnChangedRows(person, conflictAlgorithm);
 
       verify(mockDatabaseExecutor.update(
         entityName,
@@ -146,7 +146,7 @@ void main() {
 
     test('update items but supply empty list', () async {
       final actual =
-      await underTest.updateListAndReturnChangedRows([], conflictAlgorithm);
+          await underTest.updateListAndReturnChangedRows([], conflictAlgorithm);
 
       verifyZeroInteractions(mockDatabaseExecutor);
       expect(actual, equals(0));

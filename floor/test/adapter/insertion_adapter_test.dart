@@ -12,7 +12,7 @@ void main() {
 
   const entityName = 'person';
   final valueMapper = (Person person) =>
-  <String, dynamic>{'id': person.id, 'name': person.name};
+      <String, dynamic>{'id': person.id, 'name': person.name};
   const conflictAlgorithm = ConflictAlgorithm.ignore;
 
   tearDown(() {
@@ -96,7 +96,7 @@ void main() {
         )).thenAnswer((_) => Future(() => person.id));
 
         final actual =
-        await underTest.insertAndReturnId(person, conflictAlgorithm);
+            await underTest.insertAndReturnId(person, conflictAlgorithm);
 
         verify(mockDatabaseExecutor.insert(
           entityName,
@@ -116,7 +116,7 @@ void main() {
         )).thenAnswer((_) => Future(() => null));
 
         final actual =
-        await underTest.insertAndReturnId(person, conflictAlgorithm);
+            await underTest.insertAndReturnId(person, conflictAlgorithm);
 
         verify(mockDatabaseExecutor.insert(
           entityName,
@@ -136,7 +136,7 @@ void main() {
             .thenAnswer((_) => Future(() => primaryKeys));
 
         final actual =
-        await underTest.insertListAndReturnIds(persons, conflictAlgorithm);
+            await underTest.insertListAndReturnIds(persons, conflictAlgorithm);
 
         final values1 = <String, dynamic>{
           'id': person1.id,
@@ -165,7 +165,7 @@ void main() {
 
       test('insert empty list', () async {
         final actual =
-        await underTest.insertListAndReturnIds([], conflictAlgorithm);
+            await underTest.insertListAndReturnIds([], conflictAlgorithm);
 
         verifyZeroInteractions(mockDatabaseExecutor);
         expect(actual, equals(<int>[]));
