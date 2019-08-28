@@ -46,13 +46,13 @@ void main() {
                 _personUpdateAdapter = UpdateAdapter(
                     database,
                     'Person',
-                    'id',
+                    ['id'],
                     (Person item) =>
                         <String, dynamic>{'id': item.id, 'name': item.name}),
                 _personDeletionAdapter = DeletionAdapter(
                     database,
                     'Person',
-                    'id',
+                    ['id'],
                     (Person item) =>
                         <String, dynamic>{'id': item.id, 'name': item.name});
         
@@ -127,14 +127,14 @@ void main() {
                 _personUpdateAdapter = UpdateAdapter(
                     database,
                     'Person',
-                    'id',
+                    ['id'],
                     (Person item) =>
                         <String, dynamic>{'id': item.id, 'name': item.name},
                     changeListener),
                 _personDeletionAdapter = DeletionAdapter(
                     database,
                     'Person',
-                    'id',
+                    ['id'],
                     (Person item) =>
                         <String, dynamic>{'id': item.id, 'name': item.name},
                     changeListener);
