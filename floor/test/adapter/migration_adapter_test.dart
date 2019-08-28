@@ -3,7 +3,7 @@ import 'package:floor/src/migration.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/mockito.dart';
 
-import '../util/mocks.dart';
+import '../test_util/mocks.dart';
 
 void main() {
   final mockMigrationDatabase = MockSqfliteDatabase();
@@ -75,11 +75,11 @@ void main() {
     ];
 
     final actual = () => MigrationAdapter.runMigrations(
-          mockMigrationDatabase,
-          startVersion,
-          endVersion,
-          migrations,
-        );
+      mockMigrationDatabase,
+      startVersion,
+      endVersion,
+      migrations,
+    );
 
     expect(actual, throwsStateError);
     verifyZeroInteractions(mockMigrationDatabase);
@@ -96,11 +96,11 @@ void main() {
     ];
 
     final actual = () => MigrationAdapter.runMigrations(
-          mockMigrationDatabase,
-          startVersion,
-          endVersion,
-          migrations,
-        );
+      mockMigrationDatabase,
+      startVersion,
+      endVersion,
+      migrations,
+    );
 
     expect(actual, throwsStateError);
     verifyZeroInteractions(mockMigrationDatabase);

@@ -1,22 +1,22 @@
 import 'dart:async';
 
-import 'package:floor/src/util/query_formatter.dart';
+import 'package:floor/src/util/primary_key_helper.dart';
 import 'package:sqflite/sqflite.dart';
 
 class DeletionAdapter<T> {
   final DatabaseExecutor _database;
   final String _entityName;
-  final List<String> _primaryKeyColumnName;
+  final List<String> _primaryKeyColumnNames;
   final Map<String, dynamic> Function(T) _valueMapper;
   final StreamController<String> _changeListener;
 
   DeletionAdapter(
-    final DatabaseExecutor database,
-    final String entityName,
-    final List<String> primaryKeyColumnName,
-    final Map<String, dynamic> Function(T) valueMapper, [
-    final StreamController<String> changeListener,
-  ])  : assert(database != null),
+      final DatabaseExecutor database,
+      final String entityName,
+      final List<String> primaryKeyColumnName,
+      final Map<String, dynamic> Function(T) valueMapper, [
+        final StreamController<String> changeListener,
+      ])  : assert(database != null),
         assert(entityName != null),
         assert(entityName.isNotEmpty),
         assert(primaryKeyColumnName != null),
@@ -24,7 +24,7 @@ class DeletionAdapter<T> {
         assert(valueMapper != null),
         _database = database,
         _entityName = entityName,
-        _primaryKeyColumnName = primaryKeyColumnName,
+        _primaryKeyColumnNames = primaryKeyColumnName,
         _valueMapper = valueMapper,
         _changeListener = changeListener;
 
@@ -49,10 +49,10 @@ class DeletionAdapter<T> {
   Future<int> _delete(final T item) async {
     final result = await _database.delete(
       _entityName,
-      where: QueryFormatter.getGroupPrimaryKeyQuery(_primaryKeyColumnName),
-      whereArgs: QueryFormatter.getGroupPrimaryKeyArgs(
+      where: PrimaryKeyHelper.getWhereClause(_primaryKeyColumnNames),
+      whereArgs: PrimaryKeyHelper.getPrimaryKeyValues(
+        _primaryKeyColumnNames,
         _valueMapper(item),
-        _primaryKeyColumnName,
       ),
     );
     if (_changeListener != null && result != 0) {
@@ -66,10 +66,10 @@ class DeletionAdapter<T> {
     for (final item in items) {
       batch.delete(
         _entityName,
-        where: QueryFormatter.getGroupPrimaryKeyQuery(_primaryKeyColumnName),
-        whereArgs: QueryFormatter.getGroupPrimaryKeyArgs(
+        where: PrimaryKeyHelper.getWhereClause(_primaryKeyColumnNames),
+        whereArgs: PrimaryKeyHelper.getPrimaryKeyValues(
+          _primaryKeyColumnNames,
           _valueMapper(item),
-          _primaryKeyColumnName,
         ),
       );
     }

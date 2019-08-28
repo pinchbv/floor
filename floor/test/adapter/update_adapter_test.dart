@@ -1,26 +1,25 @@
 import 'package:floor/src/adapter/update_adapter.dart';
-import 'package:floor/src/util/query_formatter.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/mockito.dart';
 import 'package:sqflite/sqflite.dart';
 
-import '../util/mocks.dart';
-import '../util/person.dart';
+import '../test_util/mocks.dart';
+import '../test_util/person.dart';
 
 void main() {
   final mockDatabaseExecutor = MockDatabaseExecutor();
   final mockDatabaseBatch = MockDatabaseBatch();
 
   const entityName = 'person';
-  const primaryKeyColumnName = ['id'];
+  const primaryKeyColumnName = 'id';
   final valueMapper = (Person person) =>
-      <String, dynamic>{'id': person.id, 'name': person.name};
+  <String, dynamic>{'id': person.id, 'name': person.name};
   const conflictAlgorithm = ConflictAlgorithm.abort;
 
   final underTest = UpdateAdapter(
     mockDatabaseExecutor,
     entityName,
-    primaryKeyColumnName,
+    [primaryKeyColumnName],
     valueMapper,
   );
 
@@ -41,7 +40,7 @@ void main() {
       verify(mockDatabaseExecutor.update(
         entityName,
         values,
-        where: QueryFormatter.getGroupPrimaryKeyQuery(primaryKeyColumnName),
+        where: '$primaryKeyColumnName = ?',
         whereArgs: <dynamic>[person.id],
         conflictAlgorithm: conflictAlgorithm,
       ));
@@ -64,14 +63,14 @@ void main() {
         mockDatabaseBatch.update(
           entityName,
           values1,
-          where: QueryFormatter.getGroupPrimaryKeyQuery(primaryKeyColumnName),
+          where: '$primaryKeyColumnName = ?',
           whereArgs: <dynamic>[person1.id],
           conflictAlgorithm: conflictAlgorithm,
         ),
         mockDatabaseBatch.update(
           entityName,
           values2,
-          where: QueryFormatter.getGroupPrimaryKeyQuery(primaryKeyColumnName),
+          where: '$primaryKeyColumnName = ?',
           whereArgs: <dynamic>[person2.id],
           conflictAlgorithm: conflictAlgorithm,
         ),
@@ -93,18 +92,18 @@ void main() {
       when(mockDatabaseExecutor.update(
         entityName,
         values,
-        where: QueryFormatter.getGroupPrimaryKeyQuery(primaryKeyColumnName),
+        where: '$primaryKeyColumnName = ?',
         whereArgs: <dynamic>[person.id],
         conflictAlgorithm: conflictAlgorithm,
       )).thenAnswer((_) => Future(() => 1));
 
       final actual =
-          await underTest.updateAndReturnChangedRows(person, conflictAlgorithm);
+      await underTest.updateAndReturnChangedRows(person, conflictAlgorithm);
 
       verify(mockDatabaseExecutor.update(
         entityName,
         values,
-        where: QueryFormatter.getGroupPrimaryKeyQuery(primaryKeyColumnName),
+        where: '$primaryKeyColumnName = ?',
         whereArgs: <dynamic>[person.id],
         conflictAlgorithm: conflictAlgorithm,
       ));
@@ -129,14 +128,14 @@ void main() {
         mockDatabaseBatch.update(
           entityName,
           values1,
-          where: QueryFormatter.getGroupPrimaryKeyQuery(primaryKeyColumnName),
+          where: '$primaryKeyColumnName = ?',
           whereArgs: <dynamic>[person1.id],
           conflictAlgorithm: conflictAlgorithm,
         ),
         mockDatabaseBatch.update(
           entityName,
           values2,
-          where: QueryFormatter.getGroupPrimaryKeyQuery(primaryKeyColumnName),
+          where: '$primaryKeyColumnName = ?',
           whereArgs: <dynamic>[person2.id],
           conflictAlgorithm: conflictAlgorithm,
         ),
@@ -147,7 +146,7 @@ void main() {
 
     test('update items but supply empty list', () async {
       final actual =
-          await underTest.updateListAndReturnChangedRows([], conflictAlgorithm);
+      await underTest.updateListAndReturnChangedRows([], conflictAlgorithm);
 
       verifyZeroInteractions(mockDatabaseExecutor);
       expect(actual, equals(0));
