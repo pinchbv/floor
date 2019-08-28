@@ -1,18 +1,19 @@
 import 'dart:async';
 
+import 'package:floor/src/util/primary_key_helper.dart';
 import 'package:sqflite/sqflite.dart';
 
 class UpdateAdapter<T> {
   final DatabaseExecutor _database;
   final String _entityName;
-  final String _primaryKeyColumnName;
+  final List<String> _primaryKeyColumnName;
   final Map<String, dynamic> Function(T) _valueMapper;
   final StreamController<String> _changeListener;
 
   UpdateAdapter(
     final DatabaseExecutor database,
     final String entityName,
-    final String primaryKeyColumnName,
+    final List<String> primaryKeyColumnName,
     final Map<String, dynamic> Function(T) valueMapper, [
     final StreamController<String> changeListener,
   ])  : assert(database != null),
@@ -62,13 +63,15 @@ class UpdateAdapter<T> {
     final ConflictAlgorithm conflictAlgorithm,
   ) async {
     final values = _valueMapper(item);
-    final int primaryKey = values[_primaryKeyColumnName];
 
     final result = await _database.update(
       _entityName,
       values,
-      where: '$_primaryKeyColumnName = ?',
-      whereArgs: <int>[primaryKey],
+      where: PrimaryKeyHelper.getWhereClause(_primaryKeyColumnName),
+      whereArgs: PrimaryKeyHelper.getPrimaryKeyValues(
+        _primaryKeyColumnName,
+        values,
+      ),
       conflictAlgorithm: conflictAlgorithm,
     );
     if (_changeListener != null && result != 0) {
@@ -84,13 +87,15 @@ class UpdateAdapter<T> {
     final batch = _database.batch();
     for (final item in items) {
       final values = _valueMapper(item);
-      final int primaryKey = values[_primaryKeyColumnName];
 
       batch.update(
         _entityName,
         values,
-        where: '$_primaryKeyColumnName = ?',
-        whereArgs: <int>[primaryKey],
+        where: PrimaryKeyHelper.getWhereClause(_primaryKeyColumnName),
+        whereArgs: PrimaryKeyHelper.getPrimaryKeyValues(
+          _primaryKeyColumnName,
+          values,
+        ),
         conflictAlgorithm: conflictAlgorithm,
       );
     }

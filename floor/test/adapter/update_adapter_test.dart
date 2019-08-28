@@ -3,8 +3,8 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/mockito.dart';
 import 'package:sqflite/sqflite.dart';
 
-import '../util/mocks.dart';
-import '../util/person.dart';
+import '../test_util/mocks.dart';
+import '../test_util/person.dart';
 
 void main() {
   final mockDatabaseExecutor = MockDatabaseExecutor();
@@ -19,7 +19,7 @@ void main() {
   final underTest = UpdateAdapter(
     mockDatabaseExecutor,
     entityName,
-    primaryKeyColumnName,
+    [primaryKeyColumnName],
     valueMapper,
   );
 
@@ -41,7 +41,7 @@ void main() {
         entityName,
         values,
         where: '$primaryKeyColumnName = ?',
-        whereArgs: <int>[person.id],
+        whereArgs: <dynamic>[person.id],
         conflictAlgorithm: conflictAlgorithm,
       ));
     });
@@ -64,14 +64,14 @@ void main() {
           entityName,
           values1,
           where: '$primaryKeyColumnName = ?',
-          whereArgs: <int>[person1.id],
+          whereArgs: <dynamic>[person1.id],
           conflictAlgorithm: conflictAlgorithm,
         ),
         mockDatabaseBatch.update(
           entityName,
           values2,
           where: '$primaryKeyColumnName = ?',
-          whereArgs: <int>[person2.id],
+          whereArgs: <dynamic>[person2.id],
           conflictAlgorithm: conflictAlgorithm,
         ),
         mockDatabaseBatch.commit(noResult: false),
@@ -93,7 +93,7 @@ void main() {
         entityName,
         values,
         where: '$primaryKeyColumnName = ?',
-        whereArgs: <int>[person.id],
+        whereArgs: <dynamic>[person.id],
         conflictAlgorithm: conflictAlgorithm,
       )).thenAnswer((_) => Future(() => 1));
 
@@ -104,7 +104,7 @@ void main() {
         entityName,
         values,
         where: '$primaryKeyColumnName = ?',
-        whereArgs: <int>[person.id],
+        whereArgs: <dynamic>[person.id],
         conflictAlgorithm: conflictAlgorithm,
       ));
       expect(actual, equals(1));
@@ -129,14 +129,14 @@ void main() {
           entityName,
           values1,
           where: '$primaryKeyColumnName = ?',
-          whereArgs: <int>[person1.id],
+          whereArgs: <dynamic>[person1.id],
           conflictAlgorithm: conflictAlgorithm,
         ),
         mockDatabaseBatch.update(
           entityName,
           values2,
           where: '$primaryKeyColumnName = ?',
-          whereArgs: <int>[person2.id],
+          whereArgs: <dynamic>[person2.id],
           conflictAlgorithm: conflictAlgorithm,
         ),
         mockDatabaseBatch.commit(noResult: false),
