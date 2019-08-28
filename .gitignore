@@ -31,8 +31,8 @@
 .pub/
 build/
 pubspec.lock
-**/values/*.arb
 **/generated/i18n.dart
+**/values/*.arb
 
 # Android related
 **/android/**/gradle-wrapper.jar
