@@ -7,7 +7,7 @@ TypeChecker typeChecker(final Type type) => TypeChecker.fromRuntime(type);
 
 @nonNull
 bool isString(final DartType type) {
-  return _stringTypeChecker.isExactlyType(type);
+  return type.isDartCoreString;
 }
 
 @nonNull
@@ -27,7 +27,7 @@ bool isDouble(final DartType type) {
 
 @nonNull
 bool isList(final DartType type) {
-  return type.name == 'List' && type.element.library.isDartCore;
+  return type.isDartCoreList;
 }
 
 @nonNull
