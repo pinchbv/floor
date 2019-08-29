@@ -115,7 +115,7 @@ class DatabaseWriter implements Writer {
       ..modifier = MethodModifier.async
       ..requiredParameters.addAll([nameParameter, migrationsParameter])
       ..optionalParameters
-          .addAll([onConfigureParameter, onCreateParameter, onUpgradeParameter])
+          .addAll([onConfigureParameter, onCreateParameter, onUpgradeParameter,])
       ..body = Code('''
           final path = join(await sqflite.getDatabasesPath(), name);
 
