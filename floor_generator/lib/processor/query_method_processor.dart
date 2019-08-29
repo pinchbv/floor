@@ -100,7 +100,7 @@ class QueryMethodProcessor extends Processor<QueryMethod> {
 
     final type = returnsStream
         ? flattenStream(_methodElement.returnType)
-        : rawReturnType.flattenFutures(_methodElement.context.typeSystem);
+        : _methodElement.context.typeSystem.flatten(rawReturnType);
     if (returnsList) {
       return flattenList(type);
     }
@@ -111,7 +111,7 @@ class QueryMethodProcessor extends Processor<QueryMethod> {
   bool _getReturnsList(final DartType returnType, final bool returnsStream) {
     final type = returnsStream
         ? flattenStream(returnType)
-        : returnType.flattenFutures(_methodElement.context.typeSystem);
+        : _methodElement.context.typeSystem.flatten(returnType);
 
     return isList(type);
   }
