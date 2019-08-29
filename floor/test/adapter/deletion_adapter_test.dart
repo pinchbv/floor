@@ -2,8 +2,8 @@ import 'package:floor/src/adapter/deletion_adapter.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/mockito.dart';
 
-import '../util/mocks.dart';
-import '../util/person.dart';
+import '../test_util/mocks.dart';
+import '../test_util/person.dart';
 
 void main() {
   final mockDatabaseExecutor = MockDatabaseExecutor();
@@ -17,7 +17,7 @@ void main() {
   final underTest = DeletionAdapter(
     mockDatabaseExecutor,
     entityName,
-    primaryKeyColumnName,
+    [primaryKeyColumnName],
     valueMapper,
   );
 
@@ -34,7 +34,7 @@ void main() {
       verify(mockDatabaseExecutor.delete(
         entityName,
         where: '$primaryKeyColumnName = ?',
-        whereArgs: <int>[person.id],
+        whereArgs: <dynamic>[person.id],
       ));
     });
 
@@ -53,12 +53,12 @@ void main() {
         mockDatabaseBatch.delete(
           entityName,
           where: '$primaryKeyColumnName = ?',
-          whereArgs: <int>[person1.id],
+          whereArgs: <dynamic>[person1.id],
         ),
         mockDatabaseBatch.delete(
           entityName,
           where: '$primaryKeyColumnName = ?',
-          whereArgs: <int>[person2.id],
+          whereArgs: <dynamic>[person2.id],
         ),
         mockDatabaseBatch.commit(noResult: false),
       ]);
@@ -77,7 +77,7 @@ void main() {
       when(mockDatabaseExecutor.delete(
         entityName,
         where: '$primaryKeyColumnName = ?',
-        whereArgs: <int>[person.id],
+        whereArgs: <dynamic>[person.id],
       )).thenAnswer((_) => Future(() => 1));
 
       final actual = await underTest.deleteAndReturnChangedRows(person);
@@ -85,7 +85,7 @@ void main() {
       verify(mockDatabaseExecutor.delete(
         entityName,
         where: '$primaryKeyColumnName = ?',
-        whereArgs: <int>[person.id],
+        whereArgs: <dynamic>[person.id],
       ));
       expect(actual, equals(1));
     });
@@ -105,12 +105,12 @@ void main() {
         mockDatabaseBatch.delete(
           entityName,
           where: '$primaryKeyColumnName = ?',
-          whereArgs: <int>[person1.id],
+          whereArgs: <dynamic>[person1.id],
         ),
         mockDatabaseBatch.delete(
           entityName,
           where: '$primaryKeyColumnName = ?',
-          whereArgs: <int>[person2.id],
+          whereArgs: <dynamic>[person2.id],
         ),
         mockDatabaseBatch.commit(noResult: false),
       ]);

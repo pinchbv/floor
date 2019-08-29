@@ -1,18 +1,19 @@
 import 'dart:async';
 
+import 'package:floor/src/util/primary_key_helper.dart';
 import 'package:sqflite/sqflite.dart';
 
 class DeletionAdapter<T> {
   final DatabaseExecutor _database;
   final String _entityName;
-  final String _primaryKeyColumnName;
+  final List<String> _primaryKeyColumnNames;
   final Map<String, dynamic> Function(T) _valueMapper;
   final StreamController<String> _changeListener;
 
   DeletionAdapter(
     final DatabaseExecutor database,
     final String entityName,
-    final String primaryKeyColumnName,
+    final List<String> primaryKeyColumnName,
     final Map<String, dynamic> Function(T) valueMapper, [
     final StreamController<String> changeListener,
   ])  : assert(database != null),
@@ -23,7 +24,7 @@ class DeletionAdapter<T> {
         assert(valueMapper != null),
         _database = database,
         _entityName = entityName,
-        _primaryKeyColumnName = primaryKeyColumnName,
+        _primaryKeyColumnNames = primaryKeyColumnName,
         _valueMapper = valueMapper,
         _changeListener = changeListener;
 
@@ -46,12 +47,13 @@ class DeletionAdapter<T> {
   }
 
   Future<int> _delete(final T item) async {
-    final int primaryKey = _valueMapper(item)[_primaryKeyColumnName];
-
     final result = await _database.delete(
       _entityName,
-      where: '$_primaryKeyColumnName = ?',
-      whereArgs: <int>[primaryKey],
+      where: PrimaryKeyHelper.getWhereClause(_primaryKeyColumnNames),
+      whereArgs: PrimaryKeyHelper.getPrimaryKeyValues(
+        _primaryKeyColumnNames,
+        _valueMapper(item),
+      ),
     );
     if (_changeListener != null && result != 0) {
       _changeListener.add(_entityName);
@@ -62,12 +64,13 @@ class DeletionAdapter<T> {
   Future<int> _deleteList(final List<T> items) async {
     final batch = _database.batch();
     for (final item in items) {
-      final int primaryKey = _valueMapper(item)[_primaryKeyColumnName];
-
       batch.delete(
         _entityName,
-        where: '$_primaryKeyColumnName = ?',
-        whereArgs: <int>[primaryKey],
+        where: PrimaryKeyHelper.getWhereClause(_primaryKeyColumnNames),
+        whereArgs: PrimaryKeyHelper.getPrimaryKeyValues(
+          _primaryKeyColumnNames,
+          _valueMapper(item),
+        ),
       );
     }
     final result = (await batch.commit(noResult: false)).cast<int>();

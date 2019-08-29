@@ -19,7 +19,7 @@ abstract class MigrationAdapter {
         relevantMigrations.last.endVersion != endVersion) {
       throw StateError(
         'There is no migration supplied to update the database to the current version.'
-            ' Aborting the migration.',
+        ' Aborting the migration.',
       );
     }
 

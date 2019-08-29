@@ -4,8 +4,8 @@ import 'package:floor/src/adapter/query_adapter.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/mockito.dart';
 
-import '../util/mocks.dart';
-import '../util/person.dart';
+import '../test_util/mocks.dart';
+import '../test_util/person.dart';
 
 void main() {
   final mockDatabaseExecutor = MockDatabaseExecutor();
