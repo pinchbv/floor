@@ -43,7 +43,7 @@ class QueryMethod {
   bool get returnsList {
     final type = returnsStream
         ? flattenStream(rawReturnType)
-        : rawReturnType.flattenFutures(methodElement.context.typeSystem);
+        : methodElement.context.typeSystem.flatten(rawReturnType);
 
     return isList(type);
   }

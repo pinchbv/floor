@@ -10,20 +10,20 @@ environment:
   sdk: '>=2.3.0-dev <3.0.0'
 
 dependencies:
-  analyzer: ^0.36.3
-  build: ^1.1.4
+  analyzer: ^0.38.2
+  build: ^1.1.6
   code_builder: ^3.2.0
   meta: ^1.1.6
-  source_gen: ^0.9.4+2
-  build_config: ^0.4.0
+  source_gen: ^0.9.4+4
+  build_config: ^0.4.1+1
   collection: ^1.14.11
   floor_annotation:
     path: ../floor_annotation/
 
 dev_dependencies:
-  test: ^1.6.4
+  test: ^1.6.8
   build_test: ^0.10.8
   path: ^1.6.2
-  dart_style: ^1.2.7
+  dart_style: ^1.2.10
   test_cov: ^0.2.0
   mockito: ^4.1.0
