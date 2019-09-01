@@ -94,11 +94,16 @@ class DatabaseWriter implements Writer {
       ..name = 'migrations'
       ..type = refer('List<Migration>'));
 
+    final callbackParameter = Parameter((builder) => builder
+      ..name = 'callback'
+      ..type = refer('Callback'));
+
     return Method((builder) => builder
       ..name = 'open'
       ..returns = refer('Future<sqflite.Database>')
       ..modifier = MethodModifier.async
       ..requiredParameters.addAll([nameParameter, migrationsParameter])
+      ..optionalParameters.add(callbackParameter)
       ..body = Code('''
           final path = join(await sqflite.getDatabasesPath(), name);
 
@@ -108,12 +113,19 @@ class DatabaseWriter implements Writer {
             onConfigure: (database) async {
               await database.execute('PRAGMA foreign_keys = ON');
             },
+            onOpen: (database) async {
+              await callback?.onOpen?.call(database);
+            },
             onUpgrade: (database, startVersion, endVersion) async {
               MigrationAdapter.runMigrations(database, startVersion, endVersion, migrations);
+
+              await callback?.onUpgrade?.call(database, startVersion, endVersion);
             },
-            onCreate: (database, _) async {
+            onCreate: (database, version) async {
               $createTableStatements
               $createIndexStatements
+
+              await callback?.onCreate?.call(database, version);
             },
           );
           '''));

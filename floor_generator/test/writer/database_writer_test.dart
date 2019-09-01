@@ -32,7 +32,8 @@ void main() {
          changeListener = listener ?? StreamController<String>.broadcast();
         }
       
-        Future<sqflite.Database> open(String name, List<Migration> migrations) async {
+        Future<sqflite.Database> open(String name, List<Migration> migrations,
+            [Callback callback]) async {
           final path = join(await sqflite.getDatabasesPath(), name);
       
           return sqflite.openDatabase(
@@ -41,12 +42,20 @@ void main() {
             onConfigure: (database) async {
               await database.execute('PRAGMA foreign_keys = ON');
             },
-            onUpgrade: (database, startVersion, endVersion) async {
-              MigrationAdapter.runMigrations(database, startVersion, endVersion, migrations);
+            onOpen: (database) async {
+              await callback?.onOpen?.call(database);
             },
-            onCreate: (database, _) async {
+            onUpgrade: (database, startVersion, endVersion) async {
+              MigrationAdapter.runMigrations(
+                  database, startVersion, endVersion, migrations);
+
+              await callback?.onUpgrade?.call(database, startVersion, endVersion);
+            },
+            onCreate: (database, version) async {
               await database.execute(
                   'CREATE TABLE IF NOT EXISTS `Person` (`id` INTEGER, `name` TEXT, PRIMARY KEY (`id`))');
+
+              await callback?.onCreate?.call(database, version);
             },
           );
         }
@@ -76,7 +85,8 @@ void main() {
           changeListener = listener ?? StreamController<String>.broadcast();
         }
         
-        Future<sqflite.Database> open(String name, List<Migration> migrations) async {
+        Future<sqflite.Database> open(String name, List<Migration> migrations,
+            [Callback callback]) async {
           final path = join(await sqflite.getDatabasesPath(), name);
       
           return sqflite.openDatabase(
@@ -85,12 +95,20 @@ void main() {
             onConfigure: (database) async {
               await database.execute('PRAGMA foreign_keys = ON');
             },
-            onUpgrade: (database, startVersion, endVersion) async {
-              MigrationAdapter.runMigrations(database, startVersion, endVersion, migrations);
+            onOpen: (database) async {
+              await callback?.onOpen?.call(database);
             },
-            onCreate: (database, _) async {
+            onUpgrade: (database, startVersion, endVersion) async {
+              MigrationAdapter.runMigrations(
+                  database, startVersion, endVersion, migrations);
+
+              await callback?.onUpgrade?.call(database, startVersion, endVersion);
+            },
+            onCreate: (database, version) async {
               await database.execute(
                   'CREATE TABLE IF NOT EXISTS `custom_table_name` (`id` INTEGER PRIMARY KEY AUTOINCREMENT, `custom_name` TEXT NOT NULL)');
+
+              await callback?.onCreate?.call(database, version);
             },
           );
         }

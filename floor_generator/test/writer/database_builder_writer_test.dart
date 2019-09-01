@@ -19,17 +19,29 @@ void main() {
         final String name;
       
         final List<Migration> _migrations = [];
+
+        Callback _callback;
       
         /// Adds migrations to the builder.
         _$FooBarBuilder addMigrations(List<Migration> migrations) {
           _migrations.addAll(migrations);
           return this;
         }
-      
+
+        /// Adds a database [Callback] to the builder.
+        _$FooBarBuilder addCallback(Callback callback) {
+          _callback = callback;
+          return this;
+        }
+
         /// Creates the database and initializes it.
         Future<FooBar> build() async {
           final database = _$FooBar();
-          database.database = await database.open(name ?? ':memory:', _migrations);
+          database.database = await database.open(
+            name ?? ':memory:',
+            _migrations,
+            _callback,
+          );
           return database;
         }
       }      
