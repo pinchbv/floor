@@ -24,6 +24,10 @@ class DatabaseBuilderWriter extends Writer {
       ..modifier = FieldModifier.final$
       ..assignment = const Code('[]'));
 
+    final callbackField = Field((builder) => builder
+      ..name = '_callback'
+      ..type = refer('Callback'));
+
     final constructor = Constructor((builder) => builder
       ..requiredParameters.add(Parameter((builder) => builder
         ..toThis = true
@@ -41,6 +45,18 @@ class DatabaseBuilderWriter extends Writer {
         ..name = 'migrations'
         ..type = refer('List<Migration>'))));
 
+    final addCallbackMethod = Method((builder) => builder
+      ..name = 'addCallback'
+      ..returns = refer(databaseBuilderName)
+      ..body = const Code('''
+        _callback = callback;
+        return this;
+      ''')
+      ..docs.add('/// Adds a database [Callback] to the builder.')
+      ..requiredParameters.add(Parameter((builder) => builder
+        ..name = 'callback'
+        ..type = refer('Callback'))));
+
     final buildMethod = Method((builder) => builder
       ..returns = refer('Future<$_databaseName>')
       ..name = 'build'
@@ -48,14 +64,26 @@ class DatabaseBuilderWriter extends Writer {
       ..docs.add('/// Creates the database and initializes it.')
       ..body = Code('''
         final database = _\$$_databaseName();
-        database.database = await database.open(name ?? ':memory:', _migrations);
+        database.database = await database.open(
+          name ?? ':memory:',
+          _migrations,
+          _callback,
+        );
         return database;
       '''));
 
     return Class((builder) => builder
       ..name = databaseBuilderName
-      ..fields.addAll([nameField, migrationsField])
+      ..fields.addAll([
+        nameField,
+        migrationsField,
+        callbackField,
+      ])
       ..constructors.add(constructor)
-      ..methods.addAll([addMigrationsMethod, buildMethod]));
+      ..methods.addAll([
+        addMigrationsMethod,
+        addCallbackMethod,
+        buildMethod,
+      ]));
   }
 }

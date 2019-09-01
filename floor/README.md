@@ -26,6 +26,7 @@ This package is still in an early phase and the API will likely change.
 1. [Indices](#indices)
 1. [Migrations](#migrations)
 1. [In-Memory Database](#in-memory-database)
+1. [Callback](#callback)
 1. [Examples](#examples)
 1. [Naming](#naming)
 1. [Bugs and Feedback](#bugs-and-feedback)
@@ -425,7 +426,31 @@ To instantiate an in-memory database, use the static `inMemoryDatabaseBuilder()`
 
 ```dart
 final database = await $FloorAppDatabase.inMemoryDatabaseBuilder('app_database.db').build();
-``` 
+```
+
+## Callback
+In order to hook into Floor's database initialization process, `Callback` should be used.
+It allows the invocation of three separate callbacks which are triggered when the database has been
+- initialized for the first time (`onCreate`).
+- opened (`onOpen`).
+- upgraded (`onUpgrade`).
+
+Each callback is optional.
+
+Their usage can be seen in the following snippet.
+
+```dart
+final callback = Callback(
+   onCreate: (database, version) { /* database has been created */ },
+   onOpen: (database) { /* database has been opened */},
+   onUpgrade: (database, startVersion, endVersion) { /* database has been upgraded */ },
+);
+
+final database = await $FloorAppDatabase
+    .databaseBuilder('app_database.db')
+    .addCallback(callback)
+    .build();
+```
 
 ## Examples
 For further examples take a look at the [example](https://github.com/vitusortner/floor/tree/develop/example) and [floor_test](https://github.com/vitusortner/floor/tree/develop/floor_test) directories.
