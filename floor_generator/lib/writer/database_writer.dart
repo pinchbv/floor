@@ -103,7 +103,7 @@ class DatabaseWriter implements Writer {
       ..returns = refer('Future<sqflite.Database>')
       ..modifier = MethodModifier.async
       ..requiredParameters.addAll([nameParameter, migrationsParameter])
-      ..optionalParameters.addAll([callbackParameter])
+      ..optionalParameters.add(callbackParameter)
       ..body = Code('''
           final path = join(await sqflite.getDatabasesPath(), name);
 
@@ -114,24 +114,18 @@ class DatabaseWriter implements Writer {
               await database.execute('PRAGMA foreign_keys = ON');
             },
             onOpen: (database) async {
-              if (callback?.onOpen != null) {
-                await callback.onOpen(database);
-              }
+              await callback?.onOpen?.call(database);
             },
             onUpgrade: (database, startVersion, endVersion) async {
-              MigrationAdapter.runMigrations(database, startVersion, endVersion, ${migrationsParameter.name});
+              MigrationAdapter.runMigrations(database, startVersion, endVersion, migrations);
 
-              if (callback?.onUpgrade != null) {
-                await callback.onUpgrade(database, startVersion, endVersion);
-              }
+              await callback?.onUpgrade?.call(database, startVersion, endVersion);
             },
             onCreate: (database, version) async {
               $createTableStatements
               $createIndexStatements
 
-              if (callback?.onCreate != null) {
-                await callback.onCreate(database, version);
-              }
+              await callback?.onCreate?.call(database, version);
             },
           );
           '''));

@@ -42,7 +42,6 @@ void main() {
             _migrations,
             _callback,
           );
-
           return database;
         }
       }      

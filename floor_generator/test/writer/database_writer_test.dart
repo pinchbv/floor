@@ -43,25 +43,19 @@ void main() {
               await database.execute('PRAGMA foreign_keys = ON');
             },
             onOpen: (database) async {
-              if (callback?.onOpen != null) {
-                await callback.onOpen(database);
-              }
+              await callback?.onOpen?.call(database);
             },
             onUpgrade: (database, startVersion, endVersion) async {
               MigrationAdapter.runMigrations(
                   database, startVersion, endVersion, migrations);
-      
-              if (callback?.onUpgrade != null) {
-                await callback.onUpgrade(database, startVersion, endVersion);
-              }
+
+              await callback?.onUpgrade?.call(database, startVersion, endVersion);
             },
             onCreate: (database, version) async {
               await database.execute(
                   'CREATE TABLE IF NOT EXISTS `Person` (`id` INTEGER, `name` TEXT, PRIMARY KEY (`id`))');
 
-              if (callback?.onCreate != null) {
-                await callback.onCreate(database, version);
-              }
+              await callback?.onCreate?.call(database, version);
             },
           );
         }
@@ -102,25 +96,19 @@ void main() {
               await database.execute('PRAGMA foreign_keys = ON');
             },
             onOpen: (database) async {
-              if (callback?.onOpen != null) {
-                await callback.onOpen(database);
-              }
+              await callback?.onOpen?.call(database);
             },
             onUpgrade: (database, startVersion, endVersion) async {
               MigrationAdapter.runMigrations(
                   database, startVersion, endVersion, migrations);
-      
-              if (callback?.onUpgrade != null) {
-                await callback.onUpgrade(database, startVersion, endVersion);
-              }
+
+              await callback?.onUpgrade?.call(database, startVersion, endVersion);
             },
             onCreate: (database, version) async {
               await database.execute(
                   'CREATE TABLE IF NOT EXISTS `custom_table_name` (`id` INTEGER PRIMARY KEY AUTOINCREMENT, `custom_name` TEXT NOT NULL)');
 
-              if (callback?.onCreate != null) {
-                await callback.onCreate(database, version);
-              }
+              await callback?.onCreate?.call(database, version);
             },
           );
         }

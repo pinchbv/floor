@@ -26,8 +26,7 @@ class DatabaseBuilderWriter extends Writer {
 
     final callbackField = Field((builder) => builder
       ..name = '_callback'
-      ..type = refer('Callback')
-      ..modifier = FieldModifier.var$);
+      ..type = refer('Callback'));
 
     final constructor = Constructor((builder) => builder
       ..requiredParameters.add(Parameter((builder) => builder
@@ -70,7 +69,6 @@ class DatabaseBuilderWriter extends Writer {
           _migrations,
           _callback,
         );
-
         return database;
       '''));
 
