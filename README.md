@@ -117,10 +117,12 @@ This package is still in an early phase and the API will likely change.
  
     import 'dart:async';
     import 'package:floor/floor.dart';
-    import 'package:path/path.dart';
-    import 'package:sqflite/sqflite.dart' as sqflite;
     import 'dao/person_dao.dart';
     import 'model/person.dart';
+    
+    // Following imports are necessary for generated code to work.
+    import 'package:path/path.dart';
+    import 'package:sqflite/sqflite.dart' as sqflite;
  
     part 'database.g.dart'; // the generated code will be there
  
