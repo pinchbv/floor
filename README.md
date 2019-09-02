@@ -111,18 +111,20 @@ This package is still in an early phase and the API will likely change.
     It has to be an abstract class which extends `FloorDatabase`.
     Furthermore, it's required to add `@Database()` to the signature of the class.
     Make sure to add the created entity to the `entities` attribute of the `@Database` annotation.
+    
+    In order to make the generated code work, it's required to also add the listed imports.
 
     ```dart
-    // database.dart   
- 
+    // database.dart
+      
+    // required package imports
     import 'dart:async';
     import 'package:floor/floor.dart';
-    import 'dao/person_dao.dart';
-    import 'model/person.dart';
-    
-    // Following imports are necessary for generated code to work.
     import 'package:path/path.dart';
-    import 'package:sqflite/sqflite.dart' as sqflite;
+    import 'package:sqflite/sqflite.dart' as sqflite;   
+   
+    import 'dao/person_dao.dart';
+    import 'model/person.dart';   
  
     part 'database.g.dart'; // the generated code will be there
  
