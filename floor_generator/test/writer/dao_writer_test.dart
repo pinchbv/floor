@@ -62,7 +62,7 @@ void main() {
         
           final QueryAdapter _queryAdapter;
         
-          final _personMapper = (Map<String, dynamic> row) =>
+          static final _personMapper = (Map<String, dynamic> row) =>
               Person(row['id'] as int, row['name'] as String);
         
           final InsertionAdapter<Person> _personInsertionAdapter;
@@ -145,7 +145,7 @@ void main() {
         
           final QueryAdapter _queryAdapter;
         
-          final _personMapper = (Map<String, dynamic> row) =>
+          static final _personMapper = (Map<String, dynamic> row) =>
               Person(row['id'] as int, row['name'] as String);
         
           final InsertionAdapter<Person> _personInsertionAdapter;
