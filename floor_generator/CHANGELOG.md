@@ -1,5 +1,20 @@
 # Changelog
 
+# 0.8.0
+
+### Changes
+
+* Update README with clear package import instructions
+
+### 🚀 Features
+
+* Introduce static 'to map' functions
+* Add optional callback functions when opening database
+
+### 🐛 Bug Fixes
+
+* Allow int and string (composite) primary keys
+
 # 0.7.0
 
 ### 🐛 Bug Fixes
