@@ -69,6 +69,7 @@ class DaoWriter extends Writer {
         return Field((builder) => builder
           ..name = name
           ..modifier = FieldModifier.final$
+          ..static = true
           ..assignment = Code('(Map<String, dynamic> row) => $constructor'));
       });
 
