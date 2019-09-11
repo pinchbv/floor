@@ -5,6 +5,7 @@ abstract class AnnotationField {
 
   static const DATABASE_VERSION = 'version';
   static const DATABASE_ENTITIES = 'entities';
+  static const DATABASE_OVERRIDE_OPEN = 'overrideOpen';
 
   static const COLUMN_INFO_NAME = 'name';
   static const COLUMN_INFO_NULLABLE = 'nullable';

@@ -29,8 +29,16 @@ class DatabaseProcessor extends Processor<Database> {
     final entities = _getEntities(_classElement);
     final daoGetters = _getDaoGetters(databaseName, entities);
     final version = _getDatabaseVersion();
+    final overrideOpen = _shouldOverrideOpen();
 
-    return Database(_classElement, databaseName, entities, daoGetters, version);
+    return Database(
+      _classElement,
+      databaseName,
+      entities,
+      daoGetters,
+      version,
+      overrideOpen,
+    );
   }
 
   @nonNull
@@ -44,6 +52,16 @@ class DatabaseProcessor extends Processor<Database> {
     if (version < 1) throw _processorError.VERSION_IS_BELOW_ONE;
 
     return version;
+  }
+
+  @nonNull
+  bool _shouldOverrideOpen() {
+    final overrideOpen = typeChecker(annotations.Database)
+        .firstAnnotationOfExact(_classElement)
+        .getField(AnnotationField.DATABASE_OVERRIDE_OPEN)
+        ?.toBoolValue();
+
+    return true == overrideOpen;
   }
 
   @nonNull

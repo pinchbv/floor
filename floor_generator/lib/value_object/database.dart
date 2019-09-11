@@ -9,6 +9,7 @@ class Database {
   final List<Entity> entities;
   final List<DaoGetter> daoGetters;
   final int version;
+  final bool overrideOpen;
 
   Database(
     this.classElement,
@@ -16,6 +17,7 @@ class Database {
     this.entities,
     this.daoGetters,
     this.version,
+    this.overrideOpen,
   );
 
   @override
@@ -27,7 +29,8 @@ class Database {
           name == other.name &&
           entities == other.entities &&
           daoGetters == other.daoGetters &&
-          version == other.version;
+          version == other.version &&
+          overrideOpen == other.overrideOpen;
 
   @override
   int get hashCode =>

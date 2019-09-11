@@ -12,7 +12,7 @@ void main() {
   useDartfmt();
 
   test('open database for simple entity', () async {
-    final database = await _createDatabase('''
+    final database = await _createDatabase(false, '''
       @entity
       class Person {
         @primaryKey
@@ -64,7 +64,7 @@ void main() {
   });
 
   test('open database for complex entity', () async {
-    final database = await _createDatabase('''
+    final database = await _createDatabase(true, '''
       @Entity(tableName: 'custom_table_name')
       class Person {
         @PrimaryKey(autoGenerate: true)
@@ -85,6 +85,7 @@ void main() {
           changeListener = listener ?? StreamController<String>.broadcast();
         }
         
+        @override
         Future<sqflite.Database> open(String name, List<Migration> migrations,
             [Callback callback]) async {
           final path = join(await sqflite.getDatabasesPath(), name);
@@ -117,13 +118,17 @@ void main() {
   });
 }
 
-Future<Database> _createDatabase(final String entity) async {
+Future<Database> _createDatabase(
+  final bool overrideOpen,
+  final String entity,
+) async {
+  final overrideOpenText = overrideOpen ? ', overrideOpen: true' : '';
   final library = await resolveSource('''
       library test;
       
       import 'package:floor_annotation/floor_annotation.dart';
       
-      @Database(version: 1, entities: [Person])
+      @Database(version: 1, entities: [Person]$overrideOpenText)
       abstract class TestDatabase extends FloorDatabase {}
       
       $entity
