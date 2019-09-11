@@ -100,6 +100,7 @@ class DatabaseWriter implements Writer {
 
     return Method((builder) => builder
       ..name = 'open'
+      ..annotations.add(overrideAnnotationExpression)
       ..returns = refer('Future<sqflite.Database>')
       ..modifier = MethodModifier.async
       ..requiredParameters.addAll([nameParameter, migrationsParameter])

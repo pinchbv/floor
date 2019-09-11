@@ -31,7 +31,8 @@ void main() {
         _$TestDatabase([StreamController<String> listener]) {
          changeListener = listener ?? StreamController<String>.broadcast();
         }
-      
+
+        @override
         Future<sqflite.Database> open(String name, List<Migration> migrations,
             [Callback callback]) async {
           final path = join(await sqflite.getDatabasesPath(), name);
@@ -84,7 +85,8 @@ void main() {
         _$TestDatabase([StreamController<String> listener]) {
           changeListener = listener ?? StreamController<String>.broadcast();
         }
-        
+
+        @override
         Future<sqflite.Database> open(String name, List<Migration> migrations,
             [Callback callback]) async {
           final path = join(await sqflite.getDatabasesPath(), name);
