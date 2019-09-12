@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:meta/meta.dart';
 import 'package:sqflite/sqflite.dart' as sqflite;
 
+import 'callback.dart';
 import 'migration.dart';
 
 /// Extend this class to enable database functionality.
