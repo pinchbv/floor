@@ -131,7 +131,7 @@ void main() {
     expect(actual, equalsDart(r'''
       @override
       Future<List<Person>> findWithIds(List<int> ids) async {
-        final valueList1 = ids.map((value) => '$value').join(', ');
+        final valueList1 = ids.map((value) => "'$value'").join(', ');
         return _queryAdapter.queryList('SELECT * FROM Person WHERE id IN ($valueList1)', mapper: _personMapper);
       }
     '''));
@@ -148,8 +148,8 @@ void main() {
     expect(actual, equalsDart(r'''
       @override
       Future<List<Person>> findWithIds(List<int> ids, List<int> idx) async {
-        final valueList1 = ids.map((value) => '$value').join(', ');
-        final valueList2 = idx.map((value) => '$value').join(', ');
+        final valueList1 = ids.map((value) => "'$value'").join(', ');
+        final valueList2 = idx.map((value) => "'$value'").join(', ');
         return _queryAdapter.queryList('SELECT * FROM Person WHERE id IN ($valueList1) AND id IN ($valueList2)', mapper: _personMapper);
       }
     '''));

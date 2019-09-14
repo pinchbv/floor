@@ -80,7 +80,7 @@ class QueryMethodWriter implements Writer {
         .map((parameter) {
           if (isList(parameter.type)) {
             index++;
-            return "final valueList$index = ${parameter.displayName}.map((value) => '\$value').join(', ');";
+            return '''final valueList$index = ${parameter.displayName}.map((value) => "'\$value'").join(', ');''';
           } else {
             return null;
           }
