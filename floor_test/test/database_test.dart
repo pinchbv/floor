@@ -352,11 +352,22 @@ void main() {
         final person1 = Person(1, 'Simon');
         final person2 = Person(2, 'Frank');
         final person3 = Person(3, 'Paul');
-        final allPersons = [person1, person2, person3];
-        await personDao.insertPersons(allPersons);
+        await personDao.insertPersons([person1, person2, person3]);
         final ids = [person1.id, person2.id];
 
         final actual = await personDao.findPersonsWithIds(ids);
+
+        expect(actual, equals([person1, person2]));
+      });
+
+      test('Find persons with names', () async {
+        final person1 = Person(1, 'Simon');
+        final person2 = Person(2, 'Simon');
+        final person3 = Person(3, 'Paul');
+        await personDao.insertPersons([person1, person2, person3]);
+        final names = [person1.name, person2.name];
+
+        final actual = await personDao.findPersonsWithNames(names);
 
         expect(actual, equals([person1, person2]));
       });
