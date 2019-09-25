@@ -10,7 +10,7 @@ environment:
   sdk: '>=2.3.0-dev <3.0.0'
 
 dependencies:
-  analyzer: ^0.38.2
+  analyzer: ^0.36.4
   build: ^1.1.6
   code_builder: ^3.2.0
   meta: ^1.1.6
@@ -24,6 +24,6 @@ dev_dependencies:
   test: ^1.6.8
   build_test: ^0.10.8
   path: ^1.6.2
-  dart_style: ^1.2.10
+  dart_style: ^1.2.9
   test_cov: ^0.2.0
   mockito: ^4.1.0
