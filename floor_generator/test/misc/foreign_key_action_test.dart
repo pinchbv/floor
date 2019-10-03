@@ -33,7 +33,7 @@ void main() {
       expect(actual, equals('CASCADE'));
     });
 
-    test('falls back to NO ACTION is action not knonw', () {
+    test('falls back to NO ACTION if action not known', () {
       final actual = ForeignKeyAction.getString(12345);
 
       expect(actual, equals('NO ACTION'));
