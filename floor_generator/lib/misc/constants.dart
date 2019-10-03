@@ -29,14 +29,6 @@ abstract class IndexField {
   static const VALUE = 'value';
 }
 
-abstract class ForeignKeyAction {
-  static const NO_ACTION = 1;
-  static const RESTRICT = 2;
-  static const SET_NULL = 3;
-  static const SET_DEFAULT = 4;
-  static const CASCADE = 5;
-}
-
 abstract class SqlType {
   static const INTEGER = 'INTEGER';
   static const TEXT = 'TEXT';
