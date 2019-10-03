@@ -4,6 +4,7 @@ import 'package:analyzer/dart/element/type.dart';
 import 'package:floor_annotation/floor_annotation.dart' as annotations;
 import 'package:floor_generator/misc/annotations.dart';
 import 'package:floor_generator/misc/constants.dart';
+import 'package:floor_generator/misc/foreign_key_action.dart';
 import 'package:floor_generator/misc/type_utils.dart';
 import 'package:floor_generator/processor/error/entity_processor_error.dart';
 import 'package:floor_generator/processor/field_processor.dart';
@@ -100,12 +101,12 @@ class EntityProcessor extends Processor<Entity> {
           final onUpdateAnnotationValue = foreignKeyObject
               .getField(ForeignKeyField.ON_UPDATE)
               ?.toIntValue();
-          final onUpdate = _getAction(onUpdateAnnotationValue);
+          final onUpdate = ForeignKeyAction.getString(onUpdateAnnotationValue);
 
           final onDeleteAnnotationValue = foreignKeyObject
               .getField(ForeignKeyField.ON_DELETE)
               ?.toIntValue();
-          final onDelete = _getAction(onDeleteAnnotationValue);
+          final onDelete = ForeignKeyAction.getString(onDeleteAnnotationValue);
 
           return ForeignKey(
             parentName,
@@ -160,23 +161,6 @@ class EntityProcessor extends Processor<Entity> {
     final List<String> columnNames,
   ) {
     return Index.DEFAULT_PREFIX + tableName + '_' + columnNames.join('_');
-  }
-
-  @nonNull
-  String _getAction(@nullable final int action) {
-    switch (action) {
-      case ForeignKeyAction.RESTRICT:
-        return 'RESTRICT';
-      case ForeignKeyAction.SET_NULL:
-        return 'SET_NULL';
-      case ForeignKeyAction.SET_DEFAULT:
-        return 'SET_DEFAULT';
-      case ForeignKeyAction.CASCADE:
-        return 'CASCADE';
-      case ForeignKeyAction.NO_ACTION:
-      default:
-        return 'NO ACTION';
-    }
   }
 
   @nonNull

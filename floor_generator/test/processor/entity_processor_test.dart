@@ -78,6 +78,56 @@ void main() {
     );
     expect(actual, equals(expected));
   });
+
+  group('foreign keys', () {
+    test('foreign key holds correct values', () async {
+      final classElements = await _createClassElements('''
+        @entity
+        class Person {
+          @primaryKey
+          final int id;
+          
+          final String name;
+        
+          Person(this.id, this.name);
+        }
+        
+        @Entity(
+          foreignKeys: [
+            ForeignKey(
+              childColumns: ['owner_id'],
+              parentColumns: ['id'],
+              entity: Person,
+              onUpdate: ForeignKeyAction.CASCADE
+              onDelete: ForeignKeyAction.SET_NULL,
+            )
+          ],
+        )
+        class Dog {
+          @primaryKey
+          final int id;
+        
+          final String name;
+        
+          @ColumnInfo(name: 'owner_id')
+          final int ownerId;
+        
+          Dog(this.id, this.name, this.ownerId);
+        }
+    ''');
+
+      final actual = EntityProcessor(classElements[1]).process().foreignKeys[0];
+
+      final expected = ForeignKey(
+        'Person',
+        ['id'],
+        ['owner_id'],
+        'CASCADE',
+        'SET NULL',
+      );
+      expect(actual, equals(expected));
+    });
+  });
 }
 
 Future<ClassElement> _createClassElement(final String clazz) async {
@@ -92,4 +142,18 @@ Future<ClassElement> _createClassElement(final String clazz) async {
   });
 
   return library.classes.first;
+}
+
+Future<List<ClassElement>> _createClassElements(final String classes) async {
+  final library = await resolveSource('''
+      library test;
+      
+      import 'package:floor_annotation/floor_annotation.dart';
+      
+      $classes
+      ''', (resolver) async {
+    return LibraryReader(await resolver.findLibraryByName('test'));
+  });
+
+  return library.classes.toList();
 }
