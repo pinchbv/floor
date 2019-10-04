@@ -46,11 +46,11 @@ This package is still in an early phase and the API will likely change.
     dependencies:
       flutter:
         sdk: flutter
-      floor: ^0.8.0
+      floor: ^0.9.0
     
     dev_dependencies:
-      floor_generator: ^0.8.0
-      build_runner: ^1.6.7
+      floor_generator: ^0.9.0
+      build_runner: ^1.7.1
     ````
 
 1. Creating an *Entity*

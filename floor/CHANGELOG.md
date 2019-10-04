@@ -1,5 +1,12 @@
 # Changelog
 
+# 0.9.0
+
+### 🐛 Bug Fixes
+
+* Make IN clauses work with strings
+* Fix foreign key action string representation
+
 # 0.8.0
 
 ### Changes
