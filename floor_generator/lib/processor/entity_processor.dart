@@ -257,7 +257,7 @@ class EntityProcessor extends Processor<Entity> {
     final String parameterValue,
   ) {
     if (isBool(parameterType)) {
-      return 'boolAsInt == true ? ($parameterValue as bool) : ($parameterValue as int) != 0'; // maps int to bool
+      return 'boolAsInt == false ? ($parameterValue as bool) : ($parameterValue as int) != 0'; // maps int to bool
     } else if (isString(parameterType)) {
       return '$parameterValue as String';
     } else if (isInt(parameterType)) {
