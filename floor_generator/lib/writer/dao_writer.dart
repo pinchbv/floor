@@ -70,7 +70,8 @@ class DaoWriter extends Writer {
           ..name = name
           ..modifier = FieldModifier.final$
           ..static = true
-          ..assignment = Code('(Map<String, dynamic> row) => $constructor'));
+          ..assignment = Code('(Map<String, dynamic> row, '
+              '[bool boolAsInt]) => $constructor'));
       });
 
       classBuilder.fields.addAll(queryMapperFields);
