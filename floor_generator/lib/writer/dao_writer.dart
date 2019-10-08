@@ -77,8 +77,11 @@ class DaoWriter extends Writer {
       classBuilder.fields.addAll(queryMapperFields);
     }
 
+    bool shouldIncludeExporter = false;
+
     final insertionMethods = dao.insertionMethods;
     if (insertionMethods.isNotEmpty) {
+      shouldIncludeExporter = true;
       final entities = insertionMethods.map((method) => method.entity).toSet();
 
       for (final entity in entities) {
@@ -107,6 +110,7 @@ class DaoWriter extends Writer {
 
     final updateMethods = dao.updateMethods;
     if (updateMethods.isNotEmpty) {
+      shouldIncludeExporter = true;
       final entities = updateMethods.map((method) => method.entity).toSet();
 
       for (final entity in entities) {
@@ -135,6 +139,7 @@ class DaoWriter extends Writer {
 
     final deleteMethods = dao.deletionMethods;
     if (deleteMethods.isNotEmpty) {
+      shouldIncludeExporter = true;
       final entities = deleteMethods.map((method) => method.entity).toSet();
 
       for (final entity in entities) {
@@ -161,9 +166,7 @@ class DaoWriter extends Writer {
       }
     }
 
-    if (insertionMethods.isNotEmpty ||
-        updateMethods.isNotEmpty ||
-        deleteMethods.isNotEmpty) {
+    if (shouldIncludeExporter) {
       final toMapFields = queryMethods
           .map((method) => method.entity)
           .where((entity) => entity != null)
