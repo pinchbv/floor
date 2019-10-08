@@ -39,22 +39,11 @@ void main() {
           _$PersonDao(this.database, this.changeListener)
               : _queryAdapter = QueryAdapter(database),
                 _personInsertionAdapter = InsertionAdapter(
-                    database,
-                    'Person',
-                    (Person item) =>
-                        <String, dynamic>{'id': item.id, 'name': item.name}),
+                    database, 'Person', (Person item) => _personExporter(item)),
                 _personUpdateAdapter = UpdateAdapter(
-                    database,
-                    'Person',
-                    ['id'],
-                    (Person item) =>
-                        <String, dynamic>{'id': item.id, 'name': item.name}),
+                    database, 'Person', ['id'], (Person item) => _personExporter(item)),
                 _personDeletionAdapter = DeletionAdapter(
-                    database,
-                    'Person',
-                    ['id'],
-                    (Person item) =>
-                        <String, dynamic>{'id': item.id, 'name': item.name});
+                    database, 'Person', ['id'], (Person item) => _personExporter(item));
         
           final sqflite.DatabaseExecutor database;
         
@@ -71,6 +60,9 @@ void main() {
         
           final DeletionAdapter<Person> _personDeletionAdapter;
         
+          static final _personExporter = (Person item, [bool boolAsInt]) =>
+              <String, dynamic>{'id': item.id, 'name': item.name};
+
           @override
           Future<List<Person>> findAllPersons() async {
             return _queryAdapter.queryList('SELECT * FROM person', mapper: _personMapper);
@@ -118,26 +110,12 @@ void main() {
         class _$PersonDao extends PersonDao {
           _$PersonDao(this.database, this.changeListener)
               : _queryAdapter = QueryAdapter(database, changeListener),
-                _personInsertionAdapter = InsertionAdapter(
-                    database,
-                    'Person',
-                    (Person item) =>
-                        <String, dynamic>{'id': item.id, 'name': item.name},
-                    changeListener),
-                _personUpdateAdapter = UpdateAdapter(
-                    database,
-                    'Person',
-                    ['id'],
-                    (Person item) =>
-                        <String, dynamic>{'id': item.id, 'name': item.name},
-                    changeListener),
-                _personDeletionAdapter = DeletionAdapter(
-                    database,
-                    'Person',
-                    ['id'],
-                    (Person item) =>
-                        <String, dynamic>{'id': item.id, 'name': item.name},
-                    changeListener);
+                _personInsertionAdapter = InsertionAdapter(database, 'Person',
+                    (Person item) => _personExporter(item), changeListener),
+                _personUpdateAdapter = UpdateAdapter(database, 'Person', ['id'],
+                    (Person item) => _personExporter(item), changeListener),
+                _personDeletionAdapter = DeletionAdapter(database, 'Person', ['id'],
+                    (Person item) => _personExporter(item), changeListener);
         
           final sqflite.DatabaseExecutor database;
         
@@ -154,6 +132,9 @@ void main() {
         
           final DeletionAdapter<Person> _personDeletionAdapter;
         
+          static final _personExporter = (Person item, [bool boolAsInt]) =>
+              <String, dynamic>{'id': item.id, 'name': item.name};
+
           @override
           Stream<List<Person>> findAllPersonsAsStream() {
             return _queryAdapter.queryListStream('SELECT * FROM person', tableName: 'Person', mapper: _personMapper);

@@ -75,25 +75,6 @@ class DaoWriter extends Writer {
       });
 
       classBuilder.fields.addAll(queryMapperFields);
-
-      final toMapFields = queryMethods
-          .map((method) => method.entity)
-          .where((entity) => entity != null)
-          .toSet()
-          .map((entity) {
-        final valueMapper =
-            '(${entity.classElement.displayName} item, [bool boolAsInt]) '
-            '=> ${entity.getValueMapping()}';
-        final name = '_${decapitalize(entity.name)}ToMap';
-
-        return Field((builder) => builder
-          ..name = name
-          ..modifier = FieldModifier.final$
-          ..static = true
-          ..assignment = Code('(Map<String, dynamic> row) => $valueMapper'));
-      });
-
-      classBuilder.fields.addAll(toMapFields);
     }
 
     final insertionMethods = dao.insertionMethods;
@@ -113,8 +94,7 @@ class DaoWriter extends Writer {
         classBuilder..fields.add(field);
 
         final valueMapper =
-            '(${entity.classElement.displayName} item, [bool boolAsInt]) => '
-            '${entity.getValueMapping()}';
+            '(${entity.classElement.displayName} item) => _${decapitalize(entity.name)}Exporter(item)';
 
         final requiresChangeListener =
             streamEntities.any((streamEntity) => streamEntity == entity);
@@ -142,8 +122,7 @@ class DaoWriter extends Writer {
         classBuilder..fields.add(field);
 
         final valueMapper =
-            '(${entity.classElement.displayName} item, [bool boolAsInt]) => '
-            '${entity.getValueMapping()}';
+            '(${entity.classElement.displayName} item) => _${decapitalize(entity.name)}Exporter(item)';
 
         final requiresChangeListener =
             streamEntities.any((streamEntity) => streamEntity == entity);
@@ -171,8 +150,7 @@ class DaoWriter extends Writer {
         classBuilder..fields.add(field);
 
         final valueMapper =
-            '(${entity.classElement.displayName} item, [bool boolAsInt]) => '
-            '${entity.getValueMapping()}';
+            '(${entity.classElement.displayName} item) => _${decapitalize(entity.name)}Exporter(item)';
 
         final requiresChangeListener =
             streamEntities.any((streamEntity) => streamEntity == entity);
@@ -181,6 +159,29 @@ class DaoWriter extends Writer {
           ..initializers.add(Code(
               "$fieldName = DeletionAdapter(database, '${entity.name}', ${entity.primaryKey.fields.map((field) => '\'${field.columnName}\'').toList()}, $valueMapper${requiresChangeListener ? ', changeListener' : ''})"));
       }
+    }
+
+    if (insertionMethods.isNotEmpty ||
+        updateMethods.isNotEmpty ||
+        deleteMethods.isNotEmpty) {
+      final toMapFields = queryMethods
+          .map((method) => method.entity)
+          .where((entity) => entity != null)
+          .toSet()
+          .map((entity) {
+        final valueMapper =
+            '(${entity.classElement.displayName} item, [bool boolAsInt]) '
+            '=> ${entity.getValueMapping(true)}';
+        final name = '_${decapitalize(entity.name)}Exporter';
+
+        return Field((builder) => builder
+          ..name = name
+          ..modifier = FieldModifier.final$
+          ..static = true
+          ..assignment = Code('$valueMapper'));
+      });
+
+      classBuilder.fields.addAll(toMapFields);
     }
 
     classBuilder

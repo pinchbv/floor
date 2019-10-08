@@ -58,10 +58,11 @@ class Entity {
   }
 
   @nonNull
-  String getValueMapping() {
+  String getValueMapping(final bool includeBoolAsInt) {
     final keyValueList = fields.map((field) {
       final columnName = field.columnName;
-      final attributeValue = _getAttributeValue(field.fieldElement);
+      final attributeValue =
+          _getAttributeValue(field.fieldElement, includeBoolAsInt);
       return "'$columnName': $attributeValue";
     }).toList();
 
@@ -69,10 +70,15 @@ class Entity {
   }
 
   @nonNull
-  String _getAttributeValue(final FieldElement fieldElement) {
+  String _getAttributeValue(
+      final FieldElement fieldElement, final bool includeBoolAsInt) {
     final parameterName = fieldElement.displayName;
+    final boolCheckPrefix =
+        true != includeBoolAsInt ? '' : 'boolAsInt != false ? (';
+    final boolCheckSuffix =
+        true != includeBoolAsInt ? '' : ') : item.$parameterName';
     return isBool(fieldElement.type)
-        ? 'boolAsInt == false ? (item.$parameterName ? 1 : 0) : item.$parameterName'
+        ? '${boolCheckPrefix}item.$parameterName ? 1 : 0$boolCheckSuffix'
         : 'item.$parameterName';
   }
 

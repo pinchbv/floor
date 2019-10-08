@@ -160,7 +160,7 @@ void main() {
     test('Get value mapping', () {
       when(mockDartType.isDartCoreBool).thenReturn(false);
 
-      final actual = entity.getValueMapping();
+      final actual = entity.getValueMapping(false);
 
       final expected = '<String, dynamic>{'
           "'${nullableField.columnName}': item.$fieldElementDisplayName"
@@ -171,7 +171,7 @@ void main() {
     test('Get boolean value mapping', () {
       when(mockDartType.isDartCoreBool).thenReturn(true);
 
-      final actual = entity.getValueMapping();
+      final actual = entity.getValueMapping(false);
 
       final expected = '<String, dynamic>{'
           "'${nullableField.columnName}': item.$fieldElementDisplayName ? 1 : 0"
