@@ -72,7 +72,7 @@ class Entity {
   String _getAttributeValue(final FieldElement fieldElement) {
     final parameterName = fieldElement.displayName;
     return isBool(fieldElement.type)
-        ? 'item.$parameterName ? 1 : 0'
+        ? 'boolAsInt == false ? (item.$parameterName ? 1 : 0) : item.$parameterName'
         : 'item.$parameterName';
   }
 

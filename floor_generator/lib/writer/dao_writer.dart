@@ -75,6 +75,25 @@ class DaoWriter extends Writer {
       });
 
       classBuilder.fields.addAll(queryMapperFields);
+
+      final toMapFields = queryMethods
+          .map((method) => method.entity)
+          .where((entity) => entity != null)
+          .toSet()
+          .map((entity) {
+        final valueMapper =
+            '(${entity.classElement.displayName} item, [bool boolAsInt]) '
+            '=> ${entity.getValueMapping()}';
+        final name = '_${decapitalize(entity.name)}ToMap';
+
+        return Field((builder) => builder
+          ..name = name
+          ..modifier = FieldModifier.final$
+          ..static = true
+          ..assignment = Code('(Map<String, dynamic> row) => $valueMapper'));
+      });
+
+      classBuilder.fields.addAll(toMapFields);
     }
 
     final insertionMethods = dao.insertionMethods;
@@ -94,7 +113,8 @@ class DaoWriter extends Writer {
         classBuilder..fields.add(field);
 
         final valueMapper =
-            '(${entity.classElement.displayName} item) => ${entity.getValueMapping()}';
+            '(${entity.classElement.displayName} item, [bool boolAsInt]) => '
+            '${entity.getValueMapping()}';
 
         final requiresChangeListener =
             streamEntities.any((streamEntity) => streamEntity == entity);
@@ -122,7 +142,8 @@ class DaoWriter extends Writer {
         classBuilder..fields.add(field);
 
         final valueMapper =
-            '(${entity.classElement.displayName} item) => ${entity.getValueMapping()}';
+            '(${entity.classElement.displayName} item, [bool boolAsInt]) => '
+            '${entity.getValueMapping()}';
 
         final requiresChangeListener =
             streamEntities.any((streamEntity) => streamEntity == entity);
@@ -150,7 +171,8 @@ class DaoWriter extends Writer {
         classBuilder..fields.add(field);
 
         final valueMapper =
-            '(${entity.classElement.displayName} item) => ${entity.getValueMapping()}';
+            '(${entity.classElement.displayName} item, [bool boolAsInt]) => '
+            '${entity.getValueMapping()}';
 
         final requiresChangeListener =
             streamEntities.any((streamEntity) => streamEntity == entity);
