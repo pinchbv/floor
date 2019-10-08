@@ -2,6 +2,7 @@ import 'package:code_builder/code_builder.dart';
 import 'package:floor_generator/misc/string_utils.dart';
 import 'package:floor_generator/value_object/dao.dart';
 import 'package:floor_generator/value_object/deletion_method.dart';
+import 'package:floor_generator/value_object/entity.dart';
 import 'package:floor_generator/value_object/insertion_method.dart';
 import 'package:floor_generator/value_object/query_method.dart';
 import 'package:floor_generator/value_object/transaction_method.dart';
@@ -77,12 +78,12 @@ class DaoWriter extends Writer {
       classBuilder.fields.addAll(queryMapperFields);
     }
 
-    bool shouldIncludeExporter = false;
+    final Set<Entity> exporterEntities = <Entity>{};
 
     final insertionMethods = dao.insertionMethods;
     if (insertionMethods.isNotEmpty) {
-      shouldIncludeExporter = true;
       final entities = insertionMethods.map((method) => method.entity).toSet();
+      exporterEntities.addAll(entities);
 
       for (final entity in entities) {
         final entityClassName = entity.classElement.displayName;
@@ -110,8 +111,8 @@ class DaoWriter extends Writer {
 
     final updateMethods = dao.updateMethods;
     if (updateMethods.isNotEmpty) {
-      shouldIncludeExporter = true;
       final entities = updateMethods.map((method) => method.entity).toSet();
+      exporterEntities.addAll(entities);
 
       for (final entity in entities) {
         final entityClassName = entity.classElement.displayName;
@@ -139,8 +140,8 @@ class DaoWriter extends Writer {
 
     final deleteMethods = dao.deletionMethods;
     if (deleteMethods.isNotEmpty) {
-      shouldIncludeExporter = true;
       final entities = deleteMethods.map((method) => method.entity).toSet();
+      exporterEntities.addAll(entities);
 
       for (final entity in entities) {
         final entityClassName = entity.classElement.displayName;
@@ -166,12 +167,8 @@ class DaoWriter extends Writer {
       }
     }
 
-    if (shouldIncludeExporter) {
-      final toMapFields = queryMethods
-          .map((method) => method.entity)
-          .where((entity) => entity != null)
-          .toSet()
-          .map((entity) {
+    if (exporterEntities.isNotEmpty) {
+      final toMapFields = exporterEntities.map((entity) {
         final valueMapper =
             '(${entity.classElement.displayName} item, [bool boolAsInt]) '
             '=> ${entity.getValueMapping(true)}';
