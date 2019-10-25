@@ -63,9 +63,12 @@ class DatabaseBuilderWriter extends Writer {
       ..modifier = MethodModifier.async
       ..docs.add('/// Creates the database and initializes it.')
       ..body = Code('''
+        final path = name != null
+          ? join(await sqflite.getDatabasesPath(), name)
+          : ':memory:';
         final database = _\$$_databaseName();
         database.database = await database.open(
-          name ?? ':memory:',
+          path,
           _migrations,
           _callback,
         );

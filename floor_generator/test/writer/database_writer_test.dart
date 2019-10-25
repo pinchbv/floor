@@ -32,10 +32,8 @@ void main() {
          changeListener = listener ?? StreamController<String>.broadcast();
         }
       
-        Future<sqflite.Database> open(String name, List<Migration> migrations,
+        Future<sqflite.Database> open(String path, List<Migration> migrations,
             [Callback callback]) async {
-          final path = join(await sqflite.getDatabasesPath(), name);
-      
           return sqflite.openDatabase(
             path,
             version: 1,
@@ -85,10 +83,8 @@ void main() {
           changeListener = listener ?? StreamController<String>.broadcast();
         }
         
-        Future<sqflite.Database> open(String name, List<Migration> migrations,
+        Future<sqflite.Database> open(String path, List<Migration> migrations,
             [Callback callback]) async {
-          final path = join(await sqflite.getDatabasesPath(), name);
-      
           return sqflite.openDatabase(
             path,
             version: 1,

@@ -86,8 +86,8 @@ class DatabaseWriter implements Writer {
         .map((statement) => "await database.execute('$statement');")
         .join('\n');
 
-    final nameParameter = Parameter((builder) => builder
-      ..name = 'name'
+    final pathParameter = Parameter((builder) => builder
+      ..name = 'path'
       ..type = refer('String'));
 
     final migrationsParameter = Parameter((builder) => builder
@@ -102,11 +102,9 @@ class DatabaseWriter implements Writer {
       ..name = 'open'
       ..returns = refer('Future<sqflite.Database>')
       ..modifier = MethodModifier.async
-      ..requiredParameters.addAll([nameParameter, migrationsParameter])
+      ..requiredParameters.addAll([pathParameter, migrationsParameter])
       ..optionalParameters.add(callbackParameter)
       ..body = Code('''
-          final path = join(await sqflite.getDatabasesPath(), name);
-
           return sqflite.openDatabase(
             path,
             version: ${database.version},
