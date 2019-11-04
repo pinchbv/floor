@@ -56,7 +56,8 @@ class EntityProcessor extends Processor<Entity> {
   List<Field> _getFields() {
     return _classElement.fields
         .where(_isNotHashCode)
-        .map((field) => FieldProcessor(field).process())
+        .map((fieldElement) => FieldProcessor(fieldElement).process())
+        .where((field) => !field.isIgnored)
         .toList();
   }
 

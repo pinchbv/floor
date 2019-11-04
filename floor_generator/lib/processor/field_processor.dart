@@ -25,12 +25,14 @@ class FieldProcessor extends Processor<Field> {
         _columnInfoTypeChecker.hasAnnotationOfExact(_fieldElement);
     final columnName = _getColumnName(hasColumnInfoAnnotation, name);
     final isNullable = _getIsNullable(hasColumnInfoAnnotation);
+    final isIgnored = _getIsIgnored(hasColumnInfoAnnotation);
 
     return Field(
       _fieldElement,
       name,
       columnName,
       isNullable,
+      isIgnored,
       _getSqlType(),
     );
   }
@@ -55,6 +57,17 @@ class FieldProcessor extends Processor<Field> {
                 ?.toBoolValue() ??
             true
         : true; // all Dart fields are nullable by default
+  }
+
+  @nonNull
+  bool _getIsIgnored(bool hasColumnInfoAnnotation) {
+    return hasColumnInfoAnnotation
+        ? _columnInfoTypeChecker
+                .firstAnnotationOfExact(_fieldElement)
+                .getField(AnnotationField.COLUMN_INFO_IGNORE)
+                ?.toBoolValue() ??
+            false
+        : false;
   }
 
   @nonNull

@@ -7,6 +7,7 @@ class Field {
   final String name;
   final String columnName;
   final bool isNullable;
+  final bool isIgnored;
   final String sqlType;
 
   Field(
@@ -14,6 +15,7 @@ class Field {
     this.name,
     this.columnName,
     this.isNullable,
+    this.isIgnored,
     this.sqlType,
   );
 
@@ -41,6 +43,7 @@ class Field {
           name == other.name &&
           columnName == other.columnName &&
           isNullable == other.isNullable &&
+          isIgnored == other.isIgnored &&
           sqlType == other.sqlType;
 
   @override
@@ -49,10 +52,11 @@ class Field {
       name.hashCode ^
       columnName.hashCode ^
       isNullable.hashCode ^
+      isIgnored.hashCode ^
       sqlType.hashCode;
 
   @override
   String toString() {
-    return 'Field{fieldElement: $fieldElement, name: $name, columnName: $columnName, isNullable: $isNullable, sqlType: $sqlType}';
+    return 'Field{fieldElement: $fieldElement, name: $name, columnName: $columnName, isNullable: $isNullable, isIgnored: $isIgnored, sqlType: $sqlType}';
   }
 }

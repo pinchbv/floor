@@ -8,6 +8,7 @@ abstract class AnnotationField {
 
   static const COLUMN_INFO_NAME = 'name';
   static const COLUMN_INFO_NULLABLE = 'nullable';
+  static const COLUMN_INFO_IGNORE = 'ignore';
 
   static const ENTITY_TABLE_NAME = 'tableName';
   static const ENTITY_FOREIGN_KEYS = 'foreignKeys';
