@@ -18,6 +18,7 @@ void main() {
     'field1Name',
     'field1ColumnName',
     false,
+    false,
     SqlType.INTEGER,
   );
   final nullableField = Field(
@@ -25,6 +26,7 @@ void main() {
     'field2Name',
     'field2ColumnName',
     true,
+    false,
     SqlType.TEXT,
   );
   final allFields = [field, nullableField];

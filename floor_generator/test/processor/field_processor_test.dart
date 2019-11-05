@@ -17,12 +17,14 @@ void main() {
     const name = 'id';
     const columnName = 'id';
     const isNullable = true;
+    const isIgnored = false;
     const sqlType = SqlType.INTEGER;
     final expected = Field(
       fieldElement,
       name,
       columnName,
       isNullable,
+      isIgnored,
       sqlType,
     );
     expect(actual, equals(expected));

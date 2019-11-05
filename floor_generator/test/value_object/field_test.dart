@@ -20,6 +20,7 @@ void main() {
       'field1Name',
       'field1ColumnName',
       false,
+      false,
       SqlType.INTEGER,
     );
 
@@ -37,6 +38,7 @@ void main() {
       'field1Name',
       'field1ColumnName',
       true,
+      false,
       SqlType.TEXT,
     );
 
