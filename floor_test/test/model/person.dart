@@ -10,10 +10,17 @@ class Person {
   @primaryKey
   final int id;
 
+  @transient
+  final String nickName;
+
+  @transient
+  final String alias;
+
+
   @ColumnInfo(name: 'custom_name', nullable: false)
   final String name;
 
-  Person(this.id, this.name);
+  Person(this.id,this.nickName,this.alias, this.name);
 
   @override
   bool operator ==(Object other) =>
@@ -21,13 +28,15 @@ class Person {
       other is Person &&
           runtimeType == other.runtimeType &&
           id == other.id &&
-          name == other.name;
+          nickName == other.nickName &&
+          alias == other.alias &&
+          name == other.name ;
 
   @override
-  int get hashCode => id.hashCode ^ name.hashCode;
+  int get hashCode => id.hashCode ^ nickName.hashCode ^ alias.hashCode ^ name.hashCode;
 
   @override
   String toString() {
-    return 'Person{id: $id, name: $name}';
+    return 'Person{id: $id, nickName: $nickName, alias: $alias, name: $name}';
   }
 }
