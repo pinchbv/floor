@@ -12,4 +12,5 @@ export 'src/on_conflict_strategy.dart';
 export 'src/primary_key.dart';
 export 'src/query.dart';
 export 'src/transaction.dart';
+export 'src/transient.dart';
 export 'src/update.dart';

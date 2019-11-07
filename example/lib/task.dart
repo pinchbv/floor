@@ -7,7 +7,10 @@ class Task {
 
   final String message;
 
-  Task(this.id, this.message);
+  @transient
+  String description;
+
+  Task(this.id, this.message, [this.description='']);
 
   @override
   bool operator ==(Object other) =>

@@ -45,7 +45,7 @@ void main() {
 
     group('change single item', () {
       test('insert person', () async {
-        final person = Person(null, 'Simon');
+        final person = Person(null, 'Rick','Rock', 'Simon');
         await personDao.insertPerson(person);
 
         final actual = await personDao.findAllPersons();
@@ -54,7 +54,7 @@ void main() {
       });
 
       test('delete person', () async {
-        final person = Person(1, 'Simon');
+        final person = Person(1,'Rick','Rock', 'Simon');
         await personDao.insertPerson(person);
 
         await personDao.deletePerson(person);
@@ -64,9 +64,9 @@ void main() {
       });
 
       test('update person', () async {
-        final person = Person(1, 'Simon');
+        final person = Person(1,'Rick','Rock', 'Simon');
         await personDao.insertPerson(person);
-        final updatedPerson = Person(person.id, _reverse(person.name));
+        final updatedPerson = Person(person.id,_reverse(person.nickName),_reverse(person.alias), _reverse(person.name));
 
         await personDao.updatePerson(updatedPerson);
 
@@ -77,7 +77,7 @@ void main() {
 
     group('change multiple items', () {
       test('insert persons', () async {
-        final persons = [Person(1, 'Simon'), Person(2, 'Frank')];
+        final persons = [Person(1,'Rick','Rock', 'Simon'), Person(2,'Joe','Vallery', 'Samuel')];
 
         await personDao.insertPersons(persons);
 
@@ -86,7 +86,7 @@ void main() {
       });
 
       test('delete persons', () async {
-        final persons = [Person(1, 'Simon'), Person(2, 'Frank')];
+        final persons = [Person(1,'Rick','Rock', 'Simon'), Person(2,'Joe','Vallery', 'Samuel')];
         await personDao.insertPersons(persons);
 
         await personDao.deletePersons(persons);
@@ -96,10 +96,10 @@ void main() {
       });
 
       test('update persons', () async {
-        final persons = [Person(1, 'Simon'), Person(2, 'Frank')];
+        final persons = [Person(1,'Rick','Rock', 'Simon'), Person(2,'Joe','Vallery', 'Samuel')];
         await personDao.insertPersons(persons);
         final updatedPersons = persons
-            .map((person) => Person(person.id, _reverse(person.name)))
+            .map((person) => Person(person.id,_reverse(person.nickName),_reverse(person.alias), _reverse(person.name)))
             .toList();
 
         await personDao.updatePersons(updatedPersons);
@@ -111,7 +111,7 @@ void main() {
 
     group('querying', () {
       test('query with two parameters (int, String)', () async {
-        final person = Person(1, 'Frank');
+        final person = Person(1,'Rick','Rock', 'Simon');
         await personDao.insertPerson(person);
 
         final actual = await personDao.findPersonByIdAndName(1, 'Frank');
@@ -122,9 +122,9 @@ void main() {
 
     group('transaction', () {
       test('replace persons in transaction', () async {
-        final persons = [Person(1, 'Simon'), Person(2, 'Frank')];
+        final persons = [Person(1,'Rick','Rock', 'Simon'), Person(2,'Joe','Vallery', 'Samuel')];
         await personDao.insertPersons(persons);
-        final newPersons = [Person(3, 'Paul'), Person(4, 'Karl')];
+        final newPersons =[Person(3,'Mickey','Wick', 'Paul'), Person(4,'Raul','Nox', 'Karl')];
 
         await personDao.replacePersons(newPersons);
 
@@ -133,9 +133,9 @@ void main() {
       });
 
       test('Reactivity is retained when using transactions', () async {
-        final persons = [Person(1, 'Simon'), Person(2, 'Frank')];
+        final persons = [Person(1,'Rick','Rock', 'Simon'), Person(2,'Joe','Vallery', 'Samuel')];
         await personDao.insertPersons(persons);
-        final newPersons = [Person(3, 'Paul'), Person(4, 'Karl')];
+        final newPersons =[Person(3,'Mickey','Wick', 'Paul'), Person(4,'Raul','Nox', 'Karl')];
 
         final actual = personDao.findAllPersonsAsStream();
         expect(actual, emits(persons));
@@ -147,7 +147,7 @@ void main() {
 
     group('change items and return int/list of int', () {
       test('insert person and return id of inserted item', () async {
-        final person = Person(1, 'Simon');
+        final person = Person(1,'Rick','Rock', 'Simon');
 
         final actual = await personDao.insertPersonWithReturn(person);
 
@@ -155,7 +155,7 @@ void main() {
       });
 
       test('insert persons and return ids of inserted items', () async {
-        final persons = [Person(1, 'Simon'), Person(2, 'Frank')];
+        final persons = [Person(1,'Rick','Rock', 'Simon'), Person(2,'Joe','Vallery', 'Samuel')];
 
         final actual = await personDao.insertPersonsWithReturn(persons);
 
@@ -164,9 +164,9 @@ void main() {
       });
 
       test('update person and return 1 (affected row count)', () async {
-        final person = Person(1, 'Simon');
+        final person = Person(1,'Rick','Rock', 'Simon');
         await personDao.insertPerson(person);
-        final updatedPerson = Person(person.id, _reverse(person.name));
+        final updatedPerson = Person(person.id,_reverse(person.nickName),_reverse(person.alias), _reverse(person.name));
 
         final actual = await personDao.updatePersonWithReturn(updatedPerson);
 
@@ -176,10 +176,10 @@ void main() {
       });
 
       test('update persons and return affected rows count', () async {
-        final persons = [Person(1, 'Simon'), Person(2, 'Frank')];
+        final persons = [Person(1,'Rick','Rock', 'Simon'), Person(2,'Joe','Vallery', 'Samuel')];
         await personDao.insertPersons(persons);
         final updatedPersons = persons
-            .map((person) => Person(person.id, _reverse(person.name)))
+            .map((person) => Person(person.id,_reverse(person.nickName),_reverse(person.alias), _reverse(person.name)))
             .toList();
 
         final actual = await personDao.updatePersonsWithReturn(updatedPersons);
@@ -190,7 +190,7 @@ void main() {
       });
 
       test('delete person and return 1 (affected row count)', () async {
-        final person = Person(1, 'Simon');
+        final person = Person(1,'Rick','Rock', 'Simon');
         await personDao.insertPerson(person);
 
         final actual = await personDao.deletePersonWithReturn(person);
@@ -199,7 +199,7 @@ void main() {
       });
 
       test('delete persons and return affected rows count', () async {
-        final persons = [Person(1, 'Simon'), Person(2, 'Frank')];
+        final persons =  [Person(1,'Rick','Rock', 'Simon'), Person(2,'Joe','Vallery', 'Samuel')];
         await personDao.insertPersons(persons);
 
         final actual = await personDao.deletePersonsWithReturn(persons);
@@ -210,15 +210,15 @@ void main() {
 
     group('foreign key', () {
       test('foreign key constraint failed exception', () {
-        final dog = Dog(null, 'Peter', 'Pete', 2);
+        final dog = Dog(null,'Brown','Fido', 'Peter', 'Pete', 2);
 
         expect(() => dogDao.insertDog(dog), _throwsDatabaseException);
       });
 
       test('find dog for person', () async {
-        final person = Person(1, 'Simon');
+        final person = Person(1,'Rick','Rock', 'Simon');
         await personDao.insertPerson(person);
-        final dog = Dog(2, 'Peter', 'Pete', person.id);
+        final dog = Dog(2,'Brown' ,'Fido','Peter', 'Pete', person.id);
         await dogDao.insertDog(dog);
 
         final actual = await dogDao.findDogForPersonId(person.id);
@@ -227,9 +227,9 @@ void main() {
       });
 
       test('cascade delete dog on deletion of person', () async {
-        final person = Person(1, 'Simon');
+        final person = Person(1,'Rick','Rock', 'Simon');
         await personDao.insertPerson(person);
-        final dog = Dog(2, 'Peter', 'Pete', person.id);
+        final dog = Dog(2,'Brown' ,'Fido','Peter', 'Pete', person.id);
         await dogDao.insertDog(dog);
 
         await personDao.deletePerson(person);
@@ -241,7 +241,7 @@ void main() {
 
     group('query with void return', () {
       test('delete all persons', () async {
-        final persons = [Person(1, 'Simon'), Person(2, 'Frank')];
+        final persons =  [Person(1,'Rick','Rock', 'Simon'), Person(2,'Joe','Vallery', 'Samuel')];
         await personDao.insertPersons(persons);
 
         await personDao.deleteAllPersons();
@@ -253,7 +253,7 @@ void main() {
 
     group('stream queries', () {
       test('initially emit persistent data', () async {
-        final person = Person(1, 'Simon');
+        final person = Person(1,'Rick','Rock', 'Simon');
         await personDao.insertPerson(person);
 
         final actual = personDao.findAllPersonsAsStream();
@@ -263,7 +263,7 @@ void main() {
 
       group('insert change', () {
         test('find person by id as stream', () async {
-          final person = Person(1, 'Simon');
+          final person = Person(1,'Rick','Rock', 'Simon');
 
           final actual = personDao.findPersonByIdAsStream(person.id);
 
@@ -272,7 +272,7 @@ void main() {
         });
 
         test('find all persons as stream', () async {
-          final persons = [Person(1, 'Simon'), Person(2, 'Frank')];
+          final persons = [Person(1,'Rick','Rock', 'Simon'), Person(2,'Joe','Vallery', 'Samuel')];
 
           final actual = personDao.findAllPersonsAsStream();
           expect(actual, emits(<List<Person>>[]));
@@ -282,8 +282,8 @@ void main() {
         });
 
         test('initially emits persistent data then new', () async {
-          final persons = [Person(1, 'Simon'), Person(2, 'Frank')];
-          final persons2 = [Person(3, 'Paul'), Person(4, 'George')];
+          final persons = [Person(1,'Rick','Rock', 'Simon'), Person(2,'Joe','Vallery', 'Samuel')];
+          final persons2 =[Person(3,'Mickey','Wick', 'Paul'), Person(4,'Raul','Nox', 'Karl')];
           await personDao.insertPersons(persons);
 
           final actual = personDao.findAllPersonsAsStream();
@@ -296,21 +296,21 @@ void main() {
 
       group('update change', () {
         test('update item', () async {
-          final person = Person(1, 'Simon');
+          final person = Person(1,'Rick','Rock', 'Simon');
           await personDao.insertPerson(person);
 
           final actual = personDao.findAllPersonsAsStream();
           expect(actual, emits([person]));
 
-          final updatedPerson = Person(person.id, 'Frank');
+          final updatedPerson = Person(person.id,'Rick','Rock', 'Frank');
           await personDao.updatePerson(updatedPerson);
           expect(actual, emits([updatedPerson]));
         });
 
         test('update items', () async {
-          final persons = [Person(1, 'Simon'), Person(2, 'Frank')];
+          final persons = [Person(1,'Rick','Rock', 'Simon'), Person(2,'Joe','Vallery', 'Samuel')];
           final updatedPersons = persons
-              .map((person) => Person(person.id, _reverse(person.name)))
+              .map((person) => Person(person.id, _reverse(person.nickName),_reverse(person.alias),_reverse(person.name)))
               .toList();
           await personDao.insertPersons(persons);
 
@@ -324,7 +324,7 @@ void main() {
 
       group('deletion change', () {
         test('delete item', () async {
-          final person = Person(1, 'Simon');
+          final person = Person(1,'Rick','Rock', 'Simon');
           await personDao.insertPerson(person);
 
           final actual = personDao.findAllPersonsAsStream();
@@ -335,7 +335,7 @@ void main() {
         });
 
         test('delete items', () async {
-          final persons = [Person(1, 'Simon'), Person(2, 'Frank')];
+          final persons = [Person(1,'Rick','Rock', 'Simon'), Person(2,'Joe','Vallery', 'Samuel')];
           await personDao.insertPersons(persons);
 
           final actual = personDao.findAllPersonsAsStream();
@@ -349,9 +349,9 @@ void main() {
 
     group('IN clause', () {
       test('Find persons with IDs', () async {
-        final person1 = Person(1, 'Simon');
-        final person2 = Person(2, 'Frank');
-        final person3 = Person(3, 'Paul');
+        final person1 = Person(1,'Rick','Rock', 'Simon');
+        final person2 =Person(2,'Joe','Vallery', 'Samuel');
+        final person3 = Person(3,'Mickey','Wick', 'Paul');
         await personDao.insertPersons([person1, person2, person3]);
         final ids = [person1.id, person2.id];
 
@@ -361,9 +361,9 @@ void main() {
       });
 
       test('Find persons with names', () async {
-        final person1 = Person(1, 'Simon');
-        final person2 = Person(2, 'Simon');
-        final person3 = Person(3, 'Paul');
+        final person1 = Person(1,'Rick','Rock', 'Simon');
+        final person2 =Person(2,'Joe','Vallery', 'Samuel');
+        final person3 = Person(3,'Mickey','Wick', 'Paul');
         await personDao.insertPersons([person1, person2, person3]);
         final names = [person1.name, person2.name];
 
@@ -376,9 +376,9 @@ void main() {
     group('LIKE operator', () {
       test('Find persons with name LIKE', () async {
         final persons = [
-          Person(1, 'Simon'),
-          Person(2, 'Frank'),
-          Person(3, 'Paul')
+        Person(1,'Rick','Rock', 'Simon'),
+        Person(2,'Joe','Vallery', 'Samuel'),
+        Person(3,'Mickey','Wick', 'Paul')
         ];
         await personDao.insertPersons(persons);
 
