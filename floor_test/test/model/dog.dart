@@ -17,6 +17,12 @@ class Dog {
   @primaryKey
   final int id;
 
+  @transient
+  final String color;
+
+  @transient
+  final String alias;
+
   final String name;
 
   @ColumnInfo(name: 'nick_name')
@@ -25,7 +31,7 @@ class Dog {
   @ColumnInfo(name: 'owner_id')
   final int ownerId;
 
-  Dog(this.id, this.name, this.nickName, this.ownerId);
+  Dog(this.id,this.color ,this.alias, this.name, this.nickName, this.ownerId);
 
   @override
   bool operator ==(Object other) =>
@@ -33,16 +39,18 @@ class Dog {
       other is Dog &&
           runtimeType == other.runtimeType &&
           id == other.id &&
+          color == other.color &&
+          alias == other.alias &&
           name == other.name &&
           nickName == other.nickName &&
           ownerId == other.ownerId;
 
   @override
   int get hashCode =>
-      id.hashCode ^ name.hashCode ^ nickName.hashCode ^ ownerId.hashCode;
+      id.hashCode ^ color.hashCode ^ alias.hashCode ^ name.hashCode ^ nickName.hashCode ^ ownerId.hashCode;
 
   @override
   String toString() {
-    return 'Dog{id: $id, name: $name, nickName: $nickName, ownerId: $ownerId}';
+    return 'Dog{id: $id, color: $color, alias: $alias, name: $name, nickName: $nickName, ownerId: $ownerId}';
   }
 }

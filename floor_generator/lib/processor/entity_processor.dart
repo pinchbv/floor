@@ -30,16 +30,16 @@ class EntityProcessor extends Processor<Entity> {
   @override
   Entity process() {
     final name = _getName();
-    final fields = _getFields();
+    final allFieldsButTransients  = _getAllButTransientsFields();
 
     return Entity(
       _classElement,
       name,
-      fields,
-      _getPrimaryKey(fields),
+      allFieldsButTransients,
+      _getPrimaryKey(allFieldsButTransients),
       _getForeignKeys(),
-      _getIndices(fields, name),
-      _getConstructor(fields),
+      _getIndices(allFieldsButTransients, name),
+      _getConstructor(allFieldsButTransients),
     );
   }
 
@@ -53,9 +53,9 @@ class EntityProcessor extends Processor<Entity> {
   }
 
   @nonNull
-  List<Field> _getFields() {
+  List<Field> _getAllButTransientsFields() {
     return _classElement.fields
-        .where(_isNotHashCode)
+        .where(_isNotHashCode).where(_isNotTransient)
         .map((field) => FieldProcessor(field).process())
         .toList();
   }
@@ -63,6 +63,12 @@ class EntityProcessor extends Processor<Entity> {
   @nonNull
   bool _isNotHashCode(final FieldElement fieldElement) {
     return fieldElement.displayName != 'hashCode';
+  }
+
+  @nonNull
+  bool _isNotTransient(final FieldElement fieldElement) {
+    return !typeChecker(annotations.Transient)
+        .hasAnnotationOfExact(fieldElement);
   }
 
   @nonNull
@@ -231,7 +237,7 @@ class EntityProcessor extends Processor<Entity> {
   @nonNull
   String _getConstructor(final List<Field> fields) {
     final columnNames = fields.map((field) => field.columnName).toList();
-    final constructorParameters = _classElement.constructors.first.parameters;
+    final constructorParameters = _classElement.constructors.first.parameters. where((f)=> columnNames.contains(f.name)).toList();
 
     final parameterValues = <String>[];
 

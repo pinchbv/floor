@@ -128,6 +128,45 @@ void main() {
       expect(actual, equals(expected));
     });
   });
+
+  test('Should entity with transient field be not equals to floor processed entity', () async {
+     final classElement = await _createClassElement('''
+        @entity
+        class Person {
+        @primaryKey
+        final int id;
+
+        final String name;
+        
+        @transient
+        String nickName;
+
+        Person(this.id, this.name, [this.nickName='']);
+        }
+        ''');
+
+    final actual = EntityProcessor(classElement).process();
+
+    const name = 'Person';
+    final fields = classElement.fields
+        .map((fieldElement) => FieldProcessor(fieldElement).process())
+        .toList();
+    final primaryKey = PrimaryKey([fields[0]], false);
+    const foreignKeys = <ForeignKey>[];
+    const indices = <Index>[];
+    const constructor = "Person(row['id'] as int, row['name'] as String)";
+    final expected = Entity(
+      classElement,
+      name,
+      fields,
+      primaryKey,
+      foreignKeys,
+      indices,
+      constructor,
+    );
+
+    expect(actual.fields, isNot(equals(expected.fields)));
+  });
 }
 
 Future<ClassElement> _createClassElement(final String clazz) async {
