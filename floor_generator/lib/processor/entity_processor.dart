@@ -55,7 +55,7 @@ class EntityProcessor extends Processor<Entity> {
   @nonNull
   List<Field> _getFields() {
     return _classElement.fields
-        .where(_isNotHashCode)
+        .where(_shouldIncludeField)
         .map((field) => FieldProcessor(field).process())
         .toList();
   }
@@ -63,6 +63,11 @@ class EntityProcessor extends Processor<Entity> {
   @nonNull
   bool _isNotHashCode(final FieldElement fieldElement) {
     return fieldElement.displayName != 'hashCode';
+  }
+
+  @nonNull
+  bool _shouldIncludeField(final FieldElement fieldElement) {
+    return !fieldElement.isStatic && !_isNotHashCode(fieldElement);
   }
 
   @nonNull
