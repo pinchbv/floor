@@ -67,7 +67,7 @@ class EntityProcessor extends Processor<Entity> {
 
   @nonNull
   bool _shouldIncludeField(final FieldElement fieldElement) {
-    return !fieldElement.isStatic && !_isNotHashCode(fieldElement);
+    return !fieldElement.isStatic && _isNotHashCode(fieldElement);
   }
 
   @nonNull
