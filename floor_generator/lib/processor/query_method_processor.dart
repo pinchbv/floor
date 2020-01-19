@@ -4,8 +4,8 @@ import 'package:floor_annotation/floor_annotation.dart' as annotations
     show Query;
 import 'package:floor_generator/misc/annotations.dart';
 import 'package:floor_generator/misc/constants.dart';
-import 'package:floor_generator/processor/error/query_method_processor_error.dart';
 import 'package:floor_generator/misc/type_utils.dart';
+import 'package:floor_generator/processor/error/query_method_processor_error.dart';
 import 'package:floor_generator/processor/processor.dart';
 import 'package:floor_generator/value_object/entity.dart';
 import 'package:floor_generator/value_object/query_method.dart';
@@ -44,7 +44,8 @@ class QueryMethodProcessor extends Processor<QueryMethod> {
 
     final entity = _entities.firstWhere(
         (entity) =>
-            entity.classElement.displayName == flattenedReturnType.displayName,
+            entity.classElement.displayName ==
+            flattenedReturnType.getDisplayString(),
         orElse: () => null); // doesn't return an entity
 
     return QueryMethod(
@@ -100,7 +101,7 @@ class QueryMethodProcessor extends Processor<QueryMethod> {
 
     final type = returnsStream
         ? flattenStream(_methodElement.returnType)
-        : _methodElement.context.typeSystem.flatten(rawReturnType);
+        : _methodElement.library.typeSystem.flatten(rawReturnType);
     if (returnsList) {
       return flattenList(type);
     }
@@ -111,7 +112,7 @@ class QueryMethodProcessor extends Processor<QueryMethod> {
   bool _getReturnsList(final DartType returnType, final bool returnsStream) {
     final type = returnsStream
         ? flattenStream(returnType)
-        : _methodElement.context.typeSystem.flatten(returnType);
+        : _methodElement.library.typeSystem.flatten(returnType);
 
     return isList(type);
   }

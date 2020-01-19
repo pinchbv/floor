@@ -61,7 +61,7 @@ class DeletionMethodProcessor implements Processor<DeletionMethod> {
 
   @nonNull
   DartType _getFlattenedReturnType(final DartType returnType) {
-    return _methodElement.context.typeSystem.flatten(returnType);
+    return _methodElement.library.typeSystem.flatten(returnType);
   }
 
   void _assertMethodReturnsNoList(final DartType flattenedReturnType) {

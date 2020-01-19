@@ -83,7 +83,7 @@ class EntityProcessor extends Processor<Entity> {
                       .firstAnnotationOfExact(parentElement)
                       .getField(AnnotationField.ENTITY_TABLE_NAME)
                       ?.toStringValue() ??
-                  parentType.displayName
+                  parentType.getDisplayString()
               : throw _processorError.FOREIGN_KEY_DOES_NOT_REFERENCE_ENTITY;
 
           final childColumns =
