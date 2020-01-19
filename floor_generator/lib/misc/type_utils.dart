@@ -2,8 +2,6 @@ import 'package:analyzer/dart/element/type.dart';
 import 'package:floor_generator/misc/annotations.dart';
 import 'package:source_gen/source_gen.dart';
 
-// TODO transform all of these to extension functions
-
 @nonNull
 TypeChecker typeChecker(final Type type) => TypeChecker.fromRuntime(type);
 
