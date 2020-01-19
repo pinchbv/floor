@@ -12,7 +12,7 @@ class TransactionMethodWriter implements Writer {
   Method write() {
     return Method((builder) => builder
       ..annotations.add(overrideAnnotationExpression)
-      ..returns = refer(method.returnType.displayName)
+      ..returns = refer(method.returnType.getDisplayString())
       ..name = method.name
       ..requiredParameters.addAll(_generateParameters())
       ..modifier = MethodModifier.async
@@ -40,7 +40,7 @@ class TransactionMethodWriter implements Writer {
     return method.parameterElements.map((parameter) {
       return Parameter((builder) => builder
         ..name = parameter.name
-        ..type = refer(parameter.type.displayName));
+        ..type = refer(parameter.type.getDisplayString()));
     }).toList();
   }
 }

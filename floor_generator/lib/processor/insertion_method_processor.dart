@@ -68,7 +68,7 @@ class InsertionMethodProcessor implements Processor<InsertionMethod> {
 
   @nonNull
   bool _getReturnsList(final DartType returnType) {
-    final type = _methodElement.context.typeSystem.flatten(returnType);
+    final type = _methodElement.library.typeSystem.flatten(returnType);
     return isList(type);
   }
 
@@ -77,7 +77,7 @@ class InsertionMethodProcessor implements Processor<InsertionMethod> {
     final DartType returnType,
     final bool returnsList,
   ) {
-    final type = _methodElement.context.typeSystem.flatten(returnType);
+    final type = _methodElement.library.typeSystem.flatten(returnType);
     return returnsList ? flattenList(type) : type;
   }
 

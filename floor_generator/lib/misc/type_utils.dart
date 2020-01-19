@@ -27,7 +27,7 @@ bool isDouble(final DartType type) {
 
 @nonNull
 bool isList(final DartType type) {
-  return type.name == 'List' && type.element.library.isDartCore;
+  return type.isDartCoreList;
 }
 
 @nonNull

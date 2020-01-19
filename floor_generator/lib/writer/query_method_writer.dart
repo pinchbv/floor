@@ -22,7 +22,7 @@ class QueryMethodWriter implements Writer {
   Method _generateQueryMethod() {
     final builder = MethodBuilder()
       ..annotations.add(overrideAnnotationExpression)
-      ..returns = refer(_queryMethod.rawReturnType.displayName)
+      ..returns = refer(_queryMethod.rawReturnType.getDisplayString())
       ..name = _queryMethod.name
       ..requiredParameters.addAll(_generateMethodParameters())
       ..body = Code(_generateMethodBody());
@@ -45,7 +45,7 @@ class QueryMethodWriter implements Writer {
 
       return Parameter((builder) => builder
         ..name = parameter.name
-        ..type = refer(parameter.type.displayName));
+        ..type = refer(parameter.type.getDisplayString()));
     }).toList();
   }
 
