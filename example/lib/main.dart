@@ -4,6 +4,8 @@ import 'package:example/task_dao.dart';
 import 'package:flutter/material.dart';
 
 Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
   final database = await $FloorFlutterDatabase
       .databaseBuilder('flutter_database.db')
       .build();

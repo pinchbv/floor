@@ -7,18 +7,18 @@ homepage: https://github.com/vitusortner/floor
 author: Vitus Ortner <vitusortner.dev@gmail.com>
 
 environment:
-  sdk: '>=2.3.0-dev <3.0.0'
+  sdk: '>=2.6.0 <3.0.0'
 
 dependencies:
-  path: ^1.6.2
-  sqflite: ^1.1.6+4
+  path: ^1.6.4
+  sqflite: ^1.2.0
   floor_annotation:
     path: ../floor_annotation/
-  meta: ^1.1.6
+  meta: ^1.1.8
   flutter:
     sdk: flutter
 
 dev_dependencies:
-  mockito: ^4.1.0
+  mockito: ^4.1.1
   flutter_test:
     sdk: flutter

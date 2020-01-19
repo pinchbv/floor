@@ -12,6 +12,8 @@ import 'model/person.dart';
 // run test with 'flutter run test/database_test.dart'
 // trigger generator with 'flutter packages pub run build_runner build'
 void main() {
+  TestWidgetsFlutterBinding.ensureInitialized();
+
   group('database tests', () {
     TestDatabase database;
     PersonDao personDao;
