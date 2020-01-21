@@ -1,5 +1,16 @@
 # Changelog
 
+# 0.10.0
+
+### Changes
+
+* Update dependencies
+* Update README with correct instructions to initialize in memory database
+
+### 🐛 Bug Fixes
+
+* Make in-memory database actually be just in memory
+
 # 0.9.0
 
 ### 🐛 Bug Fixes
