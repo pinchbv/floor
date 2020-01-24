@@ -63,7 +63,7 @@ class QueryMethodWriter implements Writer {
       return _methodBody.toString();
     }
 
-    final mapper = '_${decapitalize(_queryMethod.entity.name)}Mapper';
+    final mapper = '_${_queryMethod.entity.name.decapitalize()}Mapper';
     if (_queryMethod.returnsStream) {
       _methodBody.write(_generateStreamQuery(arguments, mapper));
     } else {

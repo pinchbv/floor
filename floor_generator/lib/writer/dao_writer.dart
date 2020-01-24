@@ -64,7 +64,7 @@ class DaoWriter extends Writer {
           .toSet()
           .map((entity) {
         final constructor = entity.constructor;
-        final name = '_${decapitalize(entity.name)}Mapper';
+        final name = '_${entity.name.decapitalize()}Mapper';
 
         return Field((builder) => builder
           ..name = name
@@ -82,7 +82,7 @@ class DaoWriter extends Writer {
 
       for (final entity in entities) {
         final entityClassName = entity.classElement.displayName;
-        final fieldName = '_${decapitalize(entityClassName)}InsertionAdapter';
+        final fieldName = '_${entityClassName.decapitalize()}InsertionAdapter';
         final type = refer('InsertionAdapter<$entityClassName>');
 
         final field = Field((builder) => builder
@@ -110,7 +110,7 @@ class DaoWriter extends Writer {
 
       for (final entity in entities) {
         final entityClassName = entity.classElement.displayName;
-        final fieldName = '_${decapitalize(entityClassName)}UpdateAdapter';
+        final fieldName = '_${entityClassName.decapitalize()}UpdateAdapter';
         final type = refer('UpdateAdapter<$entityClassName>');
 
         final field = Field((builder) => builder
@@ -138,7 +138,7 @@ class DaoWriter extends Writer {
 
       for (final entity in entities) {
         final entityClassName = entity.classElement.displayName;
-        final fieldName = '_${decapitalize(entityClassName)}DeletionAdapter';
+        final fieldName = '_${entityClassName.decapitalize()}DeletionAdapter';
         final type = refer('DeletionAdapter<$entityClassName>');
 
         final field = Field((builder) => builder
