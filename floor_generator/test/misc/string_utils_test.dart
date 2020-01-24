@@ -5,7 +5,7 @@ void main() {
   test('decapitalize word (first letter to lowercase)', () {
     const string = 'FOO';
 
-    final actual = decapitalize(string);
+    final actual = string.decapitalize();
 
     expect(actual, 'fOO');
   });
