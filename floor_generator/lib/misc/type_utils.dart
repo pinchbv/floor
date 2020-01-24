@@ -1,10 +1,8 @@
+import 'package:analyzer/dart/constant/value.dart';
 import 'package:analyzer/dart/element/element.dart';
 import 'package:analyzer/dart/element/type.dart';
 import 'package:floor_generator/misc/annotations.dart';
 import 'package:source_gen/source_gen.dart';
-
-@nonNull
-TypeChecker typeChecker(final Type type) => TypeChecker.fromRuntime(type);
 
 @nonNull
 bool isString(final DartType type) {
@@ -56,18 +54,28 @@ DartType flattenStream(final DartType type) {
   return (type as ParameterizedType).typeArguments.first;
 }
 
-final _stringTypeChecker = typeChecker(String);
-
-final _boolTypeChecker = typeChecker(bool);
-
-final _intTypeChecker = typeChecker(int);
-
-final _doubleTypeChecker = typeChecker(double);
-
-final _streamTypeChecker = typeChecker(Stream);
-
 extension AnnotationChecker on Element {
+  @nonNull
   bool hasAnnotation(final Type type) {
-    return typeChecker(type).hasAnnotationOfExact(this);
+    return _typeChecker(type).hasAnnotationOfExact(this);
+  }
+
+  /// Returns the first annotation object found on [type]
+  @nonNull
+  DartObject getAnnotation(final Type type) {
+    return _typeChecker(type).firstAnnotationOfExact(this);
   }
 }
+
+@nonNull
+TypeChecker _typeChecker(final Type type) => TypeChecker.fromRuntime(type);
+
+final _stringTypeChecker = _typeChecker(String);
+
+final _boolTypeChecker = _typeChecker(bool);
+
+final _intTypeChecker = _typeChecker(int);
+
+final _doubleTypeChecker = _typeChecker(double);
+
+final _streamTypeChecker = _typeChecker(Stream);

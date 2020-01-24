@@ -65,8 +65,8 @@ class UpdateMethodProcessor implements Processor<UpdateMethod> {
 
   @nonNull
   String _getOnConflictStrategy() {
-    final strategy = typeChecker(annotations.Update)
-        .firstAnnotationOfExact(_methodElement)
+    final strategy = _methodElement
+        .getAnnotation(annotations.Update)
         .getField(AnnotationField.ON_CONFLICT)
         .toIntValue();
 

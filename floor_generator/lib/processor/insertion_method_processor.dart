@@ -83,8 +83,8 @@ class InsertionMethodProcessor implements Processor<InsertionMethod> {
 
   @nonNull
   String _getOnConflictStrategy() {
-    final strategy = typeChecker(annotations.Insert)
-        .firstAnnotationOfExact(_methodElement)
+    final strategy = _methodElement
+        .getAnnotation(annotations.Insert)
         .getField(AnnotationField.ON_CONFLICT)
         .toIntValue();
 

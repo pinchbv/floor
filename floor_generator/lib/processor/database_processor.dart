@@ -35,8 +35,8 @@ class DatabaseProcessor extends Processor<Database> {
 
   @nonNull
   int _getDatabaseVersion() {
-    final version = typeChecker(annotations.Database)
-        .firstAnnotationOfExact(_classElement)
+    final version = _classElement
+        .getAnnotation(annotations.Database)
         .getField(AnnotationField.DATABASE_VERSION)
         ?.toIntValue();
 
@@ -80,8 +80,8 @@ class DatabaseProcessor extends Processor<Database> {
 
   @nonNull
   List<Entity> _getEntities(final ClassElement databaseClassElement) {
-    final entities = typeChecker(annotations.Database)
-        .firstAnnotationOfExact(_classElement)
+    final entities = _classElement
+        .getAnnotation(annotations.Database)
         .getField(AnnotationField.DATABASE_ENTITIES)
         ?.toListValue()
         ?.map((object) => object.toTypeValue().element)
