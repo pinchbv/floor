@@ -253,13 +253,13 @@ class EntityProcessor extends Processor<Entity> {
     final DartType parameterType,
     final String parameterValue,
   ) {
-    if (isBool(parameterType)) {
+    if (parameterType.isDartCoreBool) {
       return '($parameterValue as int) != 0'; // maps int to bool
-    } else if (isString(parameterType)) {
+    } else if (parameterType.isDartCoreString) {
       return '$parameterValue as String';
-    } else if (isInt(parameterType)) {
+    } else if (parameterType.isDartCoreInt) {
       return '$parameterValue as int';
-    } else if (isDouble(parameterType)) {
+    } else if (parameterType.isDartCoreDouble) {
       return '$parameterValue as double';
     } else {
       return null;

@@ -2,7 +2,6 @@ import 'package:analyzer/dart/element/element.dart';
 import 'package:analyzer/dart/element/type.dart';
 import 'package:floor_generator/misc/annotations.dart';
 import 'package:floor_generator/misc/change_method_processor_helper.dart';
-import 'package:floor_generator/misc/type_utils.dart';
 import 'package:floor_generator/processor/processor.dart';
 import 'package:floor_generator/value_object/deletion_method.dart';
 import 'package:floor_generator/value_object/entity.dart';
@@ -34,7 +33,7 @@ class DeletionMethodProcessor implements Processor<DeletionMethod> {
     _assertMethodReturnsNoList(flattenedReturnType);
 
     final returnsVoid = flattenedReturnType.isVoid;
-    final returnsInt = isInt(flattenedReturnType);
+    final returnsInt = flattenedReturnType.isDartCoreInt;
 
     if (!returnsVoid && !returnsInt) {
       throw InvalidGenerationSourceError(
@@ -65,7 +64,7 @@ class DeletionMethodProcessor implements Processor<DeletionMethod> {
   }
 
   void _assertMethodReturnsNoList(final DartType flattenedReturnType) {
-    if (isList(flattenedReturnType)) {
+    if (flattenedReturnType.isDartCoreList) {
       throw InvalidGenerationSourceError(
         'Deletion methods have to return a Future of either void or int but not a list.',
         element: _methodElement,

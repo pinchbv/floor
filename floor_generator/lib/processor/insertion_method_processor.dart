@@ -38,8 +38,8 @@ class InsertionMethodProcessor implements Processor<InsertionMethod> {
         _getFlattenedReturnType(returnType, returnsList);
 
     final returnsVoid = flattenedReturnType.isVoid;
-    final returnsInt = isInt(flattenedReturnType);
-    final returnsIntList = returnsList && isInt(flattenedReturnType);
+    final returnsInt = flattenedReturnType.isDartCoreInt;
+    final returnsIntList = returnsList && flattenedReturnType.isDartCoreInt;
 
     if (!returnsVoid && !returnsIntList && !returnsInt) {
       throw InvalidGenerationSourceError(
@@ -69,7 +69,7 @@ class InsertionMethodProcessor implements Processor<InsertionMethod> {
   @nonNull
   bool _getReturnsList(final DartType returnType) {
     final type = _methodElement.library.typeSystem.flatten(returnType);
-    return isList(type);
+    return type.isDartCoreList;
   }
 
   @nonNull
@@ -78,7 +78,7 @@ class InsertionMethodProcessor implements Processor<InsertionMethod> {
     final bool returnsList,
   ) {
     final type = _methodElement.library.typeSystem.flatten(returnType);
-    return returnsList ? flattenList(type) : type;
+    return returnsList ? type.flatten() : type;
   }
 
   @nonNull

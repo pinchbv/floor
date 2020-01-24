@@ -58,13 +58,13 @@ class FieldProcessor extends Processor<Field> {
   @nonNull
   String _getSqlType() {
     final type = _fieldElement.type;
-    if (isInt(type)) {
+    if (type.isDartCoreInt) {
       return SqlType.INTEGER;
-    } else if (isString(type)) {
+    } else if (type.isDartCoreString) {
       return SqlType.TEXT;
-    } else if (isBool(type)) {
+    } else if (type.isDartCoreBool) {
       return SqlType.INTEGER;
-    } else if (isDouble(type)) {
+    } else if (type.isDartCoreDouble) {
       return SqlType.REAL;
     }
     throw InvalidGenerationSourceError(
