@@ -215,8 +215,7 @@ class EntityProcessor extends Processor<Entity> {
   @nonNull
   PrimaryKey _getPrimaryKeyFromAnnotation(final List<Field> fields) {
     final primaryKeyField = fields.firstWhere(
-        (field) => typeChecker(annotations.PrimaryKey)
-            .hasAnnotationOfExact(field.fieldElement),
+        (field) => field.fieldElement.hasAnnotation(annotations.PrimaryKey),
         orElse: () => throw _processorError.MISSING_PRIMARY_KEY);
 
     final autoGenerate = typeChecker(annotations.PrimaryKey)

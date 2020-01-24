@@ -1,3 +1,4 @@
+import 'package:analyzer/dart/element/element.dart';
 import 'package:analyzer/dart/element/type.dart';
 import 'package:floor_generator/misc/annotations.dart';
 import 'package:source_gen/source_gen.dart';
@@ -64,3 +65,9 @@ final _intTypeChecker = typeChecker(int);
 final _doubleTypeChecker = typeChecker(double);
 
 final _streamTypeChecker = typeChecker(Stream);
+
+extension AnnotationChecker on Element {
+  bool hasAnnotation(final Type type) {
+    return typeChecker(type).hasAnnotationOfExact(this);
+  }
+}

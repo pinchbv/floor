@@ -22,7 +22,7 @@ class FieldProcessor extends Processor<Field> {
   Field process() {
     final name = _fieldElement.name;
     final hasColumnInfoAnnotation =
-        _columnInfoTypeChecker.hasAnnotationOfExact(_fieldElement);
+        _fieldElement.hasAnnotation(annotations.ColumnInfo);
     final columnName = _getColumnName(hasColumnInfoAnnotation, name);
     final isNullable = _getIsNullable(hasColumnInfoAnnotation);
 
