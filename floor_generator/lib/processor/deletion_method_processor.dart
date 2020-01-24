@@ -2,7 +2,6 @@ import 'package:analyzer/dart/element/element.dart';
 import 'package:analyzer/dart/element/type.dart';
 import 'package:floor_generator/misc/annotations.dart';
 import 'package:floor_generator/misc/change_method_processor_helper.dart';
-import 'package:floor_generator/misc/type_utils.dart';
 import 'package:floor_generator/processor/processor.dart';
 import 'package:floor_generator/value_object/deletion_method.dart';
 import 'package:floor_generator/value_object/entity.dart';
