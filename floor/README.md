@@ -9,7 +9,7 @@ Thus not supporting automatic relationship mapping is intentional.
 This package is still in an early phase and the API will likely change.
 
 [![pub package](https://img.shields.io/pub/v/floor.svg)](https://pub.dartlang.org/packages/floor)
-[![Build Status](https://travis-ci.org/vitusortner/floor.svg?branch=develop)](https://travis-ci.org/vitusortner/floor)
+[![build status](https://github.com/vitusortner/floor/workflows/Continuous%20integration/badge.svg)](https://github.com/vitusortner/floor/actions)
 [![codecov](https://codecov.io/gh/vitusortner/floor/branch/develop/graph/badge.svg)](https://codecov.io/gh/vitusortner/floor)
 
 ### Table of contents
@@ -46,11 +46,11 @@ This package is still in an early phase and the API will likely change.
     dependencies:
       flutter:
         sdk: flutter
-      floor: ^0.9.0
+      floor: ^0.10.0
     
     dev_dependencies:
-      floor_generator: ^0.9.0
-      build_runner: ^1.7.1
+      floor_generator: ^0.10.0
+      build_runner: ^1.7.3
     ````
 
 1. Creating an *Entity*
@@ -429,7 +429,7 @@ final database = await $FloorAppDatabase
 To instantiate an in-memory database, use the static `inMemoryDatabaseBuilder()` method of the generated `$FloorAppDatabase` class instead of `databaseBuilder()`.
 
 ```dart
-final database = await $FloorAppDatabase.inMemoryDatabaseBuilder('app_database.db').build();
+final database = await $FloorAppDatabase.inMemoryDatabaseBuilder().build();
 ```
 
 ## Callback

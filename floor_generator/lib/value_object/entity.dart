@@ -1,7 +1,6 @@
 import 'package:analyzer/dart/element/element.dart';
 import 'package:collection/collection.dart';
 import 'package:floor_generator/misc/annotations.dart';
-import 'package:floor_generator/misc/type_utils.dart';
 import 'package:floor_generator/value_object/field.dart';
 import 'package:floor_generator/value_object/foreign_key.dart';
 import 'package:floor_generator/value_object/index.dart';
@@ -71,7 +70,7 @@ class Entity {
   @nonNull
   String _getAttributeValue(final FieldElement fieldElement) {
     final parameterName = fieldElement.displayName;
-    return isBool(fieldElement.type)
+    return fieldElement.type.isDartCoreBool
         ? 'item.$parameterName ? 1 : 0'
         : 'item.$parameterName';
   }

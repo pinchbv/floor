@@ -39,10 +39,10 @@ class ChangeMethodProcessorHelper {
   DartType getFlattenedParameterType(
     @nonNull final ParameterElement parameterElement,
   ) {
-    final changesMultipleItems = isList(parameterElement.type);
+    final changesMultipleItems = parameterElement.type.isDartCoreList;
 
     return changesMultipleItems
-        ? flattenList(parameterElement.type)
+        ? parameterElement.type.flatten()
         : parameterElement.type;
   }
 

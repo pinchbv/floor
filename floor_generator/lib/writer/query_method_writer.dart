@@ -36,7 +36,7 @@ class QueryMethodWriter implements Writer {
 
   List<Parameter> _generateMethodParameters() {
     return _queryMethod.parameters.map((parameter) {
-      if (!isSupportedType(parameter.type)) {
+      if (!parameter.type.isSupported) {
         InvalidGenerationSourceError(
           'The type of this parameter is not supported.',
           element: parameter,
@@ -63,7 +63,7 @@ class QueryMethodWriter implements Writer {
       return _methodBody.toString();
     }
 
-    final mapper = '_${decapitalize(_queryMethod.entity.name)}Mapper';
+    final mapper = '_${_queryMethod.entity.name.decapitalize()}Mapper';
     if (_queryMethod.returnsStream) {
       _methodBody.write(_generateStreamQuery(arguments, mapper));
     } else {
@@ -78,7 +78,7 @@ class QueryMethodWriter implements Writer {
     var index = 0;
     return _queryMethod.parameters
         .map((parameter) {
-          if (isList(parameter.type)) {
+          if (parameter.type.isDartCoreList) {
             index++;
             return '''final valueList$index = ${parameter.displayName}.map((value) => "'\$value'").join(', ');''';
           } else {
@@ -93,7 +93,7 @@ class QueryMethodWriter implements Writer {
   List<String> _generateParameters() {
     return _queryMethod.parameters
         .map((parameter) {
-          if (!isList(parameter.type)) {
+          if (!parameter.type.isDartCoreList) {
             return parameter.displayName;
           } else {
             return null;

@@ -36,7 +36,7 @@ class UpdateMethodProcessor implements Processor<UpdateMethod> {
     final flattenedReturnType = _getFlattenedReturnType(returnType);
     _assertMethodReturnsNoList(flattenedReturnType);
 
-    final returnsInt = isInt(flattenedReturnType);
+    final returnsInt = flattenedReturnType.isDartCoreInt;
     final returnsVoid = flattenedReturnType.isVoid;
 
     if (!returnsInt && !returnsVoid) {
@@ -65,8 +65,8 @@ class UpdateMethodProcessor implements Processor<UpdateMethod> {
 
   @nonNull
   String _getOnConflictStrategy() {
-    final strategy = typeChecker(annotations.Update)
-        .firstAnnotationOfExact(_methodElement)
+    final strategy = _methodElement
+        .getAnnotation(annotations.Update)
         .getField(AnnotationField.ON_CONFLICT)
         .toIntValue();
 
@@ -79,7 +79,7 @@ class UpdateMethodProcessor implements Processor<UpdateMethod> {
   }
 
   void _assertMethodReturnsNoList(final DartType flattenedReturnType) {
-    if (isList(flattenedReturnType)) {
+    if (flattenedReturnType.isDartCoreList) {
       throw InvalidGenerationSourceError(
         'Update methods have to return a Future of either void or int but not a list.',
         element: _methodElement,

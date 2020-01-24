@@ -33,7 +33,7 @@ class QueryMethodProcessor extends Processor<QueryMethod> {
     final rawReturnType = _methodElement.returnType;
 
     final query = _getQuery();
-    final returnsStream = isStream(rawReturnType);
+    final returnsStream = rawReturnType.isStream;
 
     _assertReturnsFutureOrStream(rawReturnType, returnsStream);
 
@@ -61,8 +61,8 @@ class QueryMethodProcessor extends Processor<QueryMethod> {
 
   @nonNull
   String _getQuery() {
-    final query = typeChecker(annotations.Query)
-        .firstAnnotationOfExact(_methodElement)
+    final query = _methodElement
+        .getAnnotation(annotations.Query)
         .getField(AnnotationField.QUERY_VALUE)
         ?.toStringValue()
         ?.replaceAll('\n', ' ')
@@ -100,10 +100,10 @@ class QueryMethodProcessor extends Processor<QueryMethod> {
     final returnsList = _getReturnsList(rawReturnType, returnsStream);
 
     final type = returnsStream
-        ? flattenStream(_methodElement.returnType)
+        ? _methodElement.returnType.flatten()
         : _methodElement.library.typeSystem.flatten(rawReturnType);
     if (returnsList) {
-      return flattenList(type);
+      return type.flatten();
     }
     return type;
   }
@@ -111,10 +111,10 @@ class QueryMethodProcessor extends Processor<QueryMethod> {
   @nonNull
   bool _getReturnsList(final DartType returnType, final bool returnsStream) {
     final type = returnsStream
-        ? flattenStream(returnType)
+        ? returnType.flatten()
         : _methodElement.library.typeSystem.flatten(returnType);
 
-    return isList(type);
+    return type.isDartCoreList;
   }
 
   void _assertReturnsFutureOrStream(
