@@ -9,7 +9,7 @@ Thus not supporting automatic relationship mapping is intentional.
 This package is still in an early phase and the API will likely change.
 
 [![pub package](https://img.shields.io/pub/v/floor.svg)](https://pub.dartlang.org/packages/floor)
-[![Build Status](https://travis-ci.org/vitusortner/floor.svg?branch=develop)](https://travis-ci.org/vitusortner/floor)
+[![build status](https://github.com/vitusortner/floor/workflows/Continuous%20integration/badge.svg)
 [![codecov](https://codecov.io/gh/vitusortner/floor/branch/develop/graph/badge.svg)](https://codecov.io/gh/vitusortner/floor)
 
 ### Table of contents
