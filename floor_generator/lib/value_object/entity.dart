@@ -71,7 +71,7 @@ class Entity {
   @nonNull
   String _getAttributeValue(final FieldElement fieldElement) {
     final parameterName = fieldElement.displayName;
-    return isBool(fieldElement.type)
+    return fieldElement.type.isDartCoreBool
         ? 'item.$parameterName ? 1 : 0'
         : 'item.$parameterName';
   }

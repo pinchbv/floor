@@ -23,7 +23,7 @@ class ChangeMethod {
 
   bool get requiresAsyncModifier => flattenedReturnType.isVoid;
 
-  bool get changesMultipleItems => isList(parameterElement.type);
+  bool get changesMultipleItems => parameterElement.type.isDartCoreList;
 
   @override
   bool operator ==(Object other) =>

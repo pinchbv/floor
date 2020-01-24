@@ -42,13 +42,13 @@ class QueryMethod {
 
   bool get returnsList {
     final type = returnsStream
-        ? flattenStream(rawReturnType)
+        ? rawReturnType.flatten()
         : methodElement.library.typeSystem.flatten(rawReturnType);
 
-    return isList(type);
+    return type.isDartCoreList;
   }
 
-  bool get returnsStream => isStream(rawReturnType);
+  bool get returnsStream => rawReturnType.isStream;
 
   bool get returnsVoid => flattenedReturnType.isVoid;
 
