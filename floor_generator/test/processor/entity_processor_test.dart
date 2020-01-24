@@ -79,6 +79,47 @@ void main() {
     expect(actual, equals(expected));
   });
 
+  test('Ignore hashCode field', () async {
+    final classElement = await _createClassElement('''
+      @entity
+      class Person {
+        @primaryKey
+        final int id;
+      
+        final String name;
+      
+        Person(this.id, this.name);
+        
+        @override
+        int get hashCode => id.hashCode ^ name.hashCode;
+      }
+    ''');
+
+    final actual = EntityProcessor(classElement).process();
+
+    expect(actual.fields.length, equals(2));
+  });
+
+  test('Ignore static field', () async {
+    final classElement = await _createClassElement('''
+      @entity
+      class Person {
+        @primaryKey
+        final int id;
+      
+        final String name;
+      
+        Person(this.id, this.name);
+        
+        static String foo = 'foo';
+      }
+    ''');
+
+    final actual = EntityProcessor(classElement).process();
+
+    expect(actual.fields.length, equals(2));
+  });
+
   group('foreign keys', () {
     test('foreign key holds correct values', () async {
       final classElements = await _createClassElements('''
