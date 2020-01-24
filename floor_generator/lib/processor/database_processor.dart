@@ -3,10 +3,10 @@ import 'package:floor_annotation/floor_annotation.dart' as annotations
     show Database, dao, Entity;
 import 'package:floor_generator/misc/annotations.dart';
 import 'package:floor_generator/misc/constants.dart';
-import 'package:floor_generator/processor/error/database_processor_error.dart';
 import 'package:floor_generator/misc/type_utils.dart';
 import 'package:floor_generator/processor/dao_processor.dart';
 import 'package:floor_generator/processor/entity_processor.dart';
+import 'package:floor_generator/processor/error/database_processor_error.dart';
 import 'package:floor_generator/processor/processor.dart';
 import 'package:floor_generator/value_object/dao_getter.dart';
 import 'package:floor_generator/value_object/database.dart';
@@ -35,8 +35,8 @@ class DatabaseProcessor extends Processor<Database> {
 
   @nonNull
   int _getDatabaseVersion() {
-    final version = typeChecker(annotations.Database)
-        .firstAnnotationOfExact(_classElement)
+    final version = _classElement
+        .getAnnotation(annotations.Database)
         .getField(AnnotationField.DATABASE_VERSION)
         ?.toIntValue();
 
@@ -74,15 +74,14 @@ class DatabaseProcessor extends Processor<Database> {
 
   @nonNull
   bool _isDaoClass(final ClassElement classElement) {
-    return typeChecker(annotations.dao.runtimeType)
-            .hasAnnotationOfExact(classElement) &&
+    return classElement.hasAnnotation(annotations.dao.runtimeType) &&
         classElement.isAbstract;
   }
 
   @nonNull
   List<Entity> _getEntities(final ClassElement databaseClassElement) {
-    final entities = typeChecker(annotations.Database)
-        .firstAnnotationOfExact(_classElement)
+    final entities = _classElement
+        .getAnnotation(annotations.Database)
         .getField(AnnotationField.DATABASE_ENTITIES)
         ?.toListValue()
         ?.map((object) => object.toTypeValue().element)
@@ -100,7 +99,7 @@ class DatabaseProcessor extends Processor<Database> {
 
   @nonNull
   bool _isEntity(final ClassElement classElement) {
-    return !classElement.isAbstract &&
-        typeChecker(annotations.Entity).hasAnnotationOfExact(classElement);
+    return classElement.hasAnnotation(annotations.Entity) &&
+        !classElement.isAbstract;
   }
 }

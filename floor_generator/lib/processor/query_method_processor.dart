@@ -61,8 +61,8 @@ class QueryMethodProcessor extends Processor<QueryMethod> {
 
   @nonNull
   String _getQuery() {
-    final query = typeChecker(annotations.Query)
-        .firstAnnotationOfExact(_methodElement)
+    final query = _methodElement
+        .getAnnotation(annotations.Query)
         .getField(AnnotationField.QUERY_VALUE)
         ?.toStringValue()
         ?.replaceAll('\n', ' ')

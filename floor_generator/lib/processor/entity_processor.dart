@@ -19,8 +19,6 @@ class EntityProcessor extends Processor<Entity> {
   final ClassElement _classElement;
   final EntityProcessorError _processorError;
 
-  final _entityTypeChecker = typeChecker(annotations.Entity);
-
   EntityProcessor(final ClassElement classElement)
       : assert(classElement != null),
         _classElement = classElement,
@@ -45,8 +43,8 @@ class EntityProcessor extends Processor<Entity> {
 
   @nonNull
   String _getName() {
-    return _entityTypeChecker
-            .firstAnnotationOfExact(_classElement)
+    return _classElement
+            .getAnnotation(annotations.Entity)
             .getField(AnnotationField.ENTITY_TABLE_NAME)
             .toStringValue() ??
         _classElement.displayName;
@@ -67,8 +65,8 @@ class EntityProcessor extends Processor<Entity> {
 
   @nonNull
   List<ForeignKey> _getForeignKeys() {
-    return _entityTypeChecker
-            .firstAnnotationOfExact(_classElement)
+    return _classElement
+            .getAnnotation(annotations.Entity)
             .getField(AnnotationField.ENTITY_FOREIGN_KEYS)
             ?.toListValue()
             ?.map((foreignKeyObject) {
@@ -79,8 +77,8 @@ class EntityProcessor extends Processor<Entity> {
 
           final parentElement = parentType.element;
           final parentName = parentElement is ClassElement
-              ? _entityTypeChecker
-                      .firstAnnotationOfExact(parentElement)
+              ? parentElement
+                      .getAnnotation(annotations.Entity)
                       .getField(AnnotationField.ENTITY_TABLE_NAME)
                       ?.toStringValue() ??
                   parentType.getDisplayString()
@@ -121,8 +119,8 @@ class EntityProcessor extends Processor<Entity> {
 
   @nonNull
   List<Index> _getIndices(final List<Field> fields, final String tableName) {
-    return _entityTypeChecker
-            .firstAnnotationOfExact(_classElement)
+    return _classElement
+            .getAnnotation(annotations.Entity)
             .getField(AnnotationField.ENTITY_INDICES)
             ?.toListValue()
             ?.map((indexObject) {
@@ -189,8 +187,8 @@ class EntityProcessor extends Processor<Entity> {
 
   @nullable
   PrimaryKey _getCompoundPrimaryKey(final List<Field> fields) {
-    final compoundPrimaryKeyColumnNames = _entityTypeChecker
-        .firstAnnotationOfExact(_classElement)
+    final compoundPrimaryKeyColumnNames = _classElement
+        .getAnnotation(annotations.Entity)
         .getField(AnnotationField.ENTITY_PRIMARY_KEYS)
         ?.toListValue()
         ?.map((object) => object.toStringValue());
@@ -215,12 +213,11 @@ class EntityProcessor extends Processor<Entity> {
   @nonNull
   PrimaryKey _getPrimaryKeyFromAnnotation(final List<Field> fields) {
     final primaryKeyField = fields.firstWhere(
-        (field) => typeChecker(annotations.PrimaryKey)
-            .hasAnnotationOfExact(field.fieldElement),
+        (field) => field.fieldElement.hasAnnotation(annotations.PrimaryKey),
         orElse: () => throw _processorError.MISSING_PRIMARY_KEY);
 
-    final autoGenerate = typeChecker(annotations.PrimaryKey)
-            .firstAnnotationOfExact(primaryKeyField.fieldElement)
+    final autoGenerate = primaryKeyField.fieldElement
+            .getAnnotation(annotations.PrimaryKey)
             .getField(AnnotationField.PRIMARY_KEY_AUTO_GENERATE)
             ?.toBoolValue() ??
         false;
