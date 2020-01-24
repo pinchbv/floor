@@ -10,21 +10,21 @@ jobs:
     container:
       image: google/dart:latest
 
-      steps:
-        - name: Check out code
-          uses: actions/checkout@v2
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v2
 
-        - name: Install dependencies
-          working-directory: floor_annotation
-          run: pub get
+      - name: Install dependencies
+        working-directory: floor_annotation
+        run: pub get
 
-        - name: Analyze
-          working-directory: floor_annotation
-          run: dartanalyzer --fatal-infos --fatal-warnings .
+      - name: Analyze
+        working-directory: floor_annotation
+        run: dartanalyzer --fatal-infos --fatal-warnings .
 
-        - name: Format
-          working-directory: floor_annotation
-          run: dartfmt -n --set-exit-if-changed .
+      - name: Format
+        working-directory: floor_annotation
+        run: dartfmt -n --set-exit-if-changed .
 
   floor-generator:
     runs-on: ubuntu-latest
