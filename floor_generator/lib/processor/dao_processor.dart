@@ -63,8 +63,7 @@ class DaoProcessor extends Processor<Dao> {
 
   List<QueryMethod> _getQueryMethods(final List<MethodElement> methods) {
     return methods
-        .where((method) =>
-            typeChecker(annotations.Query).hasAnnotationOfExact(method))
+        .where((method) => method.hasAnnotation(annotations.Query))
         .map((method) => QueryMethodProcessor(method, _entities).process())
         .toList();
   }
@@ -73,37 +72,45 @@ class DaoProcessor extends Processor<Dao> {
     final List<MethodElement> methodElements,
   ) {
     return methodElements
-        .where((method) =>
-            typeChecker(annotations.Insert).hasAnnotationOfExact(method))
+        .where(
+            (methodElement) => methodElement.hasAnnotation(annotations.Insert))
         .map((method) => InsertionMethodProcessor(method, _entities).process())
         .toList();
   }
 
-  List<UpdateMethod> _getUpdateMethods(final List<MethodElement> methods) {
-    return methods
-        .where((method) =>
-            typeChecker(annotations.Update).hasAnnotationOfExact(method))
-        .map((method) => UpdateMethodProcessor(method, _entities).process())
+  List<UpdateMethod> _getUpdateMethods(
+    final List<MethodElement> methodElements,
+  ) {
+    return methodElements
+        .where(
+            (methodElement) => methodElement.hasAnnotation(annotations.Update))
+        .map((methodElement) =>
+            UpdateMethodProcessor(methodElement, _entities).process())
         .toList();
   }
 
-  List<DeletionMethod> _getDeletionMethods(final List<MethodElement> methods) {
-    return methods
-        .where((method) => typeChecker(annotations.delete.runtimeType)
-            .hasAnnotationOfExact(method))
-        .map((method) => DeletionMethodProcessor(method, _entities).process())
+  List<DeletionMethod> _getDeletionMethods(
+    final List<MethodElement> methodElements,
+  ) {
+    return methodElements
+        .where((methodElement) =>
+            methodElement.hasAnnotation(annotations.delete.runtimeType))
+        .map((methodElement) =>
+            DeletionMethodProcessor(methodElement, _entities).process())
         .toList();
   }
 
   List<TransactionMethod> _getTransactionMethods(
-    final List<MethodElement> methods,
+    final List<MethodElement> methodElements,
   ) {
-    return methods
-        .where((method) => typeChecker(annotations.transaction.runtimeType)
-            .hasAnnotationOfExact(method))
-        .map((method) =>
-            TransactionMethodProcessor(method, _daoGetterName, _databaseName)
-                .process())
+    return methodElements
+        .where((methodElement) =>
+            methodElement.hasAnnotation(annotations.transaction.runtimeType))
+        .map((methodElement) => TransactionMethodProcessor(
+              methodElement,
+              _daoGetterName,
+              _databaseName,
+            ).process())
         .toList();
   }
 

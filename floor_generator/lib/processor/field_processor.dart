@@ -11,8 +11,6 @@ import 'package:source_gen/source_gen.dart';
 class FieldProcessor extends Processor<Field> {
   final FieldElement _fieldElement;
 
-  final _columnInfoTypeChecker = typeChecker(annotations.ColumnInfo);
-
   FieldProcessor(final FieldElement fieldElement)
       : assert(fieldElement != null),
         _fieldElement = fieldElement;
@@ -22,7 +20,7 @@ class FieldProcessor extends Processor<Field> {
   Field process() {
     final name = _fieldElement.name;
     final hasColumnInfoAnnotation =
-        _columnInfoTypeChecker.hasAnnotationOfExact(_fieldElement);
+        _fieldElement.hasAnnotation(annotations.ColumnInfo);
     final columnName = _getColumnName(hasColumnInfoAnnotation, name);
     final isNullable = _getIsNullable(hasColumnInfoAnnotation);
 
@@ -38,8 +36,8 @@ class FieldProcessor extends Processor<Field> {
   @nonNull
   String _getColumnName(bool hasColumnInfoAnnotation, String name) {
     return hasColumnInfoAnnotation
-        ? _columnInfoTypeChecker
-                .firstAnnotationOfExact(_fieldElement)
+        ? _fieldElement
+                .getAnnotation(annotations.ColumnInfo)
                 .getField(AnnotationField.COLUMN_INFO_NAME)
                 ?.toStringValue() ??
             name
@@ -49,8 +47,8 @@ class FieldProcessor extends Processor<Field> {
   @nonNull
   bool _getIsNullable(bool hasColumnInfoAnnotation) {
     return hasColumnInfoAnnotation
-        ? _columnInfoTypeChecker
-                .firstAnnotationOfExact(_fieldElement)
+        ? _fieldElement
+                .getAnnotation(annotations.ColumnInfo)
                 .getField(AnnotationField.COLUMN_INFO_NULLABLE)
                 ?.toBoolValue() ??
             true

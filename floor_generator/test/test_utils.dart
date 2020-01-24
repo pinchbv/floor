@@ -121,12 +121,10 @@ Future<Dao> createDao(final String methodSignature) async {
   });
 
   final daoClass = library.classes.firstWhere((classElement) =>
-      typeChecker(annotations.dao.runtimeType)
-          .hasAnnotationOfExact(classElement));
+      classElement.hasAnnotation(annotations.dao.runtimeType));
 
   final entities = library.classes
-      .where((classElement) =>
-          typeChecker(annotations.Entity).hasAnnotationOfExact(classElement))
+      .where((classElement) => classElement.hasAnnotation(annotations.Entity))
       .map((classElement) => EntityProcessor(classElement).process())
       .toList();
 

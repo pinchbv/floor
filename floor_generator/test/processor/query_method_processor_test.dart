@@ -267,8 +267,7 @@ Future<List<Entity>> _getEntities() async {
   });
 
   return library.classes
-      .where((classElement) =>
-          typeChecker(annotations.Entity).hasAnnotationOfExact(classElement))
+      .where((classElement) => classElement.hasAnnotation(annotations.Entity))
       .map((classElement) => EntityProcessor(classElement).process())
       .toList();
 }
