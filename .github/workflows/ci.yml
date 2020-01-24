@@ -52,7 +52,7 @@ jobs:
       - name: Run tests
         if:
         working-directory: floor_generator
-        run: pub run pub run test_cov
+        run: pub run test_cov
 
       - name: Upload coverage to codecov
         uses: codecov/codecov-action@v1
