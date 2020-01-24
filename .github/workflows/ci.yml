@@ -3,33 +3,54 @@ name: CI
 on: [push]
 
 jobs:
-  dart-package:
+  floor-annotation:
     runs-on: ubuntu-latest
     timeout-minutes: 10
 
-    strategy:
-      matrix:
-        package: ["floor_annotation", "floor_generator"]
+    container:
+      image: google/dart:latest
+
+      steps:
+        - name: Check out code
+          uses: actions/checkout@v2
+
+        - name: Install dependencies
+          working-directory: floor_annotation
+          run: pub get
+
+        - name: Analyze
+          working-directory: floor_annotation
+          run: dartanalyzer --fatal-infos --fatal-warnings .
+
+        - name: Format
+          working-directory: floor_annotation
+          run: dartfmt -n --set-exit-if-changed .
+
+  floor-generator:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
 
     container:
       image: google/dart:latest
 
     steps:
-      - uses: actions/checkout@v2
+      - name: Check out code
+        uses: actions/checkout@v2
 
       - name: Install dependencies
-        working-directory: ${{ matrix.package }}
+        working-directory: floor_generator
         run: pub get
 
       - name: Analyze
-        working-directory: ${{ matrix.package }}
+        working-directory: floor_generator
         run: dartanalyzer --fatal-infos --fatal-warnings .
 
       - name: Format
-        working-directory: ${{ matrix.package }}
+        working-directory: floor_generator
         run: dartfmt -n --set-exit-if-changed .
 
       - name: Run tests
+        if:
         working-directory: floor_generator
         run: pub run pub run test_cov
 
@@ -37,22 +58,21 @@ jobs:
         uses: codecov/codecov-action@v1
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
-          flags: ${{ matrix.package }}
-          file: ./${{ matrix.package }}/coverage/lcov.info
+          flags: floor_generator
+          file: ./floor_generator/coverage/lcov.info
 
-  flutter-package:
+  floor:
     runs-on: ubuntu-latest
-
-    strategy:
-      matrix:
-        channel: ["stable"]
+    timeout-minutes: 10
 
     steps:
-      - uses: actions/checkout@v2
+      - name: Check out code
+        uses: actions/checkout@v2
 
-      - uses: subosito/flutter-action@v1
+      - name: Install Flutter
+        uses: subosito/flutter-action@v1
         with:
-          channel: ${{ matrix.channel }}
+          channel: stable
 
       - name: Install dependencies
         run: flutter packages get
