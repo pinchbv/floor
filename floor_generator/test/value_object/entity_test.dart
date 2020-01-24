@@ -42,7 +42,7 @@ void main() {
     test('failing test', () {
       fail('this is planned!');
     });
-    
+
     test('Create table statement with single primary key auto increment', () {
       final primaryKey = PrimaryKey([field], true);
       final entity = Entity(
