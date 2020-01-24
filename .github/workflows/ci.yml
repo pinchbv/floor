@@ -54,7 +54,7 @@ jobs:
         working-directory: floor_generator
         run: pub run test_cov
 
-      - name: Upload coverage to codecov
+      - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v1
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
@@ -86,7 +86,7 @@ jobs:
         run: flutter test --coverage --coverage-path coverage/lcov.info
         working-directory: floor
 
-      - name: Upload coverage to codecov
+      - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v1
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
