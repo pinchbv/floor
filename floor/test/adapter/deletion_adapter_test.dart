@@ -26,10 +26,6 @@ void main() {
   });
 
   group('delete without return', () {
-    test('failing test', () {
-      fail('this is planned!');
-    });
-
     test('delete item', () async {
       final person = Person(1, 'Simon');
 
