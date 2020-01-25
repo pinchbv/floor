@@ -27,6 +27,7 @@ This package is still in an early phase and the API will likely change.
 1. [Migrations](#migrations)
 1. [In-Memory Database](#in-memory-database)
 1. [Callback](#callback)
+1. [Ignore Fields](#ignore-fields)
 1. [Examples](#examples)
 1. [Naming](#naming)
 1. [Bugs and Feedback](#bugs-and-feedback)
@@ -305,6 +306,11 @@ For more information about primary keys and especially compound primary keys, re
 `@ColumnInfo` enables custom mapping of single table columns.
 With the annotation, it's possible to give columns a custom name and define if the column is able to store `null`.
 
+`@ignore` excludes annotated fields from the library's mapping.
+More information on that can be found in the [Ignore Fields](#ignore-fields) section.
+
+Constructors with positional and named parameters are supported out of the box.
+
 ```dart
 @Entity(tableName: 'person')
 class Person {
@@ -454,6 +460,24 @@ final database = await $FloorAppDatabase
     .databaseBuilder('app_database.db')
     .addCallback(callback)
     .build();
+```
+
+## Ignore Fields
+The `hashCode` property and all static fields of entities are ignored by default and thus excluded from the library's mapping.
+In case further fields should be ignored, the `@ignore` annotation should be used and applied as shown in the following snippet.
+
+```dart
+class Person {
+  @primaryKey
+  final int id;
+
+  final String name;
+
+  @ignore
+  String nickname;
+
+  Person(this.id, this.name);
+}
 ```
 
 ## Examples
