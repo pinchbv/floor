@@ -120,6 +120,115 @@ void main() {
     expect(actual.fields.length, equals(2));
   });
 
+  group('Constructors', () {
+    test('generate simple constructor', () async {
+      final classElement = await _createClassElement('''
+      @entity
+      class Person {
+        @primaryKey
+        final int id;
+      
+        final String name;
+      
+        Person(this.id, this.name);
+      }
+    ''');
+
+      final actual = EntityProcessor(classElement).process().constructor;
+
+      const expected = "Person(row['id'] as int, row['name'] as String)";
+      expect(actual, equals(expected));
+    });
+
+    test('generate constructor with named argument', () async {
+      final classElement = await _createClassElement('''
+      @entity
+      class Person {
+        @primaryKey
+        final int id;
+      
+        final String name;
+        
+        final String bar;
+      
+        Person(this.id, this.name, {this.bar});
+      }
+    ''');
+
+      final actual = EntityProcessor(classElement).process().constructor;
+
+      const expected =
+          "Person(row['id'] as int, row['name'] as String, bar: row['bar'] as String)";
+      expect(actual, equals(expected));
+    });
+
+    test('generate constructor with named arguments', () async {
+      final classElement = await _createClassElement('''
+      @entity
+      class Person {
+        @primaryKey
+        final int id;
+      
+        final String name;
+        
+        final String bar;
+      
+        Person({this.id, this.name, this.bar});
+      }
+    ''');
+
+      final actual = EntityProcessor(classElement).process().constructor;
+
+      const expected =
+          "Person(id: row['id'] as int, name: row['name'] as String, bar: row['bar'] as String)";
+      expect(actual, equals(expected));
+    });
+
+    test('generate constructor with optional argument', () async {
+      final classElement = await _createClassElement('''
+      @entity
+      class Person {
+        @primaryKey
+        final int id;
+      
+        final String name;
+        
+        final String bar;
+      
+        Person(this.id, this.name, [this.bar]);
+      }
+    ''');
+
+      final actual = EntityProcessor(classElement).process().constructor;
+
+      const expected =
+          "Person(row['id'] as int, row['name'] as String, row['bar'] as String)";
+      expect(actual, equals(expected));
+    });
+
+    test('generate constructor with optional arguments', () async {
+      final classElement = await _createClassElement('''
+      @entity
+      class Person {
+        @primaryKey
+        final int id;
+      
+        final String name;
+        
+        final String bar;
+      
+        Person([this.id, this.name, this.bar]);
+      }
+    ''');
+
+      final actual = EntityProcessor(classElement).process().constructor;
+
+      const expected =
+          "Person(row['id'] as int, row['name'] as String, row['bar'] as String)";
+      expect(actual, equals(expected));
+    });
+  });
+
   group('foreign keys', () {
     test('foreign key holds correct values', () async {
       final classElements = await _createClassElements('''
