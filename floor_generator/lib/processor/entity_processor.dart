@@ -222,28 +222,40 @@ class EntityProcessor extends Processor<Entity> {
 
   @nonNull
   String _getConstructor(final List<Field> fields) {
-    final columnNames = fields.map((field) => field.columnName).toList();
     final constructorParameters = _classElement.constructors.first.parameters;
+    final parameterValues = constructorParameters
+        .map((parameterElement) => _getParameterValue(parameterElement, fields))
+        .where((parameterValue) => parameterValue != null)
+        .join(', ');
 
-    final parameterValues = <String>[];
-
-    for (var i = 0; i < constructorParameters.length; i++) {
-      final parameterValue = "row['${columnNames[i]}']";
-      final constructorParameter = constructorParameters[i];
-      final castedParameterValue =
-          _castParameterValue(constructorParameter.type, parameterValue);
-
-      if (castedParameterValue == null) {
-        throw _processorError.parameterTypeNotSupported(constructorParameter);
-      }
-
-      parameterValues.add(castedParameterValue);
-    }
-
-    return '${_classElement.displayName}(${parameterValues.join(', ')})';
+    return '${_classElement.displayName}($parameterValues)';
   }
 
+  /// Returns `null` whenever field is @ignored
   @nullable
+  String _getParameterValue(
+    final ParameterElement parameterElement,
+    final List<Field> fields,
+  ) {
+    final parameterName = parameterElement.displayName;
+    final field = fields.firstWhere(
+      (field) => field.name == parameterName,
+      orElse: () => null, // whenever field is @ignored
+    );
+    if (field != null) {
+      final parameterValue = "row['${field.columnName}']";
+      final castedParameterValue =
+          _castParameterValue(parameterElement.type, parameterValue);
+      if (parameterElement.isNamed) {
+        return '$parameterName: $castedParameterValue';
+      }
+      return castedParameterValue; // also covers positional parameter
+    } else {
+      return null;
+    }
+  }
+
+  @nonNull
   String _castParameterValue(
     final DartType parameterType,
     final String parameterValue,
@@ -254,10 +266,8 @@ class EntityProcessor extends Processor<Entity> {
       return '$parameterValue as String';
     } else if (parameterType.isDartCoreInt) {
       return '$parameterValue as int';
-    } else if (parameterType.isDartCoreDouble) {
-      return '$parameterValue as double';
     } else {
-      return null;
+      return '$parameterValue as double'; // must be double
     }
   }
 }
