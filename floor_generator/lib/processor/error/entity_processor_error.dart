@@ -40,16 +40,19 @@ class EntityProcessorError {
   // ignore: non_constant_identifier_names
   InvalidGenerationSourceError get FOREIGN_KEY_DOES_NOT_REFERENCE_ENTITY {
     return InvalidGenerationSourceError(
-        "The foreign key doesn't reference an entity class.",
-        todo: 'Make sure to add an entity to the foreign key. ',
-        element: _classElement);
+      "The foreign key doesn't reference an entity class.",
+      todo: 'Make sure to add an entity to the foreign key. ',
+      element: _classElement,
+    );
   }
 
   // ignore: non_constant_identifier_names
   InvalidGenerationSourceError get FOREIGN_KEY_NO_ENTITY {
-    return InvalidGenerationSourceError('No entity defined for foreign key',
-        todo: 'Make sure to add an entity to the foreign key. ',
-        element: _classElement);
+    return InvalidGenerationSourceError(
+      'No entity defined for foreign key',
+      todo: 'Make sure to add an entity to the foreign key. ',
+      element: _classElement,
+    );
   }
 
   // ignore: non_constant_identifier_names
@@ -59,16 +62,6 @@ class EntityProcessorError {
       todo:
           "Make sure to add an index column name like: Index(values: ['foo'])').",
       element: _classElement,
-    );
-  }
-
-  InvalidGenerationSourceError parameterTypeNotSupported(
-    final ParameterElement parameterElement,
-  ) {
-    return InvalidGenerationSourceError(
-      'The given constrcutor parameter type is not supported.',
-      todo: 'Make sure to only use bool, String, int and double types.',
-      element: parameterElement,
     );
   }
 
