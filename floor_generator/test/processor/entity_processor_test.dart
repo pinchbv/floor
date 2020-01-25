@@ -229,6 +229,55 @@ void main() {
     });
   });
 
+  group('@Ignore', () {
+    test('ignore field not present in constructor', () async {
+      final classElement = await _createClassElement('''
+      @entity
+      class Person {
+        @primaryKey
+        final int id;
+      
+        final String name;
+        
+        @ignore
+        String foo;
+      
+        Person(this.id, this.name);
+      }
+    ''');
+
+      final actual = EntityProcessor(classElement)
+          .process()
+          .fields
+          .map((field) => field.name);
+
+      const expected = 'foo';
+      expect(actual, isNot(contains(expected)));
+    });
+
+    test('ignore field present in constructor', () async {
+      final classElement = await _createClassElement('''
+      @entity
+      class Person {
+        @primaryKey
+        final int id;
+      
+        final String name;
+        
+        @ignore
+        String foo;
+      
+        Person(this.id, this.name, [this.foo = 'foo']);
+      }
+    ''');
+
+      final actual = EntityProcessor(classElement).process().constructor;
+
+      const expected = "Person(row['id'] as int, row['name'] as String)";
+      expect(actual, equals(expected));
+    });
+  });
+
   group('foreign keys', () {
     test('foreign key holds correct values', () async {
       final classElements = await _createClassElements('''
