@@ -27,6 +27,7 @@ This package is still in an early phase and the API will likely change.
 1. [Migrations](#migrations)
 1. [In-Memory Database](#in-memory-database)
 1. [Callback](#callback)
+1. [Ignore Fields](#ignore-fields)
 1. [Examples](#examples)
 1. [Naming](#naming)
 1. [Bugs and Feedback](#bugs-and-feedback)
@@ -37,17 +38,17 @@ This package is still in an early phase and the API will likely change.
     The third dependency is `build_runner` which has to be included as a dev dependency just like the generator.
 
     - `floor` holds all the code you are going to use in your application.
-    
+
     - `floor_generator` includes the code for generating the database classes.
-    
+
     - `build_runner` enables a concrete way of generating source code files.
- 
+
     ````yaml
     dependencies:
       flutter:
         sdk: flutter
       floor: ^0.11.0
-    
+
     dev_dependencies:
       floor_generator: ^0.11.0
       build_runner: ^1.7.3
@@ -63,16 +64,16 @@ This package is still in an early phase and the API will likely change.
 
     ````dart
     // entity/person.dart
- 
+
     import 'package:floor/floor.dart';
-    
+
     @entity
     class Person {
       @primaryKey
       final int id;
-    
+
       final String name;
-    
+
       Person(this.id, this.name);
     }
     ````
@@ -85,49 +86,49 @@ This package is still in an early phase and the API will likely change.
     - You can define queries by adding the `@Query` annotation to a method.
         The SQL statement has to get added in parenthesis.
         The method must return a `Future` of the `Entity` you're querying for.
-        
+
     - `@insert` marks a method as an insertion method.
-    
+
     ```dart
-    // dao/person_dao.dart   
- 
+    // dao/person_dao.dart
+
     import 'package:floor/floor.dart';
 
     @dao
     abstract class PersonDao {
       @Query('SELECT * FROM Person')
       Future<List<Person>> findAllPersons();
-      
+
       @Query('SELECT * FROM Person WHERE id = :id')
       Future<Person> findPersonById(int id);
-      
+
       @insert
       Future<void> insertPerson(Person person);
     }
     ```
-    
+
 1. Creating the *Database*
 
     It has to be an abstract class which extends `FloorDatabase`.
     Furthermore, it's required to add `@Database()` to the signature of the class.
     Make sure to add the created entity to the `entities` attribute of the `@Database` annotation.
-    
+
     In order to make the generated code work, it's required to also add the listed imports.
 
     ```dart
     // database.dart
-      
+
     // required package imports
     import 'dart:async';
     import 'package:floor/floor.dart';
     import 'package:path/path.dart';
-    import 'package:sqflite/sqflite.dart' as sqflite;   
-   
+    import 'package:sqflite/sqflite.dart' as sqflite;
+
     import 'dao/person_dao.dart';
-    import 'model/person.dart';   
- 
+    import 'model/person.dart';
+
     part 'database.g.dart'; // the generated code will be there
- 
+
     @Database(version: 1, entities: [Person])
     abstract class AppDatabase extends FloorDatabase {
       PersonDao get personDao;
@@ -140,7 +141,7 @@ This package is still in an early phase and the API will likely change.
 
 1. Run the generator with `flutter packages pub run build_runner build`.
     To automatically run it, whenever a file changes, use `flutter packages pub run build_runner watch`.
-    
+
 1. Use the generated code.
     For obtaining an instance of the database, use the generated `$FloorAppDatabase` class, which allows access to a database builder.
     The name is composited from `$Floor` and the database class name.
@@ -153,7 +154,7 @@ This package is still in an early phase and the API will likely change.
     final person = await database.findPersonById(1);
     await database.insertPerson(person);
     ```
-    
+
 For further examples take a look at the [example](https://github.com/vitusortner/floor/tree/develop/example) and [floor_test](https://github.com/vitusortner/floor/tree/develop/floor_test) directories.
 
 ## Architecture
@@ -208,7 +209,7 @@ Future<List<City>> findPersonsWithNamesLike(String name);
 // usage
 final name = '%foo%';
 await dao.findPersonsWithNamesLike(name);
-``` 
+```
 
 ## Persisting Data Changes
 Use the `@insert`, `@update` and `@delete` annotations for inserting and changing persistent data.
@@ -223,7 +224,7 @@ All these methods accept single or multiple entity instances.
     - `void` return nothing
     - `int` return primary key of inserted item
     - `List<int>` return primary keys of inserted items
-     
+
 - **Update**
 
     `@update` marks a method as an update method.
@@ -232,16 +233,16 @@ All these methods accept single or multiple entity instances.
     These methods can return a `Future` of either `void` or `int`.
     - `void` return nothing
     - `int` return number of changed rows
-    
-- **Delete** 
+
+- **Delete**
 
     `@delete` marks a method as a deletion method.
     These methods can return a `Future` of either `void` or `int`.
     - `void` return nothing
     - `int` return number of deleted rows
-    
+
 ```dart
-// examples of changing multiple items with return 
+// examples of changing multiple items with return
 
 @insert
 Future<List<int>> insertPersons(List<Person> person);
@@ -295,7 +296,7 @@ It has the additional attribute of `tableName` which opens up the possibility to
 More information on how to use these can be found in the [Foreign Keys](#foreign-keys) section.
 Indices are supported as well.
 They can be used by adding an `Index` to the `indices` value of the entity.
-For further information of these, please refer to the [Indices](#indices) section. 
+For further information of these, please refer to the [Indices](#indices) section.
 
 `@PrimaryKey` marks property of a class as the primary key column.
 This property has to be of type int.
@@ -337,7 +338,7 @@ class Person {
 ## Foreign Keys
 Add a list of `ForeignKey`s to the `Entity` annotation of the referencing entity.
 `childColumns` define the columns of the current entity, whereas `parentColumns` define the columns of the parent entity.
-Foreign key actions can get triggered after defining them for the `onUpdate` and `onDelete` properties. 
+Foreign key actions can get triggered after defining them for the `onUpdate` and `onDelete` properties.
 
 ```dart
 @Entity(
@@ -390,7 +391,7 @@ Whenever are doing changes to your entities, you're required to also migrate the
 First, update your entity.
 Next, Increase the database version.
 Define a `Migration` which specifies a `startVersion`, an `endVersion` and a function that executes SQL to migrate the data.
-At last, use `addMigrations()` on the obtained database builder to add migrations. 
+At last, use `addMigrations()` on the obtained database builder to add migrations.
 Don't forget to trigger the code generator again, to create the code for handling the new entity.
 
 ```dart
@@ -402,7 +403,7 @@ class Person {
 
   @ColumnInfo(name: 'custom_name', nullable: false)
   final String name;
-  
+
   final String nickname;
 
   Person(this.id, this.name, this.nickname);
@@ -454,6 +455,21 @@ final database = await $FloorAppDatabase
     .databaseBuilder('app_database.db')
     .addCallback(callback)
     .build();
+```
+
+## Ignore Fields
+The `hashCode` property and all static fields of entities are ignored by default and thus excluded from the library's mapping.
+In case further fields should be ignored, the `@ignore` annotation should be used and applied as shown in the following snippet.
+
+```dart
+class Person {
+  @primaryKey
+  final int id;
+  final String name;
+  @ignore
+  String nickname;
+  Person(this.id, this.name);
+}
 ```
 
 ## Examples
