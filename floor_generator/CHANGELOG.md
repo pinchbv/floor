@@ -1,5 +1,19 @@
 # Changelog
 
+# 0.11.0
+
+### Changes
+
+* Refactor string utility function into extension function
+* Refactor annotation check functions to use extension functions
+* Refactor type check functions to use extension functions
+
+### 🚀 Features
+
+* Ignore fields of entities by adding ignore annotation
+* Handle named constructor parameters and ignore field order
+* Exclude static fields from entity mapping
+
 # 0.10.0
 
 ### Changes

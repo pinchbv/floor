@@ -1,5 +1,9 @@
 # Changelog
 
+# 0.6.0
+
+* Add @ignore annotation
+
 # 0.5.0
 
 * Update dependency
@@ -30,7 +34,6 @@
 ### 🐛 Bug Fixes
 
 *  Correct mapper instance name referenced by generated query methods
-
 
 # 0.2.0
 
