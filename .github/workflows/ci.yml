@@ -86,6 +86,9 @@ jobs:
         run: flutter analyze
         working-directory: floor
 
+      - name: Install SQLite
+        run: dart sqflite_ffi_test/linux_setup.dart
+
       - name: Run tests
         run: flutter test --coverage --coverage-path coverage/lcov.info
         working-directory: floor
