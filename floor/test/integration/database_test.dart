@@ -2,6 +2,7 @@ import 'package:floor/floor.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:matcher/matcher.dart';
 import 'package:sqflite/sqflite.dart';
+import 'package:sqflite_ffi_test/sqflite_ffi_test.dart';
 
 import 'dao/dog_dao.dart';
 import 'dao/person_dao.dart';
@@ -9,17 +10,17 @@ import 'database.dart';
 import 'model/dog.dart';
 import 'model/person.dart';
 
-// run test with 'flutter run test/database_test.dart'
 // trigger generator with 'flutter packages pub run build_runner build'
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
+  sqfliteFfiTestInit();
 
   group('database tests', () {
     TestDatabase database;
     PersonDao personDao;
     DogDao dogDao;
 
-    setUpAll(() async {
+    setUp(() async {
       final migration1to2 = Migration(1, 2, (database) {
         database.execute('ALTER TABLE dog ADD COLUMN nick_name TEXT');
       });
@@ -35,8 +36,7 @@ void main() {
     });
 
     tearDown(() async {
-      await database.database.execute('DELETE FROM dog');
-      await database.database.execute('DELETE FROM person');
+      await database.close();
     });
 
     test('database initially is empty', () async {
@@ -68,7 +68,7 @@ void main() {
       test('update person', () async {
         final person = Person(1, 'Simon');
         await personDao.insertPerson(person);
-        final updatedPerson = Person(person.id, _reverse(person.name));
+        final updatedPerson = Person(person.id, person.name.reversed());
 
         await personDao.updatePerson(updatedPerson);
 
@@ -101,7 +101,7 @@ void main() {
         final persons = [Person(1, 'Simon'), Person(2, 'Frank')];
         await personDao.insertPersons(persons);
         final updatedPersons = persons
-            .map((person) => Person(person.id, _reverse(person.name)))
+            .map((person) => Person(person.id, person.name.reversed()))
             .toList();
 
         await personDao.updatePersons(updatedPersons);
@@ -168,7 +168,7 @@ void main() {
       test('update person and return 1 (affected row count)', () async {
         final person = Person(1, 'Simon');
         await personDao.insertPerson(person);
-        final updatedPerson = Person(person.id, _reverse(person.name));
+        final updatedPerson = Person(person.id, person.name.reversed());
 
         final actual = await personDao.updatePersonWithReturn(updatedPerson);
 
@@ -181,7 +181,7 @@ void main() {
         final persons = [Person(1, 'Simon'), Person(2, 'Frank')];
         await personDao.insertPersons(persons);
         final updatedPersons = persons
-            .map((person) => Person(person.id, _reverse(person.name)))
+            .map((person) => Person(person.id, person.name.reversed()))
             .toList();
 
         final actual = await personDao.updatePersonsWithReturn(updatedPersons);
@@ -312,7 +312,7 @@ void main() {
         test('update items', () async {
           final persons = [Person(1, 'Simon'), Person(2, 'Frank')];
           final updatedPersons = persons
-              .map((person) => Person(person.id, _reverse(person.name)))
+              .map((person) => Person(person.id, person.name.reversed()))
               .toList();
           await personDao.insertPersons(persons);
 
@@ -397,6 +397,6 @@ void main() {
 final _throwsDatabaseException =
     throwsA(const TypeMatcher<DatabaseException>());
 
-String _reverse(final String value) {
-  return value.split('').reversed.join();
+extension on String {
+  String reversed() => split('').reversed.join();
 }

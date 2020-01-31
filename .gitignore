@@ -1,5 +1,6 @@
 # Exclude generated Dart files
 *.g.dart
+!floor/test/integration/*.g.dart
 
 # Miscellaneous
 *.class

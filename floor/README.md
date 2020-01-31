@@ -28,6 +28,7 @@ This package is still in an early phase and the API will likely change.
 1. [In-Memory Database](#in-memory-database)
 1. [Callback](#callback)
 1. [Ignore Fields](#ignore-fields)
+1. [Testing](#testing)
 1. [Examples](#examples)
 1. [Naming](#naming)
 1. [Bugs and Feedback](#bugs-and-feedback)
@@ -465,15 +466,87 @@ In case further fields should be ignored, the `@ignore` annotation should be use
 class Person {
   @primaryKey
   final int id;
+
   final String name;
+
   @ignore
   String nickname;
+
   Person(this.id, this.name);
 }
 ```
 
+## Testing
+In order to run database tests on your development machine without the need to deploy the code to an actual device, the setup has to be configured as shown in the following.
+For more test references, check out the [project's tests](https://github.com/vitusortner/floor/tree/develop/floor/integration).
+
+#### pubspec.yaml
+```yaml
+dependencies:
+  flutter:
+    sdk: flutter
+  floor: ^0.11.0
+
+dev_dependencies:
+  floor_generator: ^0.11.0
+  build_runner: ^1.7.3
+
+  # additional dependencies
+  flutter_test:
+    sdk: flutter
+  sqflite_ffi_test:
+    git:
+      url: git://github.com/tekartik/sqflite_more
+      ref: dart2
+      path: sqflite_ffi_test
+```
+
+#### database_test.dart
+```dart
+import 'package:floor/floor.dart';
+import 'package:flutter_test/flutter_test.dart';
+import 'package:matcher/matcher.dart';
+import 'package:sqflite/sqflite.dart';
+import 'package:sqflite_ffi_test/sqflite_ffi_test.dart';
+
+// your imports follow here
+import 'dao/person_dao.dart';
+import 'database.dart';
+import 'model/person.dart';
+
+void main() {
+  TestWidgetsFlutterBinding.ensureInitialized();
+  sqfliteFfiTestInit();
+
+  group('database tests', () {
+    TestDatabase database;
+    PersonDao personDao;
+
+    setUp(() async {
+      database = await $FloorTestDatabase
+          .inMemoryDatabaseBuilder()
+          .build();
+      personDao = database.personDao;
+    });
+
+    tearDown(() async {
+      await database.close();
+    });
+  
+    test('insert person', () async {
+      final person = Person(1, 'Simon');
+      await personDao.insertPerson(person);
+
+      final actual = await personDao.findPersonById(person.id);
+
+      expect(actual, equals(person));
+    });
+  }
+}
+```
+
 ## Examples
-For further examples take a look at the [example](https://github.com/vitusortner/floor/tree/develop/example) and [floor_test](https://github.com/vitusortner/floor/tree/develop/floor_test) directories.
+For further examples take a look at the [example](https://github.com/vitusortner/floor/tree/develop/example) and [test](https://github.com/vitusortner/floor/tree/develop/floor/integration) directories.
      
 ## Naming
 *Floor - the bottom layer of a [Room](https://developer.android.com/topic/libraries/architecture/room).*
