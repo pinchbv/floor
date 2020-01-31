@@ -73,10 +73,21 @@ jobs:
       - name: Check out code
         uses: actions/checkout@v2
 
+      #      - name: Install Flutter
+      #        uses: subosito/flutter-action@v1
+      #        with:
+      #          channel: stable
+
+      # install pre-compiled flutter
       - name: Install Flutter
-        uses: subosito/flutter-action@v1
-        with:
-          channel: stable
+        run: |
+          sudo apt-get install -y --no-install-recommends lib32stdc++6 libstdc++6 > /dev/null
+          FLUTTER_CHANNEL=stable
+          FLUTTER_VERSION=1.12.13+hotfix.5-${FLUTTER_CHANNEL}
+          wget --quiet --output-document=flutter.tar.xz https://storage.googleapis.com/flutter_infra/releases/${FLUTTER_CHANNEL}/linux/flutter_linux_v${FLUTTER_VERSION}.tar.xz && tar xf flutter.tar.xz > /dev/null && rm flutter.tar.xz
+          export PATH="$PATH":"$HOME/.pub-cache/bin"
+          export PATH=$PWD/flutter/bin:$PWD/flutter/bin/cache/dart-sdk/bin:$PATH
+          flutter doctor -v
 
       - name: Install dependencies
         run: flutter packages get
