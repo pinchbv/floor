@@ -465,9 +465,12 @@ In case further fields should be ignored, the `@ignore` annotation should be use
 class Person {
   @primaryKey
   final int id;
+
   final String name;
+
   @ignore
   String nickname;
+
   Person(this.id, this.name);
 }
 ```
