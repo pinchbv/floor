@@ -69,7 +69,7 @@ void main() {
       test('update person', () async {
         final person = Person(1, 'Simon');
         await personDao.insertPerson(person);
-        final updatedPerson = Person(person.id, _reverse(person.name));
+        final updatedPerson = Person(person.id, person.name.reversed());
 
         await personDao.updatePerson(updatedPerson);
 
@@ -102,7 +102,7 @@ void main() {
         final persons = [Person(1, 'Simon'), Person(2, 'Frank')];
         await personDao.insertPersons(persons);
         final updatedPersons = persons
-            .map((person) => Person(person.id, _reverse(person.name)))
+            .map((person) => Person(person.id, person.name.reversed()))
             .toList();
 
         await personDao.updatePersons(updatedPersons);
@@ -169,7 +169,7 @@ void main() {
       test('update person and return 1 (affected row count)', () async {
         final person = Person(1, 'Simon');
         await personDao.insertPerson(person);
-        final updatedPerson = Person(person.id, _reverse(person.name));
+        final updatedPerson = Person(person.id, person.name.reversed());
 
         final actual = await personDao.updatePersonWithReturn(updatedPerson);
 
@@ -182,7 +182,7 @@ void main() {
         final persons = [Person(1, 'Simon'), Person(2, 'Frank')];
         await personDao.insertPersons(persons);
         final updatedPersons = persons
-            .map((person) => Person(person.id, _reverse(person.name)))
+            .map((person) => Person(person.id, person.name.reversed()))
             .toList();
 
         final actual = await personDao.updatePersonsWithReturn(updatedPersons);
@@ -313,7 +313,7 @@ void main() {
         test('update items', () async {
           final persons = [Person(1, 'Simon'), Person(2, 'Frank')];
           final updatedPersons = persons
-              .map((person) => Person(person.id, _reverse(person.name)))
+              .map((person) => Person(person.id, person.name.reversed()))
               .toList();
           await personDao.insertPersons(persons);
 
@@ -398,6 +398,6 @@ void main() {
 final _throwsDatabaseException =
     throwsA(const TypeMatcher<DatabaseException>());
 
-String _reverse(final String value) {
-  return value.split('').reversed.join();
+extension on String {
+  String reversed() => split('').reversed.join();
 }
