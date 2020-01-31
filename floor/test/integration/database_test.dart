@@ -20,7 +20,7 @@ void main() {
     PersonDao personDao;
     DogDao dogDao;
 
-    setUpAll(() async {
+    setUp(() async {
       final migration1to2 = Migration(1, 2, (database) {
         database.execute('ALTER TABLE dog ADD COLUMN nick_name TEXT');
       });
@@ -36,8 +36,7 @@ void main() {
     });
 
     tearDown(() async {
-      await database.database.execute('DELETE FROM dog');
-      await database.database.execute('DELETE FROM person');
+      await database.close();
     });
 
     test('database initially is empty', () async {
