@@ -87,7 +87,7 @@ jobs:
         working-directory: floor
 
       - name: Install SQLite
-        run: dart sqflite_ffi_test/linux_setup.dart
+        run: sudo apt-get -y install sqlite3 libsqlite3-dev
 
       - name: Run tests
         run: flutter test --coverage --coverage-path coverage/lcov.info
