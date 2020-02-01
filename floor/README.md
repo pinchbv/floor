@@ -478,7 +478,9 @@ class Person {
 
 ## Testing
 In order to run database tests on your development machine without the need to deploy the code to an actual device, the setup has to be configured as shown in the following.
-For more test references, check out the [project's tests](https://github.com/vitusortner/floor/tree/develop/floor/integration).
+For more test references, check out the [project's tests](https://github.com/vitusortner/floor/tree/develop/floor/test/integration).
+
+In case you're running Linux, make sure to have sqlite3 and libsqlite3-dev installed.
 
 #### pubspec.yaml
 ```yaml
@@ -546,7 +548,7 @@ void main() {
 ```
 
 ## Examples
-For further examples take a look at the [example](https://github.com/vitusortner/floor/tree/develop/example) and [test](https://github.com/vitusortner/floor/tree/develop/floor/integration) directories.
+For further examples take a look at the [example](https://github.com/vitusortner/floor/tree/develop/example) and [test](https://github.com/vitusortner/floor/tree/develop/floor/test/integration) directories.
      
 ## Naming
 *Floor - the bottom layer of a [Room](https://developer.android.com/topic/libraries/architecture/room).*
