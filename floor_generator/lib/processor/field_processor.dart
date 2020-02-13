@@ -66,6 +66,8 @@ class FieldProcessor extends Processor<Field> {
       return SqlType.INTEGER;
     } else if (type.isDartCoreDouble) {
       return SqlType.REAL;
+    } else if (type.getDisplayString() == 'Uint8List') {
+      return SqlType.BLOB;
     }
     throw InvalidGenerationSourceError(
       'Column type is not supported for $type.',

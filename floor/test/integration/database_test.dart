@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 import 'package:floor/floor.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:matcher/matcher.dart';
@@ -212,7 +214,7 @@ void main() {
 
     group('foreign key', () {
       test('foreign key constraint failed exception', () {
-        final dog = Dog(null, 'Peter', 'Pete', 2);
+        final dog = Dog(null, 'Peter', 'Pete', 2, Uint8List(8));
 
         expect(() => dogDao.insertDog(dog), _throwsDatabaseException);
       });
@@ -220,7 +222,7 @@ void main() {
       test('find dog for person', () async {
         final person = Person(1, 'Simon');
         await personDao.insertPerson(person);
-        final dog = Dog(2, 'Peter', 'Pete', person.id);
+        final dog = Dog(2, 'Peter', 'Pete', person.id, Uint8List(8));
         await dogDao.insertDog(dog);
 
         final actual = await dogDao.findDogForPersonId(person.id);
@@ -231,7 +233,7 @@ void main() {
       test('cascade delete dog on deletion of person', () async {
         final person = Person(1, 'Simon');
         await personDao.insertPerson(person);
-        final dog = Dog(2, 'Peter', 'Pete', person.id);
+        final dog = Dog(2, 'Peter', 'Pete', person.id, Uint8List(8));
         await dogDao.insertDog(dog);
 
         await personDao.deletePerson(person);

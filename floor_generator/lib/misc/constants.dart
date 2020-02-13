@@ -33,6 +33,7 @@ abstract class SqlType {
   static const INTEGER = 'INTEGER';
   static const TEXT = 'TEXT';
   static const REAL = 'REAL';
+  static const BLOB = 'BLOB';
 }
 
 abstract class OnConflictStrategy {
