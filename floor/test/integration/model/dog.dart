@@ -1,8 +1,8 @@
 import 'dart:typed_data';
 
+import 'package:collection/collection.dart';
 import 'package:floor/floor.dart';
 
-import '../../test_util/list_helper.dart';
 import 'person.dart';
 
 @Entity(
@@ -40,7 +40,7 @@ class Dog {
           id == other.id &&
           name == other.name &&
           nickName == other.nickName &&
-          ListHelper.deepEquals(picture, other.picture) &&
+          const ListEquality<int>().equals(picture, other.picture) &&
           ownerId == other.ownerId;
 
   @override

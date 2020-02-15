@@ -77,6 +77,19 @@ void main() {
         final actual = await personDao.findPersonById(person.id);
         expect(actual, equals(updatedPerson));
       });
+
+      test('insert/update dog, search by Uint8List', () async {
+        final person = Person(1, 'Simon');
+        await personDao.insertPerson(person);
+        final dog = Dog(1, 'Dogbert', 'Doggy', 1, Uint8List(9));
+        await dogDao.addDog(dog);
+        final updatedDog = Dog(1, 'Dogbert 2.', 'Doggy', 1, Uint8List(7));
+
+        await dogDao.updateDog(updatedDog);
+
+        final actual = await dogDao.findDogForPicture(Uint8List(7));
+        expect(actual, equals(updatedDog));
+      });
     });
 
     group('change multiple items', () {
