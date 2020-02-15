@@ -85,6 +85,10 @@ class DatabaseWriter implements Writer {
         .expand((statements) => statements)
         .map((statement) => "await database.execute('$statement');")
         .join('\n');
+    final createViewStatements = database.views
+        .map((view) => view.getCreateViewStatement())
+        .map((statement) => "await database.execute('$statement');")
+        .join('\n');
 
     final pathParameter = Parameter((builder) => builder
       ..name = 'path'
@@ -122,6 +126,7 @@ class DatabaseWriter implements Writer {
             onCreate: (database, version) async {
               $createTableStatements
               $createIndexStatements
+              $createViewStatements
 
               await callback?.onCreate?.call(database, version);
             },

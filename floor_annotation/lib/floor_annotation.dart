@@ -3,6 +3,7 @@ library floor_annotation;
 export 'src/column_info.dart';
 export 'src/dao.dart';
 export 'src/database.dart';
+export 'src/database_view.dart';
 export 'src/delete.dart';
 export 'src/entity.dart';
 export 'src/foreign_key.dart';

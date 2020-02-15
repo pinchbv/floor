@@ -10,6 +10,7 @@ import 'package:floor_annotation/floor_annotation.dart' as annotations;
 import 'package:floor_generator/misc/type_utils.dart';
 import 'package:floor_generator/processor/dao_processor.dart';
 import 'package:floor_generator/processor/entity_processor.dart';
+import 'package:floor_generator/processor/view_processor.dart';
 import 'package:floor_generator/value_object/dao.dart';
 import 'package:path/path.dart' as path;
 import 'package:source_gen/source_gen.dart';
@@ -62,6 +63,29 @@ Future<DartType> getDartTypeWithPerson(String value) async {
     final String name;
   
     Person(this.id, this.name);
+  }
+  ''';
+  return resolveSource(source, (item) async {
+    final libraryReader = LibraryReader(await item.findLibraryByName('test'));
+    return (libraryReader.allElements.first as PropertyAccessorElement)
+        .type
+        .returnType;
+  });
+}
+
+Future<DartType> getDartTypeWithName(String value) async {
+  final source = '''
+  library test;
+  
+  import 'package:floor_annotation/floor_annotation.dart';
+  
+  $value value;
+  
+  @DatabaseView("SELECT DISTINCT(name) AS name from person")
+  class Name {
+    final String name;
+  
+    Name(this.name);
   }
   ''';
   return resolveSource(source, (item) async {
@@ -127,7 +151,12 @@ Future<Dao> createDao(final String methodSignature) async {
       .where((classElement) => classElement.hasAnnotation(annotations.Entity))
       .map((classElement) => EntityProcessor(classElement).process())
       .toList();
+  final views = library.classes
+      .where((classElement) =>
+          classElement.hasAnnotation(annotations.DatabaseView))
+      .map((classElement) => ViewProcessor(classElement).process())
+      .toList();
 
-  return DaoProcessor(daoClass, 'personDao', 'TestDatabase', entities)
+  return DaoProcessor(daoClass, 'personDao', 'TestDatabase', entities, views)
       .process();
 }

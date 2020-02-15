@@ -5,25 +5,22 @@ import 'package:floor_generator/value_object/field.dart';
 import 'package:floor_generator/value_object/foreign_key.dart';
 import 'package:floor_generator/value_object/index.dart';
 import 'package:floor_generator/value_object/primary_key.dart';
+import 'package:floor_generator/value_object/queryable.dart';
 
-class Entity {
-  final ClassElement classElement;
-  final String name;
-  final List<Field> fields;
+class Entity extends Queryable {
   final PrimaryKey primaryKey;
   final List<ForeignKey> foreignKeys;
   final List<Index> indices;
-  final String constructor;
 
   Entity(
-    this.classElement,
-    this.name,
-    this.fields,
+    ClassElement classElement,
+    String name,
+    List<Field> fields,
     this.primaryKey,
     this.foreignKeys,
     this.indices,
-    this.constructor,
-  );
+    String constructor,
+  ) : super(classElement, name, fields, constructor);
 
   @nonNull
   String getCreateTableStatement() {

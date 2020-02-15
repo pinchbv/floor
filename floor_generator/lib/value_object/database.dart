@@ -1,5 +1,6 @@
 import 'package:analyzer/dart/element/element.dart';
 import 'package:floor_generator/value_object/dao_getter.dart';
+import 'package:floor_generator/value_object/view.dart';
 import 'package:floor_generator/value_object/entity.dart';
 
 /// Representation of the database component.
@@ -7,6 +8,7 @@ class Database {
   final ClassElement classElement;
   final String name;
   final List<Entity> entities;
+  final List<View> views;
   final List<DaoGetter> daoGetters;
   final int version;
 
@@ -14,6 +16,7 @@ class Database {
     this.classElement,
     this.name,
     this.entities,
+    this.views,
     this.daoGetters,
     this.version,
   );
@@ -26,6 +29,7 @@ class Database {
           classElement == other.classElement &&
           name == other.name &&
           entities == other.entities &&
+          views == other.views &&
           daoGetters == other.daoGetters &&
           version == other.version;
 

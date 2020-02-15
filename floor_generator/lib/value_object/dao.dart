@@ -1,8 +1,8 @@
 import 'package:analyzer/dart/element/element.dart';
 import 'package:floor_generator/value_object/deletion_method.dart';
-import 'package:floor_generator/value_object/entity.dart';
 import 'package:floor_generator/value_object/insertion_method.dart';
 import 'package:floor_generator/value_object/query_method.dart';
+import 'package:floor_generator/value_object/queryable.dart';
 import 'package:floor_generator/value_object/transaction_method.dart';
 import 'package:floor_generator/value_object/update_method.dart';
 
@@ -14,7 +14,7 @@ class Dao {
   final List<UpdateMethod> updateMethods;
   final List<DeletionMethod> deletionMethods;
   final List<TransactionMethod> transactionMethods;
-  final List<Entity> streamEntities;
+  final List<Queryable> streamEntities;
 
   Dao(
     this.classElement,

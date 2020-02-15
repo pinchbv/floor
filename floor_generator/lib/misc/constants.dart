@@ -5,6 +5,7 @@ abstract class AnnotationField {
 
   static const DATABASE_VERSION = 'version';
   static const DATABASE_ENTITIES = 'entities';
+  static const DATABASE_VIEWS = 'views';
 
   static const COLUMN_INFO_NAME = 'name';
   static const COLUMN_INFO_NULLABLE = 'nullable';
@@ -13,6 +14,9 @@ abstract class AnnotationField {
   static const ENTITY_FOREIGN_KEYS = 'foreignKeys';
   static const ENTITY_INDICES = 'indices';
   static const ENTITY_PRIMARY_KEYS = 'primaryKeys';
+
+  static const VIEW_NAME = 'viewName';
+  static const VIEW_QUERY = 'query';
 }
 
 abstract class ForeignKeyField {
