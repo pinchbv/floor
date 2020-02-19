@@ -30,7 +30,7 @@ void main() {
 
   test('Process Uint8List field', () async {
     final fieldElement = await _generateFieldElement('''
-      @ColumnInfo(name : 'data', nullable:false)
+      @ColumnInfo(name: 'data', nullable: false)
       final Uint8List bytes;
     ''');
 
