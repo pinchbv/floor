@@ -4,13 +4,13 @@ import 'package:matcher/matcher.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:sqflite_ffi_test/sqflite_ffi_test.dart';
 
+import '../test_util/extensions.dart';
 import 'dao/dog_dao.dart';
 import 'dao/person_dao.dart';
 import 'database.dart';
 import 'model/dog.dart';
 import 'model/person.dart';
 
-// trigger generator with 'flutter packages pub run build_runner build'
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
   sqfliteFfiTestInit();
@@ -253,102 +253,6 @@ void main() {
       });
     });
 
-    group('stream queries', () {
-      test('initially emit persistent data', () async {
-        final person = Person(1, 'Simon');
-        await personDao.insertPerson(person);
-
-        final actual = personDao.findAllPersonsAsStream();
-
-        expect(actual, emits([person]));
-      });
-
-      group('insert change', () {
-        test('find person by id as stream', () async {
-          final person = Person(1, 'Simon');
-
-          final actual = personDao.findPersonByIdAsStream(person.id);
-
-          await personDao.insertPerson(person);
-          expect(actual, emits(person));
-        });
-
-        test('find all persons as stream', () async {
-          final persons = [Person(1, 'Simon'), Person(2, 'Frank')];
-
-          final actual = personDao.findAllPersonsAsStream();
-          expect(actual, emits(<List<Person>>[]));
-
-          await personDao.insertPersons(persons);
-          expect(actual, emits(persons));
-        });
-
-        test('initially emits persistent data then new', () async {
-          final persons = [Person(1, 'Simon'), Person(2, 'Frank')];
-          final persons2 = [Person(3, 'Paul'), Person(4, 'George')];
-          await personDao.insertPersons(persons);
-
-          final actual = personDao.findAllPersonsAsStream();
-          expect(actual, emits(persons));
-
-          await personDao.insertPersons(persons2);
-          expect(actual, emits(persons + persons2));
-        });
-      });
-
-      group('update change', () {
-        test('update item', () async {
-          final person = Person(1, 'Simon');
-          await personDao.insertPerson(person);
-
-          final actual = personDao.findAllPersonsAsStream();
-          expect(actual, emits([person]));
-
-          final updatedPerson = Person(person.id, 'Frank');
-          await personDao.updatePerson(updatedPerson);
-          expect(actual, emits([updatedPerson]));
-        });
-
-        test('update items', () async {
-          final persons = [Person(1, 'Simon'), Person(2, 'Frank')];
-          final updatedPersons = persons
-              .map((person) => Person(person.id, person.name.reversed()))
-              .toList();
-          await personDao.insertPersons(persons);
-
-          final actual = personDao.findAllPersonsAsStream();
-          expect(actual, emits(persons));
-
-          await personDao.updatePersons(updatedPersons);
-          expect(actual, emits(updatedPersons));
-        });
-      });
-
-      group('deletion change', () {
-        test('delete item', () async {
-          final person = Person(1, 'Simon');
-          await personDao.insertPerson(person);
-
-          final actual = personDao.findAllPersonsAsStream();
-          expect(actual, emits([person]));
-
-          await personDao.deletePerson(person);
-          expect(actual, emits(<Person>[]));
-        });
-
-        test('delete items', () async {
-          final persons = [Person(1, 'Simon'), Person(2, 'Frank')];
-          await personDao.insertPersons(persons);
-
-          final actual = personDao.findAllPersonsAsStream();
-          expect(actual, emits(persons));
-
-          await personDao.deletePersons(persons);
-          expect(actual, emits(<Person>[]));
-        });
-      });
-    });
-
     group('IN clause', () {
       test('Find persons with IDs', () async {
         final person1 = Person(1, 'Simon');
@@ -396,7 +300,3 @@ void main() {
 
 final _throwsDatabaseException =
     throwsA(const TypeMatcher<DatabaseException>());
-
-extension on String {
-  String reversed() => split('').reversed.join();
-}
