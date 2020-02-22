@@ -323,7 +323,7 @@ class _$DogDao extends DogDao {
       row['name'] as String,
       row['nick_name'] as String,
       row['owner_id'] as int,
-      row['picture']);
+      row['picture'] as Uint8List);
 
   final InsertionAdapter<Dog> _dogInsertionAdapter;
 
@@ -348,11 +348,6 @@ class _$DogDao extends DogDao {
 
   @override
   Future<void> insertDog(Dog dog) async {
-    await _dogInsertionAdapter.insert(dog, sqflite.ConflictAlgorithm.abort);
-  }
-
-  @override
-  Future<void> addDog(Dog dog) async {
     await _dogInsertionAdapter.insert(dog, sqflite.ConflictAlgorithm.abort);
   }
 

@@ -18,9 +18,6 @@ abstract class DogDao {
   @update
   Future<void> updateDog(Dog dog);
 
-  @insert
-  Future<void> addDog(Dog dog);
-
   @Query('SELECT * FROM dog WHERE picture = :pic')
   Future<Dog> findDogForPicture(Uint8List pic);
 }
