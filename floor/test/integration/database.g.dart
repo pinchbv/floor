@@ -338,12 +338,6 @@ class _$DogDao extends DogDao {
   }
 
   @override
-  Future<Dog> findDogForPicture(Uint8List pic) async {
-    return _queryAdapter.query('SELECT * FROM dog WHERE picture = ?',
-        arguments: <dynamic>[pic], mapper: _dogMapper);
-  }
-
-  @override
   Future<void> insertDog(Dog dog) async {
     await _dogInsertionAdapter.insert(dog, sqflite.ConflictAlgorithm.abort);
   }
