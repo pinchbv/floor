@@ -85,7 +85,7 @@ class _$TestDatabase extends TestDatabase {
         await database.execute(
             'CREATE TABLE IF NOT EXISTS `person` (`id` INTEGER, `custom_name` TEXT NOT NULL, PRIMARY KEY (`id`))');
         await database.execute(
-            'CREATE TABLE IF NOT EXISTS `dog` (`id` INTEGER, `name` TEXT, `nick_name` TEXT, `owner_id` INTEGER, `picture` BLOB, FOREIGN KEY (`owner_id`) REFERENCES `person` (`id`) ON UPDATE NO ACTION ON DELETE CASCADE, PRIMARY KEY (`id`))');
+            'CREATE TABLE IF NOT EXISTS `dog` (`id` INTEGER, `name` TEXT, `nick_name` TEXT, `owner_id` INTEGER, FOREIGN KEY (`owner_id`) REFERENCES `person` (`id`) ON UPDATE NO ACTION ON DELETE CASCADE, PRIMARY KEY (`id`))');
         await database.execute(
             'CREATE INDEX `index_person_custom_name` ON `person` (`custom_name`)');
 
@@ -297,8 +297,7 @@ class _$DogDao extends DogDao {
                   'id': item.id,
                   'name': item.name,
                   'nick_name': item.nickName,
-                  'owner_id': item.ownerId,
-                  'picture': item.picture
+                  'owner_id': item.ownerId
                 }),
         _dogUpdateAdapter = UpdateAdapter(
             database,
@@ -308,8 +307,7 @@ class _$DogDao extends DogDao {
                   'id': item.id,
                   'name': item.name,
                   'nick_name': item.nickName,
-                  'owner_id': item.ownerId,
-                  'picture': item.picture
+                  'owner_id': item.ownerId
                 });
 
   final sqflite.DatabaseExecutor database;
@@ -322,8 +320,7 @@ class _$DogDao extends DogDao {
       row['id'] as int,
       row['name'] as String,
       row['nick_name'] as String,
-      row['owner_id'] as int,
-      row['picture'] as Uint8List);
+      row['owner_id'] as int);
 
   final InsertionAdapter<Dog> _dogInsertionAdapter;
 
