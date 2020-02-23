@@ -266,6 +266,8 @@ class EntityProcessor extends Processor<Entity> {
       return '$parameterValue as String';
     } else if (parameterType.isDartCoreInt) {
       return '$parameterValue as int';
+    } else if (parameterType.isUint8List) {
+      return '$parameterValue as Uint8List';
     } else {
       return '$parameterValue as double'; // must be double
     }

@@ -1,3 +1,6 @@
+import 'dart:typed_data';
+
+import 'package:collection/collection.dart';
 import 'package:floor/floor.dart';
 
 import 'person.dart';
@@ -25,7 +28,9 @@ class Dog {
   @ColumnInfo(name: 'owner_id')
   final int ownerId;
 
-  Dog(this.id, this.name, this.nickName, this.ownerId);
+  final Uint8List picture;
+
+  Dog(this.id, this.name, this.nickName, this.ownerId, this.picture);
 
   @override
   bool operator ==(Object other) =>
@@ -35,6 +40,7 @@ class Dog {
           id == other.id &&
           name == other.name &&
           nickName == other.nickName &&
+          const ListEquality<int>().equals(picture, other.picture) &&
           ownerId == other.ownerId;
 
   @override
@@ -43,6 +49,6 @@ class Dog {
 
   @override
   String toString() {
-    return 'Dog{id: $id, name: $name, nickName: $nickName, ownerId: $ownerId}';
+    return 'Dog{id: $id, name: $name, nickName: $nickName, ownerId: $ownerId, picture: $picture}';
   }
 }

@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:typed_data';
 
 import 'package:floor/floor.dart';
 import 'package:path/path.dart';

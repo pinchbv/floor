@@ -27,6 +27,28 @@ void main() {
     );
     expect(actual, equals(expected));
   });
+
+  test('Process Uint8List field', () async {
+    final fieldElement = await _generateFieldElement('''
+      @ColumnInfo(name: 'data', nullable: false)
+      final Uint8List bytes;
+    ''');
+
+    final actual = FieldProcessor(fieldElement).process();
+
+    const name = 'bytes';
+    const columnName = 'data';
+    const isNullable = false;
+    const sqlType = SqlType.BLOB;
+    final expected = Field(
+      fieldElement,
+      name,
+      columnName,
+      isNullable,
+      sqlType,
+    );
+    expect(actual, equals(expected));
+  });
 }
 
 Future<FieldElement> _generateFieldElement(final String field) async {
@@ -34,6 +56,7 @@ Future<FieldElement> _generateFieldElement(final String field) async {
       library test;
       
       import 'package:floor_annotation/floor_annotation.dart';
+      import 'dart:typed_data';
       
       class Foo {
         $field
