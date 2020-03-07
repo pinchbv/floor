@@ -11,7 +11,7 @@ This package is still in an early phase and the API will likely change.
 
 ### Table of contents
 
-1. [How to use this library](#how-to-use-this-library)
+1. [Quick Start](#quick-start)
 1. [Architecture](#architecture)
 1. [Querying](#querying)
 1. [Persisting Data Changes](#persisting-data-changes)
@@ -22,7 +22,7 @@ This package is still in an early phase and the API will likely change.
     1. [Foreign Keys](#foreign-keys)
     1. [Primary Keys](#primary-keys)
     1. [Indices](#indices)
-    1. [Ignore Fields](#ignore-fields)
+    1. [Ignoring Fields](#ignoring-fields)
 1. [Migrations](#migrations)
 1. [In-Memory Database](#in-memory-database)
 1. [Callback](#callback)
@@ -32,7 +32,7 @@ This package is still in an early phase and the API will likely change.
 1. [Bugs and Feedback](#bugs-and-feedback)
 1. [License](#license)
 
-## How to use this library
+## Quick Start
 1. Add the runtime dependency `floor` as well as the generator `floor_generator` to your `pubspec.yaml`.
     The third dependency is `build_runner` which has to be included as a dev dependency just like the generator.
 
@@ -319,7 +319,7 @@ class Person {
 ```
 
 ### Supported Types
-Floor entities can hold values the following Dart types which map to their corresponding SQLite types and vice versa.
+Floor entities can hold values of the following Dart types which map to their corresponding SQLite types and vice versa.
 
 - `int` - REAL
 - `double` - REAL
@@ -392,7 +392,7 @@ class Person {
 }
 ```
 
-### Ignore Fields
+### Ignoring Fields
 The `hashCode` property and all static fields of entities are ignored by default and thus excluded from the library's mapping.
 In case further fields should be ignored, the `@ignore` annotation should be used and applied as shown in the following snippet.
 
@@ -541,7 +541,7 @@ void main() {
       await database.close();
     });
   
-    test('insert person', () async {
+    test('find person by id', () async {
       final person = Person(1, 'Simon');
       await personDao.insertPerson(person);
 
