@@ -1,6 +1,7 @@
 import 'package:code_builder/code_builder.dart';
 import 'package:floor_generator/value_object/query_method.dart';
 import 'package:floor_generator/writer/query_method_writer.dart';
+import 'package:source_gen/source_gen.dart';
 import 'package:test/test.dart';
 
 import '../test_utils.dart';
@@ -153,6 +154,17 @@ void main() {
         return _queryAdapter.queryList('SELECT * FROM Person WHERE id IN ($valueList1) AND id IN ($valueList2)', mapper: _personMapper);
       }
     '''));
+  });
+
+  test('query with unsupported type throws', () async {
+    final queryMethod = await _createQueryMethod('''
+      @Query('SELECT * FROM Person WHERE id = :person')
+      Future<Person> findById(Person person);
+    ''');
+
+    final actual = () => QueryMethodWriter(queryMethod).write();
+
+    expect(actual, throwsA(const TypeMatcher<InvalidGenerationSourceError>()));
   });
 }
 
