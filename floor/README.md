@@ -135,7 +135,7 @@ This package is still in an early phase and the API will likely change.
     ```
 
 1. Make sure to add `part 'database.g.dart';` beneath the imports of this file.
-    It's important to note, that 'database' has to get exchanged with the name of the file the entity and database is defined in.
+    It's important to note that 'database' has to get exchanged with the filename of the database definition.
     In this case, the file is named `database.dart`.
 
 1. Run the generator with `flutter packages pub run build_runner build`.
