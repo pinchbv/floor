@@ -82,12 +82,16 @@ jobs:
         run: flutter packages get
         working-directory: floor
 
-      - name: Install SQLite
-        run: sudo apt-get -y install sqlite3 libsqlite3-dev
+      - name: Run generator
+        run: flutter packages pub run build_runner build
+        working-directory: floor
 
       - name: Analyze
         run: flutter analyze
         working-directory: floor
+
+      - name: Install SQLite
+        run: sudo apt-get -y install sqlite3 libsqlite3-dev
 
       - name: Run tests
         run: flutter test --coverage --coverage-path coverage/lcov.info

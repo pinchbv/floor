@@ -1,4 +1,5 @@
 # Miscellaneous
+floor/test/integration/**/*.g.dart
 *.class
 *.lock
 *.log
