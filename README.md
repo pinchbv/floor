@@ -1,10 +1,7 @@
 # Floor
-**A supportive SQLite abstraction for your Flutter applications.**
+**A supportive SQLite abstraction for your Flutter applications (iOS, Android and macOS)**
 
 The Floor library provides a lightweight SQLite abstraction with automatic mapping between in-memory objects and database rows while still offering full control of the database with the use of SQL.
-
-It's important to note that this library is not a full-featured ORM like Hibernate and will never be.
-Thus not supporting automatic relationship mapping is intentional.
 
 This package is still in an early phase and the API will likely change.
 
@@ -14,27 +11,28 @@ This package is still in an early phase and the API will likely change.
 
 ### Table of contents
 
-1. [How to use this library](#how-to-use-this-library)
+1. [Quick Start](#quick-start)
 1. [Architecture](#architecture)
 1. [Querying](#querying)
 1. [Persisting Data Changes](#persisting-data-changes)
 1. [Streams](#streams)
 1. [Transactions](#transactions)
 1. [Entities](#entities)
-1. [Foreign Keys](#foreign-keys)
-1. [Primary Keys](#primary-keys)
-1. [Indices](#indices)
+    1. [Supported Types](#supported-types)
+    1. [Foreign Keys](#foreign-keys)
+    1. [Primary Keys](#primary-keys)
+    1. [Indices](#indices)
+    1. [Ignoring Fields](#ignoring-fields)
 1. [Migrations](#migrations)
 1. [In-Memory Database](#in-memory-database)
 1. [Callback](#callback)
-1. [Ignore Fields](#ignore-fields)
 1. [Testing](#testing)
 1. [Examples](#examples)
 1. [Naming](#naming)
 1. [Bugs and Feedback](#bugs-and-feedback)
 1. [License](#license)
 
-## How to use this library
+## Quick Start
 1. Add the runtime dependency `floor` as well as the generator `floor_generator` to your `pubspec.yaml`.
     The third dependency is `build_runner` which has to be included as a dev dependency just like the generator.
 
@@ -320,7 +318,16 @@ class Person {
 }
 ```
 
-## Primary Keys
+### Supported Types
+Floor entities can hold values of the following Dart types which map to their corresponding SQLite types and vice versa.
+
+- `int` - REAL
+- `double` - REAL
+- `String` - TEXT
+- `bool` - REAL (0 = false, 1 = true)
+- `Uint8List` - BLOB 
+
+### Primary Keys
 Whenever a compound primary key is required (e.g. *n-m* relationships), the syntax for setting the keys differs from the previously mentioned way of setting primary keys.
 Instead of annotating a field with `@PrimaryKey`, the `@Entity` annotation's `primaryKey` attribute is used.
 It accepts a list of column names that make up the compound primary key.
@@ -336,7 +343,7 @@ class Person {
 }
 ```
 
-## Foreign Keys
+### Foreign Keys
 Add a list of `ForeignKey`s to the `Entity` annotation of the referencing entity.
 `childColumns` define the columns of the current entity, whereas `parentColumns` define the columns of the parent entity.
 Foreign key actions can get triggered after defining them for the `onUpdate` and `onDelete` properties.
@@ -365,7 +372,7 @@ class Dog {
 }
 ```
 
-## Indices
+### Indices
 Indices help speeding up query, join and grouping operations.
 For more information on SQLite indices please refer to the official [documentation](https://sqlite.org/lang_createindex.html).
 To create an index with floor, add a list of indices to the `@Entity` annotation.
@@ -381,6 +388,24 @@ class Person {
 
   @ColumnInfo(name: 'custom_name', nullable: false)
   final String name;
+
+  Person(this.id, this.name);
+}
+```
+
+### Ignoring Fields
+The `hashCode` property and all static fields of entities are ignored by default and thus excluded from the library's mapping.
+In case further fields should be ignored, the `@ignore` annotation should be used and applied as shown in the following snippet.
+
+```dart
+class Person {
+  @primaryKey
+  final int id;
+
+  final String name;
+
+  @ignore
+  String nickname;
 
   Person(this.id, this.name);
 }
@@ -458,24 +483,6 @@ final database = await $FloorAppDatabase
     .build();
 ```
 
-## Ignore Fields
-The `hashCode` property and all static fields of entities are ignored by default and thus excluded from the library's mapping.
-In case further fields should be ignored, the `@ignore` annotation should be used and applied as shown in the following snippet.
-
-```dart
-class Person {
-  @primaryKey
-  final int id;
-
-  final String name;
-
-  @ignore
-  String nickname;
-
-  Person(this.id, this.name);
-}
-```
-
 ## Testing
 In order to run database tests on your development machine without the need to deploy the code to an actual device, the setup has to be configured as shown in the following.
 For more test references, check out the [project's tests](https://github.com/vitusortner/floor/tree/develop/floor/test/integration).
@@ -535,7 +542,7 @@ void main() {
       await database.close();
     });
   
-    test('insert person', () async {
+    test('find person by id', () async {
       final person = Person(1, 'Simon');
       await personDao.insertPerson(person);
 

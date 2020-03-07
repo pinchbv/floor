@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 import 'package:floor_generator/misc/type_utils.dart';
 import 'package:test/test.dart';
 
@@ -31,6 +33,14 @@ void main() {
 
     test('double is supported type', () async {
       final type = await getDartType(1.1);
+
+      final actual = type.isSupported;
+
+      expect(actual, isTrue);
+    });
+
+    test('Uint8List is supported type', () async {
+      final type = await getDartType(Uint8List(10));
 
       final actual = type.isSupported;
 
