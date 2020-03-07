@@ -324,6 +324,7 @@ Floor entities can hold values of the following Dart types which map to their co
 - `int` - REAL
 - `double` - REAL
 - `String` - TEXT
+- `bool` - REAL (0 = false, 1 = true)
 - `Uint8List` - BLOB 
 
 ### Primary Keys
