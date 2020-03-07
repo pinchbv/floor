@@ -37,7 +37,7 @@ class QueryMethodWriter implements Writer {
   List<Parameter> _generateMethodParameters() {
     return _queryMethod.parameters.map((parameter) {
       if (!parameter.type.isSupported) {
-        InvalidGenerationSourceError(
+        throw InvalidGenerationSourceError(
           'The type of this parameter is not supported.',
           element: parameter,
         );

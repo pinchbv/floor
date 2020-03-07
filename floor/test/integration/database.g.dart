@@ -298,16 +298,6 @@ class _$DogDao extends DogDao {
                   'name': item.name,
                   'nick_name': item.nickName,
                   'owner_id': item.ownerId
-                }),
-        _dogUpdateAdapter = UpdateAdapter(
-            database,
-            'dog',
-            ['id'],
-            (Dog item) => <String, dynamic>{
-                  'id': item.id,
-                  'name': item.name,
-                  'nick_name': item.nickName,
-                  'owner_id': item.ownerId
                 });
 
   final sqflite.DatabaseExecutor database;
@@ -324,8 +314,6 @@ class _$DogDao extends DogDao {
 
   final InsertionAdapter<Dog> _dogInsertionAdapter;
 
-  final UpdateAdapter<Dog> _dogUpdateAdapter;
-
   @override
   Future<Dog> findDogForPersonId(int id) async {
     return _queryAdapter.query('SELECT * FROM dog WHERE owner_id = ?',
@@ -340,10 +328,5 @@ class _$DogDao extends DogDao {
   @override
   Future<void> insertDog(Dog dog) async {
     await _dogInsertionAdapter.insert(dog, sqflite.ConflictAlgorithm.abort);
-  }
-
-  @override
-  Future<void> updateDog(Dog dog) async {
-    await _dogUpdateAdapter.update(dog, sqflite.ConflictAlgorithm.abort);
   }
 }

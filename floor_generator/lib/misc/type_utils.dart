@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 import 'package:analyzer/dart/constant/value.dart';
 import 'package:analyzer/dart/element/element.dart';
 import 'package:analyzer/dart/element/type.dart';
@@ -11,8 +13,9 @@ extension SupportedTypeChecker on DartType {
       _stringTypeChecker,
       _boolTypeChecker,
       _intTypeChecker,
-      _doubleTypeChecker
-    ]).isExactlyType(this);
+      _doubleTypeChecker,
+      _uint8ListTypeChecker
+    ]).isExactlyType(isDartCoreList ? flatten() : this);
   }
 }
 
@@ -56,5 +59,7 @@ final _boolTypeChecker = _typeChecker(bool);
 final _intTypeChecker = _typeChecker(int);
 
 final _doubleTypeChecker = _typeChecker(double);
+
+final _uint8ListTypeChecker = _typeChecker(Uint8List);
 
 final _streamTypeChecker = _typeChecker(Stream);

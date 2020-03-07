@@ -119,7 +119,7 @@ class ListCell extends StatelessWidget {
       onDismissed: (_) async {
         await dao.deleteTask(task);
         Scaffold.of(context).showSnackBar(
-          SnackBar(content: const Text('Removed task')),
+          const SnackBar(content: Text('Removed task')),
         );
       },
     );
