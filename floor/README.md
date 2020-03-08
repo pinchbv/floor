@@ -9,7 +9,7 @@ This package is still in an early phase and the API will likely change.
 [![build status](https://github.com/vitusortner/floor/workflows/Continuous%20integration/badge.svg)](https://github.com/vitusortner/floor/actions)
 [![codecov](https://codecov.io/gh/vitusortner/floor/branch/develop/graph/badge.svg)](https://codecov.io/gh/vitusortner/floor)
 
-### Table of contents
+### Table of Contents
 
 1. [Quick Start](#quick-start)
 1. [Architecture](#architecture)
@@ -28,6 +28,7 @@ This package is still in an early phase and the API will likely change.
 1. [Callback](#callback)
 1. [Testing](#testing)
 1. [Examples](#examples)
+1. [Snapshot Version](#snapshot-version)
 1. [Naming](#naming)
 1. [Bugs and Feedback](#bugs-and-feedback)
 1. [License](#license)
@@ -473,7 +474,7 @@ Their usage can be seen in the following snippet.
 ```dart
 final callback = Callback(
    onCreate: (database, version) { /* database has been created */ },
-   onOpen: (database) { /* database has been opened */},
+   onOpen: (database) { /* database has been opened */ },
    onUpgrade: (database, startVersion, endVersion) { /* database has been upgraded */ },
 );
 
@@ -556,9 +557,33 @@ void main() {
 
 ## Examples
 For further examples take a look at the [example](https://github.com/vitusortner/floor/tree/develop/example) and [test](https://github.com/vitusortner/floor/tree/develop/floor/test/integration) directories.
+
+## Snapshot Version
+In case you want to play with the most recent changes that haven't been released to pub yet, apply following changes to your `pubspec.yaml`.
+
+```yaml
+dependencies:
+  flutter:
+    sdk: flutter
+  floor:
+    git:
+      url: git://github.com/vitusortner/floor.git
+      ref: develop
+      path: floor
+
+dev_dependencies:
+  floor_generator:
+    git:
+      url: git://github.com/vitusortner/floor.git
+      ref: develop
+      path: floor_generator
+  build_runner: ^1.7.3
+```
      
 ## Naming
-*Floor - the bottom layer of a [Room](https://developer.android.com/topic/libraries/architecture/room).*
+The library's name derives from the following.
+*Floor* as the *bottom layer* of a [Room](https://developer.android.com/topic/libraries/architecture/room) which points to the analogy of the database layer being the bottom and foundation layer of most applications.
+Where *fl* also gives a pointer that the library is used in the Flutter context.
 
 ## Bugs and Feedback
 For bugs, questions and discussions please use the [Github Issues](https://github.com/vitusortner/floor/issues).
