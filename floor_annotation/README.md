@@ -1,11 +1,15 @@
 # Floor
-**A supportive SQLite abstraction for your Flutter applications.**
+**A supportive SQLite abstraction for your Flutter applications (iOS, Android and macOS)**
 
 Don't import this package!
 You should be using the [floor](https://pub.dartlang.org/packages/floor) package, which comes with all the annotations.
 Separating the packages brings some benefits for developing the library but not for the users of it.
 
-*Floor - the bottom layer of a [Room](https://developer.android.com/topic/libraries/architecture/room).*
+---
+
+The library's name derives from the following.
+*Floor* as the *bottom layer* of a [Room](https://developer.android.com/topic/libraries/architecture/room) which points to the analogy of the database layer being the bottom and foundation layer of most applications.
+Where *fl* also gives a pointer that the library is used in the Flutter context.
 
 ## Bugs and Feedback
 For bugs, questions and discussions please use the [Github Issues](https://github.com/vitusortner/floor/issues).
