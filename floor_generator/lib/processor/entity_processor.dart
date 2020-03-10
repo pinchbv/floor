@@ -278,6 +278,6 @@ extension on FieldElement {
   bool shouldBeIncluded() {
     final isIgnored = hasAnnotation(annotations.ignore.runtimeType);
     final isHashCode = displayName == 'hashCode';
-    return !(isStatic || isHashCode || isIgnored);
+    return !(isStatic || isSynthetic || isHashCode || isIgnored);
   }
 }
