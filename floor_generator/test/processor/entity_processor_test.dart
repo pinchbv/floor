@@ -164,7 +164,6 @@ void main() {
     expect(actual.fields.length, equals(2));
   });
 
-
   group('Constructors', () {
     test('generate simple constructor', () async {
       final classElement = await _createClassElement('''
