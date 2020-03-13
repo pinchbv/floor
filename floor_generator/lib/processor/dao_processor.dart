@@ -40,6 +40,12 @@ class DaoProcessor extends Processor<Dao> {
   Dao process() {
     final name = _classElement.displayName;
     final methods = _classElement.methods;
+    
+    dynamic _super = _classElement.supertype;
+    while (_super != null) {
+      methods.addAll(_super.methods);
+      _super = _super.superclass;
+    }
 
     final queryMethods = _getQueryMethods(methods);
     final insertionMethods = _getInsertionMethods(methods);
