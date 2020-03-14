@@ -6,11 +6,9 @@ import 'package:sqflite_ffi_test/sqflite_ffi_test.dart';
 
 import '../test_util/extensions.dart';
 import 'dao/dog_dao.dart';
-import 'dao/name_dao.dart';
 import 'dao/person_dao.dart';
 import 'database.dart';
 import 'model/dog.dart';
-import 'model/name.dart';
 import 'model/person.dart';
 
 void main() {
@@ -21,7 +19,6 @@ void main() {
     TestDatabase database;
     PersonDao personDao;
     DogDao dogDao;
-    NameDao nameDao;
 
     setUp(() async {
       final migration1to2 = Migration(1, 2, (database) {
@@ -36,7 +33,6 @@ void main() {
 
       personDao = database.personDao;
       dogDao = database.dogDao;
-      nameDao = database.nameDao;
     });
 
     tearDown(() async {
@@ -297,44 +293,6 @@ void main() {
           final expectedPersons =
               persons.where((person) => person.name.contains('a'));
           expect(actual, equals(expectedPersons));
-        });
-      });
-
-      group('Query View', () {
-        test('query view with exact value', () async {
-          final person = Person(1, 'Frank');
-          await personDao.insertPerson(person);
-
-          final actual = await nameDao.findExactName('Frank');
-
-        final expected = Name('Frank');
-          expect(actual, equals(expected));
-        });
-
-        test('query view with LIKE', () async {
-          final persons = [Person(1, 'Leo'), Person(2, 'Frank')];
-          await personDao.insertPersons(persons);
-
-          final dog = Dog(1, 'Romeo', 'Rome', 1);
-          await dogDao.insertDog(dog);
-
-          final actual = await nameDao.findNamesLike('%eo');
-
-          final expected = [Name('Leo'), Name('Romeo')];
-          expect(actual, equals(expected));
-        });
-
-        test('query view with all values', () async {
-          final persons = [Person(1, 'Leo'), Person(2, 'Frank')];
-          await personDao.insertPersons(persons);
-
-          final dog = Dog(1, 'Romeo', 'Rome', 1);
-          await dogDao.insertDog(dog);
-
-          final actual = await nameDao.findAllNames();
-
-          final expected = [Name('Frank'), Name('Leo'), Name('Romeo')];
-          expect(actual, equals(expected));
         });
       });
     });
