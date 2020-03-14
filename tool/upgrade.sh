@@ -7,8 +7,8 @@ flutter packages pub upgrade
 cd ..
 
 cd floor_annotation
-pub upgrade
+flutter packages pub upgrade
 cd ..
 
 cd floor_generator
-pub upgrade
+flutter packages pub upgrade
