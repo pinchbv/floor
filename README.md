@@ -395,7 +395,7 @@ class Person {
 ```
 
 ### Ignoring Fields
-The `hashCode` property and all static fields of entities are ignored by default and thus excluded from the library's mapping.
+Getters, setters, operators and all static fields of entities are ignored by default and thus excluded from the library's mapping.
 In case further fields should be ignored, the `@ignore` annotation should be used and applied as shown in the following snippet.
 
 ```dart
@@ -407,6 +407,9 @@ class Person {
 
   @ignore
   String nickname;
+
+  //ignored by default
+  String get combinedName => "$name ($nickname)";
 
   Person(this.id, this.name);
 }

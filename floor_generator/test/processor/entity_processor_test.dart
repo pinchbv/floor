@@ -132,14 +132,16 @@ void main() {
         String get label => "" + id + ": " + name
       
         Person(this.id, this.name);
-        
-        static String foo = 'foo';
       }
     ''');
 
-    final actual = EntityProcessor(classElement).process();
+    final actual = EntityProcessor(classElement)
+        .process()
+        .fields
+        .map((field) => field.name)
+        .toList();
 
-    expect(actual.fields.length, equals(2));
+    expect(actual, equals(['id', 'name']));
   });
 
   test('Ignore setter', () async {
@@ -159,9 +161,13 @@ void main() {
       }
     ''');
 
-    final actual = EntityProcessor(classElement).process();
+    final actual = EntityProcessor(classElement)
+        .process()
+        .fields
+        .map((field) => field.name)
+        .toList();
 
-    expect(actual.fields.length, equals(2));
+    expect(actual, equals(['id', 'name']));
   });
 
   group('Constructors', () {
