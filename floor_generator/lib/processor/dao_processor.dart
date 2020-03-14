@@ -39,7 +39,9 @@ class DaoProcessor extends Processor<Dao> {
   @override
   Dao process() {
     final name = _classElement.displayName;
-    final methods = _classElement.methods;
+    final supertypeMethods =
+        _classElement.allSupertypes.expand((type) => type.methods);
+    final methods = [..._classElement.methods, ...supertypeMethods];
 
     final queryMethods = _getQueryMethods(methods);
     final insertionMethods = _getInsertionMethods(methods);
