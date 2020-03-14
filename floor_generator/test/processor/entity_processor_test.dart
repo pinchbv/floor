@@ -129,7 +129,7 @@ void main() {
       
         final String name;
       
-        String get label => "" + id + ": " + name
+        String get label => '\$id: \$name'
       
         Person(this.id, this.name);
       }
