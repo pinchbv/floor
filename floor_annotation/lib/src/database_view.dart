@@ -6,7 +6,7 @@ class DatabaseView {
   /// The SELECT query on which the view is based on.
   final String query;
 
-  /// Marks a class as a database entity (table).
+  /// Marks a class as a database view (a fixed select statement).
   const DatabaseView(
     this.query, {
     this.viewName,

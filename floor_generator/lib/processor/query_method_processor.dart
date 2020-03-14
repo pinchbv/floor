@@ -48,7 +48,7 @@ class QueryMethodProcessor extends Processor<QueryMethod> {
       returnsStream,
     );
 
-    final Queryable queryable = _entities.firstWhere(
+    final queryable = _entities.firstWhere(
             (entity) =>
                 entity.classElement.displayName ==
                 flattenedReturnType.getDisplayString(),
@@ -57,7 +57,8 @@ class QueryMethodProcessor extends Processor<QueryMethod> {
             (view) =>
                 view.classElement.displayName ==
                 flattenedReturnType.getDisplayString(),
-            orElse: () => null);
+            orElse: () => null); // doesn't return entity nor view
+    _assertViewQueryDoesNotReturnStream(queryable, returnsStream);
 
     return QueryMethod(
       _methodElement,
@@ -134,6 +135,15 @@ class QueryMethodProcessor extends Processor<QueryMethod> {
   ) {
     if (!rawReturnType.isDartAsyncFuture && !returnsStream) {
       throw _processorError.DOES_NOT_RETURN_FUTURE_NOR_STREAM;
+    }
+  }
+
+  void _assertViewQueryDoesNotReturnStream(
+    final Queryable queryable,
+    final bool returnsStream,
+  ) {
+    if (queryable != null && queryable is View && returnsStream) {
+      throw _processorError.VIEW_NOT_STREAMABLE;
     }
   }
 

@@ -12,6 +12,9 @@ class Database {
   final List<Type> views;
 
   /// Marks a class as a FloorDatabase.
-  const Database(
-      {@required this.version, @required this.entities, this.views = const []});
+  const Database({
+    @required this.version,
+    @required this.entities,
+    this.views = const [],
+  });
 }

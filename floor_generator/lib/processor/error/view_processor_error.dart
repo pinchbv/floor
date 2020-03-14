@@ -11,9 +11,9 @@ class ViewProcessorError {
   // ignore: non_constant_identifier_names
   InvalidGenerationSourceError get MISSING_QUERY {
     return InvalidGenerationSourceError(
-      'There is no SELECT Query defined on the entity ${_classElement.displayName}.',
+      'There is no SELECT query defined on the database view ${_classElement.displayName}.',
       todo:
-          'Define a SELECT query for this View with @DatabaseView(\'SELECT [...]\') ',
+          'Define a SELECT query for this database view with @DatabaseView(\'SELECT [...]\') ',
       element: _classElement,
     );
   }

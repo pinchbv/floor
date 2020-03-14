@@ -14,7 +14,6 @@ import 'package:floor_generator/value_object/deletion_method.dart';
 import 'package:floor_generator/value_object/entity.dart';
 import 'package:floor_generator/value_object/insertion_method.dart';
 import 'package:floor_generator/value_object/query_method.dart';
-import 'package:floor_generator/value_object/queryable.dart';
 import 'package:floor_generator/value_object/transaction_method.dart';
 import 'package:floor_generator/value_object/update_method.dart';
 
@@ -123,10 +122,10 @@ class DaoProcessor extends Processor<Dao> {
         .toList();
   }
 
-  List<Queryable> _getStreamEntities(final List<QueryMethod> queryMethods) {
+  List<Entity> _getStreamEntities(final List<QueryMethod> queryMethods) {
     return queryMethods
         .where((method) => method.returnsStream)
-        .map((method) => method.queryable)
+        .map((method) => method.queryable as Entity)
         .toList();
   }
 }

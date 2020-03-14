@@ -38,11 +38,12 @@ class Database {
       classElement.hashCode ^
       name.hashCode ^
       entities.hashCode ^
+      views.hashCode ^
       daoGetters.hashCode ^
       version.hashCode;
 
   @override
   String toString() {
-    return 'Database{classElement: $classElement, name: $name, entities: $entities, daoGetters: $daoGetters, version: $version}';
+    return 'Database{classElement: $classElement, name: $name, entities: $entities, views: $views, daoGetters: $daoGetters, version: $version}';
   }
 }

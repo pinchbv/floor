@@ -252,6 +252,22 @@ void main() {
           .QUERY_ARGUMENTS_AND_METHOD_PARAMETERS_DO_NOT_MATCH;
       expect(actual, throwsInvalidGenerationSourceError(error));
     });
+
+    test(
+        'exception when a query returns Stream<X> while querying a DatabaseView',
+        () async {
+      final methodElement = await _createQueryMethodElement('''
+      @Query('SELECT * FROM Name')
+      Stream<List<Name>> allNamesAsStream();
+    ''');
+
+      final actual =
+          () => QueryMethodProcessor(methodElement, entities, views).process();
+
+      final error =
+          QueryMethodProcessorError(methodElement).VIEW_NOT_STREAMABLE;
+      expect(actual, throwsInvalidGenerationSourceError(error));
+    });
   });
 }
 

@@ -34,7 +34,13 @@ class DatabaseProcessor extends Processor<Database> {
     final version = _getDatabaseVersion();
 
     return Database(
-        _classElement, databaseName, entities, views, daoGetters, version);
+      _classElement,
+      databaseName,
+      entities,
+      views,
+      daoGetters,
+      version,
+    );
   }
 
   @nonNull
@@ -105,7 +111,7 @@ class DatabaseProcessor extends Processor<Database> {
 
   @nonNull
   List<View> _getViews(final ClassElement databaseClassElement) {
-    final views = _classElement
+    return _classElement
         .getAnnotation(annotations.Database)
         .getField(AnnotationField.DATABASE_VIEWS)
         ?.toListValue()
@@ -114,8 +120,6 @@ class DatabaseProcessor extends Processor<Database> {
         ?.where(_isView)
         ?.map((classElement) => ViewProcessor(classElement).process())
         ?.toList();
-
-    return views;
   }
 
   @nonNull

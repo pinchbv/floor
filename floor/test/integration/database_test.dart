@@ -304,36 +304,37 @@ void main() {
         test('query view with exact value', () async {
           final person = Person(1, 'Frank');
           await personDao.insertPerson(person);
-          final expectedName = Name('Frank');
+
           final actual = await nameDao.findExactName('Frank');
 
-          expect(actual, equals(expectedName));
+        final expected = Name('Frank');
+          expect(actual, equals(expected));
         });
 
         test('query view with LIKE', () async {
-          final person = Person(1, 'Leo');
+          final persons = [Person(1, 'Leo'), Person(2, 'Frank')];
+          await personDao.insertPersons(persons);
+
           final dog = Dog(1, 'Romeo', 'Rome', 1);
-          await personDao.insertPerson(person);
-          await personDao.insertPerson(Person(2, 'Frank'));
           await dogDao.insertDog(dog);
 
-          final expectedNames = [Name('Leo'), Name('Romeo')];
           final actual = await nameDao.findNamesLike('%eo');
 
-          expect(actual, equals(expectedNames));
+          final expected = [Name('Leo'), Name('Romeo')];
+          expect(actual, equals(expected));
         });
 
         test('query view with all values', () async {
-          final person = Person(1, 'Leo');
+          final persons = [Person(1, 'Leo'), Person(2, 'Frank')];
+          await personDao.insertPersons(persons);
+
           final dog = Dog(1, 'Romeo', 'Rome', 1);
-          await personDao.insertPerson(person);
-          await personDao.insertPerson(Person(2, 'Frank'));
           await dogDao.insertDog(dog);
 
-          final expectedNames = [Name('Frank'), Name('Leo'), Name('Romeo')];
           final actual = await nameDao.findAllNames();
 
-          expect(actual, equals(expectedNames));
+          final expected = [Name('Frank'), Name('Leo'), Name('Romeo')];
+          expect(actual, equals(expected));
         });
       });
     });
