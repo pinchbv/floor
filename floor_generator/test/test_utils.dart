@@ -160,3 +160,17 @@ Future<Dao> createDao(final String methodSignature) async {
   return DaoProcessor(daoClass, 'personDao', 'TestDatabase', entities, views)
       .process();
 }
+
+Future<ClassElement> createClassElement(final String clazz) async {
+  final library = await resolveSource('''
+      library test;
+      
+      import 'package:floor_annotation/floor_annotation.dart';
+      
+      $clazz
+      ''', (resolver) async {
+    return LibraryReader(await resolver.findLibraryByName('test'));
+  });
+
+  return library.classes.first;
+}

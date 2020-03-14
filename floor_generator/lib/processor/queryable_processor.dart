@@ -6,9 +6,10 @@ import 'package:floor_generator/misc/type_utils.dart';
 import 'package:floor_generator/processor/field_processor.dart';
 import 'package:floor_generator/processor/processor.dart';
 import 'package:floor_generator/value_object/field.dart';
+import 'package:floor_generator/value_object/queryable.dart';
 import 'package:meta/meta.dart';
 
-abstract class QueryableProcessor<T> extends Processor<T> {
+abstract class QueryableProcessor<T extends Queryable> extends Processor<T> {
   @protected
   final ClassElement classElement;
 

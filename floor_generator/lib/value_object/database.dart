@@ -1,4 +1,5 @@
 import 'package:analyzer/dart/element/element.dart';
+import 'package:collection/collection.dart';
 import 'package:floor_generator/value_object/dao_getter.dart';
 import 'package:floor_generator/value_object/view.dart';
 import 'package:floor_generator/value_object/entity.dart';
@@ -28,9 +29,10 @@ class Database {
           runtimeType == other.runtimeType &&
           classElement == other.classElement &&
           name == other.name &&
-          entities == other.entities &&
-          views == other.views &&
-          daoGetters == other.daoGetters &&
+          const ListEquality<Entity>().equals(entities, other.entities) &&
+          const ListEquality<View>().equals(views, other.views) &&
+          const ListEquality<DaoGetter>()
+              .equals(daoGetters, other.daoGetters) &&
           version == other.version;
 
   @override

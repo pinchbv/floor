@@ -15,7 +15,7 @@ import '../model/person.dart';
 
 part 'view_test.g.dart';
 
-@Database(version: 2, entities: [Person, Dog], views: [Name])
+@Database(version: 1, entities: [Person, Dog], views: [Name])
 abstract class ViewTestDatabase extends FloorDatabase {
   PersonDao get personDao;
 
@@ -35,15 +35,7 @@ void main() {
     NameDao nameDao;
 
     setUp(() async {
-      final migration1to2 = Migration(1, 2, (database) {
-        database.execute('ALTER TABLE dog ADD COLUMN nick_name TEXT');
-      });
-      final allMigrations = [migration1to2];
-
-      database = await $FloorViewTestDatabase
-          .inMemoryDatabaseBuilder()
-          .addMigrations(allMigrations)
-          .build();
+      database = await $FloorViewTestDatabase.inMemoryDatabaseBuilder().build();
 
       personDao = database.personDao;
       dogDao = database.dogDao;
