@@ -120,6 +120,56 @@ void main() {
     expect(actual.fields.length, equals(2));
   });
 
+  test('Ignore getter', () async {
+    final classElement = await _createClassElement('''
+      @entity
+      class Person {
+        @primaryKey
+        final int id;
+      
+        final String name;
+      
+        String get label => '\$id: \$name'
+      
+        Person(this.id, this.name);
+      }
+    ''');
+
+    final actual = EntityProcessor(classElement)
+        .process()
+        .fields
+        .map((field) => field.name)
+        .toList();
+
+    expect(actual, equals(['id', 'name']));
+  });
+
+  test('Ignore setter', () async {
+    final classElement = await _createClassElement('''
+      @entity
+      class Person {
+        @primaryKey
+        final int id;
+      
+        final String name;
+      
+        set printwith(String prefix) => print(prefix+name);
+
+        Person(this.id, this.name);
+        
+        static String foo = 'foo';
+      }
+    ''');
+
+    final actual = EntityProcessor(classElement)
+        .process()
+        .fields
+        .map((field) => field.name)
+        .toList();
+
+    expect(actual, equals(['id', 'name']));
+  });
+
   group('Constructors', () {
     test('generate simple constructor', () async {
       final classElement = await _createClassElement('''
