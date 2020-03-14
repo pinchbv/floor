@@ -7,8 +7,8 @@ flutter packages pub get
 cd ..
 
 cd floor_annotation
-pub get
+flutter packages pub get
 cd ..
 
 cd floor_generator
-pub get
+flutter packages pub get
