@@ -1,6 +1,6 @@
 import 'package:floor_generator/misc/constants.dart';
-import 'package:floor_generator/value_object/view.dart';
 import 'package:floor_generator/value_object/field.dart';
+import 'package:floor_generator/value_object/view.dart';
 import 'package:mockito/mockito.dart';
 import 'package:test/test.dart';
 
@@ -36,59 +36,19 @@ void main() {
     reset(mockDartType);
   });
 
-  group('statement', () {
-    test('Create view statement with simple query', () {
-      final view = View(
-        mockClassElement,
-        'entityName',
-        allFields,
-        'select * from x',
-        '',
-      );
-
-      final actual = view.getCreateViewStatement();
-
-      final expected =
-          'CREATE VIEW IF NOT EXISTS `${view.name}` AS ${view.query}';
-      expect(actual, equals(expected));
-    });
-  });
-
-  group('Value mapping', () {
+  test('Create view statement with simple query', () {
     final view = View(
       mockClassElement,
       'entityName',
-      [nullableField],
-      'select * from x',
+      allFields,
+      'SELECT * FROM x',
       '',
     );
-    const fieldElementDisplayName = 'foo';
 
-    setUp(() {
-      when(mockFieldElement.displayName).thenReturn(fieldElementDisplayName);
-      when(mockFieldElement.type).thenReturn(mockDartType);
-    });
+    final actual = view.getCreateViewStatement();
 
-    test('Get value mapping', () {
-      when(mockDartType.isDartCoreBool).thenReturn(false);
-
-      final actual = view.getValueMapping();
-
-      final expected = '<String, dynamic>{'
-          "'${nullableField.columnName}': item.$fieldElementDisplayName"
-          '}';
-      expect(actual, equals(expected));
-    });
-
-    test('Get boolean value mapping', () {
-      when(mockDartType.isDartCoreBool).thenReturn(true);
-
-      final actual = view.getValueMapping();
-
-      final expected = '<String, dynamic>{'
-          "'${nullableField.columnName}': item.$fieldElementDisplayName ? 1 : 0"
-          '}';
-      expect(actual, equals(expected));
-    });
+    final expected =
+        'CREATE VIEW IF NOT EXISTS `${view.name}` AS ${view.query}';
+    expect(actual, equals(expected));
   });
 }

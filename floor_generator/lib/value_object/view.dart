@@ -7,32 +7,17 @@ import 'package:floor_generator/value_object/queryable.dart';
 class View extends Queryable {
   final String query;
 
-  View(ClassElement classElement, String name, List<Field> fields, this.query,
-      String constructor)
-      : super(classElement, name, fields, constructor);
+  View(
+    ClassElement classElement,
+    String name,
+    List<Field> fields,
+    this.query,
+    String constructor,
+  ) : super(classElement, name, fields, constructor);
 
   @nonNull
   String getCreateViewStatement() {
     return 'CREATE VIEW IF NOT EXISTS `$name` AS $query';
-  }
-
-  @nonNull
-  String getValueMapping() {
-    final keyValueList = fields.map((field) {
-      final columnName = field.columnName;
-      final attributeValue = _getAttributeValue(field.fieldElement);
-      return "'$columnName': $attributeValue";
-    }).toList();
-
-    return '<String, dynamic>{${keyValueList.join(', ')}}';
-  }
-
-  @nonNull
-  String _getAttributeValue(final FieldElement fieldElement) {
-    final parameterName = fieldElement.displayName;
-    return fieldElement.type.isDartCoreBool
-        ? 'item.$parameterName ? 1 : 0'
-        : 'item.$parameterName';
   }
 
   @override
