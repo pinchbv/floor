@@ -9,6 +9,7 @@ import 'package:floor_generator/processor/query_method_processor.dart';
 import 'package:floor_generator/processor/transaction_method_processor.dart';
 import 'package:floor_generator/processor/update_method_processor.dart';
 import 'package:floor_generator/value_object/dao.dart';
+import 'package:floor_generator/value_object/view.dart';
 import 'package:floor_generator/value_object/deletion_method.dart';
 import 'package:floor_generator/value_object/entity.dart';
 import 'package:floor_generator/value_object/insertion_method.dart';
@@ -21,20 +22,24 @@ class DaoProcessor extends Processor<Dao> {
   final String _daoGetterName;
   final String _databaseName;
   final List<Entity> _entities;
+  final List<View> _views;
 
   DaoProcessor(
     final ClassElement classElement,
     final String daoGetterName,
     final String databaseName,
     final List<Entity> entities,
+    final List<View> views,
   )   : assert(classElement != null),
         assert(daoGetterName != null),
         assert(databaseName != null),
         assert(entities != null),
+        assert(views != null),
         _classElement = classElement,
         _daoGetterName = daoGetterName,
         _databaseName = databaseName,
-        _entities = entities;
+        _entities = entities,
+        _views = views;
 
   @override
   Dao process() {
@@ -66,7 +71,8 @@ class DaoProcessor extends Processor<Dao> {
   List<QueryMethod> _getQueryMethods(final List<MethodElement> methods) {
     return methods
         .where((method) => method.hasAnnotation(annotations.Query))
-        .map((method) => QueryMethodProcessor(method, _entities).process())
+        .map((method) =>
+            QueryMethodProcessor(method, _entities, _views).process())
         .toList();
   }
 
@@ -119,7 +125,7 @@ class DaoProcessor extends Processor<Dao> {
   List<Entity> _getStreamEntities(final List<QueryMethod> queryMethods) {
     return queryMethods
         .where((method) => method.returnsStream)
-        .map((method) => method.entity)
+        .map((method) => method.queryable as Entity)
         .toList();
   }
 }

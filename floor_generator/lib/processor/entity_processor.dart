@@ -1,66 +1,54 @@
 import 'package:analyzer/dart/constant/value.dart';
 import 'package:analyzer/dart/element/element.dart';
-import 'package:analyzer/dart/element/type.dart';
 import 'package:floor_annotation/floor_annotation.dart' as annotations;
 import 'package:floor_generator/misc/annotations.dart';
 import 'package:floor_generator/misc/constants.dart';
 import 'package:floor_generator/misc/foreign_key_action.dart';
 import 'package:floor_generator/misc/type_utils.dart';
 import 'package:floor_generator/processor/error/entity_processor_error.dart';
-import 'package:floor_generator/processor/field_processor.dart';
-import 'package:floor_generator/processor/processor.dart';
+import 'package:floor_generator/processor/queryable_processor.dart';
 import 'package:floor_generator/value_object/entity.dart';
 import 'package:floor_generator/value_object/field.dart';
 import 'package:floor_generator/value_object/foreign_key.dart';
 import 'package:floor_generator/value_object/index.dart';
 import 'package:floor_generator/value_object/primary_key.dart';
 
-class EntityProcessor extends Processor<Entity> {
-  final ClassElement _classElement;
+class EntityProcessor extends QueryableProcessor<Entity> {
   final EntityProcessorError _processorError;
 
   EntityProcessor(final ClassElement classElement)
-      : assert(classElement != null),
-        _classElement = classElement,
-        _processorError = EntityProcessorError(classElement);
+      : _processorError = EntityProcessorError(classElement),
+        super(classElement);
 
   @nonNull
   @override
   Entity process() {
     final name = _getName();
-    final fields = _getFields();
+    final fields = getFields();
 
     return Entity(
-      _classElement,
+      classElement,
       name,
       fields,
       _getPrimaryKey(fields),
       _getForeignKeys(),
       _getIndices(fields, name),
-      _getConstructor(fields),
+      getConstructor(fields),
     );
   }
 
   @nonNull
   String _getName() {
-    return _classElement
+    return classElement
             .getAnnotation(annotations.Entity)
             .getField(AnnotationField.ENTITY_TABLE_NAME)
             .toStringValue() ??
-        _classElement.displayName;
-  }
-
-  @nonNull
-  List<Field> _getFields() {
-    return _classElement.fields
-        .where((fieldElement) => fieldElement.shouldBeIncluded())
-        .map((field) => FieldProcessor(field).process())
-        .toList();
+        classElement.displayName;
   }
 
   @nonNull
   List<ForeignKey> _getForeignKeys() {
-    return _classElement
+    return classElement
             .getAnnotation(annotations.Entity)
             .getField(AnnotationField.ENTITY_FOREIGN_KEYS)
             ?.toListValue()
@@ -114,7 +102,7 @@ class EntityProcessor extends Processor<Entity> {
 
   @nonNull
   List<Index> _getIndices(final List<Field> fields, final String tableName) {
-    return _classElement
+    return classElement
             .getAnnotation(annotations.Entity)
             .getField(AnnotationField.ENTITY_INDICES)
             ?.toListValue()
@@ -182,7 +170,7 @@ class EntityProcessor extends Processor<Entity> {
 
   @nullable
   PrimaryKey _getCompoundPrimaryKey(final List<Field> fields) {
-    final compoundPrimaryKeyColumnNames = _classElement
+    final compoundPrimaryKeyColumnNames = classElement
         .getAnnotation(annotations.Entity)
         .getField(AnnotationField.ENTITY_PRIMARY_KEYS)
         ?.toListValue()
@@ -218,65 +206,5 @@ class EntityProcessor extends Processor<Entity> {
         false;
 
     return PrimaryKey([primaryKeyField], autoGenerate);
-  }
-
-  @nonNull
-  String _getConstructor(final List<Field> fields) {
-    final constructorParameters = _classElement.constructors.first.parameters;
-    final parameterValues = constructorParameters
-        .map((parameterElement) => _getParameterValue(parameterElement, fields))
-        .where((parameterValue) => parameterValue != null)
-        .join(', ');
-
-    return '${_classElement.displayName}($parameterValues)';
-  }
-
-  /// Returns `null` whenever field is @ignored
-  @nullable
-  String _getParameterValue(
-    final ParameterElement parameterElement,
-    final List<Field> fields,
-  ) {
-    final parameterName = parameterElement.displayName;
-    final field = fields.firstWhere(
-      (field) => field.name == parameterName,
-      orElse: () => null, // whenever field is @ignored
-    );
-    if (field != null) {
-      final parameterValue = "row['${field.columnName}']";
-      final castedParameterValue =
-          _castParameterValue(parameterElement.type, parameterValue);
-      if (parameterElement.isNamed) {
-        return '$parameterName: $castedParameterValue';
-      }
-      return castedParameterValue; // also covers positional parameter
-    } else {
-      return null;
-    }
-  }
-
-  @nonNull
-  String _castParameterValue(
-    final DartType parameterType,
-    final String parameterValue,
-  ) {
-    if (parameterType.isDartCoreBool) {
-      return '($parameterValue as int) != 0'; // maps int to bool
-    } else if (parameterType.isDartCoreString) {
-      return '$parameterValue as String';
-    } else if (parameterType.isDartCoreInt) {
-      return '$parameterValue as int';
-    } else if (parameterType.isUint8List) {
-      return '$parameterValue as Uint8List';
-    } else {
-      return '$parameterValue as double'; // must be double
-    }
-  }
-}
-
-extension on FieldElement {
-  bool shouldBeIncluded() {
-    final isIgnored = hasAnnotation(annotations.ignore.runtimeType);
-    return !(isStatic || isSynthetic || isIgnored);
   }
 }

@@ -2,7 +2,7 @@ import 'package:analyzer/dart/element/element.dart';
 import 'package:analyzer/dart/element/type.dart';
 import 'package:collection/collection.dart';
 import 'package:floor_generator/misc/type_utils.dart';
-import 'package:floor_generator/value_object/entity.dart';
+import 'package:floor_generator/value_object/queryable.dart';
 
 /// Wraps a method annotated with Query
 /// to enable easy access to code generation relevant data.
@@ -28,7 +28,7 @@ class QueryMethod {
 
   final List<ParameterElement> parameters;
 
-  final Entity entity;
+  final Queryable queryable;
 
   QueryMethod(
     this.methodElement,
@@ -37,7 +37,7 @@ class QueryMethod {
     this.rawReturnType,
     this.flattenedReturnType,
     this.parameters,
-    this.entity,
+    this.queryable,
   );
 
   bool get returnsList {
@@ -64,7 +64,7 @@ class QueryMethod {
           flattenedReturnType == other.flattenedReturnType &&
           const ListEquality<ParameterElement>()
               .equals(parameters, other.parameters) &&
-          entity == other.entity;
+          queryable == other.queryable;
 
   @override
   int get hashCode =>
@@ -74,10 +74,10 @@ class QueryMethod {
       rawReturnType.hashCode ^
       flattenedReturnType.hashCode ^
       parameters.hashCode ^
-      entity.hashCode;
+      queryable.hashCode;
 
   @override
   String toString() {
-    return 'QueryMethod{methodElement: $methodElement, name: $name, query: $query, rawReturnType: $rawReturnType, flattenedReturnType: $flattenedReturnType, parameters: $parameters, entity: $entity}';
+    return 'QueryMethod{methodElement: $methodElement, name: $name, query: $query, rawReturnType: $rawReturnType, flattenedReturnType: $flattenedReturnType, parameters: $parameters, entity: $queryable}';
   }
 }

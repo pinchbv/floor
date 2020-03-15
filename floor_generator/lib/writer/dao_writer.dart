@@ -59,7 +59,7 @@ class DaoWriter extends Writer {
             "_queryAdapter = QueryAdapter(database${requiresChangeListener ? ', changeListener' : ''})"));
 
       final queryMapperFields = queryMethods
-          .map((method) => method.entity)
+          .map((method) => method.queryable)
           .where((entity) => entity != null)
           .toSet()
           .map((entity) {
