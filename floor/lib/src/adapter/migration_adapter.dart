@@ -3,12 +3,12 @@ import 'package:sqflite/sqflite.dart';
 
 abstract class MigrationAdapter {
   /// Runs the given [migrations] for migrating the database schema and data.
-  static void runMigrations(
+  static Future<void> runMigrations(
     final Database migrationDatabase,
     final int startVersion,
     final int endVersion,
     final List<Migration> migrations,
-  ) {
+  ) async {
     final relevantMigrations = migrations
         .where((migration) => migration.startVersion >= startVersion)
         .toList()
@@ -24,7 +24,7 @@ abstract class MigrationAdapter {
     }
 
     for (final migration in relevantMigrations) {
-      migration.migrate(migrationDatabase);
+      await migration.migrate(migrationDatabase);
     }
   }
 }
