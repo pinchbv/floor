@@ -334,12 +334,9 @@ NOTE: Be aware that it is currently not possible to return a `Stream` object fro
 
 ## Data Access Objects
 These components are responsible for managing access to the underlying SQLite database and are defined as abstract classes with method signatures and query statements.
+DAO classes can use inherited methods by implementing and extending classes while also using mixins.
 
 ```dart
-// dao/person_dao.dart
-
-import 'package:floor/floor.dart';
-
 @dao
 abstract class PersonDao {
   @Query('SELECT * FROM Person')
