@@ -13,10 +13,6 @@ This package is still in an early phase and the API will likely change.
 
 1. [Quick Start](#quick-start)
 1. [Architecture](#architecture)
-1. [Querying](#querying)
-1. [Persisting Data Changes](#persisting-data-changes)
-1. [Streams](#streams)
-1. [Transactions](#transactions)
 1. [Entities](#entities)
     1. [Supported Types](#supported-types)
     1. [Foreign Keys](#foreign-keys)
@@ -24,9 +20,14 @@ This package is still in an early phase and the API will likely change.
     1. [Indices](#indices)
     1. [Ignoring Fields](#ignoring-fields)
 1. [Database Views](#database-views)
+1. [Data Access Objects](#data-access-objects)
+    1. [Queries](#queries)
+    1. [Data Changes](#data-changes)
+    1. [Streams](#streams)
+    1. [Transactions](#transactions)
 1. [Migrations](#migrations)
 1. [In-Memory Database](#in-memory-database)
-1. [Callback](#callback)
+1. [Initialization Callback](#initialization-callback)
 1. [Testing](#testing)
 1. [Examples](#examples)
 1. [Snapshot Version](#snapshot-version)
@@ -55,7 +56,7 @@ This package is still in an early phase and the API will likely change.
       build_runner: ^1.7.3
     ````
 
-1. Creating an *Entity*
+1. Create an **Entity**
 
     It will represent a database table as well as the scaffold of your business object.
     `@entity` marks the class as a persistent class.
@@ -79,14 +80,14 @@ This package is still in an early phase and the API will likely change.
     }
     ````
 
-1. Creating a *DAO*
+1. Create a **DAO (Data Access Object)**
 
     This component is responsible for managing access to the underlying SQLite database.
-    The abstract class contains the method signatures for querying the database which have to return a `Future`.
+    The abstract class contains the method signatures for querying the database which have to return a `Future` or `Stream`.
 
     - You can define queries by adding the `@Query` annotation to a method.
         The SQL statement has to get added in parenthesis.
-        The method must return a `Future` of the `Entity` you're querying for.
+        The method must return a `Future` or `Stream` of the `Entity` you're querying for.
 
     - `@insert` marks a method as an insertion method.
 
@@ -101,14 +102,14 @@ This package is still in an early phase and the API will likely change.
       Future<List<Person>> findAllPersons();
 
       @Query('SELECT * FROM Person WHERE id = :id')
-      Future<Person> findPersonById(int id);
+      Stream<Person> findPersonById(int id);
 
       @insert
       Future<void> insertPerson(Person person);
     }
     ```
 
-1. Creating the *Database*
+1. Create the **Database**
 
     It has to be an abstract class which extends `FloorDatabase`.
     Furthermore, it's required to add `@Database()` to the signature of the class.
@@ -159,137 +160,17 @@ This package is still in an early phase and the API will likely change.
 For further examples take a look at the [example](https://github.com/vitusortner/floor/tree/develop/example) and [floor_test](https://github.com/vitusortner/floor/tree/develop/floor_test) directories.
 
 ## Architecture
-The components for storing and accessing data are *Entity*, *Data Access Object (DAO)* and *Database*.
+The components for storing and accessing data are **Entity**, **Data Access Object (DAO)** and **Database**.
 
-The first, *Entity*, represents a persistent class and thus a database table.
-*DAOs* manage the access to *Entities* and take care of the mapping between in-memory objects and table rows.
-Lastly, *Database*, is the central access point to the underlying SQLite database.
-It holds the *DAOs* and, beyond that, takes care of initializing the database and its schema.
+The first, Entity, represents a persistent class and thus a database table.
+DAOs manage the access to Entities and take care of the mapping between in-memory objects and table rows.
+Lastly, Database, is the central access point to the underlying SQLite database.
+It holds the DAOs and, beyond that, takes care of initializing the database and its schema.
 [Room](https://developer.android.com/topic/libraries/architecture/room) serves as the source of inspiration for this composition, because it allows creating a clean separation of the component's responsibilities.
 
-The figure shows the relationship between *Entity*, *DAO* and *Database*.
+The figure shows the relationship between Entity, DAO and Database.
 
 ![Floor Architecture](https://raw.githubusercontent.com/vitusortner/floor/develop/img/floor-architecture.png)
-
-## Querying
-Method signatures turn into query methods by adding the `@Query()` annotation with the query in parenthesis to them.
-Be patient about the correctness of your SQL statements.
-They are only partly validated while generating the code.
-These queries have to return either a `Future` or a `Stream` of an entity or `void`.
-Returning `Future<void>` comes in handy whenever you want to delete the full content of a table, for instance.
-Some query method examples can be seen in the following.
-
-```dart
-@Query('SELECT * FROM Person WHERE id = :id')
-Future<Person> findPersonById(int id);
-
-@Query('SELECT * FROM Person WHERE id = :id AND name = :name')
-Future<Person> findPersonByIdAndName(int id, String name);
-
-@Query('SELECT * FROM Person')
-Future<List<Person>> findAllPersons(); // select multiple items
-
-@Query('SELECT * FROM Person')
-Stream<List<Person>> findAllPersonsAsStream(); // stream return
-
-@Query('DELETE FROM Person')
-Future<void> deleteAllPersons(); // query without returning an entity
-
-@Query('SELECT * FROM Person WHERE id IN (:ids)')
-Future<List<Person>> findPersonsWithIds(List<int> ids); // query with IN clause
-```
-
-Query arguments, when using SQLite's `LIKE` operator, have to be supplied by the input of a method.
-It's not possible to define a pattern matching argument like `%foo%` in the query itself.
-
-```dart
-// dao
-@Query('SELECT * FROM Person WHERE name LIKE :name')
-Future<List<City>> findPersonsWithNamesLike(String name);
-
-// usage
-final name = '%foo%';
-await dao.findPersonsWithNamesLike(name);
-```
-
-## Persisting Data Changes
-Use the `@insert`, `@update` and `@delete` annotations for inserting and changing persistent data.
-All these methods accept single or multiple entity instances.
-
-- **Insert**
-
-    `@insert` marks a method as an insertion method.
-    When using the capitalized `@Insert` you can specify a conflict strategy.
-    Else it just defaults to aborting the insert.
-    These methods can return a `Future` of either `void`, `int` or `List<int>`.
-    - `void` return nothing
-    - `int` return primary key of inserted item
-    - `List<int>` return primary keys of inserted items
-
-- **Update**
-
-    `@update` marks a method as an update method.
-    When using the capitalized `@Update` you can specify a conflict strategy.
-    Else it just defaults to aborting the update.
-    These methods can return a `Future` of either `void` or `int`.
-    - `void` return nothing
-    - `int` return number of changed rows
-
-- **Delete**
-
-    `@delete` marks a method as a deletion method.
-    These methods can return a `Future` of either `void` or `int`.
-    - `void` return nothing
-    - `int` return number of deleted rows
-
-```dart
-// examples of changing multiple items with return
-
-@insert
-Future<List<int>> insertPersons(List<Person> person);
-
-@update
-Future<int> updatePersons(List<Person> person);
-
-@delete
-Future<int> deletePersons(List<Person> person);
-```
-
-## Streams
-As already mentioned, queries can not only return a value once when called but also a continuous stream of query results.
-The returned stream keeps you in sync with the changes happening to the database table.
-This feature plays really well with the `StreamBuilder` widget.
-
-These methods return a broadcast stream.
-Thus, it can have multiple listeners.
-```dart
-// definition
-@Query('SELECT * FROM Person')
-Stream<List<Person>> findAllPersonsAsStream();
-
-// usage
-StreamBuilder<List<Person>>(
-  stream: dao.findAllPersonsAsStream(),
-  builder: (BuildContext context, AsyncSnapshot<List<Person>> snapshot) {
-    // do something with the values here
-  },
-);
-```
-
-NOTE: It is currently not possible to return a `Stream` if the function queries a database view. This is mostly due 
-to the complexity of detecting which entities are involved in a database view.
-
-## Transactions
-Whenever you want to perform some operations in a transaction you have to add the `@transaction` annotation to the method.
-It's also required to add the `async` modifier. These methods can only return `Future<void>`.
-
-```dart
-@transaction
-Future<void> replacePersons(List<Person> persons) async {
-  await deleteAllPersons();
-  await insertPersons(persons);
-}
-```
 
 ## Entities
 An entity is a persistent class.
@@ -330,7 +211,7 @@ Floor entities can hold values of the following Dart types which map to their co
 - `double` - REAL
 - `String` - TEXT
 - `bool` - REAL (0 = false, 1 = true)
-- `Uint8List` - BLOB 
+- `Uint8List` - BLOB
 
 ### Primary Keys
 Whenever a compound primary key is required (e.g. *n-m* relationships), the syntax for setting the keys differs from the previously mentioned way of setting primary keys.
@@ -419,15 +300,14 @@ class Person {
 }
 ```
 ## Database Views
-If you want to define static `SELECT`-statements which return different types than your entities, your best option is 
-to use `@DatabaseView`. A database view can be understood as a virtual table, which can be queried like a real table.
+If you want to define static `SELECT`-statements which return different types than your entities, your best option is to use `@DatabaseView`.
+A database view can be understood as a virtual table, which can be queried like a real table.
 
-A database view in floor is defined and used similarly to entities, with the main difference being that
-access is read-only, which means that update, insert and delete functions are not possible. Similarly to 
-entities, the class name is used if no `viewName` was set.
+A database view in floor is defined and used similarly to entities, with the main difference being that access is read-only, which means that update, insert and delete functions are not possible.
+Similarly to entities, the class name is used if no `viewName` was set.
 
 ```dart
-@DatabaseView('SELECT distinct(name) as name FROM person', viewName: 'name')
+@DatabaseView('SELECT distinct(name) AS name FROM person', viewName: 'name')
 class Name {
   final String name;
 
@@ -435,27 +315,160 @@ class Name {
 }
 ```
 
-Database views do not have any foreign/primary keys or indices. Instead, you should manually define indices which fit to 
-your statement and put them into the `@Entity` annotation of the involved entities.
+Database views do not have any foreign/primary keys or indices. Instead, you should manually define indices which fit to your statement and put them into the `@Entity` annotation of the involved entities.
 
-Setters, getters and static fields are automatically ignored (like in entities), you can specify additional fields
-to ignore by annotating them with `@ignore`. 
+Setters, getters and static fields are automatically ignored (like in entities), you can specify additional fields to ignore by annotating them with `@ignore`.
 
-After defining a database view in your code, you have to add it to your database by adding it to the `views` field of 
-the `@Database` annotation:
+After defining a database view in your code, you have to add it to your database by adding it to the `views` field of the `@Database` annotation:
 
 ```dart
-    @Database(version: 1, entities: [Person], views:[Name])
-    abstract class AppDatabase extends FloorDatabase {
-      PersonDao get personDao;
-    }
-
+@Database(version: 1, entities: [Person], views:[Name])
+abstract class AppDatabase extends FloorDatabase {
+  // DAO getters
+}
 ```
 
 You can then query the view via a DAO function like an entity.
 
-NOTE: Be aware that it is currently not possible to return a 
-`Stream<>` object from a function which queries a database view.
+NOTE: Be aware that it is currently not possible to return a `Stream` object from a function which queries a database view.
+
+## Data Access Objects
+These components are responsible for managing access to the underlying SQLite database and are defined as abstract classes with method signatures and query statements.
+
+```dart
+// dao/person_dao.dart
+
+import 'package:floor/floor.dart';
+
+@dao
+abstract class PersonDao {
+  @Query('SELECT * FROM Person')
+  Future<List<Person>> findAllPersons();
+
+  @Query('SELECT * FROM Person WHERE id = :id')
+  Stream<Person> findPersonById(int id);
+
+  @insert
+  Future<void> insertPerson(Person person);
+}
+```
+
+### Queries
+Method signatures turn into query methods by adding the `@Query()` annotation with the query in parenthesis to them.
+Be patient about the correctness of your SQL statements.
+They are only partly validated while generating the code.
+These queries have to return either a `Future` or a `Stream` of an entity or `void`.
+Returning `Future<void>` comes in handy whenever you want to delete the full content of a table, for instance.
+Some query method examples can be seen in the following.
+
+```dart
+@Query('SELECT * FROM Person WHERE id = :id')
+Future<Person> findPersonById(int id);
+
+@Query('SELECT * FROM Person WHERE id = :id AND name = :name')
+Future<Person> findPersonByIdAndName(int id, String name);
+
+@Query('SELECT * FROM Person')
+Future<List<Person>> findAllPersons(); // select multiple items
+
+@Query('SELECT * FROM Person')
+Stream<List<Person>> findAllPersonsAsStream(); // stream return
+
+@Query('DELETE FROM Person')
+Future<void> deleteAllPersons(); // query without returning an entity
+
+@Query('SELECT * FROM Person WHERE id IN (:ids)')
+Future<List<Person>> findPersonsWithIds(List<int> ids); // query with IN clause
+```
+
+Query arguments, when using SQLite's `LIKE` operator, have to be supplied by the input of a method.
+It's not possible to define a pattern matching argument like `%foo%` in the query itself.
+
+```dart
+// dao
+@Query('SELECT * FROM Person WHERE name LIKE :name')
+Future<List<City>> findPersonsWithNamesLike(String name);
+
+// usage
+final name = '%foo%';
+await dao.findPersonsWithNamesLike(name);
+```
+
+### Data Changes
+Use the `@insert`, `@update` and `@delete` annotations for inserting and changing persistent data.
+All these methods accept single or multiple entity instances.
+
+`@insert` marks a method as an insertion method.
+When using the capitalized `@Insert` you can specify a conflict strategy.
+Else it just defaults to aborting the insert.
+These methods can return a `Future` of either `void`, `int` or `List<int>`.
+- `void` return nothing
+- `int` return primary key of inserted item
+- `List<int>` return primary keys of inserted items
+
+
+`@update` marks a method as an update method.
+When using the capitalized `@Update` you can specify a conflict strategy.
+Else it just defaults to aborting the update.
+These methods can return a `Future` of either `void` or `int`.
+- `void` return nothing
+- `int` return number of changed rows
+
+
+`@delete` marks a method as a deletion method.
+These methods can return a `Future` of either `void` or `int`.
+- `void` return nothing
+- `int` return number of deleted rows
+
+```dart
+// examples of changing multiple items with return
+
+@insert
+Future<List<int>> insertPersons(List<Person> person);
+
+@update
+Future<int> updatePersons(List<Person> person);
+
+@delete
+Future<int> deletePersons(List<Person> person);
+```
+
+### Streams
+As already mentioned, queries can not only return a value once when called but also a continuous stream of query results.
+The returned stream keeps you in sync with the changes happening to the database table.
+This feature plays really well with the `StreamBuilder` widget.
+
+These methods return a broadcast stream.
+Thus, it can have multiple listeners.
+```dart
+// definition
+@Query('SELECT * FROM Person')
+Stream<List<Person>> findAllPersonsAsStream();
+
+// usage
+StreamBuilder<List<Person>>(
+  stream: dao.findAllPersonsAsStream(),
+  builder: (BuildContext context, AsyncSnapshot<List<Person>> snapshot) {
+    // do something with the values here
+  },
+);
+```
+
+NOTE:
+It is currently not possible to return a `Stream` if the function queries a database view.
+This is mostly due to the complexity of detecting which entities are involved in a database view.
+
+### Transactions
+Whenever you want to perform some operations in a transaction you have to add the `@transaction` annotation to the method.
+It's also required to add the `async` modifier. These methods can only return `Future<void>`.
+
+```dart
+@transaction
+Future<void> replacePersons(List<Person> persons) async {
+  await deleteAllPersons();
+  await insertPersons(persons);
+}
+```
 
 ## Migrations
 Whenever you are doing changes to your entities, you're required to also migrate the old data.
@@ -505,7 +518,7 @@ To instantiate an in-memory database, use the static `inMemoryDatabaseBuilder()`
 final database = await $FloorAppDatabase.inMemoryDatabaseBuilder().build();
 ```
 
-## Callback
+## Initialization Callback
 In order to hook into Floor's database initialization process, `Callback` should be used.
 It allows the invocation of three separate callbacks which are triggered when the database has been
 - initialized for the first time (`onCreate`).
@@ -587,7 +600,7 @@ void main() {
     tearDown(() async {
       await database.close();
     });
-  
+
     test('find person by id', () async {
       final person = Person(1, 'Simon');
       await personDao.insertPerson(person);
@@ -624,7 +637,7 @@ dev_dependencies:
       path: floor_generator
   build_runner: ^1.7.3
 ```
-     
+
 ## Naming
 The library's name derives from the following.
 *Floor* as the *bottom layer* of a [Room](https://developer.android.com/topic/libraries/architecture/room) which points to the analogy of the database layer being the bottom and foundation layer of most applications.
