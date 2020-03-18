@@ -19,7 +19,12 @@ abstract class QueryableProcessor<T extends Queryable> extends Processor<T> {
   @nonNull
   @protected
   List<Field> getFields() {
-    return classElement.fields
+    final fields = [
+      ...classElement.fields,
+      ...classElement.allSupertypes.expand((type) => type.element.fields),
+    ];
+
+    return fields
         .where((fieldElement) => fieldElement.shouldBeIncluded())
         .map((field) => FieldProcessor(field).process())
         .toList();
