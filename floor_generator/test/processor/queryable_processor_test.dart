@@ -1,46 +1,13 @@
 import 'package:analyzer/dart/element/element.dart';
 import 'package:collection/collection.dart';
-import 'package:floor_generator/processor/queryable_processor.dart';
+import 'package:floor_generator/processor/error/queryable_processor_error.dart';
 import 'package:floor_generator/processor/field_processor.dart';
+import 'package:floor_generator/processor/queryable_processor.dart';
 import 'package:floor_generator/value_object/field.dart';
 import 'package:floor_generator/value_object/queryable.dart';
-
 import 'package:test/test.dart';
 
 import '../test_utils.dart';
-
-class MockQueryable extends Queryable {
-  MockQueryable(
-      ClassElement classElement, List<Field> fields, String constructor)
-      : super(classElement, '', fields, constructor);
-
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      other is MockQueryable &&
-          runtimeType == other.runtimeType &&
-          classElement == other.classElement &&
-          const ListEquality<Field>().equals(fields, other.fields) &&
-          constructor == other.constructor;
-
-  @override
-  int get hashCode =>
-      classElement.hashCode ^ fields.hashCode ^ constructor.hashCode;
-}
-
-class MockProcessor extends QueryableProcessor<MockQueryable> {
-  MockProcessor(ClassElement classElement) : super(classElement);
-
-  @override
-  MockQueryable process() {
-    final fields = getFields();
-    return MockQueryable(
-      classElement,
-      fields,
-      getConstructor(fields),
-    );
-  }
-}
 
 void main() {
   test('Process Queryable', () async {
@@ -54,18 +21,152 @@ void main() {
       }
     ''');
 
-    final actual = MockProcessor(classElement).process();
+    final actual = TestProcessor(classElement).process();
 
     final fields = classElement.fields
         .map((fieldElement) => FieldProcessor(fieldElement).process())
         .toList();
     const constructor = "Person(row['id'] as int, row['name'] as String)";
-    final expected = MockQueryable(
+    final expected = TestQueryable(
       classElement,
       fields,
       constructor,
     );
     expect(actual, equals(expected));
+  });
+
+  group('Field inheritance', () {
+    test('Inherits fields from abstract parent class', () async {
+      final classElement = await createClassElement('''
+      class TestEntity extends AbstractEntity {
+        final String name;
+      
+        TestEntity(int id, this.name) : super(id);
+      }
+      
+      abstract class AbstractEntity {
+        @primaryKey
+        final int id;
+      
+        AbstractEntity(this.id);
+      }           
+    ''');
+
+      final actual = TestProcessor(classElement).process();
+      final fieldNames = actual.fields.map((field) => field.name).toList();
+
+      final expectedFieldNames = ['id', 'name'];
+      const expectedConstructor =
+          "TestEntity(row['id'] as int, row['name'] as String)";
+      expect(fieldNames, containsAll(expectedFieldNames));
+      expect(actual.constructor, equals(expectedConstructor));
+    });
+
+    test('Inherits fields from abstract parent class', () async {
+      final classElement = await createClassElement('''
+        class TestEntity extends AnotherAbstractEntity {
+          final String name;
+        
+          TestEntity(int id, double foo, this.name) : super(id, foo);
+        }
+        
+        abstract class AnotherAbstractEntity extends AbstractEntity {
+          final double foo;
+        
+          AnotherAbstractEntity(int id, this.foo) : super(id);
+        }
+        
+        abstract class AbstractEntity {
+          @primaryKey
+          final int id;
+        
+          AbstractEntity(this.id);
+        }                 
+    ''');
+
+      final actual = TestProcessor(classElement).process();
+      final fieldNames = actual.fields.map((field) => field.name).toList();
+
+      final expectedFieldNames = ['id', 'foo', 'name'];
+      const expectedConstructor =
+          "TestEntity(row['id'] as int, row['foo'] as double, row['name'] as String)";
+      expect(fieldNames, containsAll(expectedFieldNames));
+      expect(actual.constructor, equals(expectedConstructor));
+    });
+
+    test('Inherits fields from superclass', () async {
+      final classElement = await createClassElement('''
+        class TestEntity extends SuperClassEntity {
+          final String name;
+        
+          TestEntity(int id, this.name) : super(id);
+        }
+        
+        class SuperClassEntity {
+          @primaryKey
+          final int id;
+        
+          SuperClassEntity(this.id);
+        }                 
+    ''');
+
+      final actual = TestProcessor(classElement).process();
+      final fieldNames = actual.fields.map((field) => field.name).toList();
+
+      final expectedFieldNames = ['id', 'name'];
+      const expectedConstructor =
+          "TestEntity(row['id'] as int, row['name'] as String)";
+      expect(fieldNames, containsAll(expectedFieldNames));
+      expect(actual.constructor, equals(expectedConstructor));
+    });
+
+    test('Inherits fields from superclass', () async {
+      final classElement = await createClassElement('''
+        class TestEntity implements InterfaceEntity {
+          @primaryKey
+          @override
+          final int id;
+          final String name;
+        
+          TestEntity(this.id, this.name);
+        }
+        
+        class InterfaceEntity {
+          final int id;
+        
+          InterfaceEntity(this.id);
+        }                 
+    ''');
+
+      final actual = TestProcessor(classElement).process();
+      final fieldNames = actual.fields.map((field) => field.name).toList();
+
+      final expectedFieldNames = ['id', 'name'];
+      const expectedConstructor =
+          "TestEntity(row['id'] as int, row['name'] as String)";
+      expect(fieldNames, containsAll(expectedFieldNames));
+      expect(actual.constructor, equals(expectedConstructor));
+    });
+
+    test('Throws when queryable inherits from mixin', () async {
+      final classElement = await createClassElement('''
+        class TestEntity with TestMixin {
+          final int id;
+        
+          TestEntity(this.id);
+        }
+        
+        class TestMixin {
+          String name;
+        }      
+    ''');
+
+      final actual = () => TestProcessor(classElement).process();
+
+      final error =
+          QueryableProcessorError(classElement).PROHIBITED_MIXIN_USAGE;
+      expect(actual, throwsInvalidGenerationSourceError(error));
+    });
   });
 
   group('Ignore special fields', () {
@@ -82,7 +183,7 @@ void main() {
       }
     ''');
 
-      final actual = MockProcessor(classElement).process();
+      final actual = TestProcessor(classElement).process();
 
       expect(actual.fields.length, equals(2));
     });
@@ -101,7 +202,7 @@ void main() {
       }
     ''');
 
-      final actual = MockProcessor(classElement).process();
+      final actual = TestProcessor(classElement).process();
 
       expect(actual.fields.length, equals(2));
     });
@@ -119,7 +220,7 @@ void main() {
       }
     ''');
 
-      final actual = MockProcessor(classElement)
+      final actual = TestProcessor(classElement)
           .process()
           .fields
           .map((field) => field.name)
@@ -144,7 +245,7 @@ void main() {
       }
     ''');
 
-      final actual = MockProcessor(classElement)
+      final actual = TestProcessor(classElement)
           .process()
           .fields
           .map((field) => field.name)
@@ -166,7 +267,7 @@ void main() {
       }
     ''');
 
-      final actual = MockProcessor(classElement).process().constructor;
+      final actual = TestProcessor(classElement).process().constructor;
 
       const expected = "Person(row['id'] as int, row['name'] as String)";
       expect(actual, equals(expected));
@@ -185,7 +286,7 @@ void main() {
       }
     ''');
 
-      final actual = MockProcessor(classElement).process().constructor;
+      final actual = TestProcessor(classElement).process().constructor;
 
       const expected =
           "Person(row['id'] as int, row['name'] as String, bar: row['bar'] as String)";
@@ -205,7 +306,7 @@ void main() {
       }
     ''');
 
-      final actual = MockProcessor(classElement).process().constructor;
+      final actual = TestProcessor(classElement).process().constructor;
 
       const expected =
           "Person(id: row['id'] as int, name: row['name'] as String, bar: row['bar'] as String)";
@@ -225,7 +326,7 @@ void main() {
       }
     ''');
 
-      final actual = MockProcessor(classElement).process().constructor;
+      final actual = TestProcessor(classElement).process().constructor;
 
       const expected =
           "Person(row['id'] as int, row['name'] as String, row['bar'] as String)";
@@ -245,7 +346,7 @@ void main() {
       }
     ''');
 
-      final actual = MockProcessor(classElement).process().constructor;
+      final actual = TestProcessor(classElement).process().constructor;
 
       const expected =
           "Person(row['id'] as int, row['name'] as String, row['bar'] as String)";
@@ -268,7 +369,7 @@ void main() {
       }
     ''');
 
-      final actual = MockProcessor(classElement)
+      final actual = TestProcessor(classElement)
           .process()
           .fields
           .map((field) => field.name);
@@ -291,10 +392,50 @@ void main() {
       }
     ''');
 
-      final actual = MockProcessor(classElement).process().constructor;
+      final actual = TestProcessor(classElement).process().constructor;
 
       const expected = "Person(row['id'] as int, row['name'] as String)";
       expect(actual, equals(expected));
     });
   });
+}
+
+class TestQueryable extends Queryable {
+  TestQueryable(
+    ClassElement classElement,
+    List<Field> fields,
+    String constructor,
+  ) : super(classElement, '', fields, constructor);
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is TestQueryable &&
+          runtimeType == other.runtimeType &&
+          classElement == other.classElement &&
+          const ListEquality<Field>().equals(fields, other.fields) &&
+          constructor == other.constructor;
+
+  @override
+  int get hashCode =>
+      classElement.hashCode ^ fields.hashCode ^ constructor.hashCode;
+
+  @override
+  String toString() {
+    return 'TestQueryable{classElement: $classElement, name: $name, fields: $fields, constructor: $constructor}';
+  }
+}
+
+class TestProcessor extends QueryableProcessor<TestQueryable> {
+  TestProcessor(ClassElement classElement) : super(classElement);
+
+  @override
+  TestQueryable process() {
+    final fields = getFields();
+    return TestQueryable(
+      classElement,
+      fields,
+      getConstructor(fields),
+    );
+  }
 }

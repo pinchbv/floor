@@ -9,13 +9,13 @@ import 'package:floor_generator/processor/query_method_processor.dart';
 import 'package:floor_generator/processor/transaction_method_processor.dart';
 import 'package:floor_generator/processor/update_method_processor.dart';
 import 'package:floor_generator/value_object/dao.dart';
-import 'package:floor_generator/value_object/view.dart';
 import 'package:floor_generator/value_object/deletion_method.dart';
 import 'package:floor_generator/value_object/entity.dart';
 import 'package:floor_generator/value_object/insertion_method.dart';
 import 'package:floor_generator/value_object/query_method.dart';
 import 'package:floor_generator/value_object/transaction_method.dart';
 import 'package:floor_generator/value_object/update_method.dart';
+import 'package:floor_generator/value_object/view.dart';
 
 class DaoProcessor extends Processor<Dao> {
   final ClassElement _classElement;
@@ -44,9 +44,10 @@ class DaoProcessor extends Processor<Dao> {
   @override
   Dao process() {
     final name = _classElement.displayName;
-    final supertypeMethods =
-        _classElement.allSupertypes.expand((type) => type.methods);
-    final methods = [..._classElement.methods, ...supertypeMethods];
+    final methods = [
+      ..._classElement.methods,
+      ..._classElement.allSupertypes.expand((type) => type.methods)
+    ];
 
     final queryMethods = _getQueryMethods(methods);
     final insertionMethods = _getInsertionMethods(methods);
