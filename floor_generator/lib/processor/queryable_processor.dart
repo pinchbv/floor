@@ -3,6 +3,7 @@ import 'package:analyzer/dart/element/type.dart';
 import 'package:floor_annotation/floor_annotation.dart' as annotations;
 import 'package:floor_generator/misc/annotations.dart';
 import 'package:floor_generator/misc/type_utils.dart';
+import 'package:floor_generator/processor/error/queryable_processor_error.dart';
 import 'package:floor_generator/processor/field_processor.dart';
 import 'package:floor_generator/processor/processor.dart';
 import 'package:floor_generator/value_object/field.dart';
@@ -10,15 +11,22 @@ import 'package:floor_generator/value_object/queryable.dart';
 import 'package:meta/meta.dart';
 
 abstract class QueryableProcessor<T extends Queryable> extends Processor<T> {
+  final QueryableProcessorError _queryableProcessorError;
+
   @protected
   final ClassElement classElement;
 
   @protected
-  QueryableProcessor(this.classElement) : assert(classElement != null);
+  QueryableProcessor(this.classElement)
+      : assert(classElement != null),
+        _queryableProcessorError = QueryableProcessorError(classElement);
 
   @nonNull
   @protected
   List<Field> getFields() {
+    if (classElement.mixins.isNotEmpty) {
+      throw _queryableProcessorError.PROHIBITED_MIXIN_USAGE;
+    }
     final fields = [
       ...classElement.fields,
       ...classElement.allSupertypes.expand((type) => type.element.fields),
