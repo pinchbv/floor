@@ -119,7 +119,7 @@ class DatabaseWriter implements Writer {
               await callback?.onOpen?.call(database);
             },
             onUpgrade: (database, startVersion, endVersion) async {
-              MigrationAdapter.runMigrations(database, startVersion, endVersion, migrations);
+              await MigrationAdapter.runMigrations(database, startVersion, endVersion, migrations);
 
               await callback?.onUpgrade?.call(database, startVersion, endVersion);
             },

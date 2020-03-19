@@ -21,8 +21,8 @@ void main() {
     DogDao dogDao;
 
     setUp(() async {
-      final migration1to2 = Migration(1, 2, (database) {
-        database.execute('ALTER TABLE dog ADD COLUMN nick_name TEXT');
+      final migration1to2 = Migration(1, 2, (database) async {
+        await database.execute('ALTER TABLE dog ADD COLUMN nick_name TEXT');
       });
       final allMigrations = [migration1to2];
 
