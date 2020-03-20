@@ -4,8 +4,8 @@ extension StringUtils on String {
     return '${this[0].toLowerCase()}${substring(1)}';
   }
 
-  /// Flattens a multiline string into a single line string by concatenating
-  /// lines separated by a space and remove leading and trailing whitespace
+  /// Flattens a multiline string into a single-line string by concatenating
+  /// lines separated by a space and removes leading and trailing whitespace
   String flatten() {
     return replaceAll('\n', ' ').replaceAll(RegExp(r'[ ]{2,}'), ' ').trim();
   }
