@@ -4,13 +4,14 @@ import 'package:floor_annotation/floor_annotation.dart' as annotations
     show Query;
 import 'package:floor_generator/misc/annotations.dart';
 import 'package:floor_generator/misc/constants.dart';
+import 'package:floor_generator/misc/string_utils.dart';
 import 'package:floor_generator/misc/type_utils.dart';
 import 'package:floor_generator/processor/error/query_method_processor_error.dart';
 import 'package:floor_generator/processor/processor.dart';
-import 'package:floor_generator/value_object/view.dart';
 import 'package:floor_generator/value_object/entity.dart';
 import 'package:floor_generator/value_object/query_method.dart';
 import 'package:floor_generator/value_object/queryable.dart';
+import 'package:floor_generator/value_object/view.dart';
 
 class QueryMethodProcessor extends Processor<QueryMethod> {
   final QueryMethodProcessorError _processorError;
@@ -77,9 +78,7 @@ class QueryMethodProcessor extends Processor<QueryMethod> {
         .getAnnotation(annotations.Query)
         .getField(AnnotationField.QUERY_VALUE)
         ?.toStringValue()
-        ?.replaceAll('\n', ' ')
-        ?.replaceAll(RegExp(r'[ ]{2,}'), ' ')
-        ?.trim();
+        ?.flatten();
 
     if (query == null || query.isEmpty) throw _processorError.NO_QUERY_DEFINED;
 
