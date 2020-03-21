@@ -641,7 +641,7 @@ The library's name derives from the following.
 Where *fl* also gives a pointer that the library is used in the Flutter context.
 
 ## Bugs and Feedback
-For bugs, questions and discussions please use the [Github Issues](https://github.com/vitusortner/floor/issues).
+For bugs, questions and discussions please use [Github Issues](https://github.com/vitusortner/floor/issues).
 For general communication, use [floor's Slack](https://floor-flutter.slack.com/).
 
 ## License
