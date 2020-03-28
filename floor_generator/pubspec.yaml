@@ -20,7 +20,7 @@ dependencies:
   floor_annotation:
     git:
       url: git://github.com/vitusortner/floor.git
-      ref: snapshot-versions
+      ref: develop
       path: floor_annotation
 
 dev_dependencies:
