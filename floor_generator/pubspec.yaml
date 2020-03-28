@@ -18,6 +18,7 @@ dependencies:
   build_config: ^0.4.1+1
   collection: ^1.14.11
   floor_annotation:
+    # change this to "path: ../floor_annotation/" for local development
     git:
       url: git://github.com/vitusortner/floor.git
       ref: develop
