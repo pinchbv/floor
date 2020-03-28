@@ -3,9 +3,7 @@ import 'package:test/test.dart';
 
 void main() {
   test('decapitalize word (first letter to lowercase)', () {
-    const string = 'FOO';
-
-    final actual = string.decapitalize();
+    final actual = 'FOO'.decapitalize();
 
     expect(actual, 'fOO');
   });

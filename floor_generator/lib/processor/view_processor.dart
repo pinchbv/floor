@@ -17,14 +17,12 @@ class ViewProcessor extends QueryableProcessor<View> {
   @nonNull
   @override
   View process() {
-    final name = _getName();
     final fields = getFields();
-    final query = _getQuery();
     return View(
       classElement,
-      name,
+      _getName(),
       fields,
-      query,
+      _getQuery(),
       getConstructor(fields),
     );
   }
@@ -34,7 +32,7 @@ class ViewProcessor extends QueryableProcessor<View> {
     return classElement
             .getAnnotation(annotations.DatabaseView)
             .getField(AnnotationField.VIEW_NAME)
-            .toStringValue() ??
+            ?.toStringValue() ??
         classElement.displayName;
   }
 
@@ -43,10 +41,11 @@ class ViewProcessor extends QueryableProcessor<View> {
     final query = classElement
         .getAnnotation(annotations.DatabaseView)
         .getField(AnnotationField.VIEW_QUERY)
-        .toStringValue();
+        ?.toStringValue();
 
-    if (query == null || !query.toLowerCase().startsWith('select'))
+    if (query == null || !query.trimLeft().toLowerCase().startsWith('select')) {
       throw _processorError.MISSING_QUERY;
+    }
     return query;
   }
 }

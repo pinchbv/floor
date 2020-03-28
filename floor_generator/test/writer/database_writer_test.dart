@@ -13,6 +13,9 @@ void main() {
 
   test('open database for simple entity', () async {
     final database = await _createDatabase('''
+      @Database(version: 1, entities: [Person])
+      abstract class TestDatabase extends FloorDatabase {}
+      
       @entity
       class Person {
         @primaryKey
@@ -63,6 +66,9 @@ void main() {
 
   test('open database for complex entity', () async {
     final database = await _createDatabase('''
+      @Database(version: 1, entities: [Person])
+      abstract class TestDatabase extends FloorDatabase {}
+      
       @Entity(tableName: 'custom_table_name')
       class Person {
         @PrimaryKey(autoGenerate: true)
@@ -111,18 +117,80 @@ void main() {
       }      
     '''));
   });
+
+  test('open database with view', () async {
+    final database = await _createDatabase('''
+      @Database(version: 1, entities: [Person], views: [Name])
+      abstract class TestDatabase extends FloorDatabase {}
+      
+      @DatabaseView(
+          'SELECT custom_name as name FROM person',
+          viewName: 'names')
+      class Name {
+        final String name;
+      
+        Name(this.name);
+      }
+      
+      @entity
+      class Person {
+        @primaryKey
+        final int id;
+      
+        final String name;
+      
+        Person(this.id, this.name);
+      }
+    ''');
+
+    final actual = DatabaseWriter(database).write();
+
+    expect(actual, equalsDart(r"""
+      class _$TestDatabase extends TestDatabase {
+        _$TestDatabase([StreamController<String> listener]) {
+         changeListener = listener ?? StreamController<String>.broadcast();
+        }
+      
+        Future<sqflite.Database> open(String path, List<Migration> migrations,
+            [Callback callback]) async {
+          return sqflite.openDatabase(
+            path,
+            version: 1,
+            onConfigure: (database) async {
+              await database.execute('PRAGMA foreign_keys = ON');
+            },
+            onOpen: (database) async {
+              await callback?.onOpen?.call(database);
+            },
+            onUpgrade: (database, startVersion, endVersion) async {
+              await MigrationAdapter.runMigrations(
+                  database, startVersion, endVersion, migrations);
+
+              await callback?.onUpgrade?.call(database, startVersion, endVersion);
+            },
+            onCreate: (database, version) async {
+              await database.execute(
+                  'CREATE TABLE IF NOT EXISTS `Person` (`id` INTEGER, `name` TEXT, PRIMARY KEY (`id`))');
+                  
+              await database.execute(
+                  '''CREATE VIEW IF NOT EXISTS `names` AS SELECT custom_name as name FROM person''');
+
+              await callback?.onCreate?.call(database, version);
+            },
+          );
+        }
+      }      
+    """));
+  });
 }
 
-Future<Database> _createDatabase(final String entity) async {
+Future<Database> _createDatabase(final String definition) async {
   final library = await resolveSource('''
       library test;
       
       import 'package:floor_annotation/floor_annotation.dart';
       
-      @Database(version: 1, entities: [Person])
-      abstract class TestDatabase extends FloorDatabase {}
-      
-      $entity
+      $definition
       ''', (resolver) async {
     return LibraryReader(await resolver.findLibraryByName('test'));
   });
