@@ -1,5 +1,9 @@
 # Changelog
 
+# 0.7.0
+
+* Add @DatabaseView annotation
+
 # 0.6.0
 
 * Add @ignore annotation
