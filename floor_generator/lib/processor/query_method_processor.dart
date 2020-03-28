@@ -4,7 +4,6 @@ import 'package:floor_annotation/floor_annotation.dart' as annotations
     show Query;
 import 'package:floor_generator/misc/annotations.dart';
 import 'package:floor_generator/misc/constants.dart';
-import 'package:floor_generator/misc/string_utils.dart';
 import 'package:floor_generator/misc/type_utils.dart';
 import 'package:floor_generator/processor/error/query_method_processor_error.dart';
 import 'package:floor_generator/processor/processor.dart';
@@ -78,7 +77,9 @@ class QueryMethodProcessor extends Processor<QueryMethod> {
         .getAnnotation(annotations.Query)
         .getField(AnnotationField.QUERY_VALUE)
         ?.toStringValue()
-        ?.flatten();
+        ?.replaceAll('\n', ' ')
+        ?.replaceAll(RegExp(r'[ ]{2,}'), ' ')
+        ?.trim();
 
     if (query == null || query.isEmpty) throw _processorError.NO_QUERY_DEFINED;
 
