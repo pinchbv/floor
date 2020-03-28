@@ -36,6 +36,49 @@ void main() {
     expect(actual, equals(expected));
   });
 
+  test('Process view with mutliline query', () async {
+    final classElement = await createClassElement("""
+      @DatabaseView('''
+        SELECT * 
+        from otherentity
+      ''')
+      class Person {
+        final int id;
+      
+        final String name;
+      
+        Person(this.id, this.name);
+      }
+    """);
+
+    final actual = ViewProcessor(classElement).process().query;
+
+    const expected = '''
+        SELECT * 
+        from otherentity
+      ''';
+    expect(actual, equals(expected));
+  });
+
+  test('Process view with concatenated string query', () async {
+    final classElement = await createClassElement('''
+      @DatabaseView('SELECT * ' 
+          'from otherentity')
+      class Person {
+        final int id;
+      
+        final String name;
+      
+        Person(this.id, this.name);
+      }
+    ''');
+
+    final actual = ViewProcessor(classElement).process().query;
+
+    const expected = 'SELECT * from otherentity';
+    expect(actual, equals(expected));
+  });
+
   test('Process view with dedicated name', () async {
     final classElement = await createClassElement('''
       @DatabaseView("SELECT * from otherentity",viewName: "personview")
