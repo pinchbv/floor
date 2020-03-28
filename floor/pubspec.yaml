@@ -13,7 +13,10 @@ dependencies:
   path: ^1.6.4
   sqflite: ^1.2.0
   floor_annotation:
-    path: ../floor_annotation/
+    git:
+      url: git://github.com/vitusortner/floor.git
+      ref: snapshot-versions
+      path: floor_annotation
   meta: ^1.1.8
   flutter:
     sdk: flutter

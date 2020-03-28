@@ -18,7 +18,10 @@ dependencies:
   build_config: ^0.4.1+1
   collection: ^1.14.11
   floor_annotation:
-    path: ../floor_annotation/
+    git:
+      url: git://github.com/vitusortner/floor.git
+      ref: snapshot-versions
+      path: floor_annotation
 
 dev_dependencies:
   test: ^1.11.0
