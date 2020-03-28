@@ -79,7 +79,6 @@ class DatabaseWriter implements Writer {
         _generateCreateTableSqlStatements(database.entities)
             .map((statement) => "await database.execute('$statement');")
             .join('\n');
-
     final createIndexStatements = database.entities
         .map((entity) => entity.indices.map((index) => index.createQuery()))
         .expand((statements) => statements)
@@ -87,17 +86,15 @@ class DatabaseWriter implements Writer {
         .join('\n');
     final createViewStatements = database.views
         .map((view) => view.getCreateViewStatement())
-        .map((statement) => "await database.execute('$statement');")
+        .map((statement) => "await database.execute('''$statement''');")
         .join('\n');
 
     final pathParameter = Parameter((builder) => builder
       ..name = 'path'
       ..type = refer('String'));
-
     final migrationsParameter = Parameter((builder) => builder
       ..name = 'migrations'
       ..type = refer('List<Migration>'));
-
     final callbackParameter = Parameter((builder) => builder
       ..name = 'callback'
       ..type = refer('Callback'));

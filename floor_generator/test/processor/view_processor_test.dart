@@ -53,7 +53,10 @@ void main() {
 
     final actual = ViewProcessor(classElement).process().query;
 
-    const expected = 'SELECT * from otherentity';
+    const expected = '''
+        SELECT * 
+        from otherentity
+      ''';
     expect(actual, equals(expected));
   });
 

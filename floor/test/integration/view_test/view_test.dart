@@ -10,12 +10,17 @@ import '../dao/dog_dao.dart';
 import '../dao/name_dao.dart';
 import '../dao/person_dao.dart';
 import '../model/dog.dart';
+import '../model/mutliline_name.dart';
 import '../model/name.dart';
 import '../model/person.dart';
 
 part 'view_test.g.dart';
 
-@Database(version: 1, entities: [Person, Dog], views: [Name])
+@Database(
+  version: 1,
+  entities: [Person, Dog],
+  views: [Name, MultilineQueryName],
+)
 abstract class ViewTestDatabase extends FloorDatabase {
   PersonDao get personDao;
 
@@ -80,6 +85,16 @@ void main() {
         final actual = await nameDao.findAllNames();
 
         final expected = [Name('Frank'), Name('Leo'), Name('Romeo')];
+        expect(actual, equals(expected));
+      });
+
+      test('query multiline query view to find name', () async {
+        final person = Person(1, 'Frank');
+        await personDao.insertPerson(person);
+
+        final actual = await nameDao.findMultilineQueryName('Frank');
+
+        final expected = MultilineQueryName('Frank');
         expect(actual, equals(expected));
       });
     });
