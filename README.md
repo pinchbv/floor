@@ -49,10 +49,10 @@ This package is still in an early phase and the API will likely change.
     dependencies:
       flutter:
         sdk: flutter
-      floor: ^0.11.0
+      floor: ^0.12.0
 
     dev_dependencies:
-      floor_generator: ^0.11.0
+      floor_generator: ^0.12.0
       build_runner: ^1.7.3
     ````
 
@@ -550,10 +550,10 @@ In case you're running Linux, make sure to have sqlite3 and libsqlite3-dev insta
 dependencies:
   flutter:
     sdk: flutter
-  floor: ^0.11.0
+  floor: ^0.12.0
 
 dev_dependencies:
-  floor_generator: ^0.11.0
+  floor_generator: ^0.12.0
   build_runner: ^1.7.3
 
   # additional dependencies

@@ -2,7 +2,7 @@ name: floor
 description: >
   A supportive SQLite abstraction for your Flutter applications.
   This library is the runtime dependency.
-version: 0.11.0
+version: 0.12.0
 homepage: https://github.com/vitusortner/floor
 author: Vitus Ortner <vitusortner.dev@gmail.com>
 
@@ -31,3 +31,4 @@ dev_dependencies:
       url: git://github.com/tekartik/sqflite_more
       ref: dart2
       path: sqflite_ffi_test
+  matcher: ^0.12.6
