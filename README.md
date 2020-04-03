@@ -30,7 +30,6 @@ This package is still in an early phase and the API will likely change.
 1. [Initialization Callback](#initialization-callback)
 1. [Testing](#testing)
 1. [Examples](#examples)
-1. [Snapshot Version](#snapshot-version)
 1. [Naming](#naming)
 1. [Bugs and Feedback](#bugs-and-feedback)
 1. [License](#license)
@@ -612,28 +611,6 @@ void main() {
 
 ## Examples
 For further examples take a look at the [example](https://github.com/vitusortner/floor/tree/develop/example) and [test](https://github.com/vitusortner/floor/tree/develop/floor/test/integration) directories.
-
-## Snapshot Version
-In case you want to play with the most recent changes that haven't been released to pub yet, apply following changes to your `pubspec.yaml`.
-
-```yaml
-dependencies:
-  flutter:
-    sdk: flutter
-  floor:
-    git:
-      url: git://github.com/vitusortner/floor.git
-      ref: develop
-      path: floor
-
-dev_dependencies:
-  floor_generator:
-    git:
-      url: git://github.com/vitusortner/floor.git
-      ref: develop
-      path: floor_generator
-  build_runner: ^1.7.3
-```
 
 ## Naming
 The library's name derives from the following.
