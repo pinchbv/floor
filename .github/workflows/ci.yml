@@ -106,32 +106,32 @@ jobs:
           flags: floor
           file: ./floor/coverage/lcov.info
 
-    example:
-      runs-on: ubuntu-latest
-      timeout-minutes: 10
+  example:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
 
-      steps:
-        - name: Check out code
-          uses: actions/checkout@v2
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v2
 
-        - name: Install Flutter
-          uses: subosito/flutter-action@v1
-          with:
-            channel: stable
+      - name: Install Flutter
+        uses: subosito/flutter-action@v1
+        with:
+          channel: stable
 
-        - name: Install dependencies
-          run: flutter packages get
-          working-directory: example
+      - name: Install dependencies
+        run: flutter packages get
+        working-directory: example
 
-        - name: Analyze
-          run: flutter analyze
-          working-directory: floor
+      - name: Analyze
+        run: flutter analyze
+        working-directory: floor
 
-        - name: Install SQLite
-          run: |
-            sudo apt-get -y update
-            sudo apt-get -y install sqlite3 libsqlite3-dev
+      - name: Install SQLite
+        run: |
+          sudo apt-get -y update
+          sudo apt-get -y install sqlite3 libsqlite3-dev
 
-        - name: Run tests
-          run: flutter test
-          working-directory: example
+      - name: Run tests
+        run: flutter test
+        working-directory: example
