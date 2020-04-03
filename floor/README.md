@@ -190,6 +190,9 @@ For more information about primary keys and especially compound primary keys, re
 `@ColumnInfo` enables custom mapping of single table columns.
 With the annotation, it's possible to give columns a custom name and define if the column is able to store `null`.
 
+**NOTE:**
+Floor automatically uses the **first** constructor defined in the entity class for creating in-memory objects from database rows.  
+
 ```dart
 @Entity(tableName: 'person')
 class Person {
@@ -329,7 +332,8 @@ abstract class AppDatabase extends FloorDatabase {
 
 You can then query the view via a DAO function like an entity.
 
-NOTE: Be aware that it is currently not possible to return a `Stream` object from a function which queries a database view.
+**NOTE:**
+Be aware that it is currently not possible to return a `Stream` object from a function which queries a database view.
 
 ## Data Access Objects
 These components are responsible for managing access to the underlying SQLite database and are defined as abstract classes with method signatures and query statements.
@@ -450,7 +454,7 @@ StreamBuilder<List<Person>>(
 );
 ```
 
-NOTE:
+**NOTE:**
 It is currently not possible to return a `Stream` if the function queries a database view.
 This is mostly due to the complexity of detecting which entities are involved in a database view.
 
