@@ -125,7 +125,7 @@ jobs:
 
       - name: Analyze
         run: flutter analyze
-        working-directory: floor
+        working-directory: example
 
       - name: Install SQLite
         run: |
