@@ -116,6 +116,8 @@ class TaskListCell extends StatelessWidget {
       ),
       onDismissed: (_) async {
         await dao.deleteTask(task);
+
+        Scaffold.of(context).hideCurrentSnackBar();
         Scaffold.of(context).showSnackBar(
           const SnackBar(content: Text('Removed task')),
         );
@@ -136,22 +138,48 @@ class TasksTextField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return TextField(
-      controller: _textEditingController,
-      decoration: InputDecoration(
-        fillColor: Theme.of(context).inputDecorationTheme.fillColor,
-        filled: true,
-        contentPadding: const EdgeInsets.all(16),
-        border: InputBorder.none,
-        hintText: 'Type task here',
+    return Container(
+      color: Colors.black12,
+      child: Row(
+        children: <Widget>[
+          Expanded(
+            child: TextField(
+              controller: _textEditingController,
+              decoration: InputDecoration(
+                fillColor: Colors.transparent,
+                filled: true,
+                contentPadding: const EdgeInsets.all(16),
+                border: InputBorder.none,
+                hintText: 'Type task here',
+              ),
+              onSubmitted: (_) async {
+                await _persistMessage();
+              },
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.only(right: 16),
+            child: OutlineButton(
+              textColor: Colors.blueGrey,
+              child: const Text('Save'),
+              onPressed: () async {
+                await _persistMessage();
+              },
+            ),
+          ),
+        ],
       ),
-      onSubmitted: (input) async {
-        final message = _textEditingController.text;
-        final task = Task(null, message);
-        await dao.insertTask(task);
-
-        _textEditingController.clear();
-      },
     );
+  }
+
+  Future<void> _persistMessage() async {
+    final message = _textEditingController.text;
+    if (message.trim().isEmpty) {
+      _textEditingController.clear();
+    } else {
+      final task = Task(null, message);
+      await dao.insertTask(task);
+      _textEditingController.clear();
+    }
   }
 }

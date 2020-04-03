@@ -74,7 +74,7 @@ class _$FlutterDatabase extends FlutterDatabase {
         await callback?.onOpen?.call(database);
       },
       onUpgrade: (database, startVersion, endVersion) async {
-        MigrationAdapter.runMigrations(
+        await MigrationAdapter.runMigrations(
             database, startVersion, endVersion, migrations);
 
         await callback?.onUpgrade?.call(database, startVersion, endVersion);
