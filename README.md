@@ -387,7 +387,7 @@ It's not possible to define a pattern matching argument like `%foo%` in the quer
 ```dart
 // dao
 @Query('SELECT * FROM Person WHERE name LIKE :name')
-Future<List<City>> findPersonsWithNamesLike(String name);
+Future<List<Person>> findPersonsWithNamesLike(String name);
 
 // usage
 final name = '%foo%';
