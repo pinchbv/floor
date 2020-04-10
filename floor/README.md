@@ -476,6 +476,30 @@ Future<void> replacePersons(List<Person> persons) async {
 }
 ```
 
+### Inheritance
+Data access object classes support inheritance as shown in the following.
+There is no limit to inheritance levels and thus, each abstract parent can have another abstract parent.
+Bear in mind that only abstract classes allow method signatures without an implementation body and thereby, make sure to position your to-be-inherited methods in an abstract class and extend this class with your DAO.  
+
+```dart
+@dao
+abstract class PersonDao extends AbstractDao<Person> {
+  @Query('SELECT * FROM Person WHERE id = :id')
+  Future<Person> findPersonById(int id);
+}
+
+abstract class AbstractDao<T> {
+  @insert
+  Future<void> insertItem(T item);
+}
+
+// usage
+final person = Person(1, 'Simon');
+await personDao.insertItem(person);
+
+final result = await personDao.findPersonById(1);
+```
+
 ## Migrations
 Whenever you are doing changes to your entities, you're required to also migrate the old data.
 
