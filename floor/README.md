@@ -145,15 +145,21 @@ This package is still in an early phase and the API will likely change.
 
 1. Use the generated code.
     For obtaining an instance of the database, use the generated `$FloorAppDatabase` class, which allows access to a database builder.
-    The name is composited from `$Floor` and the database class name.
+    The name is being composed by `$Floor` and the database class name.
     The string passed to `databaseBuilder()` will be the database file name.
-    For initializing the database, call `build()`.
+    For initializing the database, call `build()` and make sure to `await` the result.
+    
+    In order to retrieve the `PersonDao` instance, invoking the `persoDao` getter on the database instance is enough.
+    Its functions can be used as shown in the following snippet.
 
     ```dart
     final database = await $FloorAppDatabase.databaseBuilder('app_database.db').build();
-
-    final person = await database.findPersonById(1);
-    await database.insertPerson(person);
+    final personDao = database.personDao;
+   
+    final person = Person(1, 'Frank');
+    await personDao.insertPerson(person);
+   
+    final result = await personDao.findPersonById(1);
     ```
 
 For further examples take a look at the [example](https://github.com/vitusortner/floor/tree/develop/example) and [floor_test](https://github.com/vitusortner/floor/tree/develop/floor_test) directories.
