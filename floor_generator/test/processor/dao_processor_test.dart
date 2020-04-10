@@ -62,7 +62,7 @@ void main() {
     expect(actual, equals(3));
   });
 
-  test('Includes methods form mixin', () async {
+  test('Includes methods from mixin', () async {
     final classElement = await _createDao('''
       @dao
       abstract class PersonDao with MixinDao<Person> {
