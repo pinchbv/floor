@@ -19,9 +19,10 @@ class QueryAdapter {
   Future<T> query<T>(
     final String sql, {
     final List<dynamic> arguments,
+    final bool isRaw = false,
     @required final T Function(Map<String, dynamic>) mapper,
   }) async {
-    final rows = await _database.rawQuery(sql, arguments);
+    final rows = await (isRaw ? _database.rawQuery(sql.replaceAll('?', arguments[0])) : _database.rawQuery(sql, arguments));
 
     if (rows.isEmpty) {
       return null;
@@ -36,9 +37,10 @@ class QueryAdapter {
   Future<List<T>> queryList<T>(
     final String sql, {
     final List<dynamic> arguments,
+    final bool isRaw = false,
     @required final T Function(Map<String, dynamic>) mapper,
   }) async {
-    final rows = await _database.rawQuery(sql, arguments);
+    final rows = await (isRaw ? _database.rawQuery(sql.replaceAll('?', arguments[0])) : _database.rawQuery(sql, arguments));
     return rows.map((row) => mapper(row)).toList();
   }
 

@@ -1,5 +1,6 @@
 abstract class AnnotationField {
   static const QUERY_VALUE = 'value';
+  static const QUERY_IS_RAW = 'isRaw';
   static const PRIMARY_KEY_AUTO_GENERATE = 'autoGenerate';
   static const ON_CONFLICT = 'onConflict';
 

@@ -14,6 +14,8 @@ class QueryMethod {
   /// Query where ':' got replaced with '$'.
   final String query;
 
+  final bool isRaw;
+
   final DartType rawReturnType;
 
   /// Flattened return type.
@@ -37,8 +39,9 @@ class QueryMethod {
     this.rawReturnType,
     this.flattenedReturnType,
     this.parameters,
-    this.queryable,
-  );
+    this.queryable, {
+    this.isRaw
+  });
 
   bool get returnsList {
     final type = returnsStream

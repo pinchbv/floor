@@ -123,6 +123,7 @@ class QueryMethodWriter implements Writer {
   ) {
     final parameters = StringBuffer()..write("'${_queryMethod.query}', ");
     if (arguments != null) parameters.write('arguments: $arguments, ');
+    if (_queryMethod.isRaw) parameters.write('isRaw: true, ');
     parameters.write('mapper: $mapper');
 
     if (_queryMethod.returnsList) {
