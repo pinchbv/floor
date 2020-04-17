@@ -1,5 +1,30 @@
 # Changelog
 
+# 0.12.0
+
+### Changes
+
+* Ignore Getters&Setters 
+* Use Flutter bundled pub to get and upgrade project dependencies 
+* Generate database implementation on every CI run
+* Throw exception when querying for unsupported type
+* Add generated code for example app
+* Add workflow scripts 
+* Run real database tests on development machine and CI
+
+### 🚀 Features
+
+* Support ByteArrays/Blobs
+* Support inherited fields for entities and views
+* Support database views
+* Support inherited DAO methods
+* Support asynchronous migrations
+
+### 🐛 Bug Fixes
+
+* Fix failing SQLite installation process on CI
+* Fix failing stream query test
+
 # 0.11.0
 
 ### Changes

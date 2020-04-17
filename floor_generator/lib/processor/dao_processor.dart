@@ -15,33 +15,39 @@ import 'package:floor_generator/value_object/insertion_method.dart';
 import 'package:floor_generator/value_object/query_method.dart';
 import 'package:floor_generator/value_object/transaction_method.dart';
 import 'package:floor_generator/value_object/update_method.dart';
+import 'package:floor_generator/value_object/view.dart';
 
 class DaoProcessor extends Processor<Dao> {
   final ClassElement _classElement;
   final String _daoGetterName;
   final String _databaseName;
   final List<Entity> _entities;
+  final List<View> _views;
 
   DaoProcessor(
     final ClassElement classElement,
     final String daoGetterName,
     final String databaseName,
     final List<Entity> entities,
+    final List<View> views,
   )   : assert(classElement != null),
         assert(daoGetterName != null),
         assert(databaseName != null),
         assert(entities != null),
+        assert(views != null),
         _classElement = classElement,
         _daoGetterName = daoGetterName,
         _databaseName = databaseName,
-        _entities = entities;
+        _entities = entities,
+        _views = views;
 
   @override
   Dao process() {
     final name = _classElement.displayName;
-    final supertypeMethods =
-        _classElement.allSupertypes.expand((type) => type.methods);
-    final methods = [..._classElement.methods, ...supertypeMethods];
+    final methods = [
+      ..._classElement.methods,
+      ..._classElement.allSupertypes.expand((type) => type.methods)
+    ];
 
     final queryMethods = _getQueryMethods(methods);
     final insertionMethods = _getInsertionMethods(methods);
@@ -66,7 +72,8 @@ class DaoProcessor extends Processor<Dao> {
   List<QueryMethod> _getQueryMethods(final List<MethodElement> methods) {
     return methods
         .where((method) => method.hasAnnotation(annotations.Query))
-        .map((method) => QueryMethodProcessor(method, _entities).process())
+        .map((method) =>
+            QueryMethodProcessor(method, _entities, _views).process())
         .toList();
   }
 
@@ -119,7 +126,7 @@ class DaoProcessor extends Processor<Dao> {
   List<Entity> _getStreamEntities(final List<QueryMethod> queryMethods) {
     return queryMethods
         .where((method) => method.returnsStream)
-        .map((method) => method.entity)
+        .map((method) => method.queryable as Entity)
         .toList();
   }
 }

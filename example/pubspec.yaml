@@ -21,3 +21,8 @@ dev_dependencies:
   floor_generator:
     path: ../floor_generator/
   build_runner: ^1.7.3
+  sqflite_ffi_test:
+    git:
+      url: git://github.com/tekartik/sqflite_more
+      ref: dart2
+      path: sqflite_ffi_test

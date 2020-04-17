@@ -1,5 +1,7 @@
 import 'package:analyzer/dart/element/element.dart';
+import 'package:collection/collection.dart';
 import 'package:floor_generator/value_object/dao_getter.dart';
+import 'package:floor_generator/value_object/view.dart';
 import 'package:floor_generator/value_object/entity.dart';
 
 /// Representation of the database component.
@@ -7,6 +9,7 @@ class Database {
   final ClassElement classElement;
   final String name;
   final List<Entity> entities;
+  final List<View> views;
   final List<DaoGetter> daoGetters;
   final int version;
 
@@ -14,6 +17,7 @@ class Database {
     this.classElement,
     this.name,
     this.entities,
+    this.views,
     this.daoGetters,
     this.version,
   );
@@ -25,8 +29,10 @@ class Database {
           runtimeType == other.runtimeType &&
           classElement == other.classElement &&
           name == other.name &&
-          entities == other.entities &&
-          daoGetters == other.daoGetters &&
+          const ListEquality<Entity>().equals(entities, other.entities) &&
+          const ListEquality<View>().equals(views, other.views) &&
+          const ListEquality<DaoGetter>()
+              .equals(daoGetters, other.daoGetters) &&
           version == other.version;
 
   @override
@@ -34,11 +40,12 @@ class Database {
       classElement.hashCode ^
       name.hashCode ^
       entities.hashCode ^
+      views.hashCode ^
       daoGetters.hashCode ^
       version.hashCode;
 
   @override
   String toString() {
-    return 'Database{classElement: $classElement, name: $name, entities: $entities, daoGetters: $daoGetters, version: $version}';
+    return 'Database{classElement: $classElement, name: $name, entities: $entities, views: $views, daoGetters: $daoGetters, version: $version}';
   }
 }

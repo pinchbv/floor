@@ -12,17 +12,17 @@ void main() {
     clearInteractions(mockMigrationDatabase);
   });
 
-  test('run single migration', () {
+  test('run single migration', () async {
     const startVersion = 1;
     const endVersion = 2;
     const sql = 'FOO BAR';
     final migrations = [
-      Migration(1, 2, (database) {
-        database.execute(sql);
+      Migration(1, 2, (database) async {
+        await database.execute(sql);
       })
     ];
 
-    MigrationAdapter.runMigrations(
+    await MigrationAdapter.runMigrations(
       mockMigrationDatabase,
       startVersion,
       endVersion,
@@ -32,25 +32,25 @@ void main() {
     verify(mockMigrationDatabase.execute(sql));
   });
 
-  test('run multiple migrations in order', () {
+  test('run multiple migrations in order', () async {
     const startVersion = 1;
     const endVersion = 4;
     const sql1 = 'first';
     const sql2 = 'second';
     const sql3 = 'third';
     final migrations = [
-      Migration(3, 4, (database) {
-        database.execute(sql3);
+      Migration(3, 4, (database) async {
+        await database.execute(sql3);
       }),
-      Migration(1, 2, (database) {
-        database.execute(sql1);
+      Migration(1, 2, (database) async {
+        await database.execute(sql1);
       }),
-      Migration(2, 3, (database) {
-        database.execute(sql2);
+      Migration(2, 3, (database) async {
+        await database.execute(sql2);
       }),
     ];
 
-    MigrationAdapter.runMigrations(
+    await MigrationAdapter.runMigrations(
       mockMigrationDatabase,
       startVersion,
       endVersion,
@@ -69,8 +69,8 @@ void main() {
     const endVersion = 20;
     const sql = 'FOO BAR';
     final migrations = [
-      Migration(1, 2, (database) {
-        database.execute(sql);
+      Migration(1, 2, (database) async {
+        await database.execute(sql);
       })
     ];
 
@@ -90,8 +90,8 @@ void main() {
     const endVersion = 10;
     const sql = 'FOO BAR';
     final migrations = [
-      Migration(1, 2, (database) {
-        database.execute(sql);
+      Migration(1, 2, (database) async {
+        await database.execute(sql);
       })
     ];
 

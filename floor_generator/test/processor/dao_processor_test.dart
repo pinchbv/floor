@@ -28,8 +28,9 @@ void main() {
       }
     ''');
 
-    final actual =
-        DaoProcessor(classElement, '', '', entities).process().methodsLength;
+    final actual = DaoProcessor(classElement, '', '', entities, [])
+        .process()
+        .methodsLength;
 
     expect(actual, equals(2));
   });
@@ -54,13 +55,14 @@ void main() {
       }
     ''');
 
-    final actual =
-        DaoProcessor(classElement, '', '', entities).process().methodsLength;
+    final actual = DaoProcessor(classElement, '', '', entities, [])
+        .process()
+        .methodsLength;
 
     expect(actual, equals(3));
   });
 
-  test('Includes methods form mixin', () async {
+  test('Includes methods from mixin', () async {
     final classElement = await _createDao('''
       @dao
       abstract class PersonDao with MixinDao<Person> {
@@ -74,8 +76,9 @@ void main() {
       }
     ''');
 
-    final actual =
-        DaoProcessor(classElement, '', '', entities).process().methodsLength;
+    final actual = DaoProcessor(classElement, '', '', entities, [])
+        .process()
+        .methodsLength;
 
     expect(actual, equals(2));
   });
@@ -94,8 +97,9 @@ void main() {
       }
     ''');
 
-    final actual =
-        DaoProcessor(classElement, '', '', entities).process().methodsLength;
+    final actual = DaoProcessor(classElement, '', '', entities, [])
+        .process()
+        .methodsLength;
 
     expect(actual, equals(2));
   });
@@ -114,8 +118,9 @@ void main() {
       }
     ''');
 
-    final actual =
-        DaoProcessor(classElement, '', '', entities).process().methodsLength;
+    final actual = DaoProcessor(classElement, '', '', entities, [])
+        .process()
+        .methodsLength;
 
     expect(actual, equals(2));
   });

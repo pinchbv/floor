@@ -79,21 +79,22 @@ class DatabaseWriter implements Writer {
         _generateCreateTableSqlStatements(database.entities)
             .map((statement) => "await database.execute('$statement');")
             .join('\n');
-
     final createIndexStatements = database.entities
         .map((entity) => entity.indices.map((index) => index.createQuery()))
         .expand((statements) => statements)
         .map((statement) => "await database.execute('$statement');")
         .join('\n');
+    final createViewStatements = database.views
+        .map((view) => view.getCreateViewStatement())
+        .map((statement) => "await database.execute('''$statement''');")
+        .join('\n');
 
     final pathParameter = Parameter((builder) => builder
       ..name = 'path'
       ..type = refer('String'));
-
     final migrationsParameter = Parameter((builder) => builder
       ..name = 'migrations'
       ..type = refer('List<Migration>'));
-
     final callbackParameter = Parameter((builder) => builder
       ..name = 'callback'
       ..type = refer('Callback'));
@@ -115,13 +116,14 @@ class DatabaseWriter implements Writer {
               await callback?.onOpen?.call(database);
             },
             onUpgrade: (database, startVersion, endVersion) async {
-              MigrationAdapter.runMigrations(database, startVersion, endVersion, migrations);
+              await MigrationAdapter.runMigrations(database, startVersion, endVersion, migrations);
 
               await callback?.onUpgrade?.call(database, startVersion, endVersion);
             },
             onCreate: (database, version) async {
               $createTableStatements
               $createIndexStatements
+              $createViewStatements
 
               await callback?.onCreate?.call(database, version);
             },

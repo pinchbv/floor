@@ -63,7 +63,7 @@ class QueryMethodWriter implements Writer {
       return _methodBody.toString();
     }
 
-    final mapper = '_${_queryMethod.entity.name.decapitalize()}Mapper';
+    final mapper = '_${_queryMethod.queryable.name.decapitalize()}Mapper';
     if (_queryMethod.returnsStream) {
       _methodBody.write(_generateStreamQuery(arguments, mapper));
     } else {
@@ -137,7 +137,7 @@ class QueryMethodWriter implements Writer {
     @nullable final String arguments,
     @nonNull final String mapper,
   ) {
-    final entityName = _queryMethod.entity.name;
+    final entityName = _queryMethod.queryable.name;
 
     final parameters = StringBuffer()..write("'${_queryMethod.query}', ");
     if (arguments != null) parameters.write('arguments: $arguments, ');

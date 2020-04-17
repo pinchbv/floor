@@ -35,4 +35,13 @@ class QueryMethodProcessorError {
       element: _methodElement,
     );
   }
+
+  // ignore: non_constant_identifier_names
+  InvalidGenerationSourceError get VIEW_NOT_STREAMABLE {
+    return InvalidGenerationSourceError(
+      'Queries on a view can not be returned as a Stream yet.',
+      todo: 'Don\'t use Stream as the return type of a Query on a View.',
+      element: _methodElement,
+    );
+  }
 }

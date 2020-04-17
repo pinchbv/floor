@@ -1,6 +1,6 @@
 import 'package:analyzer/dart/element/element.dart';
 import 'package:floor_annotation/floor_annotation.dart' as annotations
-    show Database, dao, Entity;
+    show Database, dao, Entity, DatabaseView;
 import 'package:floor_generator/misc/annotations.dart';
 import 'package:floor_generator/misc/constants.dart';
 import 'package:floor_generator/misc/type_utils.dart';
@@ -8,8 +8,10 @@ import 'package:floor_generator/processor/dao_processor.dart';
 import 'package:floor_generator/processor/entity_processor.dart';
 import 'package:floor_generator/processor/error/database_processor_error.dart';
 import 'package:floor_generator/processor/processor.dart';
+import 'package:floor_generator/processor/view_processor.dart';
 import 'package:floor_generator/value_object/dao_getter.dart';
 import 'package:floor_generator/value_object/database.dart';
+import 'package:floor_generator/value_object/view.dart';
 import 'package:floor_generator/value_object/entity.dart';
 
 class DatabaseProcessor extends Processor<Database> {
@@ -27,10 +29,18 @@ class DatabaseProcessor extends Processor<Database> {
   Database process() {
     final databaseName = _classElement.displayName;
     final entities = _getEntities(_classElement);
-    final daoGetters = _getDaoGetters(databaseName, entities);
+    final views = _getViews(_classElement);
+    final daoGetters = _getDaoGetters(databaseName, entities, views);
     final version = _getDatabaseVersion();
 
-    return Database(_classElement, databaseName, entities, daoGetters, version);
+    return Database(
+      _classElement,
+      databaseName,
+      entities,
+      views,
+      daoGetters,
+      version,
+    );
   }
 
   @nonNull
@@ -50,6 +60,7 @@ class DatabaseProcessor extends Processor<Database> {
   List<DaoGetter> _getDaoGetters(
     final String databaseName,
     final List<Entity> entities,
+    final List<View> views,
   ) {
     return _classElement.fields.where(_isDao).map((field) {
       final classElement = field.type.element as ClassElement;
@@ -60,6 +71,7 @@ class DatabaseProcessor extends Processor<Database> {
         name,
         databaseName,
         entities,
+        views,
       ).process();
 
       return DaoGetter(field, name, dao);
@@ -98,8 +110,27 @@ class DatabaseProcessor extends Processor<Database> {
   }
 
   @nonNull
+  List<View> _getViews(final ClassElement databaseClassElement) {
+    return _classElement
+        .getAnnotation(annotations.Database)
+        .getField(AnnotationField.DATABASE_VIEWS)
+        ?.toListValue()
+        ?.map((object) => object.toTypeValue().element)
+        ?.whereType<ClassElement>()
+        ?.where(_isView)
+        ?.map((classElement) => ViewProcessor(classElement).process())
+        ?.toList();
+  }
+
+  @nonNull
   bool _isEntity(final ClassElement classElement) {
     return classElement.hasAnnotation(annotations.Entity) &&
+        !classElement.isAbstract;
+  }
+
+  @nonNull
+  bool _isView(final ClassElement classElement) {
+    return classElement.hasAnnotation(annotations.DatabaseView) &&
         !classElement.isAbstract;
   }
 }

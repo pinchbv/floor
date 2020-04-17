@@ -12,7 +12,7 @@ class Migration {
   final int endVersion;
 
   /// Function that performs the migration.
-  final void Function(sqflite.Database database) migrate;
+  final Future<void> Function(sqflite.Database database) migrate;
 
   /// Creates a new migration between [startVersion] and [endVersion].
   /// [migrate] will be called by the database and performs the actual

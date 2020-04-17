@@ -1,4 +1,4 @@
 #!/bin/bash
 
-cd ../floor
+cd ../example
 flutter packages pub run build_runner build --delete-conflicting-outputs
