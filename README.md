@@ -331,7 +331,7 @@ Setters, getters and static fields are automatically ignored (like in entities),
 After defining a database view in your code, you have to add it to your database by adding it to the `views` field of the `@Database` annotation:
 
 ```dart
-@Database(version: 1, entities: [Person], views:[Name])
+@Database(version: 1, entities: [Person], views: [Name])
 abstract class AppDatabase extends FloorDatabase {
   // DAO getters
 }
