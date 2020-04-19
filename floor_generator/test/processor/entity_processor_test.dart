@@ -100,8 +100,8 @@ void main() {
               childColumns: ['owner_id'],
               parentColumns: ['id'],
               entity: Person,
-              onUpdate: ForeignKeyAction.CASCADE
-              onDelete: ForeignKeyAction.SET_NULL,
+              onUpdate: ForeignKeyAction.cascade
+              onDelete: ForeignKeyAction.setNull,
             )
           ],
         )
