@@ -79,14 +79,12 @@ class EntityProcessor extends QueryableProcessor<Entity> {
             throw _processorError.missingParentColumns;
           }
 
-          final onUpdateAnnotationValue = foreignKeyObject
-              .getField(ForeignKeyField.onUpdate)
-              ?.toIntValue();
+          final onUpdateAnnotationValue =
+              foreignKeyObject.getField(ForeignKeyField.onUpdate)?.toIntValue();
           final onUpdate = ForeignKeyAction.getString(onUpdateAnnotationValue);
 
-          final onDeleteAnnotationValue = foreignKeyObject
-              .getField(ForeignKeyField.onDelete)
-              ?.toIntValue();
+          final onDeleteAnnotationValue =
+              foreignKeyObject.getField(ForeignKeyField.onDelete)?.toIntValue();
           final onDelete = ForeignKeyAction.getString(onDeleteAnnotationValue);
 
           return ForeignKey(

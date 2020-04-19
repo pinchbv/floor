@@ -6,9 +6,9 @@ import 'package:floor_generator/processor/entity_processor.dart';
 import 'package:floor_generator/processor/error/query_method_processor_error.dart';
 import 'package:floor_generator/processor/query_method_processor.dart';
 import 'package:floor_generator/processor/view_processor.dart';
-import 'package:floor_generator/value_object/view.dart';
 import 'package:floor_generator/value_object/entity.dart';
 import 'package:floor_generator/value_object/query_method.dart';
+import 'package:floor_generator/value_object/view.dart';
 import 'package:source_gen/source_gen.dart';
 import 'package:test/test.dart';
 
@@ -192,8 +192,8 @@ void main() {
       final actual =
           () => QueryMethodProcessor(methodElement, entities, views).process();
 
-      final error = QueryMethodProcessorError(methodElement)
-          .doesNotReturnFutureNorStream;
+      final error =
+          QueryMethodProcessorError(methodElement).doesNotReturnFutureNorStream;
       expect(actual, throwsInvalidGenerationSourceError(error));
     });
 
@@ -264,8 +264,7 @@ void main() {
       final actual =
           () => QueryMethodProcessor(methodElement, entities, views).process();
 
-      final error =
-          QueryMethodProcessorError(methodElement).viewNotStreamable;
+      final error = QueryMethodProcessorError(methodElement).viewNotStreamable;
       expect(actual, throwsInvalidGenerationSourceError(error));
     });
   });
