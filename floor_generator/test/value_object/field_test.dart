@@ -20,7 +20,7 @@ void main() {
       'field1Name',
       'field1ColumnName',
       false,
-      SqlType.INTEGER,
+      SqlType.integer,
     );
 
     final actual = field.getDatabaseDefinition(autoGenerate);
@@ -37,7 +37,7 @@ void main() {
       'field1Name',
       'field1ColumnName',
       true,
-      SqlType.TEXT,
+      SqlType.text,
     );
 
     final actual = field.getDatabaseDefinition(autoGenerate);

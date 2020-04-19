@@ -4,17 +4,17 @@
 abstract class OnConflictStrategy {
   /// OnConflict strategy constant to replace the old data and continue the
   /// transaction.
-  static const REPLACE = 1;
+  static const replace = 1;
 
   /// OnConflict strategy constant to rollback the transaction.
-  static const ROLLBACK = 2;
+  static const rollback = 2;
 
   /// OnConflict strategy constant to abort the transaction.
-  static const ABORT = 3;
+  static const abort = 3;
 
   /// OnConflict strategy constant to fail the transaction.
-  static const FAIL = 4;
+  static const fail = 4;
 
   /// OnConflict strategy constant to ignore the conflict.
-  static const IGNORE = 5;
+  static const ignore = 5;
 }

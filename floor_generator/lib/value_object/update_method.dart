@@ -36,6 +36,6 @@ class UpdateMethod extends ChangeMethod {
 
   @override
   String toString() {
-    return 'NewUpdateMethod{onConflict: $onConflict}';
+    return 'UpdateMethod{methodElement: $methodElement, name: $name, returnType: $returnType, flattenedReturnType: $flattenedReturnType, parameterElement: $parameterElement, entity: $entity, onConflict: $onConflict}';
   }
 }

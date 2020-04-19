@@ -8,8 +8,7 @@ class QueryMethodProcessorError {
       : assert(methodElement != null),
         _methodElement = methodElement;
 
-  // ignore: non_constant_identifier_names
-  InvalidGenerationSourceError get NO_QUERY_DEFINED {
+  InvalidGenerationSourceError get noQueryDefined {
     return InvalidGenerationSourceError(
       "You didn't define a query.",
       todo: 'Define a query by adding SQL to the @Query() annotation.',
@@ -17,9 +16,7 @@ class QueryMethodProcessorError {
     );
   }
 
-  InvalidGenerationSourceError
-      // ignore: non_constant_identifier_names
-      get QUERY_ARGUMENTS_AND_METHOD_PARAMETERS_DO_NOT_MATCH {
+  InvalidGenerationSourceError get queryArgumentsAndMethodParametersDoNotMatch {
     return InvalidGenerationSourceError(
       'SQL query arguments and method parameters have to match.',
       todo: 'Make sure to supply one parameter per SQL query argument.',
@@ -27,8 +24,7 @@ class QueryMethodProcessorError {
     );
   }
 
-  // ignore: non_constant_identifier_names
-  InvalidGenerationSourceError get DOES_NOT_RETURN_FUTURE_NOR_STREAM {
+  InvalidGenerationSourceError get doesNotReturnFutureNorStream {
     return InvalidGenerationSourceError(
       'All queries have to return a Future or Stream.',
       todo: 'Define the return type as Future or Stream.',
@@ -36,8 +32,7 @@ class QueryMethodProcessorError {
     );
   }
 
-  // ignore: non_constant_identifier_names
-  InvalidGenerationSourceError get VIEW_NOT_STREAMABLE {
+  InvalidGenerationSourceError get viewNotStreamable {
     return InvalidGenerationSourceError(
       'Queries on a view can not be returned as a Stream yet.',
       todo: 'Don\'t use Stream as the return type of a Query on a View.',

@@ -18,7 +18,7 @@ class Index {
         ' ON `$tableName` ($escapedColumnNames)';
   }
 
-  static const DEFAULT_PREFIX = 'index_';
+  static const defaultPrefix = 'index_';
 
   @override
   bool operator ==(Object other) =>

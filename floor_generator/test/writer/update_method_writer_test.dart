@@ -78,7 +78,7 @@ void main() {
 
   test('update person on conflict fail', () async {
     final updateMethod = await _createUpdateMethod('''
-        @Update(onConflict: OnConflictStrategy.FAIL)
+        @Update(onConflict: OnConflictStrategy.fail)
         Future<void> updatePerson(Person person);
       ''');
 

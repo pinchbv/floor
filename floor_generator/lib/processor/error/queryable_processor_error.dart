@@ -8,8 +8,7 @@ class QueryableProcessorError {
       : assert(classElement != null),
         _classElement = classElement;
 
-  // ignore: non_constant_identifier_names
-  InvalidGenerationSourceError get PROHIBITED_MIXIN_USAGE {
+  InvalidGenerationSourceError get prohibitedMixinUsage {
     return InvalidGenerationSourceError(
       'Entities and views are not allowed to inherit from mixins.',
       todo: 'Inline fields and remove mixin from class definition.',

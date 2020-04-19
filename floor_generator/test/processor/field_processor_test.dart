@@ -17,7 +17,7 @@ void main() {
     const name = 'id';
     const columnName = 'id';
     const isNullable = true;
-    const sqlType = SqlType.INTEGER;
+    const sqlType = SqlType.integer;
     final expected = Field(
       fieldElement,
       name,
@@ -39,7 +39,7 @@ void main() {
     const name = 'bytes';
     const columnName = 'data';
     const isNullable = false;
-    const sqlType = SqlType.BLOB;
+    const sqlType = SqlType.blob;
     final expected = Field(
       fieldElement,
       name,

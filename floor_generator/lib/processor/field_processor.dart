@@ -38,7 +38,7 @@ class FieldProcessor extends Processor<Field> {
     return hasColumnInfoAnnotation
         ? _fieldElement
                 .getAnnotation(annotations.ColumnInfo)
-                .getField(AnnotationField.COLUMN_INFO_NAME)
+                .getField(AnnotationField.columnInfoName)
                 ?.toStringValue() ??
             name
         : name;
@@ -49,7 +49,7 @@ class FieldProcessor extends Processor<Field> {
     return hasColumnInfoAnnotation
         ? _fieldElement
                 .getAnnotation(annotations.ColumnInfo)
-                .getField(AnnotationField.COLUMN_INFO_NULLABLE)
+                .getField(AnnotationField.columnInfoNullable)
                 ?.toBoolValue() ??
             true
         : true; // all Dart fields are nullable by default
@@ -59,15 +59,15 @@ class FieldProcessor extends Processor<Field> {
   String _getSqlType() {
     final type = _fieldElement.type;
     if (type.isDartCoreInt) {
-      return SqlType.INTEGER;
+      return SqlType.integer;
     } else if (type.isDartCoreString) {
-      return SqlType.TEXT;
+      return SqlType.text;
     } else if (type.isDartCoreBool) {
-      return SqlType.INTEGER;
+      return SqlType.integer;
     } else if (type.isDartCoreDouble) {
-      return SqlType.REAL;
+      return SqlType.real;
     } else if (type.isUint8List) {
-      return SqlType.BLOB;
+      return SqlType.blob;
     }
     throw InvalidGenerationSourceError(
       'Column type is not supported for $type.',

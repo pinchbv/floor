@@ -41,7 +41,7 @@ class EntityProcessor extends QueryableProcessor<Entity> {
   String _getName() {
     return classElement
             .getAnnotation(annotations.Entity)
-            .getField(AnnotationField.ENTITY_TABLE_NAME)
+            .getField(AnnotationField.entityTableName)
             .toStringValue() ??
         classElement.displayName;
   }
@@ -50,43 +50,41 @@ class EntityProcessor extends QueryableProcessor<Entity> {
   List<ForeignKey> _getForeignKeys() {
     return classElement
             .getAnnotation(annotations.Entity)
-            .getField(AnnotationField.ENTITY_FOREIGN_KEYS)
+            .getField(AnnotationField.entityForeignKeys)
             ?.toListValue()
             ?.map((foreignKeyObject) {
           final parentType = foreignKeyObject
-                  .getField(ForeignKeyField.ENTITY)
+                  .getField(ForeignKeyField.entity)
                   ?.toTypeValue() ??
-              (throw _processorError.FOREIGN_KEY_NO_ENTITY);
+              (throw _processorError.foreignKeyNoEntity);
 
           final parentElement = parentType.element;
           final parentName = parentElement is ClassElement
               ? parentElement
                       .getAnnotation(annotations.Entity)
-                      .getField(AnnotationField.ENTITY_TABLE_NAME)
+                      .getField(AnnotationField.entityTableName)
                       ?.toStringValue() ??
                   parentType.getDisplayString()
-              : throw _processorError.FOREIGN_KEY_DOES_NOT_REFERENCE_ENTITY;
+              : throw _processorError.foreignKeyDoesNotReferenceEntity;
 
           final childColumns =
-              _getColumns(foreignKeyObject, ForeignKeyField.CHILD_COLUMNS);
+              _getColumns(foreignKeyObject, ForeignKeyField.childColumns);
           if (childColumns.isEmpty) {
-            throw _processorError.MISSING_CHILD_COLUMNS;
+            throw _processorError.missingChildColumns;
           }
 
           final parentColumns =
-              _getColumns(foreignKeyObject, ForeignKeyField.PARENT_COLUMNS);
+              _getColumns(foreignKeyObject, ForeignKeyField.parentColumns);
           if (parentColumns.isEmpty) {
-            throw _processorError.MISSING_PARENT_COLUMNS;
+            throw _processorError.missingParentColumns;
           }
 
-          final onUpdateAnnotationValue = foreignKeyObject
-              .getField(ForeignKeyField.ON_UPDATE)
-              ?.toIntValue();
+          final onUpdateAnnotationValue =
+              foreignKeyObject.getField(ForeignKeyField.onUpdate)?.toIntValue();
           final onUpdate = ForeignKeyAction.getString(onUpdateAnnotationValue);
 
-          final onDeleteAnnotationValue = foreignKeyObject
-              .getField(ForeignKeyField.ON_DELETE)
-              ?.toIntValue();
+          final onDeleteAnnotationValue =
+              foreignKeyObject.getField(ForeignKeyField.onDelete)?.toIntValue();
           final onDelete = ForeignKeyAction.getString(onDeleteAnnotationValue);
 
           return ForeignKey(
@@ -104,19 +102,19 @@ class EntityProcessor extends QueryableProcessor<Entity> {
   List<Index> _getIndices(final List<Field> fields, final String tableName) {
     return classElement
             .getAnnotation(annotations.Entity)
-            .getField(AnnotationField.ENTITY_INDICES)
+            .getField(AnnotationField.entityIndices)
             ?.toListValue()
             ?.map((indexObject) {
-          final unique = indexObject.getField(IndexField.UNIQUE)?.toBoolValue();
+          final unique = indexObject.getField(IndexField.unique)?.toBoolValue();
 
           final values = indexObject
-              .getField(IndexField.VALUE)
+              .getField(IndexField.value)
               ?.toListValue()
               ?.map((valueObject) => valueObject.toStringValue())
               ?.toList();
 
           if (values == null || values.isEmpty) {
-            throw _processorError.MISSING_INDEX_COLUMN_NAME;
+            throw _processorError.missingIndexColumnName;
           }
 
           final indexColumnNames = fields
@@ -128,7 +126,7 @@ class EntityProcessor extends QueryableProcessor<Entity> {
             throw _processorError.noMatchingColumn(values);
           }
 
-          final name = indexObject.getField(IndexField.NAME)?.toStringValue() ??
+          final name = indexObject.getField(IndexField.name)?.toStringValue() ??
               _generateIndexName(tableName, indexColumnNames);
 
           return Index(name, tableName, unique, indexColumnNames);
@@ -141,7 +139,7 @@ class EntityProcessor extends QueryableProcessor<Entity> {
     final String tableName,
     final List<String> columnNames,
   ) {
-    return Index.DEFAULT_PREFIX + tableName + '_' + columnNames.join('_');
+    return Index.defaultPrefix + tableName + '_' + columnNames.join('_');
   }
 
   @nonNull
@@ -172,7 +170,7 @@ class EntityProcessor extends QueryableProcessor<Entity> {
   PrimaryKey _getCompoundPrimaryKey(final List<Field> fields) {
     final compoundPrimaryKeyColumnNames = classElement
         .getAnnotation(annotations.Entity)
-        .getField(AnnotationField.ENTITY_PRIMARY_KEYS)
+        .getField(AnnotationField.entityPrimaryKeys)
         ?.toListValue()
         ?.map((object) => object.toStringValue());
 
@@ -187,7 +185,7 @@ class EntityProcessor extends QueryableProcessor<Entity> {
     }).toList();
 
     if (compoundPrimaryKeyFields.isEmpty) {
-      throw _processorError.MISSING_PRIMARY_KEY;
+      throw _processorError.missingPrimaryKey;
     }
 
     return PrimaryKey(compoundPrimaryKeyFields, false);
@@ -197,11 +195,11 @@ class EntityProcessor extends QueryableProcessor<Entity> {
   PrimaryKey _getPrimaryKeyFromAnnotation(final List<Field> fields) {
     final primaryKeyField = fields.firstWhere(
         (field) => field.fieldElement.hasAnnotation(annotations.PrimaryKey),
-        orElse: () => throw _processorError.MISSING_PRIMARY_KEY);
+        orElse: () => throw _processorError.missingPrimaryKey);
 
     final autoGenerate = primaryKeyField.fieldElement
             .getAnnotation(annotations.PrimaryKey)
-            .getField(AnnotationField.PRIMARY_KEY_AUTO_GENERATE)
+            .getField(AnnotationField.primaryKeyAutoGenerate)
             ?.toBoolValue() ??
         false;
 

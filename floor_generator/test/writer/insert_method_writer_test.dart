@@ -78,7 +78,7 @@ void main() {
 
   test('insert method on conflict replace', () async {
     final insertionMethod = await _createInsertionMethod('''
-        @Insert(onConflict: OnConflictStrategy.REPLACE)
+        @Insert(onConflict: OnConflictStrategy.replace)
         Future<void> insertPerson(Person person);
       ''');
 

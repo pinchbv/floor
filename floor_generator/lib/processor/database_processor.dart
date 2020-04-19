@@ -47,11 +47,11 @@ class DatabaseProcessor extends Processor<Database> {
   int _getDatabaseVersion() {
     final version = _classElement
         .getAnnotation(annotations.Database)
-        .getField(AnnotationField.DATABASE_VERSION)
+        .getField(AnnotationField.databaseVersion)
         ?.toIntValue();
 
-    if (version == null) throw _processorError.VERSION_IS_MISSING;
-    if (version < 1) throw _processorError.VERSION_IS_BELOW_ONE;
+    if (version == null) throw _processorError.versionIsMissing;
+    if (version < 1) throw _processorError.versionIsBelowOne;
 
     return version;
   }
@@ -94,7 +94,7 @@ class DatabaseProcessor extends Processor<Database> {
   List<Entity> _getEntities(final ClassElement databaseClassElement) {
     final entities = _classElement
         .getAnnotation(annotations.Database)
-        .getField(AnnotationField.DATABASE_ENTITIES)
+        .getField(AnnotationField.databaseEntities)
         ?.toListValue()
         ?.map((object) => object.toTypeValue().element)
         ?.whereType<ClassElement>()
@@ -103,7 +103,7 @@ class DatabaseProcessor extends Processor<Database> {
         ?.toList();
 
     if (entities == null || entities.isEmpty) {
-      throw _processorError.NO_ENTITIES_DEFINED;
+      throw _processorError.noEntitiesDefined;
     }
 
     return entities;
@@ -113,7 +113,7 @@ class DatabaseProcessor extends Processor<Database> {
   List<View> _getViews(final ClassElement databaseClassElement) {
     return _classElement
         .getAnnotation(annotations.Database)
-        .getField(AnnotationField.DATABASE_VIEWS)
+        .getField(AnnotationField.databaseViews)
         ?.toListValue()
         ?.map((object) => object.toTypeValue().element)
         ?.whereType<ClassElement>()

@@ -75,13 +75,13 @@ class QueryMethodProcessor extends Processor<QueryMethod> {
   String _getQuery() {
     final query = _methodElement
         .getAnnotation(annotations.Query)
-        .getField(AnnotationField.QUERY_VALUE)
+        .getField(AnnotationField.queryValue)
         ?.toStringValue()
         ?.replaceAll('\n', ' ')
         ?.replaceAll(RegExp(r'[ ]{2,}'), ' ')
         ?.trim();
 
-    if (query == null || query.isEmpty) throw _processorError.NO_QUERY_DEFINED;
+    if (query == null || query.isEmpty) throw _processorError.noQueryDefined;
 
     final substitutedQuery = query.replaceAll(RegExp(r':[^\s)]+'), '?');
     _assertQueryParameters(substitutedQuery, _methodElement.parameters);
@@ -134,7 +134,7 @@ class QueryMethodProcessor extends Processor<QueryMethod> {
     final bool returnsStream,
   ) {
     if (!rawReturnType.isDartAsyncFuture && !returnsStream) {
-      throw _processorError.DOES_NOT_RETURN_FUTURE_NOR_STREAM;
+      throw _processorError.doesNotReturnFutureNorStream;
     }
   }
 
@@ -143,7 +143,7 @@ class QueryMethodProcessor extends Processor<QueryMethod> {
     final bool returnsStream,
   ) {
     if (queryable != null && queryable is View && returnsStream) {
-      throw _processorError.VIEW_NOT_STREAMABLE;
+      throw _processorError.viewNotStreamable;
     }
   }
 
@@ -154,7 +154,7 @@ class QueryMethodProcessor extends Processor<QueryMethod> {
     final queryParameterCount = RegExp(r'\?').allMatches(query).length;
 
     if (queryParameterCount != parameterElements.length) {
-      throw _processorError.QUERY_ARGUMENTS_AND_METHOD_PARAMETERS_DO_NOT_MATCH;
+      throw _processorError.queryArgumentsAndMethodParametersDoNotMatch;
     }
   }
 }

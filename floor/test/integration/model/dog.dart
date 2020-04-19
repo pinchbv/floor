@@ -9,7 +9,7 @@ import 'person.dart';
       childColumns: ['owner_id'],
       parentColumns: ['id'],
       entity: Person,
-      onDelete: ForeignKeyAction.CASCADE,
+      onDelete: ForeignKeyAction.cascade,
     )
   ],
 )
