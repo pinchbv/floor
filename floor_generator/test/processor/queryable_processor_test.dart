@@ -164,7 +164,7 @@ void main() {
       final actual = () => TestProcessor(classElement).process();
 
       final error =
-          QueryableProcessorError(classElement).PROHIBITED_MIXIN_USAGE;
+          QueryableProcessorError(classElement).prohibitedMixinUsage;
       expect(actual, throwsInvalidGenerationSourceError(error));
     });
   });

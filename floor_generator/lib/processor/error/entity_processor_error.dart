@@ -8,8 +8,7 @@ class EntityProcessorError {
       : assert(classElement != null),
         _classElement = classElement;
 
-  // ignore: non_constant_identifier_names
-  InvalidGenerationSourceError get MISSING_PRIMARY_KEY {
+  InvalidGenerationSourceError get missingPrimaryKey {
     return InvalidGenerationSourceError(
       'There is no primary key defined on the entity ${_classElement.displayName}.',
       todo:
@@ -19,8 +18,7 @@ class EntityProcessorError {
     );
   }
 
-  // ignore: non_constant_identifier_names
-  InvalidGenerationSourceError get MISSING_PARENT_COLUMNS {
+  InvalidGenerationSourceError get missingParentColumns {
     return InvalidGenerationSourceError(
       'No parent columns defined for foreign key.',
       todo: 'Add parent columns to the foreign key.',
@@ -28,8 +26,7 @@ class EntityProcessorError {
     );
   }
 
-  // ignore: non_constant_identifier_names
-  InvalidGenerationSourceError get MISSING_CHILD_COLUMNS {
+  InvalidGenerationSourceError get missingChildColumns {
     return InvalidGenerationSourceError(
       'No child columns defined for foreign key.',
       todo: 'Add child columns to the foreign key.',
@@ -37,8 +34,7 @@ class EntityProcessorError {
     );
   }
 
-  // ignore: non_constant_identifier_names
-  InvalidGenerationSourceError get FOREIGN_KEY_DOES_NOT_REFERENCE_ENTITY {
+  InvalidGenerationSourceError get foreignKeyDoesNotReferenceEntity {
     return InvalidGenerationSourceError(
       "The foreign key doesn't reference an entity class.",
       todo: 'Make sure to add an entity to the foreign key. ',
@@ -46,8 +42,7 @@ class EntityProcessorError {
     );
   }
 
-  // ignore: non_constant_identifier_names
-  InvalidGenerationSourceError get FOREIGN_KEY_NO_ENTITY {
+  InvalidGenerationSourceError get foreignKeyNoEntity {
     return InvalidGenerationSourceError(
       'No entity defined for foreign key',
       todo: 'Make sure to add an entity to the foreign key. ',
@@ -55,8 +50,7 @@ class EntityProcessorError {
     );
   }
 
-  // ignore: non_constant_identifier_names
-  InvalidGenerationSourceError get MISSING_INDEX_COLUMN_NAME {
+  InvalidGenerationSourceError get missingIndexColumnName {
     return InvalidGenerationSourceError(
       'No index column name defined.',
       todo:

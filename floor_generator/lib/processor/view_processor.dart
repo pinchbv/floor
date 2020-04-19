@@ -31,7 +31,7 @@ class ViewProcessor extends QueryableProcessor<View> {
   String _getName() {
     return classElement
             .getAnnotation(annotations.DatabaseView)
-            .getField(AnnotationField.VIEW_NAME)
+            .getField(AnnotationField.viewName)
             ?.toStringValue() ??
         classElement.displayName;
   }
@@ -40,11 +40,11 @@ class ViewProcessor extends QueryableProcessor<View> {
   String _getQuery() {
     final query = classElement
         .getAnnotation(annotations.DatabaseView)
-        .getField(AnnotationField.VIEW_QUERY)
+        .getField(AnnotationField.viewQuery)
         ?.toStringValue();
 
     if (query == null || !query.trimLeft().toLowerCase().startsWith('select')) {
-      throw _processorError.MISSING_QUERY;
+      throw _processorError.missingQuery;
     }
     return query;
   }

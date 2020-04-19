@@ -67,7 +67,7 @@ class UpdateMethodProcessor implements Processor<UpdateMethod> {
   String _getOnConflictStrategy() {
     final strategy = _methodElement
         .getAnnotation(annotations.Update)
-        .getField(AnnotationField.ON_CONFLICT)
+        .getField(AnnotationField.onConflict)
         .toIntValue();
 
     return 'sqflite.ConflictAlgorithm.${OnConflictStrategy.getConflictAlgorithm(strategy)}';

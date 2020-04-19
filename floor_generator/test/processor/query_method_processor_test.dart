@@ -193,7 +193,7 @@ void main() {
           () => QueryMethodProcessor(methodElement, entities, views).process();
 
       final error = QueryMethodProcessorError(methodElement)
-          .DOES_NOT_RETURN_FUTURE_NOR_STREAM;
+          .doesNotReturnFutureNorStream;
       expect(actual, throwsInvalidGenerationSourceError(error));
     });
 
@@ -206,7 +206,7 @@ void main() {
       final actual =
           () => QueryMethodProcessor(methodElement, entities, views).process();
 
-      final error = QueryMethodProcessorError(methodElement).NO_QUERY_DEFINED;
+      final error = QueryMethodProcessorError(methodElement).noQueryDefined;
       expect(actual, throwsInvalidGenerationSourceError(error));
     });
 
@@ -219,7 +219,7 @@ void main() {
       final actual =
           () => QueryMethodProcessor(methodElement, entities, views).process();
 
-      final error = QueryMethodProcessorError(methodElement).NO_QUERY_DEFINED;
+      final error = QueryMethodProcessorError(methodElement).noQueryDefined;
       expect(actual, throwsInvalidGenerationSourceError(error));
     });
 
@@ -234,7 +234,7 @@ void main() {
           () => QueryMethodProcessor(methodElement, entities, views).process();
 
       final error = QueryMethodProcessorError(methodElement)
-          .QUERY_ARGUMENTS_AND_METHOD_PARAMETERS_DO_NOT_MATCH;
+          .queryArgumentsAndMethodParametersDoNotMatch;
       expect(actual, throwsInvalidGenerationSourceError(error));
     });
 
@@ -249,7 +249,7 @@ void main() {
           () => QueryMethodProcessor(methodElement, entities, views).process();
 
       final error = QueryMethodProcessorError(methodElement)
-          .QUERY_ARGUMENTS_AND_METHOD_PARAMETERS_DO_NOT_MATCH;
+          .queryArgumentsAndMethodParametersDoNotMatch;
       expect(actual, throwsInvalidGenerationSourceError(error));
     });
 
@@ -265,7 +265,7 @@ void main() {
           () => QueryMethodProcessor(methodElement, entities, views).process();
 
       final error =
-          QueryMethodProcessorError(methodElement).VIEW_NOT_STREAMABLE;
+          QueryMethodProcessorError(methodElement).viewNotStreamable;
       expect(actual, throwsInvalidGenerationSourceError(error));
     });
   });

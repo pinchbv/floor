@@ -1,24 +1,24 @@
 import 'package:floor_generator/misc/annotations.dart';
 
 abstract class ForeignKeyAction {
-  static const NO_ACTION = 1;
-  static const RESTRICT = 2;
-  static const SET_NULL = 3;
-  static const SET_DEFAULT = 4;
-  static const CASCADE = 5;
+  static const noAction = 1;
+  static const restrict = 2;
+  static const setNull = 3;
+  static const setDefault = 4;
+  static const cascade = 5;
 
   @nonNull
   static String getString(final int action) {
     switch (action) {
-      case ForeignKeyAction.RESTRICT:
+      case ForeignKeyAction.restrict:
         return 'RESTRICT';
-      case ForeignKeyAction.SET_NULL:
+      case ForeignKeyAction.setNull:
         return 'SET NULL';
-      case ForeignKeyAction.SET_DEFAULT:
+      case ForeignKeyAction.setDefault:
         return 'SET DEFAULT';
-      case ForeignKeyAction.CASCADE:
+      case ForeignKeyAction.cascade:
         return 'CASCADE';
-      case ForeignKeyAction.NO_ACTION:
+      case ForeignKeyAction.noAction:
       default:
         return 'NO ACTION';
     }

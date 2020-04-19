@@ -16,7 +16,7 @@ void main() {
 
     final actual = () => DatabaseProcessor(classElement).process();
 
-    final error = DatabaseProcessorError(classElement).VERSION_IS_BELOW_ONE;
+    final error = DatabaseProcessorError(classElement).versionIsBelowOne;
     expect(actual, throwsInvalidGenerationSourceError(error));
   });
 
@@ -28,7 +28,7 @@ void main() {
 
     final actual = () => DatabaseProcessor(classElement).process();
 
-    final error = DatabaseProcessorError(classElement).VERSION_IS_MISSING;
+    final error = DatabaseProcessorError(classElement).versionIsMissing;
     expect(actual, throwsInvalidGenerationSourceError(error));
   });
 
@@ -42,7 +42,7 @@ void main() {
 
       final actual = () => DatabaseProcessor(classElement).process();
 
-      final error = DatabaseProcessorError(classElement).NO_ENTITIES_DEFINED;
+      final error = DatabaseProcessorError(classElement).noEntitiesDefined;
       expect(actual, throwsInvalidGenerationSourceError(error));
     },
   );
@@ -55,7 +55,7 @@ void main() {
 
     final actual = () => DatabaseProcessor(classElement).process();
 
-    final error = DatabaseProcessorError(classElement).NO_ENTITIES_DEFINED;
+    final error = DatabaseProcessorError(classElement).noEntitiesDefined;
     expect(actual, throwsInvalidGenerationSourceError(error));
   });
 }

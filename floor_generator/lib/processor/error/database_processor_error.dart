@@ -8,8 +8,7 @@ class DatabaseProcessorError {
       : assert(classElement != null),
         _classElement = classElement;
 
-  // ignore: non_constant_identifier_names
-  InvalidGenerationSourceError get VERSION_IS_MISSING {
+  InvalidGenerationSourceError get versionIsMissing {
     return InvalidGenerationSourceError(
       'No version for this database specified even though it is required.',
       todo:
@@ -18,8 +17,7 @@ class DatabaseProcessorError {
     );
   }
 
-  // ignore: non_constant_identifier_names
-  InvalidGenerationSourceError get VERSION_IS_BELOW_ONE {
+  InvalidGenerationSourceError get versionIsBelowOne {
     return InvalidGenerationSourceError(
       'The version of the database has to be a positive number.',
       todo:
@@ -28,8 +26,7 @@ class DatabaseProcessorError {
     );
   }
 
-  // ignore: non_constant_identifier_names
-  InvalidGenerationSourceError get NO_ENTITIES_DEFINED {
+  InvalidGenerationSourceError get noEntitiesDefined {
     return InvalidGenerationSourceError(
       'There are no entities added to the database annotation.',
       todo:

@@ -85,7 +85,7 @@ class InsertionMethodProcessor implements Processor<InsertionMethod> {
   String _getOnConflictStrategy() {
     final strategy = _methodElement
         .getAnnotation(annotations.Insert)
-        .getField(AnnotationField.ON_CONFLICT)
+        .getField(AnnotationField.onConflict)
         .toIntValue();
 
     return 'sqflite.ConflictAlgorithm.${OnConflictStrategy.getConflictAlgorithm(strategy)}';

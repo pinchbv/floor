@@ -25,7 +25,7 @@ abstract class QueryableProcessor<T extends Queryable> extends Processor<T> {
   @protected
   List<Field> getFields() {
     if (classElement.mixins.isNotEmpty) {
-      throw _queryableProcessorError.PROHIBITED_MIXIN_USAGE;
+      throw _queryableProcessorError.prohibitedMixinUsage;
     }
     final fields = [
       ...classElement.fields,
