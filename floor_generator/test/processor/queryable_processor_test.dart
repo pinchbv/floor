@@ -24,7 +24,7 @@ void main() {
     final actual = TestProcessor(classElement).process();
 
     final fields = classElement.fields
-        .map((fieldElement) => FieldProcessor(fieldElement).process())
+        .map((fieldElement) => FieldProcessor(fieldElement, null).process())
         .toList();
     const constructor = "Person(row['id'] as int, row['name'] as String)";
     final expected = TestQueryable(
@@ -426,7 +426,7 @@ class TestQueryable extends Queryable {
 }
 
 class TestProcessor extends QueryableProcessor<TestQueryable> {
-  TestProcessor(ClassElement classElement) : super(classElement);
+  TestProcessor(ClassElement classElement) : super(classElement, []);
 
   @override
   TestQueryable process() {

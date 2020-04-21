@@ -1,11 +1,12 @@
+import 'dart:core';
+
 import 'package:code_builder/code_builder.dart';
+import 'package:dartx/dartx.dart';
 import 'package:floor_generator/misc/annotation_expression.dart';
 import 'package:floor_generator/misc/annotations.dart';
-import 'package:floor_generator/misc/string_utils.dart';
 import 'package:floor_generator/misc/type_utils.dart';
 import 'package:floor_generator/value_object/query_method.dart';
 import 'package:floor_generator/writer/writer.dart';
-import 'package:source_gen/source_gen.dart';
 
 class QueryMethodWriter implements Writer {
   final QueryMethod _queryMethod;
@@ -36,12 +37,13 @@ class QueryMethodWriter implements Writer {
 
   List<Parameter> _generateMethodParameters() {
     return _queryMethod.parameters.map((parameter) {
-      if (!parameter.type.isSupported) {
-        throw InvalidGenerationSourceError(
-          'The type of this parameter is not supported.',
-          element: parameter,
-        );
-      }
+      // TODO #165
+//      if (!parameter.type.isDefaultSqlType) {
+//        throw InvalidGenerationSourceError(
+//          'The type of this parameter is not supported.',
+//          element: parameter,
+//        );
+//      }
 
       return Parameter((builder) => builder
         ..name = parameter.name
@@ -63,7 +65,9 @@ class QueryMethodWriter implements Writer {
       return _methodBody.toString();
     }
 
-    final mapper = '_${_queryMethod.queryable.name.decapitalize()}Mapper';
+    final constructor = _queryMethod.queryable.constructor;
+    final mapper = '(Map<String, dynamic> row) => $constructor';
+
     if (_queryMethod.returnsStream) {
       _methodBody.write(_generateStreamQuery(arguments, mapper));
     } else {
@@ -77,30 +81,31 @@ class QueryMethodWriter implements Writer {
   List<String> _generateInClauseValueLists() {
     var index = 0;
     return _queryMethod.parameters
+        .where((parameter) => parameter.type.isDartCoreList)
         .map((parameter) {
-          if (parameter.type.isDartCoreList) {
-            index++;
-            return '''final valueList$index = ${parameter.displayName}.map((value) => "'\$value'").join(', ');''';
-          } else {
-            return null;
-          }
-        })
-        .where((string) => string != null)
-        .toList();
+      // TODO #165 take type converters into account
+      index++;
+      return '''final valueList$index = ${parameter.displayName}.map((value) => "'\$value'").join(', ');''';
+    }).toList();
   }
 
   @nonNull
   List<String> _generateParameters() {
     return _queryMethod.parameters
+        .where((parameter) => !parameter.type.isDartCoreList)
         .map((parameter) {
-          if (!parameter.type.isDartCoreList) {
-            return parameter.displayName;
-          } else {
-            return null;
-          }
-        })
-        .where((string) => string != null)
-        .toList();
+      if (parameter.type.isDefaultSqlType) {
+        return parameter.displayName;
+      } else {
+        final typeConverter = _queryMethod.typeConverters
+            .onEach((typeConverter) => print(typeConverter)) // TODO #165 remove
+            .sortedByDescending((typeConverter) => typeConverter.scope.index) // TODO #165 extract and reuse
+            .firstWhere(
+                (typeConverter) => typeConverter.fieldType == parameter.type);
+
+        return '${typeConverter.name}().encode(${parameter.displayName})';
+      }
+    }).toList();
   }
 
   @nullable

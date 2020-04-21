@@ -11,6 +11,7 @@ class Entity extends Queryable {
   final PrimaryKey primaryKey;
   final List<ForeignKey> foreignKeys;
   final List<Index> indices;
+  final String valueMapping;
 
   Entity(
     ClassElement classElement,
@@ -20,6 +21,7 @@ class Entity extends Queryable {
     this.foreignKeys,
     this.indices,
     String constructor,
+    this.valueMapping,
   ) : super(classElement, name, fields, constructor);
 
   @nonNull
@@ -51,25 +53,6 @@ class Entity extends Queryable {
           primaryKey.fields.map((field) => '`${field.columnName}`').join(', ');
       return 'PRIMARY KEY ($columns)';
     }
-  }
-
-  @nonNull
-  String getValueMapping() {
-    final keyValueList = fields.map((field) {
-      final columnName = field.columnName;
-      final attributeValue = _getAttributeValue(field.fieldElement);
-      return "'$columnName': $attributeValue";
-    }).toList();
-
-    return '<String, dynamic>{${keyValueList.join(', ')}}';
-  }
-
-  @nonNull
-  String _getAttributeValue(final FieldElement fieldElement) {
-    final parameterName = fieldElement.displayName;
-    return fieldElement.type.isDartCoreBool
-        ? 'item.$parameterName ? 1 : 0'
-        : 'item.$parameterName';
   }
 
   @override

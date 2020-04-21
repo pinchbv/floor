@@ -149,16 +149,16 @@ Future<Dao> createDao(final String methodSignature) async {
 
   final entities = library.classes
       .where((classElement) => classElement.hasAnnotation(annotations.Entity))
-      .map((classElement) => EntityProcessor(classElement).process())
+      .map((classElement) => EntityProcessor(classElement, []).process())
       .toList();
   final views = library.classes
       .where((classElement) =>
           classElement.hasAnnotation(annotations.DatabaseView))
-      .map((classElement) => ViewProcessor(classElement).process())
+      .map((classElement) => ViewProcessor(classElement, []).process())
       .toList();
 
-  return DaoProcessor(daoClass, 'personDao', 'TestDatabase', entities, views)
-      .process();
+  return DaoProcessor(
+      daoClass, 'personDao', 'TestDatabase', entities, views, []).process();
 }
 
 Future<ClassElement> createClassElement(final String clazz) async {

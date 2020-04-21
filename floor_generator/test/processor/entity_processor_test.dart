@@ -25,11 +25,11 @@ void main() {
       }
     ''');
 
-    final actual = EntityProcessor(classElement).process();
+    final actual = EntityProcessor(classElement, []).process();
 
     const name = 'Person';
     final fields = classElement.fields
-        .map((fieldElement) => FieldProcessor(fieldElement).process())
+        .map((fieldElement) => FieldProcessor(fieldElement, null).process())
         .toList();
     final primaryKey = PrimaryKey([fields[0]], false);
     const foreignKeys = <ForeignKey>[];
@@ -43,6 +43,7 @@ void main() {
       foreignKeys,
       indices,
       constructor,
+      '', // TODO #165
     );
     expect(actual, equals(expected));
   });
@@ -59,11 +60,11 @@ void main() {
       }
     ''');
 
-    final actual = EntityProcessor(classElement).process();
+    final actual = EntityProcessor(classElement, []).process();
 
     const name = 'Person';
     final fields = classElement.fields
-        .map((fieldElement) => FieldProcessor(fieldElement).process())
+        .map((fieldElement) => FieldProcessor(fieldElement, null).process())
         .toList();
     final primaryKey = PrimaryKey(fields, false);
     const foreignKeys = <ForeignKey>[];
@@ -77,6 +78,7 @@ void main() {
       foreignKeys,
       indices,
       constructor,
+      '', // TODO #165
     );
     expect(actual, equals(expected));
   });
@@ -118,7 +120,8 @@ void main() {
         }
     ''');
 
-      final actual = EntityProcessor(classElements[1]).process().foreignKeys[0];
+      final actual =
+          EntityProcessor(classElements[1], []).process().foreignKeys[0];
 
       final expected = ForeignKey(
         'Person',

@@ -1,6 +1,7 @@
 import 'package:code_builder/code_builder.dart';
 import 'package:floor_generator/misc/annotation_expression.dart';
 import 'package:floor_generator/misc/annotations.dart';
+import 'package:floor_generator/misc/string_utils.dart';
 import 'package:floor_generator/value_object/database.dart';
 import 'package:floor_generator/value_object/entity.dart';
 import 'package:floor_generator/writer/writer.dart';
@@ -27,6 +28,7 @@ class DatabaseWriter implements Writer {
       ..methods.add(_generateOpenMethod(database))
       ..methods.addAll(_generateDaoGetters(database))
       ..fields.addAll(_generateDaoInstances(database))
+//      ..fields.addAll(_generateTypeConverters()) // TODO #165 needed?
       ..constructors.add(_generateConstructor()));
   }
 
@@ -51,6 +53,12 @@ class DatabaseWriter implements Writer {
       final daoGetterName = daoGetter.name;
       final daoTypeName = daoGetter.dao.classElement.displayName;
 
+      // TODO #165
+//      final typeConverterNames =
+//          daoGetter.dao.typeConverters // TODO #165 use database ones?
+//              .map((typeConverter) => '_${typeConverter.name.decapitalize()}')
+//              .join(', ');
+
       return Method((builder) => builder
         ..annotations.add(overrideAnnotationExpression)
         ..type = MethodType.getter
@@ -70,6 +78,19 @@ class DatabaseWriter implements Writer {
       return Field((builder) => builder
         ..type = refer(daoTypeName)
         ..name = '_${daoGetterName}Instance');
+    }).toList();
+  }
+
+  @nonNull
+  List<Field> _generateTypeConverters() {
+    return database.typeConverters.map((typeConverter) {
+      return Field((builder) {
+        return builder
+//          ..type = refer(typeConverterName) // TODO #165 needed?
+          ..name = '_${typeConverter.name.decapitalize()}'
+          ..modifier = FieldModifier.final$
+          ..assignment = Code('${typeConverter.name}()');
+      });
     }).toList();
   }
 

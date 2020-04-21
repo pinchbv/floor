@@ -8,7 +8,7 @@ import 'package:source_gen/source_gen.dart';
 
 extension SupportedTypeChecker on DartType {
   @nonNull
-  bool get isSupported {
+  bool get isDefaultSqlType {
     return TypeChecker.any([
       _stringTypeChecker,
       _boolTypeChecker,

@@ -12,7 +12,7 @@ void main() {
       final int id;
     ''');
 
-    final actual = FieldProcessor(fieldElement).process();
+    final actual = FieldProcessor(fieldElement, null).process();
 
     const name = 'id';
     const columnName = 'id';
@@ -34,7 +34,7 @@ void main() {
       final Uint8List bytes;
     ''');
 
-    final actual = FieldProcessor(fieldElement).process();
+    final actual = FieldProcessor(fieldElement, null).process();
 
     const name = 'bytes';
     const columnName = 'data';

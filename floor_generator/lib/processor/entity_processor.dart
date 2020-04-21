@@ -1,5 +1,6 @@
 import 'package:analyzer/dart/constant/value.dart';
 import 'package:analyzer/dart/element/element.dart';
+import 'package:dartx/dartx.dart';
 import 'package:floor_annotation/floor_annotation.dart' as annotations;
 import 'package:floor_generator/misc/annotations.dart';
 import 'package:floor_generator/misc/constants.dart';
@@ -12,13 +13,16 @@ import 'package:floor_generator/value_object/field.dart';
 import 'package:floor_generator/value_object/foreign_key.dart';
 import 'package:floor_generator/value_object/index.dart';
 import 'package:floor_generator/value_object/primary_key.dart';
+import 'package:floor_generator/value_object/type_converter.dart';
 
 class EntityProcessor extends QueryableProcessor<Entity> {
   final EntityProcessorError _processorError;
 
-  EntityProcessor(final ClassElement classElement)
-      : _processorError = EntityProcessorError(classElement),
-        super(classElement);
+  EntityProcessor(
+    final ClassElement classElement,
+    final List<TypeConverter> typeConverters,
+  )   : _processorError = EntityProcessorError(classElement),
+        super(classElement, typeConverters);
 
   @nonNull
   @override
@@ -34,6 +38,7 @@ class EntityProcessor extends QueryableProcessor<Entity> {
       _getForeignKeys(),
       _getIndices(fields, name),
       getConstructor(fields),
+      _getValueMapping(fields),
     );
   }
 
@@ -204,5 +209,42 @@ class EntityProcessor extends QueryableProcessor<Entity> {
         false;
 
     return PrimaryKey([primaryKeyField], autoGenerate);
+  }
+
+  @nonNull
+  @nonNull
+  String _getValueMapping(final List<Field> fields) {
+    final keyValueList = fields.map((field) {
+      final columnName = field.columnName;
+      final attributeValue = _getAttributeValue(field.fieldElement);
+      return "'$columnName': $attributeValue";
+    }).toList();
+
+    return '<String, dynamic>{${keyValueList.join(', ')}}';
+  }
+
+  @nonNull
+  String _getAttributeValue(final FieldElement fieldElement) {
+    final parameterName = fieldElement.displayName;
+    final fieldType = fieldElement.type;
+
+    if (!fieldType.isDefaultSqlType) {
+      // TODO #165 should field instead have type converter as member?
+      print('Type c $allTypeConverters');
+
+      final typeConverter = allTypeConverters
+          .sortedByDescending((typeConverter) =>
+              typeConverter.scope.index) // TODO #165 extract and reuse
+          .firstWhere((typeConverter) =>
+              typeConverter.fieldType == fieldType); // TODO #165 error handling
+      final typeConverterName = '${typeConverter.name}()';
+      return typeConverter.databaseType.isDartCoreBool
+          ? '$typeConverterName.encode(item.$parameterName) ? 1 : 0'
+          : '$typeConverterName.encode(item.$parameterName)';
+    } else {
+      return fieldType.isDartCoreBool
+          ? 'item.$parameterName ? 1 : 0'
+          : 'item.$parameterName';
+    }
   }
 }

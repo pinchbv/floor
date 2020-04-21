@@ -28,7 +28,7 @@ void main() {
       }
     ''');
 
-    final actual = DaoProcessor(classElement, '', '', entities, [])
+    final actual = DaoProcessor(classElement, '', '', entities, [], [])
         .process()
         .methodsLength;
 
@@ -55,7 +55,7 @@ void main() {
       }
     ''');
 
-    final actual = DaoProcessor(classElement, '', '', entities, [])
+    final actual = DaoProcessor(classElement, '', '', entities, [], [])
         .process()
         .methodsLength;
 
@@ -76,7 +76,7 @@ void main() {
       }
     ''');
 
-    final actual = DaoProcessor(classElement, '', '', entities, [])
+    final actual = DaoProcessor(classElement, '', '', entities, [], [])
         .process()
         .methodsLength;
 
@@ -97,7 +97,7 @@ void main() {
       }
     ''');
 
-    final actual = DaoProcessor(classElement, '', '', entities, [])
+    final actual = DaoProcessor(classElement, '', '', entities, [], [])
         .process()
         .methodsLength;
 
@@ -118,7 +118,7 @@ void main() {
       }
     ''');
 
-    final actual = DaoProcessor(classElement, '', '', entities, [])
+    final actual = DaoProcessor(classElement, '', '', entities, [], [])
         .process()
         .methodsLength;
 
@@ -183,6 +183,6 @@ Future<List<Entity>> _getEntities() async {
 
   return library.classes
       .where((classElement) => classElement.hasAnnotation(annotations.Entity))
-      .map((classElement) => EntityProcessor(classElement).process())
+      .map((classElement) => EntityProcessor(classElement, []).process())
       .toList();
 }

@@ -19,4 +19,6 @@ class DeletionMethod extends ChangeMethod {
           parameterElement,
           entity,
         );
+
+  // TODO #165 equals, hashCode, toString
 }

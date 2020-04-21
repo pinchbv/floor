@@ -17,6 +17,7 @@ dependencies:
   source_gen: ^0.9.4+7
   build_config: ^0.4.1+1
   collection: ^1.14.11
+  dartx: ^0.3.0
   floor_annotation:
     path: ../floor_annotation/
 

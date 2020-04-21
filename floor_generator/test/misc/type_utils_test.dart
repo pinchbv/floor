@@ -7,10 +7,11 @@ import '../test_utils.dart';
 
 void main() {
   group('assert types', () {
+    // TODO #165 rename tests
     test('string is supported type', () async {
       final type = await getDartType("'foo bar'");
 
-      final actual = type.isSupported;
+      final actual = type.isDefaultSqlType;
 
       expect(actual, isTrue);
     });
@@ -18,7 +19,7 @@ void main() {
     test('bool is supported type', () async {
       final type = await getDartType(true);
 
-      final actual = type.isSupported;
+      final actual = type.isDefaultSqlType;
 
       expect(actual, isTrue);
     });
@@ -26,7 +27,7 @@ void main() {
     test('int is supported type', () async {
       final type = await getDartType(1);
 
-      final actual = type.isSupported;
+      final actual = type.isDefaultSqlType;
 
       expect(actual, isTrue);
     });
@@ -34,7 +35,7 @@ void main() {
     test('double is supported type', () async {
       final type = await getDartType(1.1);
 
-      final actual = type.isSupported;
+      final actual = type.isDefaultSqlType;
 
       expect(actual, isTrue);
     });
@@ -42,7 +43,7 @@ void main() {
     test('Uint8List is supported type', () async {
       final type = await getDartType(Uint8List(10));
 
-      final actual = type.isSupported;
+      final actual = type.isDefaultSqlType;
 
       expect(actual, isTrue);
     });

@@ -18,11 +18,11 @@ void main() {
       }
     ''');
 
-    final actual = ViewProcessor(classElement).process();
+    final actual = ViewProcessor(classElement, []).process();
 
     const name = 'Person';
     final fields = classElement.fields
-        .map((fieldElement) => FieldProcessor(fieldElement).process())
+        .map((fieldElement) => FieldProcessor(fieldElement, null).process())
         .toList();
     const query = 'SELECT * from otherentity';
     const constructor = "Person(row['id'] as int, row['name'] as String)";
@@ -51,7 +51,7 @@ void main() {
       }
     """);
 
-    final actual = ViewProcessor(classElement).process().query;
+    final actual = ViewProcessor(classElement, []).process().query;
 
     const expected = '''
         SELECT * 
@@ -73,7 +73,7 @@ void main() {
       }
     ''');
 
-    final actual = ViewProcessor(classElement).process().query;
+    final actual = ViewProcessor(classElement, []).process().query;
 
     const expected = 'SELECT * from otherentity';
     expect(actual, equals(expected));
@@ -91,11 +91,11 @@ void main() {
       }
     ''');
 
-    final actual = ViewProcessor(classElement).process();
+    final actual = ViewProcessor(classElement, []).process();
 
     const name = 'personview';
     final fields = classElement.fields
-        .map((fieldElement) => FieldProcessor(fieldElement).process())
+        .map((fieldElement) => FieldProcessor(fieldElement, null).process())
         .toList();
     const query = 'SELECT * from otherentity';
     const constructor = "Person(row['id'] as int, row['name'] as String)";

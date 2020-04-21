@@ -1,8 +1,8 @@
 import 'package:analyzer/dart/element/element.dart';
-import 'package:floor_annotation/floor_annotation.dart' as annotations
-    show Database, dao, Entity, DatabaseView;
+import 'package:floor_annotation/floor_annotation.dart' as annotations;
 import 'package:floor_generator/misc/annotations.dart';
 import 'package:floor_generator/misc/constants.dart';
+import 'package:floor_generator/misc/extensions/type_converter_element_extension.dart';
 import 'package:floor_generator/misc/type_utils.dart';
 import 'package:floor_generator/processor/dao_processor.dart';
 import 'package:floor_generator/processor/entity_processor.dart';
@@ -11,8 +11,9 @@ import 'package:floor_generator/processor/processor.dart';
 import 'package:floor_generator/processor/view_processor.dart';
 import 'package:floor_generator/value_object/dao_getter.dart';
 import 'package:floor_generator/value_object/database.dart';
-import 'package:floor_generator/value_object/view.dart';
 import 'package:floor_generator/value_object/entity.dart';
+import 'package:floor_generator/value_object/type_converter.dart';
+import 'package:floor_generator/value_object/view.dart';
 
 class DatabaseProcessor extends Processor<Database> {
   final DatabaseProcessorError _processorError;
@@ -28,9 +29,16 @@ class DatabaseProcessor extends Processor<Database> {
   @override
   Database process() {
     final databaseName = _classElement.displayName;
-    final entities = _getEntities(_classElement);
-    final views = _getViews(_classElement);
-    final daoGetters = _getDaoGetters(databaseName, entities, views);
+    final typeConverters =
+        _classElement.getTypeConverters(TypeConverterScope.database);
+    final entities = _getEntities(_classElement, typeConverters);
+    final views = _getViews(_classElement, typeConverters);
+    final daoGetters = _getDaoGetters(
+      databaseName,
+      entities,
+      views,
+      typeConverters,
+    );
     final version = _getDatabaseVersion();
 
     return Database(
@@ -40,6 +48,7 @@ class DatabaseProcessor extends Processor<Database> {
       views,
       daoGetters,
       version,
+      typeConverters,
     );
   }
 
@@ -61,6 +70,7 @@ class DatabaseProcessor extends Processor<Database> {
     final String databaseName,
     final List<Entity> entities,
     final List<View> views,
+    final List<TypeConverter> typeConverters,
   ) {
     return _classElement.fields.where(_isDao).map((field) {
       final classElement = field.type.element as ClassElement;
@@ -72,6 +82,7 @@ class DatabaseProcessor extends Processor<Database> {
         databaseName,
         entities,
         views,
+        typeConverters,
       ).process();
 
       return DaoGetter(field, name, dao);
@@ -91,7 +102,10 @@ class DatabaseProcessor extends Processor<Database> {
   }
 
   @nonNull
-  List<Entity> _getEntities(final ClassElement databaseClassElement) {
+  List<Entity> _getEntities(
+    final ClassElement databaseClassElement,
+    final List<TypeConverter> typeConverters,
+  ) {
     final entities = _classElement
         .getAnnotation(annotations.Database)
         .getField(AnnotationField.databaseEntities)
@@ -99,7 +113,10 @@ class DatabaseProcessor extends Processor<Database> {
         ?.map((object) => object.toTypeValue().element)
         ?.whereType<ClassElement>()
         ?.where(_isEntity)
-        ?.map((classElement) => EntityProcessor(classElement).process())
+        ?.map((classElement) => EntityProcessor(
+              classElement,
+              typeConverters,
+            ).process())
         ?.toList();
 
     if (entities == null || entities.isEmpty) {
@@ -110,16 +127,23 @@ class DatabaseProcessor extends Processor<Database> {
   }
 
   @nonNull
-  List<View> _getViews(final ClassElement databaseClassElement) {
+  List<View> _getViews(
+    final ClassElement databaseClassElement,
+    final List<TypeConverter> typeConverters,
+  ) {
     return _classElement
-        .getAnnotation(annotations.Database)
-        .getField(AnnotationField.databaseViews)
-        ?.toListValue()
-        ?.map((object) => object.toTypeValue().element)
-        ?.whereType<ClassElement>()
-        ?.where(_isView)
-        ?.map((classElement) => ViewProcessor(classElement).process())
-        ?.toList();
+            .getAnnotation(annotations.Database)
+            .getField(AnnotationField.databaseViews)
+            ?.toListValue()
+            ?.map((object) => object.toTypeValue().element)
+            ?.whereType<ClassElement>()
+            ?.where(_isView)
+            ?.map((classElement) => ViewProcessor(
+                  classElement,
+                  typeConverters,
+                ).process())
+            ?.toList() ??
+        [];
   }
 
   @nonNull

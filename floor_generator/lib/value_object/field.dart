@@ -1,5 +1,6 @@
 import 'package:analyzer/dart/element/element.dart';
 import 'package:floor_generator/misc/annotations.dart';
+import 'package:floor_generator/value_object/type_converter.dart';
 
 /// Represents an Entity field and thus a table column.
 class Field {
@@ -8,6 +9,7 @@ class Field {
   final String columnName;
   final bool isNullable;
   final String sqlType;
+  final List<TypeConverter> typeConverters;
 
   Field(
     this.fieldElement,
@@ -15,6 +17,7 @@ class Field {
     this.columnName,
     this.isNullable,
     this.sqlType,
+    this.typeConverters,
   );
 
   /// The database column definition.
@@ -32,6 +35,7 @@ class Field {
     return '`$columnName` $sqlType$columnSpecification';
   }
 
+  // TODO #165 equals, hashCode, toString
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||

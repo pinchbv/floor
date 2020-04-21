@@ -36,6 +36,7 @@ class InsertionMethod extends ChangeMethod {
 
   @override
   String toString() {
+    // TODO #165 update
     return 'InsertionMethod{onConflict: $onConflict}';
   }
 }

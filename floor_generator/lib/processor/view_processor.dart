@@ -5,14 +5,17 @@ import 'package:floor_generator/misc/constants.dart';
 import 'package:floor_generator/misc/type_utils.dart';
 import 'package:floor_generator/processor/error/view_processor_error.dart';
 import 'package:floor_generator/processor/queryable_processor.dart';
+import 'package:floor_generator/value_object/type_converter.dart';
 import 'package:floor_generator/value_object/view.dart';
 
 class ViewProcessor extends QueryableProcessor<View> {
   final ViewProcessorError _processorError;
 
-  ViewProcessor(final ClassElement classElement)
-      : _processorError = ViewProcessorError(classElement),
-        super(classElement);
+  ViewProcessor(
+    final ClassElement classElement,
+    final List<TypeConverter> typeConverters,
+  )   : _processorError = ViewProcessorError(classElement),
+        super(classElement, typeConverters);
 
   @nonNull
   @override

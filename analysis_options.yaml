@@ -7,7 +7,6 @@ analyzer:
     todo: ignore
   exclude:
     - 'bin/cache/**'
-    - '**.g.dart'
 
 linter:
   rules:
