@@ -1,9 +1,9 @@
 import 'package:analyzer/dart/constant/value.dart';
 import 'package:analyzer/dart/element/element.dart';
-import 'package:dartx/dartx.dart';
 import 'package:floor_annotation/floor_annotation.dart' as annotations;
 import 'package:floor_generator/misc/annotations.dart';
 import 'package:floor_generator/misc/constants.dart';
+import 'package:floor_generator/misc/extensions/type_converters_extension.dart';
 import 'package:floor_generator/misc/foreign_key_action.dart';
 import 'package:floor_generator/misc/type_utils.dart';
 import 'package:floor_generator/processor/error/entity_processor_error.dart';
@@ -14,6 +14,7 @@ import 'package:floor_generator/value_object/foreign_key.dart';
 import 'package:floor_generator/value_object/index.dart';
 import 'package:floor_generator/value_object/primary_key.dart';
 import 'package:floor_generator/value_object/type_converter.dart';
+import 'package:source_gen/source_gen.dart';
 
 class EntityProcessor extends QueryableProcessor<Entity> {
   final EntityProcessorError _processorError;
@@ -229,14 +230,11 @@ class EntityProcessor extends QueryableProcessor<Entity> {
     final fieldType = fieldElement.type;
 
     if (!fieldType.isDefaultSqlType) {
-      // TODO #165 should field instead have type converter as member?
-      print('Type c $allTypeConverters');
+      final typeConverter = allTypeConverters.getClosestOrNull(fieldType);
+      if (typeConverter == null) {
+        throw InvalidGenerationSourceError(''); // TODO #165
+      }
 
-      final typeConverter = allTypeConverters
-          .sortedByDescending((typeConverter) =>
-              typeConverter.scope.index) // TODO #165 extract and reuse
-          .firstWhere((typeConverter) =>
-              typeConverter.fieldType == fieldType); // TODO #165 error handling
       final typeConverterName = '${typeConverter.name}()';
       return typeConverter.databaseType.isDartCoreBool
           ? '$typeConverterName.encode(item.$parameterName) ? 1 : 0'

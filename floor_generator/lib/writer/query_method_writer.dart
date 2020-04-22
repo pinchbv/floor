@@ -4,6 +4,7 @@ import 'package:code_builder/code_builder.dart';
 import 'package:dartx/dartx.dart';
 import 'package:floor_generator/misc/annotation_expression.dart';
 import 'package:floor_generator/misc/annotations.dart';
+import 'package:floor_generator/misc/extensions/type_converters_extension.dart';
 import 'package:floor_generator/misc/type_utils.dart';
 import 'package:floor_generator/value_object/query_method.dart';
 import 'package:floor_generator/writer/writer.dart';
@@ -17,10 +18,6 @@ class QueryMethodWriter implements Writer {
 
   @override
   Method write() {
-    return _generateQueryMethod();
-  }
-
-  Method _generateQueryMethod() {
     final builder = MethodBuilder()
       ..annotations.add(overrideAnnotationExpression)
       ..returns = refer(_queryMethod.rawReturnType.getDisplayString())
@@ -31,7 +28,6 @@ class QueryMethodWriter implements Writer {
     if (!_queryMethod.returnsStream || _queryMethod.returnsVoid) {
       builder..modifier = MethodModifier.async;
     }
-
     return builder.build();
   }
 
@@ -79,12 +75,10 @@ class QueryMethodWriter implements Writer {
 
   @nonNull
   List<String> _generateInClauseValueLists() {
-    var index = 0;
     return _queryMethod.parameters
         .where((parameter) => parameter.type.isDartCoreList)
-        .map((parameter) {
+        .mapIndexed((index, parameter) {
       // TODO #165 take type converters into account
-      index++;
       return '''final valueList$index = ${parameter.displayName}.map((value) => "'\$value'").join(', ');''';
     }).toList();
   }
@@ -97,12 +91,8 @@ class QueryMethodWriter implements Writer {
       if (parameter.type.isDefaultSqlType) {
         return parameter.displayName;
       } else {
-        final typeConverter = _queryMethod.typeConverters
-            .onEach((typeConverter) => print(typeConverter)) // TODO #165 remove
-            .sortedByDescending((typeConverter) => typeConverter.scope.index) // TODO #165 extract and reuse
-            .firstWhere(
-                (typeConverter) => typeConverter.fieldType == parameter.type);
-
+        final typeConverter =
+            _queryMethod.typeConverters.getClosest(parameter.type);
         return '${typeConverter.name}().encode(${parameter.displayName})';
       }
     }).toList();

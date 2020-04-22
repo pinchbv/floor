@@ -115,12 +115,11 @@ class QueryMethodProcessor extends Processor<QueryMethod> {
     return query.replaceAllMapped(
       RegExp(r'( in )\([?]\)', caseSensitive: false),
       (match) {
+        final matched = match.input.substring(match.start, match.end);
+        final replaced =
+            matched.replaceFirst(RegExp(r'(\?)'), '\$valueList$index');
         index++;
-        final matchedString = match.input.substring(match.start, match.end);
-        return matchedString.replaceFirst(
-          RegExp(r'(\?)'),
-          '\$valueList$index',
-        );
+        return replaced;
       },
     );
   }

@@ -1,9 +1,9 @@
 import 'package:analyzer/dart/element/element.dart';
 import 'package:analyzer/dart/element/type.dart';
-import 'package:dartx/dartx.dart';
 import 'package:floor_annotation/floor_annotation.dart' as annotations;
 import 'package:floor_generator/misc/annotations.dart';
 import 'package:floor_generator/misc/extensions/type_converter_element_extension.dart';
+import 'package:floor_generator/misc/extensions/type_converters_extension.dart';
 import 'package:floor_generator/misc/type_utils.dart';
 import 'package:floor_generator/processor/error/queryable_processor_error.dart';
 import 'package:floor_generator/processor/field_processor.dart';
@@ -18,19 +18,18 @@ abstract class QueryableProcessor<T extends Queryable> extends Processor<T> {
 
   @protected
   final ClassElement classElement;
-  @protected
-  final List<TypeConverter> _typeConverters;
+
+  final List<TypeConverter> allTypeConverters;
 
   @protected
-  QueryableProcessor(this.classElement, this._typeConverters)
-      : assert(classElement != null),
-        assert(_typeConverters != null),
-        _queryableProcessorError = QueryableProcessorError(classElement);
-
-  List<TypeConverter> get allTypeConverters {
-    return _typeConverters +
-        classElement.getTypeConverters(TypeConverterScope.entity);
-  }
+  QueryableProcessor(
+    this.classElement,
+    final List<TypeConverter> typeConverters,
+  )   : assert(classElement != null),
+        assert(typeConverters != null),
+        _queryableProcessorError = QueryableProcessorError(classElement),
+        allTypeConverters = typeConverters +
+            classElement.getTypeConverters(TypeConverterScope.entity);
 
   @nonNull
   @protected
@@ -46,14 +45,7 @@ abstract class QueryableProcessor<T extends Queryable> extends Processor<T> {
     return fields
         .where((fieldElement) => fieldElement.shouldBeIncluded())
         .map((field) {
-      final typeConverter = allTypeConverters
-          .onEach((typeConverter) => print(typeConverter)) // TODO #165 remove
-          .sortedByDescending((typeConverter) =>
-              typeConverter.scope.index) // TODO #165 extract and reuse
-          .firstWhere(
-            (typeConverter) => typeConverter.fieldType == field.type,
-            orElse: () => null,
-          );
+      final typeConverter = allTypeConverters.getClosestOrNull(field.type);
       return FieldProcessor(field, typeConverter).process();
     }).toList();
   }
@@ -87,12 +79,8 @@ abstract class QueryableProcessor<T extends Queryable> extends Processor<T> {
       String parameterValue;
 
       if (!parameterElement.type.isDefaultSqlType) {
-        final typeConverter = allTypeConverters
-            .onEach((typeConverter) => print(typeConverter)) // TODO #165 remove
-            .sortedByDescending((typeConverter) =>
-                typeConverter.scope.index) // TODO #165 extract and reuse
-            .firstWhere((typeConverter) =>
-                typeConverter.fieldType == parameterElement.type);
+        final typeConverter =
+            allTypeConverters.getClosest(parameterElement.type);
         final castedDatabaseValue =
             databaseValue.asType(typeConverter.databaseType);
 
