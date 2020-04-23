@@ -1,5 +1,5 @@
 import 'package:analyzer/dart/element/element.dart';
-import 'package:collection/collection.dart';
+import 'package:floor_generator/misc/extensions/list_equality_extension.dart';
 import 'package:floor_generator/value_object/dao_getter.dart';
 import 'package:floor_generator/value_object/entity.dart';
 import 'package:floor_generator/value_object/type_converter.dart';
@@ -32,13 +32,11 @@ class Database {
           runtimeType == other.runtimeType &&
           classElement == other.classElement &&
           name == other.name &&
-          const ListEquality<Entity>().equals(entities, other.entities) &&
-          const ListEquality<View>().equals(views, other.views) &&
-          const ListEquality<DaoGetter>()
-              .equals(daoGetters, other.daoGetters) &&
+          entities.equals(other.entities) &&
+          views.equals(other.views) &&
+          daoGetters.equals(other.daoGetters) &&
           version == other.version &&
-          const ListEquality<TypeConverter>()
-              .equals(typeConverters, other.typeConverters);
+          typeConverters.equals(other.typeConverters);
 
   @override
   int get hashCode =>

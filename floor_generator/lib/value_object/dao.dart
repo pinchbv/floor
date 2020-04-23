@@ -1,5 +1,5 @@
 import 'package:analyzer/dart/element/element.dart';
-import 'package:collection/collection.dart';
+import 'package:floor_generator/misc/extensions/list_equality_extension.dart';
 import 'package:floor_generator/value_object/deletion_method.dart';
 import 'package:floor_generator/value_object/entity.dart';
 import 'package:floor_generator/value_object/insertion_method.dart';
@@ -44,8 +44,7 @@ class Dao {
           deletionMethods == other.deletionMethods &&
           transactionMethods == other.transactionMethods &&
           streamEntities == other.streamEntities &&
-          const ListEquality<TypeConverter>()
-              .equals(typeConverters, other.typeConverters);
+          typeConverters.equals(other.typeConverters);
 
   @override
   int get hashCode =>

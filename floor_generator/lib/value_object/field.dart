@@ -1,5 +1,6 @@
 import 'package:analyzer/dart/element/element.dart';
 import 'package:floor_generator/misc/annotations.dart';
+import 'package:floor_generator/misc/extensions/list_equality_extension.dart';
 import 'package:floor_generator/value_object/type_converter.dart';
 
 /// Represents an Entity field and thus a table column.
@@ -35,7 +36,6 @@ class Field {
     return '`$columnName` $sqlType$columnSpecification';
   }
 
-  // TODO #165 equals, hashCode, toString
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -45,7 +45,8 @@ class Field {
           name == other.name &&
           columnName == other.columnName &&
           isNullable == other.isNullable &&
-          sqlType == other.sqlType;
+          sqlType == other.sqlType &&
+          typeConverters.equals(other.typeConverters);
 
   @override
   int get hashCode =>
@@ -53,10 +54,11 @@ class Field {
       name.hashCode ^
       columnName.hashCode ^
       isNullable.hashCode ^
-      sqlType.hashCode;
+      sqlType.hashCode ^
+      typeConverters.hashCode;
 
   @override
   String toString() {
-    return 'Field{fieldElement: $fieldElement, name: $name, columnName: $columnName, isNullable: $isNullable, sqlType: $sqlType}';
+    return 'Field{fieldElement: $fieldElement, name: $name, columnName: $columnName, isNullable: $isNullable, sqlType: $sqlType, typeConverters: $typeConverters}';
   }
 }

@@ -1,6 +1,6 @@
 import 'package:analyzer/dart/element/element.dart';
 import 'package:analyzer/dart/element/type.dart';
-import 'package:collection/collection.dart';
+import 'package:floor_generator/misc/extensions/list_equality_extension.dart';
 import 'package:floor_generator/misc/type_utils.dart';
 import 'package:floor_generator/value_object/queryable.dart';
 import 'package:floor_generator/value_object/type_converter.dart';
@@ -56,7 +56,6 @@ class QueryMethod {
 
   bool get returnsVoid => flattenedReturnType.isVoid;
 
-  // TODO #165 update
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -67,11 +66,9 @@ class QueryMethod {
           query == other.query &&
           rawReturnType == other.rawReturnType &&
           flattenedReturnType == other.flattenedReturnType &&
-          const ListEquality<ParameterElement>()
-              .equals(parameters, other.parameters) &&
+          parameters.equals(other.parameters) &&
           queryable == other.queryable &&
-          const ListEquality<TypeConverter>()
-              .equals(typeConverters, other.typeConverters);
+          typeConverters.equals(other.typeConverters);
 
   @override
   int get hashCode =>
@@ -86,7 +83,6 @@ class QueryMethod {
 
   @override
   String toString() {
-    // TODO #165 update
-    return 'QueryMethod{methodElement: $methodElement, name: $name, query: $query, rawReturnType: $rawReturnType, flattenedReturnType: $flattenedReturnType, parameters: $parameters, entity: $queryable}';
+    return 'QueryMethod{methodElement: $methodElement, name: $name, query: $query, rawReturnType: $rawReturnType, flattenedReturnType: $flattenedReturnType, parameters: $parameters, queryable: $queryable, typeConverters: $typeConverters}';
   }
 }
