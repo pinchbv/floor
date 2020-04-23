@@ -23,4 +23,3 @@ class DateTimeToMicrosecondsConverter extends TypeConverter<DateTime, int> {
     return value.microsecondsSinceEpoch;
   }
 }
-
