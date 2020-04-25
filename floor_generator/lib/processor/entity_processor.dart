@@ -1,5 +1,6 @@
 import 'package:analyzer/dart/constant/value.dart';
 import 'package:analyzer/dart/element/element.dart';
+import 'package:dartx/dartx.dart';
 import 'package:floor_annotation/floor_annotation.dart' as annotations;
 import 'package:floor_generator/misc/annotations.dart';
 import 'package:floor_generator/misc/constants.dart';
@@ -234,7 +235,8 @@ class EntityProcessor extends QueryableProcessor<Entity> {
           ? 'item.$parameterName ? 1 : 0'
           : 'item.$parameterName';
     } else {
-      final typeConverter = (queryableTypeConverters + field.typeConverters)
+      final typeConverter = [...queryableTypeConverters, field.typeConverter]
+          .filterNotNull()
           .getClosest(fieldType);
       final typeConverterName = '${typeConverter.name}()';
       return typeConverter.databaseType.isDartCoreBool

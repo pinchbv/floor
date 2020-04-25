@@ -1,6 +1,5 @@
 import 'package:analyzer/dart/element/element.dart';
 import 'package:floor_generator/misc/annotations.dart';
-import 'package:floor_generator/misc/extensions/list_equality_extension.dart';
 import 'package:floor_generator/value_object/type_converter.dart';
 
 /// Represents an Entity field and thus a table column.
@@ -10,7 +9,8 @@ class Field {
   final String columnName;
   final bool isNullable;
   final String sqlType;
-  final List<TypeConverter> typeConverters;
+  @nullable
+  final TypeConverter typeConverter;
 
   Field(
     this.fieldElement,
@@ -18,7 +18,7 @@ class Field {
     this.columnName,
     this.isNullable,
     this.sqlType,
-    this.typeConverters,
+    this.typeConverter,
   );
 
   /// The database column definition.
@@ -46,7 +46,7 @@ class Field {
           columnName == other.columnName &&
           isNullable == other.isNullable &&
           sqlType == other.sqlType &&
-          typeConverters.equals(other.typeConverters);
+          typeConverter == other.typeConverter;
 
   @override
   int get hashCode =>
@@ -55,10 +55,10 @@ class Field {
       columnName.hashCode ^
       isNullable.hashCode ^
       sqlType.hashCode ^
-      typeConverters.hashCode;
+      typeConverter.hashCode;
 
   @override
   String toString() {
-    return 'Field{fieldElement: $fieldElement, name: $name, columnName: $columnName, isNullable: $isNullable, sqlType: $sqlType, typeConverters: $typeConverters}';
+    return 'Field{fieldElement: $fieldElement, name: $name, columnName: $columnName, isNullable: $isNullable, sqlType: $sqlType, typeConverter: $typeConverter}';
   }
 }

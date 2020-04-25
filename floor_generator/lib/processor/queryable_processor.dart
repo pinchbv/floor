@@ -1,5 +1,6 @@
 import 'package:analyzer/dart/element/element.dart';
 import 'package:analyzer/dart/element/type.dart';
+import 'package:dartx/dartx.dart';
 import 'package:floor_annotation/floor_annotation.dart' as annotations;
 import 'package:floor_generator/misc/annotations.dart';
 import 'package:floor_generator/misc/extensions/type_converter_element_extension.dart';
@@ -80,7 +81,8 @@ abstract class QueryableProcessor<T extends Queryable> extends Processor<T> {
       String parameterValue;
 
       if (!parameterElement.type.isDefaultSqlType) {
-        final typeConverter = (queryableTypeConverters + field.typeConverters)
+        final typeConverter = [...queryableTypeConverters, field.typeConverter]
+            .filterNotNull()
             .getClosest(parameterElement.type);
         final castedDatabaseValue =
             databaseValue.asType(typeConverter.databaseType);

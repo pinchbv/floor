@@ -1,4 +1,5 @@
 import 'package:analyzer/dart/element/element.dart';
+import 'package:dartx/dartx.dart';
 import 'package:floor_annotation/floor_annotation.dart' as annotations;
 import 'package:floor_generator/misc/annotations.dart';
 import 'package:floor_generator/misc/constants.dart';
@@ -31,11 +32,10 @@ class FieldProcessor extends Processor<Field> {
         _fieldElement.hasAnnotation(annotations.ColumnInfo);
     final columnName = _getColumnName(hasColumnInfoAnnotation, name);
     final isNullable = _getIsNullable(hasColumnInfoAnnotation);
-
-    final allTypeConverters =
-        _fieldElement.getTypeConverters(TypeConverterScope.field);
-    if (_typeConverter != null) allTypeConverters.add(_typeConverter);
-    final typeConverter = allTypeConverters.closestOrNull;
+    final typeConverter = [
+      ..._fieldElement.getTypeConverters(TypeConverterScope.field),
+      _typeConverter
+    ].filterNotNull().closestOrNull;
 
     return Field(
       _fieldElement,
@@ -43,7 +43,7 @@ class FieldProcessor extends Processor<Field> {
       columnName,
       isNullable,
       _getSqlType(typeConverter),
-      allTypeConverters,
+      typeConverter,
     );
   }
 

@@ -4,7 +4,7 @@ import 'package:floor_generator/misc/annotations.dart';
 import 'package:floor_generator/value_object/type_converter.dart';
 import 'package:source_gen/source_gen.dart';
 
-extension TypeConvertersExtension on List<TypeConverter> {
+extension TypeConvertersExtension on Iterable<TypeConverter> {
   @nullable
   TypeConverter get closestOrNull {
     return sortedByDescending((typeConverter) => typeConverter.scope.index)

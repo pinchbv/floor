@@ -1,5 +1,6 @@
 import 'package:analyzer/dart/element/element.dart';
 import 'package:analyzer/dart/element/type.dart';
+import 'package:dartx/dartx.dart';
 import 'package:floor_annotation/floor_annotation.dart' as annotations;
 import 'package:floor_generator/misc/annotations.dart';
 import 'package:floor_generator/misc/constants.dart';
@@ -76,7 +77,7 @@ class QueryMethodProcessor extends Processor<QueryMethod> {
 
     if (queryable != null) {
       final fieldTypeConverters =
-          queryable.fields.expand((field) => field.typeConverters).toList();
+          queryable.fields.mapNotNull((field) => field.typeConverter).toList();
       allTypeConverters.addAll(fieldTypeConverters);
     }
 
