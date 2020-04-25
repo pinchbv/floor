@@ -14,7 +14,6 @@ import 'package:floor_generator/value_object/foreign_key.dart';
 import 'package:floor_generator/value_object/index.dart';
 import 'package:floor_generator/value_object/primary_key.dart';
 import 'package:floor_generator/value_object/type_converter.dart';
-import 'package:source_gen/source_gen.dart';
 
 class EntityProcessor extends QueryableProcessor<Entity> {
   final EntityProcessorError _processorError;
@@ -217,7 +216,7 @@ class EntityProcessor extends QueryableProcessor<Entity> {
   String _getValueMapping(final List<Field> fields) {
     final keyValueList = fields.map((field) {
       final columnName = field.columnName;
-      final attributeValue = _getAttributeValue(field.fieldElement);
+      final attributeValue = _getAttributeValue(field);
       return "'$columnName': $attributeValue";
     }).toList();
 
@@ -225,24 +224,22 @@ class EntityProcessor extends QueryableProcessor<Entity> {
   }
 
   @nonNull
-  String _getAttributeValue(final FieldElement fieldElement) {
+  String _getAttributeValue(final Field field) {
+    final fieldElement = field.fieldElement;
     final parameterName = fieldElement.displayName;
     final fieldType = fieldElement.type;
 
-    if (!fieldType.isDefaultSqlType) {
-      final typeConverter = allTypeConverters.getClosestOrNull(fieldType);
-      if (typeConverter == null) {
-        throw InvalidGenerationSourceError(''); // TODO #165
-      }
-
+    if (fieldType.isDefaultSqlType) {
+      return fieldType.isDartCoreBool
+          ? 'item.$parameterName ? 1 : 0'
+          : 'item.$parameterName';
+    } else {
+      final typeConverter = (queryableTypeConverters + field.typeConverters)
+          .getClosest(fieldType);
       final typeConverterName = '${typeConverter.name}()';
       return typeConverter.databaseType.isDartCoreBool
           ? '$typeConverterName.encode(item.$parameterName) ? 1 : 0'
           : '$typeConverterName.encode(item.$parameterName)';
-    } else {
-      return fieldType.isDartCoreBool
-          ? 'item.$parameterName ? 1 : 0'
-          : 'item.$parameterName';
     }
   }
 }

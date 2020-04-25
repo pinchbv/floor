@@ -19,7 +19,7 @@ abstract class QueryableProcessor<T extends Queryable> extends Processor<T> {
   @protected
   final ClassElement classElement;
 
-  final List<TypeConverter> allTypeConverters;
+  final List<TypeConverter> queryableTypeConverters;
 
   @protected
   QueryableProcessor(
@@ -28,7 +28,7 @@ abstract class QueryableProcessor<T extends Queryable> extends Processor<T> {
   )   : assert(classElement != null),
         assert(typeConverters != null),
         _queryableProcessorError = QueryableProcessorError(classElement),
-        allTypeConverters = typeConverters +
+        queryableTypeConverters = typeConverters +
             classElement.getTypeConverters(TypeConverterScope.entity);
 
   @nonNull
@@ -45,7 +45,8 @@ abstract class QueryableProcessor<T extends Queryable> extends Processor<T> {
     return fields
         .where((fieldElement) => fieldElement.shouldBeIncluded())
         .map((field) {
-      final typeConverter = allTypeConverters.getClosestOrNull(field.type);
+      final typeConverter =
+          queryableTypeConverters.getClosestOrNull(field.type);
       return FieldProcessor(field, typeConverter).process();
     }).toList();
   }
@@ -79,8 +80,8 @@ abstract class QueryableProcessor<T extends Queryable> extends Processor<T> {
       String parameterValue;
 
       if (!parameterElement.type.isDefaultSqlType) {
-        final typeConverter =
-            allTypeConverters.getClosest(parameterElement.type);
+        final typeConverter = (queryableTypeConverters + field.typeConverters)
+            .getClosest(parameterElement.type);
         final castedDatabaseValue =
             databaseValue.asType(typeConverter.databaseType);
 

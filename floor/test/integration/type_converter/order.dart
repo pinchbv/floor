@@ -3,11 +3,11 @@ import 'package:floor/floor.dart';
 import 'type_converter.dart';
 
 @entity
-@TypeConverters([DateTimeToMicrosecondsConverter])
 class Order {
   @primaryKey
   final int id;
 
+  @TypeConverters([DateTimeToMicrosecondsConverter])
   final DateTime date;
 
   Order(this.id, this.date);

@@ -1,9 +1,9 @@
 import 'package:analyzer/dart/element/element.dart';
-import 'package:analyzer/dart/element/type.dart';
 import 'package:floor_annotation/floor_annotation.dart' as annotations;
 import 'package:floor_generator/misc/annotations.dart';
 import 'package:floor_generator/misc/constants.dart';
 import 'package:floor_generator/misc/extensions/type_converter_element_extension.dart';
+import 'package:floor_generator/misc/extensions/type_converters_extension.dart';
 import 'package:floor_generator/misc/type_utils.dart';
 import 'package:floor_generator/processor/processor.dart';
 import 'package:floor_generator/value_object/field.dart';
@@ -35,13 +35,14 @@ class FieldProcessor extends Processor<Field> {
     final allTypeConverters =
         _fieldElement.getTypeConverters(TypeConverterScope.field);
     if (_typeConverter != null) allTypeConverters.add(_typeConverter);
+    final typeConverter = allTypeConverters.closestOrNull;
 
     return Field(
       _fieldElement,
       name,
       columnName,
       isNullable,
-      _getSqlType(),
+      _getSqlType(typeConverter),
       allTypeConverters,
     );
   }
@@ -69,15 +70,15 @@ class FieldProcessor extends Processor<Field> {
   }
 
   @nonNull
-  String _getSqlType() {
-    DartType type = _fieldElement.type;
+  String _getSqlType(@nullable final TypeConverter typeConverter) {
+    var type = _fieldElement.type;
 
-    if (!type.isDefaultSqlType && _typeConverter != null) {
-      type = _typeConverter.databaseType;
+    if (!type.isDefaultSqlType && typeConverter != null) {
+      type = typeConverter.databaseType;
     }
 
     // TODO #165 make this nicer
-    if (!type.isDefaultSqlType && _typeConverter == null) {
+    if (!type.isDefaultSqlType && typeConverter == null) {
       throw InvalidGenerationSourceError(
         'Column type is not supported for $type.',
         todo: 'Either make to use a supported type or supply a type converter.',
@@ -96,10 +97,6 @@ class FieldProcessor extends Processor<Field> {
     } else if (type.isUint8List) {
       return SqlType.blob;
     }
-    throw InvalidGenerationSourceError(
-      'Column type is not supported for $type.',
-      todo: 'Either make to use a supported type or supply a type converter.',
-      element: _fieldElement,
-    );
+    throw Error(); // unreachable
   }
 }

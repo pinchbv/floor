@@ -7,8 +7,7 @@ import 'package:floor_generator/value_object/type_converter.dart';
 
 import '../annotations.dart';
 
-// TODO #165 proper name
-extension TypeConverterElement on Element {
+extension TypeConverterElementExtension on Element {
   @nonNull
   List<TypeConverter> getTypeConverters(final TypeConverterScope scope) {
     if (hasAnnotation(annotations.TypeConverters)) {

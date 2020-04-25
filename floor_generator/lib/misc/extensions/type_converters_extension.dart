@@ -6,6 +6,12 @@ import 'package:source_gen/source_gen.dart';
 
 extension TypeConvertersExtension on List<TypeConverter> {
   @nullable
+  TypeConverter get closestOrNull {
+    return sortedByDescending((typeConverter) => typeConverter.scope.index)
+        .firstOrNull;
+  }
+
+  @nullable
   TypeConverter getClosestOrNull(DartType dartType) {
     return sortedByDescending((typeConverter) => typeConverter.scope.index)
         .firstOrNullWhere(
@@ -15,7 +21,11 @@ extension TypeConvertersExtension on List<TypeConverter> {
   @nonNull
   TypeConverter getClosest(DartType dartType) {
     final closest = getClosestOrNull(dartType);
-    if (closest == null) throw InvalidGenerationSourceError(''); // TODO #165
+    if (closest == null)
+      throw InvalidGenerationSourceError(
+        'Column type is not supported for $dartType',
+        todo: 'Either use a supported type or supply a type converter.',
+      );
     return closest;
   }
 }
