@@ -116,7 +116,7 @@ void main() {
     expect(actual, equalsDart(r'''
       @override
       Stream<Person> findByIdAsStream(int id) {
-        return _queryAdapter.queryStream('SELECT * FROM Person WHERE id = ?', arguments: <dynamic>[id], tableName: 'Person', mapper: _personMapper);
+        return _queryAdapter.queryStream('SELECT * FROM Person WHERE id = ?', arguments: <dynamic>[id], tableName: 'Person', isView: false, mapper: _personMapper);
       }
     '''));
   });
@@ -132,7 +132,7 @@ void main() {
     expect(actual, equalsDart(r'''
       @override
       Stream<List<Person>> findAllAsStream() {
-        return _queryAdapter.queryListStream('SELECT * FROM Person', tableName: 'Person', mapper: _personMapper);
+        return _queryAdapter.queryListStream('SELECT * FROM Person', tableName: 'Person', isView: false, mapper: _personMapper);
       }
     '''));
   });

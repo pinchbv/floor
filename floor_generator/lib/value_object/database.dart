@@ -1,3 +1,5 @@
+import 'dart:collection';
+
 import 'package:analyzer/dart/element/element.dart';
 import 'package:collection/collection.dart';
 import 'package:floor_generator/value_object/dao_getter.dart';
@@ -12,6 +14,8 @@ class Database {
   final List<View> views;
   final List<DaoGetter> daoGetters;
   final int version;
+  final bool hasViewStreams;
+  final Set<Entity> entityStreams;
 
   Database(
     this.classElement,
@@ -20,7 +24,9 @@ class Database {
     this.views,
     this.daoGetters,
     this.version,
-  );
+  )   : entityStreams =
+            daoGetters.expand((dg) => dg.dao.streamEntities).toSet(),
+        hasViewStreams = daoGetters.any((dg) => dg.dao.streamViews.isNotEmpty);
 
   @override
   bool operator ==(Object other) =>

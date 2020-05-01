@@ -161,8 +161,8 @@ void main() {
           ]);
       when(mockDatabaseExecutor.rawQuery(sql)).thenAnswer((_) => queryResult);
 
-      final actual =
-          underTest.queryStream(sql, tableName: entityName, mapper: mapper);
+      final actual = underTest.queryStream(sql,
+          tableName: entityName, isView: false, mapper: mapper);
 
       expect(actual, emits(person));
     });
@@ -180,6 +180,7 @@ void main() {
         sql,
         arguments: arguments,
         tableName: entityName,
+        isView: false,
         mapper: mapper,
       );
 
@@ -193,8 +194,8 @@ void main() {
           ]);
       when(mockDatabaseExecutor.rawQuery(sql)).thenAnswer((_) => queryResult);
 
-      final actual =
-          underTest.queryStream(sql, tableName: entityName, mapper: mapper);
+      final actual = underTest.queryStream(sql,
+          tableName: entityName, isView: false, mapper: mapper);
       streamController.add(entityName);
 
       expect(actual, emitsInOrder(<Person>[person, person]));
@@ -209,8 +210,8 @@ void main() {
           ]);
       when(mockDatabaseExecutor.rawQuery(sql)).thenAnswer((_) => queryResult);
 
-      final actual =
-          underTest.queryListStream(sql, tableName: entityName, mapper: mapper);
+      final actual = underTest.queryListStream(sql,
+          tableName: entityName, isView: false, mapper: mapper);
 
       expect(actual, emits([person, person2]));
     });
@@ -230,6 +231,7 @@ void main() {
         sql,
         arguments: arguments,
         tableName: entityName,
+        isView: false,
         mapper: mapper,
       );
 
@@ -245,8 +247,8 @@ void main() {
           ]);
       when(mockDatabaseExecutor.rawQuery(sql)).thenAnswer((_) => queryResult);
 
-      final actual =
-          underTest.queryListStream(sql, tableName: entityName, mapper: mapper);
+      final actual = underTest.queryListStream(sql,
+          tableName: entityName, isView: false, mapper: mapper);
       streamController.add(entityName);
 
       expect(

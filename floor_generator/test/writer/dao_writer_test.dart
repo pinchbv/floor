@@ -33,7 +33,9 @@ void main() {
         }
       ''');
 
-    final actual = DaoWriter(dao).write();
+    final actual =
+        DaoWriter(dao, dao.streamEntities.toSet(), dao.streamViews.isNotEmpty)
+            .write();
 
     expect(actual, equalsDart(r'''
         class _$PersonDao extends PersonDao {
@@ -113,7 +115,9 @@ void main() {
         }
       ''');
 
-    final actual = DaoWriter(dao).write();
+    final actual =
+        DaoWriter(dao, dao.streamEntities.toSet(), dao.streamViews.isNotEmpty)
+            .write();
 
     expect(actual, equalsDart(r'''
         class _$PersonDao extends PersonDao {
@@ -157,7 +161,7 @@ void main() {
         
           @override
           Stream<List<Person>> findAllPersonsAsStream() {
-            return _queryAdapter.queryListStream('SELECT * FROM person', tableName: 'Person', mapper: _personMapper);
+            return _queryAdapter.queryListStream('SELECT * FROM person', tableName: 'Person', isView: false, mapper: _personMapper);
           }
           
           @override

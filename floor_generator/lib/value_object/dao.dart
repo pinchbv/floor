@@ -5,6 +5,7 @@ import 'package:floor_generator/value_object/insertion_method.dart';
 import 'package:floor_generator/value_object/query_method.dart';
 import 'package:floor_generator/value_object/transaction_method.dart';
 import 'package:floor_generator/value_object/update_method.dart';
+import 'package:floor_generator/value_object/view.dart';
 
 class Dao {
   final ClassElement classElement;
@@ -15,6 +16,7 @@ class Dao {
   final List<DeletionMethod> deletionMethods;
   final List<TransactionMethod> transactionMethods;
   final List<Entity> streamEntities;
+  final List<View> streamViews;
 
   Dao(
     this.classElement,
@@ -25,6 +27,7 @@ class Dao {
     this.deletionMethods,
     this.transactionMethods,
     this.streamEntities,
+    this.streamViews,
   );
 
   @override

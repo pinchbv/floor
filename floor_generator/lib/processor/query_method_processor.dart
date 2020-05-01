@@ -58,7 +58,7 @@ class QueryMethodProcessor extends Processor<QueryMethod> {
                 view.classElement.displayName ==
                 flattenedReturnType.getDisplayString(),
             orElse: () => null); // doesn't return entity nor view
-    _assertViewQueryDoesNotReturnStream(queryable, returnsStream);
+    //_assertViewQueryDoesNotReturnStream(queryable, returnsStream);
 
     return QueryMethod(
       _methodElement,
@@ -138,14 +138,14 @@ class QueryMethodProcessor extends Processor<QueryMethod> {
     }
   }
 
-  void _assertViewQueryDoesNotReturnStream(
-    final Queryable queryable,
-    final bool returnsStream,
-  ) {
-    if (queryable != null && queryable is View && returnsStream) {
-      throw _processorError.viewNotStreamable;
-    }
-  }
+//  void _assertViewQueryDoesNotReturnStream(
+//    final Queryable queryable,
+//    final bool returnsStream,
+//  ) {
+//    if (queryable != null && queryable is View && returnsStream) {
+//      throw _processorError.viewNotStreamable;
+//    }
+//  }
 
   void _assertQueryParameters(
     final String query,

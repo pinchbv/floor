@@ -56,6 +56,7 @@ class DaoProcessor extends Processor<Dao> {
     final transactionMethods = _getTransactionMethods(methods);
 
     final streamEntities = _getStreamEntities(queryMethods);
+    final streamViews = _getStreamViews(queryMethods);
 
     return Dao(
       _classElement,
@@ -66,6 +67,7 @@ class DaoProcessor extends Processor<Dao> {
       deletionMethods,
       transactionMethods,
       streamEntities,
+      streamViews,
     );
   }
 
@@ -125,8 +127,17 @@ class DaoProcessor extends Processor<Dao> {
 
   List<Entity> _getStreamEntities(final List<QueryMethod> queryMethods) {
     return queryMethods
-        .where((method) => method.returnsStream)
+        .where((method) =>
+            method.returnsStream && method.queryable.runtimeType == Entity)
         .map((method) => method.queryable as Entity)
+        .toList();
+  }
+
+  List<View> _getStreamViews(final List<QueryMethod> queryMethods) {
+    return queryMethods
+        .where((method) =>
+            method.returnsStream && method.queryable.runtimeType == View)
+        .map((method) => method.queryable as View)
         .toList();
   }
 }

@@ -57,6 +57,7 @@ class QueryAdapter {
     final String sql, {
     final List<dynamic> arguments,
     @required final String tableName,
+    @required final bool isView,
     @required final T Function(Map<String, dynamic>) mapper,
   }) {
     assert(_changeListener != null);
@@ -71,7 +72,7 @@ class QueryAdapter {
     controller.onListen = () async => executeQueryAndNotifyController();
 
     final subscription = _changeListener.stream
-        .where((updatedTable) => updatedTable == tableName)
+        .where((updatedTable) => updatedTable == tableName || isView)
         .listen(
           (_) async => executeQueryAndNotifyController(),
           onDone: () => controller.close(),
@@ -87,6 +88,7 @@ class QueryAdapter {
     final String sql, {
     final List<dynamic> arguments,
     @required final String tableName,
+    @required final bool isView,
     @required final T Function(Map<String, dynamic>) mapper,
   }) {
     assert(_changeListener != null);
@@ -100,8 +102,9 @@ class QueryAdapter {
 
     controller.onListen = () async => executeQueryAndNotifyController();
 
+    // Views listen on all events, Entities only on events that changed the same entity.
     final subscription = _changeListener.stream
-        .where((updatedTable) => updatedTable == tableName)
+        .where((updatedTable) => isView || updatedTable == tableName)
         .listen(
           (_) async => executeQueryAndNotifyController(),
           onDone: () => controller.close(),
