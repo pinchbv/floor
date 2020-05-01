@@ -1,5 +1,3 @@
-import 'dart:collection';
-
 import 'package:analyzer/dart/element/element.dart';
 import 'package:collection/collection.dart';
 import 'package:floor_generator/value_object/dao_getter.dart';

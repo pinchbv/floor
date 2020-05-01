@@ -9,7 +9,6 @@ import 'package:floor_generator/processor/error/query_method_processor_error.dar
 import 'package:floor_generator/processor/processor.dart';
 import 'package:floor_generator/value_object/entity.dart';
 import 'package:floor_generator/value_object/query_method.dart';
-import 'package:floor_generator/value_object/queryable.dart';
 import 'package:floor_generator/value_object/view.dart';
 
 class QueryMethodProcessor extends Processor<QueryMethod> {
