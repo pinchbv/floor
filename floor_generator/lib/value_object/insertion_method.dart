@@ -36,7 +36,6 @@ class InsertionMethod extends ChangeMethod {
 
   @override
   String toString() {
-    // TODO #165 update
-    return 'InsertionMethod{onConflict: $onConflict}';
+    return 'InsertionMethod{methodElement: $methodElement, name: $name, returnType: $returnType, flattenedReturnType: $flattenedReturnType, parameterElement: $parameterElement, entity: $entity, onConflict: $onConflict}';
   }
 }

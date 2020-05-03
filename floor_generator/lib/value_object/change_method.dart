@@ -44,9 +44,4 @@ class ChangeMethod {
       flattenedReturnType.hashCode ^
       parameterElement.hashCode ^
       entity.hashCode;
-
-  @override
-  String toString() {
-    return 'ChangeMethod{methodElement: $methodElement, name: $name, returnType: $returnType, flattenedReturnType: $flattenedReturnType, parameterElement: $parameterElement, entity: $entity}';
-  }
 }

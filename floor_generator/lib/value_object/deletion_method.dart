@@ -20,5 +20,8 @@ class DeletionMethod extends ChangeMethod {
           entity,
         );
 
-  // TODO #165 equals, hashCode, toString
+  @override
+  String toString() {
+    return 'DeletionMethod{methodElement: $methodElement, name: $name, returnType: $returnType, flattenedReturnType: $flattenedReturnType, parameterElement: $parameterElement, entity: $entity}';
+  }
 }
