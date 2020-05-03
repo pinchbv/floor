@@ -13,7 +13,7 @@ import 'type_converter.dart';
 part 'order_database.g.dart';
 
 @Database(version: 1, entities: [Order])
-@TypeConverters([DateTimeToIntConverter])
+@TypeConverters([DateTimeConverter])
 abstract class OrderDatabase extends FloorDatabase {
   OrderDao get orderDao;
 }

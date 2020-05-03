@@ -3,7 +3,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'type_converter.dart';
 
 void main() {
-  final underTest = DateTimeToIntConverter();
+  final underTest = DateTimeConverter();
 
   test('encode DateTime to int', () {
     const milliseconds = 123456;
