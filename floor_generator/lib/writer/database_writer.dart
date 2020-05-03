@@ -1,7 +1,6 @@
 import 'package:code_builder/code_builder.dart';
 import 'package:floor_generator/misc/annotation_expression.dart';
 import 'package:floor_generator/misc/annotations.dart';
-import 'package:floor_generator/misc/string_utils.dart';
 import 'package:floor_generator/value_object/database.dart';
 import 'package:floor_generator/value_object/entity.dart';
 import 'package:floor_generator/writer/writer.dart';
@@ -78,19 +77,6 @@ class DatabaseWriter implements Writer {
       return Field((builder) => builder
         ..type = refer(daoTypeName)
         ..name = '_${daoGetterName}Instance');
-    }).toList();
-  }
-
-  @nonNull
-  List<Field> _generateTypeConverters() {
-    return database.typeConverters.map((typeConverter) {
-      return Field((builder) {
-        return builder
-//          ..type = refer(typeConverterName) // TODO #165 needed?
-          ..name = '_${typeConverter.name.decapitalize()}'
-          ..modifier = FieldModifier.final$
-          ..assignment = Code('${typeConverter.name}()');
-      });
     }).toList();
   }
 

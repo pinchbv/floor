@@ -33,14 +33,6 @@ class QueryMethodWriter implements Writer {
 
   List<Parameter> _generateMethodParameters() {
     return _queryMethod.parameters.map((parameter) {
-      // TODO #165
-//      if (!parameter.type.isDefaultSqlType) {
-//        throw InvalidGenerationSourceError(
-//          'The type of this parameter is not supported.',
-//          element: parameter,
-//        );
-//      }
-
       return Parameter((builder) => builder
         ..name = parameter.name
         ..type = refer(parameter.type.getDisplayString()));
