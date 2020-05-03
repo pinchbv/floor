@@ -6,8 +6,8 @@
 /// Type converters can be applied to:
 /// 1. databases
 /// 1. DAOs
-/// 1. entities
-/// 1. entity fields
+/// 1. entities/views
+/// 1. entity/view fields
 /// 1. DAO methods
 /// 1. DAO method parameters
 class TypeConverters {

@@ -27,7 +27,6 @@ class TypeConverter {
 
   @override
   String toString() {
-    // TODO #165 update
     return 'TypeConverter{name: $name, fieldType: $fieldType, databaseType: $databaseType, scope: $scope}';
   }
 }
@@ -35,7 +34,7 @@ class TypeConverter {
 enum TypeConverterScope {
   database,
   dao,
-  entity, // TODO #165 rename to queryable?
+  queryable,
   field,
   daoMethod,
   daoMethodParameter,
