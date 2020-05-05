@@ -80,7 +80,7 @@ abstract class QueryableProcessor<T extends Queryable> extends Processor<T> {
     final String parameterValue,
   ) {
     if (parameterType.isDartCoreBool) {
-      return '($parameterValue as int) != 0'; // maps int to bool
+      return '$parameterValue == null ? null : ($parameterValue as int) != 0'; // maps int to bool
     } else if (parameterType.isDartCoreString) {
       return '$parameterValue as String';
     } else if (parameterType.isDartCoreInt) {

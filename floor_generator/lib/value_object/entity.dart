@@ -57,7 +57,7 @@ class Entity extends Queryable {
   String getValueMapping() {
     final keyValueList = fields.map((field) {
       final columnName = field.columnName;
-      final attributeValue = _getAttributeValue(field.fieldElement);
+      final attributeValue = _getAttributeValue(field);
       return "'$columnName': $attributeValue";
     }).toList();
 
@@ -65,11 +65,17 @@ class Entity extends Queryable {
   }
 
   @nonNull
-  String _getAttributeValue(final FieldElement fieldElement) {
-    final parameterName = fieldElement.displayName;
-    return fieldElement.type.isDartCoreBool
-        ? 'item.$parameterName ? 1 : 0'
-        : 'item.$parameterName';
+  String _getAttributeValue(final Field field) {
+    final parameterName = field.fieldElement.displayName;
+    if (field.fieldElement.type.isDartCoreBool) {
+      if (field.isNullable) {
+        return 'item.$parameterName == null ? null : item.$parameterName ? 1 : 0';
+      } else {
+        return 'item.$parameterName ? 1 : 0';
+      }
+    } else {
+      return 'item.$parameterName';
+    }
   }
 
   @override
