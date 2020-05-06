@@ -63,8 +63,8 @@ abstract class QueryableProcessor<T extends Queryable> extends Processor<T> {
     );
     if (field != null) {
       final parameterValue = "row['${field.columnName}']";
-      final castedParameterValue =
-          _castParameterValue(parameterElement.type, parameterValue);
+      final castedParameterValue = _castParameterValue(
+          parameterElement.type, parameterValue, field.isNullable);
       if (parameterElement.isNamed) {
         return '$parameterName: $castedParameterValue';
       }
@@ -78,9 +78,16 @@ abstract class QueryableProcessor<T extends Queryable> extends Processor<T> {
   String _castParameterValue(
     final DartType parameterType,
     final String parameterValue,
+    final bool isNullable,
   ) {
     if (parameterType.isDartCoreBool) {
-      return '$parameterValue == null ? null : ($parameterValue as int) != 0'; // maps int to bool
+      if (isNullable) {
+        // maps int to bool
+        // if the value is null, return null. If the value is not null, interpret 1 as true and 0 as false.
+        return '$parameterValue == null ? null : ($parameterValue as int) != 0';
+      } else {
+        return '($parameterValue as int) != 0'; // maps int to bool
+      }
     } else if (parameterType.isDartCoreString) {
       return '$parameterValue as String';
     } else if (parameterType.isDartCoreInt) {

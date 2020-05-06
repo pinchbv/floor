@@ -69,7 +69,7 @@ class Entity extends Queryable {
     final parameterName = field.fieldElement.displayName;
     if (field.fieldElement.type.isDartCoreBool) {
       if (field.isNullable) {
-        return 'item.$parameterName == null ? null : item.$parameterName ? 1 : 0';
+        return 'item.$parameterName == null ? null : (item.$parameterName ? 1 : 0)';
       } else {
         return 'item.$parameterName ? 1 : 0';
       }
