@@ -180,6 +180,18 @@ void main() {
 
       expect(actual, equals('SELECT * FROM Persons WHERE name LIKE ?'));
     });
+
+    test('Parse query with commas', () async {
+      final methodElement = await _createQueryMethodElement('''
+      @Query('SELECT * FROM :table,:othertable')
+      Future<List<Person>> findPersonsWithNamesLike(String table, String othertable);
+    ''');
+
+      final actual =
+          QueryMethodProcessor(methodElement, [], []).process().query;
+
+      expect(actual, equals('SELECT * FROM ?,?'));
+    });
   });
 
   group('errors', () {
