@@ -94,7 +94,11 @@ class QueryMethodWriter implements Writer {
     return _queryMethod.parameters
         .map((parameter) {
           if (!parameter.type.isDartCoreList) {
-            return parameter.displayName;
+            if (parameter.type.isDartCoreBool) {
+              return '${parameter.displayName} == null ? null : (${parameter.displayName} ? 1 : 0)';
+            } else {
+              return parameter.displayName;
+            }
           } else {
             return null;
           }
