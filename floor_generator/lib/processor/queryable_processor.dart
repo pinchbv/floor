@@ -87,7 +87,8 @@ abstract class QueryableProcessor<T extends Queryable> extends Processor<T> {
         final castedDatabaseValue =
             databaseValue.asType(typeConverter.databaseType, field.isNullable);
 
-        parameterValue = '${typeConverter.name}().decode($castedDatabaseValue)';
+        parameterValue =
+            '_${typeConverter.name.decapitalize()}.decode($castedDatabaseValue)';
       } else {
         parameterValue =
             databaseValue.asType(parameterElement.type, field.isNullable);

@@ -39,18 +39,8 @@ class DaoWriter extends Writer {
       ..name = changeListenerFieldName
       ..toThis = true);
 
-    // TODO #165
-//    final typeConverterParameters =
-//        dao.typeConverters.map((typeConverter) => Parameter((builder) => builder
-//          ..name = typeConverter.name.decapitalize()
-//          ..type = refer(typeConverter.name)));
-
     final constructorBuilder = ConstructorBuilder()
-      ..requiredParameters.addAll([
-        databaseParameter,
-        changeListenerParameter,
-//        ...typeConverterParameters, // TODO #165
-      ]);
+      ..requiredParameters.addAll([databaseParameter, changeListenerParameter]);
 
     final streamEntities = dao.streamEntities;
 
@@ -153,13 +143,6 @@ class DaoWriter extends Writer {
       }
     }
 
-    // TODO #165 needed + extract?
-//    final typeConverterInitializers = dao.typeConverters.map((typeConverter) {
-//      final typeConverterName = typeConverter.name.decapitalize();
-//      return Code('_$typeConverterName = $typeConverterName');
-//    });
-//    constructorBuilder..initializers.addAll(typeConverterInitializers);
-
     classBuilder
       ..constructors.add(constructorBuilder.build())
       ..methods.addAll(_generateQueryMethods(queryMethods))
@@ -184,15 +167,6 @@ class DaoWriter extends Writer {
       ..name = changeListenerName
       ..type = refer('StreamController<String>')
       ..modifier = FieldModifier.final$);
-
-    // TODO #165 needed?
-//    final typeConverterFields = dao.typeConverters.map((typeConverter) {
-//      final typeConverterName = typeConverter.name;
-//      return Field((builder) => builder
-//        ..name = '_${typeConverterName.decapitalize()}'
-//        ..type = refer(typeConverterName)
-//        ..modifier = FieldModifier.final$);
-//    });
 
     return [databaseField, changeListenerField];
   }

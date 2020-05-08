@@ -78,7 +78,7 @@ class QueryMethodWriter implements Writer {
       } else {
         final typeConverter =
             _queryMethod.typeConverters.getClosest(flattenedParameterType);
-        value = '${typeConverter.name}().encode(value)';
+        value = '${typeConverter.name}.encode(value)';
       }
       return '''final valueList$index = ${parameter.displayName}.map((value) => "'\$$value'").join(', ');''';
     }).toList();
@@ -96,10 +96,9 @@ class QueryMethodWriter implements Writer {
           return parameter.displayName;
         }
       } else {
-        // TODO #165 reuse type converter instances
         final typeConverter =
             _queryMethod.typeConverters.getClosest(parameter.type);
-        return '${typeConverter.name}().encode(${parameter.displayName})';
+        return '_${typeConverter.name.decapitalize()}.encode(${parameter.displayName})';
       }
     }).toList();
   }

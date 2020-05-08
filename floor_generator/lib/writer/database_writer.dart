@@ -27,7 +27,6 @@ class DatabaseWriter implements Writer {
       ..methods.add(_generateOpenMethod(database))
       ..methods.addAll(_generateDaoGetters(database))
       ..fields.addAll(_generateDaoInstances(database))
-//      ..fields.addAll(_generateTypeConverters()) // TODO #165 needed?
       ..constructors.add(_generateConstructor()));
   }
 
@@ -51,12 +50,6 @@ class DatabaseWriter implements Writer {
     return database.daoGetters.map((daoGetter) {
       final daoGetterName = daoGetter.name;
       final daoTypeName = daoGetter.dao.classElement.displayName;
-
-      // TODO #165
-//      final typeConverterNames =
-//          daoGetter.dao.typeConverters // TODO #165 use database ones?
-//              .map((typeConverter) => '_${typeConverter.name.decapitalize()}')
-//              .join(', ');
 
       return Method((builder) => builder
         ..annotations.add(overrideAnnotationExpression)

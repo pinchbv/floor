@@ -3,10 +3,12 @@ import 'dart:async';
 import 'package:analyzer/dart/element/element.dart';
 import 'package:build/build.dart';
 import 'package:code_builder/code_builder.dart';
+import 'package:dartx/dartx.dart';
 import 'package:floor_annotation/floor_annotation.dart' as annotations;
 import 'package:floor_generator/misc/annotations.dart';
 import 'package:floor_generator/processor/database_processor.dart';
 import 'package:floor_generator/value_object/database.dart';
+import 'package:floor_generator/value_object/type_converter.dart';
 import 'package:floor_generator/writer/dao_writer.dart';
 import 'package:floor_generator/writer/database_builder_writer.dart';
 import 'package:floor_generator/writer/database_writer.dart';
@@ -28,14 +30,42 @@ class FloorGenerator extends GeneratorForAnnotation<annotations.Database> {
     final databaseClass = DatabaseWriter(database).write();
     final daoClasses =
         daoGetters.map((daoGetter) => DaoWriter(daoGetter.dao).write());
+    final typeConverterFields = _getAllTypeConverters(database)
+        .map((typeConverter) => writeTypeConverter(typeConverter))
+        .toList();
 
     final library = Library((builder) => builder
       ..body.add(FloorWriter(database.name).write())
       ..body.add(DatabaseBuilderWriter(database.name).write())
       ..body.add(databaseClass)
-      ..body.addAll(daoClasses));
+      ..body.addAll(daoClasses)
+      // TODO #165 find way to get rid of unused elements
+      ..body.add(const Code('// ignore: unused_element\n'))
+      ..body.addAll(typeConverterFields));
 
     return library.accept(DartEmitter()).toString();
+  }
+
+  Set<TypeConverter> _getAllTypeConverters(final Database database) {
+    return (database.typeConverters +
+            database.daoGetters
+                .expand((daoGetter) => daoGetter.dao.typeConverters)
+                .toList() +
+            database.daoGetters
+                .expand((daoGetter) => daoGetter.dao.queryMethods)
+                .expand((queryMethod) => queryMethod.typeConverters)
+                .toList())
+        .filterNotNull()
+        .toSet();
+  }
+
+  // TODO #165 TypeConverterWriter?
+  Field writeTypeConverter(final TypeConverter typeConverter) {
+    final typeConverterName = typeConverter.name;
+    return Field((builder) => builder
+      ..name = '_${typeConverterName.decapitalize()}'
+      ..modifier = FieldModifier.final$
+      ..assignment = Code('$typeConverterName()'));
   }
 
   @nonNull

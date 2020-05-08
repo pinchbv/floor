@@ -237,8 +237,8 @@ class EntityProcessor extends QueryableProcessor<Entity> {
       final typeConverter = [...queryableTypeConverters, field.typeConverter]
           .filterNotNull()
           .getClosest(fieldType);
-      // TODO #165 reuse type converter instances
-      attributeValue = '${typeConverter.name}().encode(item.$parameterName)';
+      attributeValue =
+          '_${typeConverter.name.decapitalize()}.encode(item.$parameterName)';
     }
 
     if (fieldType.isDartCoreBool) {
