@@ -17,7 +17,7 @@ class Dao {
   final List<DeletionMethod> deletionMethods;
   final List<TransactionMethod> transactionMethods;
   final List<Entity> streamEntities;
-  final List<TypeConverter> typeConverters;
+  final List<TypeConverter> typeConverters; // TODO #165 these are never used
 
   Dao(
     this.classElement,
