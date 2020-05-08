@@ -190,7 +190,7 @@ void main() {
     ''');
 
       final actual =
-          QueryMethodProcessor(methodElement, [], []).process().query;
+          QueryMethodProcessor(methodElement, [], [], []).process().query;
 
       expect(actual, equals('SELECT * FROM ?, ?'));
     });

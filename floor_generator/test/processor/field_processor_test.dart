@@ -24,6 +24,7 @@ void main() {
       columnName,
       isNullable,
       sqlType,
+      null,
     );
     expect(actual, equals(expected));
   });
@@ -46,6 +47,7 @@ void main() {
       columnName,
       isNullable,
       sqlType,
+      null,
     );
     expect(actual, equals(expected));
   });

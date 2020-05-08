@@ -19,6 +19,7 @@ void main() {
     'field1ColumnName',
     false,
     SqlType.integer,
+    null,
   );
   final nullableField = Field(
     mockFieldElement,
@@ -26,6 +27,7 @@ void main() {
     'field2ColumnName',
     true,
     SqlType.text,
+    null,
   );
   final allFields = [field, nullableField];
 
@@ -162,7 +164,7 @@ void main() {
       when(mockFieldElement.type).thenReturn(mockDartType);
     });
 
-    // TODO #165
+    // TODO #165 move these to entity_processor_test
 //    test('Get value mapping', () {
 //      when(mockDartType.isDartCoreBool).thenReturn(false);
 //
@@ -181,27 +183,27 @@ void main() {
 //
 //      final expected = '<String, dynamic>{'
 //          "'${nullableField.columnName}': item.$fieldElementDisplayName == null ? null : (item.$fieldElementDisplayName ? 1 : 0)"
-          '}';
-      expect(actual, equals(expected));
-    });
-
-    test('Get non-nullable boolean value mapping', () {
-      final entity = Entity(
-        mockClassElement,
-        'entityName',
-        [nullableField, field],
-        primaryKey,
-        [],
-        [],
-        '',
-      );
-      when(mockDartType.isDartCoreBool).thenReturn(true);
-
-      final actual = entity.getValueMapping();
-
-      final expected = '<String, dynamic>{'
-          "'${nullableField.columnName}': item.$fieldElementDisplayName == null ? null : (item.$fieldElementDisplayName ? 1 : 0),"
-          " '${field.columnName}': item.$fieldElementDisplayName ? 1 : 0"
+//          '}';
+//      expect(actual, equals(expected));
+//    });
+//
+//    test('Get non-nullable boolean value mapping', () {
+//      final entity = Entity(
+//        mockClassElement,
+//        'entityName',
+//        [nullableField, field],
+//        primaryKey,
+//        [],
+//        [],
+//        '',
+//      );
+//      when(mockDartType.isDartCoreBool).thenReturn(true);
+//
+//      final actual = entity.getValueMapping();
+//
+//      final expected = '<String, dynamic>{'
+//          "'${nullableField.columnName}': item.$fieldElementDisplayName == null ? null : (item.$fieldElementDisplayName ? 1 : 0),"
+//          " '${field.columnName}': item.$fieldElementDisplayName ? 1 : 0"
 //          '}';
 //      expect(actual, equals(expected));
 //    });
