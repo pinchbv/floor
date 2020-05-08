@@ -197,8 +197,9 @@ For more information about primary keys and especially compound primary keys, re
 `@ColumnInfo` enables custom mapping of single table columns.
 With the annotation, it's possible to give columns a custom name and define if the column is able to store `null`.
 
-**NOTE:**
-Floor automatically uses the **first** constructor defined in the entity class for creating in-memory objects from database rows.  
+#### Limitations
+- Floor automatically uses the **first** constructor defined in the entity class for creating in-memory objects from database rows.
+- There needs to be a constructor.  
 
 ```dart
 @Entity(tableName: 'person')
@@ -461,9 +462,11 @@ StreamBuilder<List<Person>>(
 );
 ```
 
-**NOTE:**
-It is currently not possible to return a `Stream` if the function queries a database view.
-This is mostly due to the complexity of detecting which entities are involved in a database view.
+#### Limitations
+- Only methods annotated with `@insert`, `@update` and `@delete` trigger `Stream` emissions. 
+  Inserting data by using the `@Query()` annotation doesn't.
+- It is not possible to return a `Stream` if the function queries a database view.
+  This is mostly due to the complexity of detecting which entities are involved in a database view.
 
 ### Transactions
 Whenever you want to perform some operations in a transaction you have to add the `@transaction` annotation to the method.
