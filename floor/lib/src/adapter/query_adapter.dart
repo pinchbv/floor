@@ -46,7 +46,7 @@ class QueryAdapter {
     final String sql, {
     final List<dynamic> arguments,
   }) async {
-    // TODO differentiate between different query kinds (select, update, delete, insert)
+    // TODO #94 differentiate between different query kinds (select, update, delete, insert)
     //  this enables to notify the observers
     //  also requires extracting the table name :(
     await _database.rawQuery(sql, arguments);

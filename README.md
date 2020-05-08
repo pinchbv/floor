@@ -340,8 +340,8 @@ abstract class AppDatabase extends FloorDatabase {
 
 You can then query the view via a DAO function like an entity.
 
-**NOTE:**
-Be aware that it is currently not possible to return a `Stream` object from a function which queries a database view.
+#### Limitations
+- Be aware it is currently not possible to return a `Stream` object from a function which queries a database view.
 
 ## Data Access Objects
 These components are responsible for managing access to the underlying SQLite database and are defined as abstract classes with method signatures and query statements.
