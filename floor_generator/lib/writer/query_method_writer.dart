@@ -70,7 +70,7 @@ class QueryMethodWriter implements Writer {
     return _queryMethod.parameters
         .where((parameter) => parameter.type.isDartCoreList)
         .mapIndexed((index, parameter) {
-          // TODO #165 what about type converters that map between e.g. string and list?
+      // TODO #165 what about type converters that map between e.g. string and list?
       final flattenedParameterType = parameter.type.flatten();
       String value;
       if (flattenedParameterType.isDefaultSqlType) {
@@ -91,11 +91,12 @@ class QueryMethodWriter implements Writer {
         .map((parameter) {
       if (parameter.type.isDefaultSqlType) {
         if (parameter.type.isDartCoreBool) {
-              return '${parameter.displayName} == null ? null : (${parameter.displayName} ? 1 : 0)';
-            } else {
-              return parameter.displayName;
-            }
+          return '${parameter.displayName} == null ? null : (${parameter.displayName} ? 1 : 0)';
+        } else {
+          return parameter.displayName;
+        }
       } else {
+        // TODO #165 reuse type converter instances
         final typeConverter =
             _queryMethod.typeConverters.getClosest(parameter.type);
         return '${typeConverter.name}().encode(${parameter.displayName})';

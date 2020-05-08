@@ -107,11 +107,11 @@ extension on String {
   String asType(DartType dartType, bool isNullable) {
     if (dartType.isDartCoreBool) {
       if (isNullable) {
-        // maps int to bool
-        // if the value is null, return null. If the value is not null, interpret 1 as true and 0 as false.
+        // if the value is null, return null
+        // if the value is not null, interpret 1 as true and 0 as false
         return '$this == null ? null : ($this as int) != 0';
       } else {
-        return '($this as int) != 0'; // maps int to bool
+        return '($this as int) != 0';
       }
     } else if (dartType.isDartCoreString) {
       return '$this as String';

@@ -213,7 +213,6 @@ class EntityProcessor extends QueryableProcessor<Entity> {
   }
 
   @nonNull
-  @nonNull
   String _getValueMapping(final List<Field> fields) {
     final keyValueList = fields.map((field) {
       final columnName = field.columnName;
@@ -230,18 +229,26 @@ class EntityProcessor extends QueryableProcessor<Entity> {
     final parameterName = fieldElement.displayName;
     final fieldType = fieldElement.type;
 
+    String attributeValue;
+
     if (fieldType.isDefaultSqlType) {
-      return fieldType.isDartCoreBool
-          ? 'item.$parameterName ? 1 : 0'
-          : 'item.$parameterName';
+      attributeValue = 'item.$parameterName';
     } else {
       final typeConverter = [...queryableTypeConverters, field.typeConverter]
           .filterNotNull()
           .getClosest(fieldType);
-      final typeConverterName = '${typeConverter.name}()';
-      return typeConverter.databaseType.isDartCoreBool
-          ? '$typeConverterName.encode(item.$parameterName) ? 1 : 0'
-          : '$typeConverterName.encode(item.$parameterName)';
+      // TODO #165 reuse type converter instances
+      attributeValue = '${typeConverter.name}().encode(item.$parameterName)';
+    }
+
+    if (fieldType.isDartCoreBool) {
+      if (field.isNullable) {
+        return '$attributeValue == null ? null : ($attributeValue ? 1 : 0)';
+      } else {
+        return '$attributeValue ? 1 : 0';
+      }
+    } else {
+      return attributeValue;
     }
   }
 }
