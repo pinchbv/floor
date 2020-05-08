@@ -174,13 +174,34 @@ void main() {
 //      expect(actual, equals(expected));
 //    });
 //
-//    test('Get boolean value mapping', () {
+//    test('Get nullable boolean value mapping', () {
 //      when(mockDartType.isDartCoreBool).thenReturn(true);
 //
 //      final actual = entity.getValueMapping();
 //
 //      final expected = '<String, dynamic>{'
-//          "'${nullableField.columnName}': item.$fieldElementDisplayName ? 1 : 0"
+//          "'${nullableField.columnName}': item.$fieldElementDisplayName == null ? null : (item.$fieldElementDisplayName ? 1 : 0)"
+          '}';
+      expect(actual, equals(expected));
+    });
+
+    test('Get non-nullable boolean value mapping', () {
+      final entity = Entity(
+        mockClassElement,
+        'entityName',
+        [nullableField, field],
+        primaryKey,
+        [],
+        [],
+        '',
+      );
+      when(mockDartType.isDartCoreBool).thenReturn(true);
+
+      final actual = entity.getValueMapping();
+
+      final expected = '<String, dynamic>{'
+          "'${nullableField.columnName}': item.$fieldElementDisplayName == null ? null : (item.$fieldElementDisplayName ? 1 : 0),"
+          " '${field.columnName}': item.$fieldElementDisplayName ? 1 : 0"
 //          '}';
 //      expect(actual, equals(expected));
 //    });

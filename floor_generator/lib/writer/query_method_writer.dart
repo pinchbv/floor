@@ -90,7 +90,11 @@ class QueryMethodWriter implements Writer {
         .where((parameter) => !parameter.type.isDartCoreList)
         .map((parameter) {
       if (parameter.type.isDefaultSqlType) {
-        return parameter.displayName;
+        if (parameter.type.isDartCoreBool) {
+              return '${parameter.displayName} == null ? null : (${parameter.displayName} ? 1 : 0)';
+            } else {
+              return parameter.displayName;
+            }
       } else {
         final typeConverter =
             _queryMethod.typeConverters.getClosest(parameter.type);

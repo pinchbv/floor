@@ -85,11 +85,12 @@ abstract class QueryableProcessor<T extends Queryable> extends Processor<T> {
             .filterNotNull()
             .getClosest(parameterElement.type);
         final castedDatabaseValue =
-            databaseValue.asType(typeConverter.databaseType);
+            databaseValue.asType(typeConverter.databaseType, field.isNullable);
 
         parameterValue = '${typeConverter.name}().decode($castedDatabaseValue)';
       } else {
-        parameterValue = databaseValue.asType(parameterElement.type);
+        parameterValue =
+            databaseValue.asType(parameterElement.type, field.isNullable);
       }
 
       if (parameterElement.isNamed) {
@@ -103,9 +104,15 @@ abstract class QueryableProcessor<T extends Queryable> extends Processor<T> {
 }
 
 extension on String {
-  String asType(DartType dartType) {
+  String asType(DartType dartType, bool isNullable) {
     if (dartType.isDartCoreBool) {
-      return '($this as int) != 0'; // maps int to bool
+      if (isNullable) {
+        // maps int to bool
+        // if the value is null, return null. If the value is not null, interpret 1 as true and 0 as false.
+        return '$this == null ? null : ($this as int) != 0';
+      } else {
+        return '($this as int) != 0'; // maps int to bool
+      }
     } else if (dartType.isDartCoreString) {
       return '$this as String';
     } else if (dartType.isDartCoreInt) {

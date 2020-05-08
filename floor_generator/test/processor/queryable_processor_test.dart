@@ -292,6 +292,29 @@ void main() {
       expect(actual, equals(expected));
     });
 
+    test('generate constructor with boolean arguments', () async {
+      final classElement = await createClassElement('''
+      class Person {
+        final int id;
+      
+        final String name;
+        
+        @ColumnInfo(nullable: false)
+        final bool bar;
+        
+        final bool foo
+      
+        Person(this.id, this.name, {this.bar, this.foo});
+      }
+    ''');
+
+      final actual = TestProcessor(classElement).process().constructor;
+
+      const expected =
+          "Person(row['id'] as int, row['name'] as String, bar: (row['bar'] as int) != 0, foo: row['foo'] == null ? null : (row['foo'] as int) != 0)";
+      expect(actual, equals(expected));
+    });
+
     test('generate constructor with named arguments', () async {
       final classElement = await createClassElement('''
       class Person {

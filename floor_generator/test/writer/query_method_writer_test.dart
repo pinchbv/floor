@@ -57,6 +57,22 @@ void main() {
     '''));
   });
 
+  test('query boolean parameter', () async {
+    final queryMethod = await _createQueryMethod('''
+      @Query('SELECT * FROM Person WHERE flag = :flag')
+      Future<List<Person>> findWithFlag(bool flag);
+    ''');
+
+    final actual = QueryMethodWriter(queryMethod).write();
+
+    expect(actual, equalsDart(r'''
+      @override
+      Future<List<Person>> findWithFlag(bool flag) async {
+        return _queryAdapter.queryList('SELECT * FROM Person WHERE flag = ?', arguments: <dynamic>[flag == null ? null : (flag ? 1 : 0)], mapper: _personMapper);
+      }
+    '''));
+  });
+
   test('query item multiple parameters', () async {
     final queryMethod = await _createQueryMethod('''
       @Query('SELECT * FROM Person WHERE id = :id AND name = :name')
