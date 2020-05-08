@@ -183,8 +183,8 @@ void main() {
 
     test('Parse query with commas', () async {
       final methodElement = await _createQueryMethodElement('''
-      @Query('SELECT * FROM :table,:othertable')
-      Future<List<Person>> findPersonsWithNamesLike(String table, String othertable);
+      @Query('SELECT * FROM :table, :otherTable')
+      Future<List<Person>> findPersonsWithNamesLike(String table, String otherTable);
     ''');
 
       final actual =
