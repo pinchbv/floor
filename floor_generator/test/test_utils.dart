@@ -174,3 +174,23 @@ Future<ClassElement> createClassElement(final String clazz) async {
 
   return library.classes.first;
 }
+
+extension StringTestExtension on String {
+  Future<DartType> asDartType() async {
+    return getDartTypeFromString(this);
+  }
+
+  Future<ClassElement> asClassElement() async {
+    final library = await resolveSource('''
+      library test;
+      
+      import 'package:floor_annotation/floor_annotation.dart';
+      
+      $this
+      ''', (resolver) async {
+      return LibraryReader(await resolver.findLibraryByName('test'));
+    });
+
+    return library.classes.first;
+  }
+}
