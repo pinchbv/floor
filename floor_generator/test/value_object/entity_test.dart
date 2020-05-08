@@ -145,26 +145,26 @@ void main() {
     });
   });
 
-  group('Value mapping', () {
-    final primaryKey = PrimaryKey([nullableField], true);
-    final entity = Entity(
-      mockClassElement,
-      'entityName',
-      [nullableField],
-      primaryKey,
-      [],
-      [],
-      '',
-      '',
-    );
-    const fieldElementDisplayName = 'foo';
-
-    setUp(() {
-      when(mockFieldElement.displayName).thenReturn(fieldElementDisplayName);
-      when(mockFieldElement.type).thenReturn(mockDartType);
-    });
-
-    // TODO #165 move these to entity_processor_test
+//  group('Value mapping', () {
+//    final primaryKey = PrimaryKey([nullableField], true);
+//    final entity = Entity(
+//      mockClassElement,
+//      'entityName',
+//      [nullableField],
+//      primaryKey,
+//      [],
+//      [],
+//      '',
+//      '',
+//    );
+//    const fieldElementDisplayName = 'foo';
+//
+//    setUp(() {
+//      when(mockFieldElement.displayName).thenReturn(fieldElementDisplayName);
+//      when(mockFieldElement.type).thenReturn(mockDartType);
+//    });
+//
+  // TODO #165 move these to entity_processor_test
 //    test('Get value mapping', () {
 //      when(mockDartType.isDartCoreBool).thenReturn(false);
 //
@@ -207,5 +207,5 @@ void main() {
 //          '}';
 //      expect(actual, equals(expected));
 //    });
-  });
+//  });
 }
