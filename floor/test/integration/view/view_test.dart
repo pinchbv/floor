@@ -2,7 +2,6 @@ import 'dart:async';
 
 import 'package:floor/floor.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:path/path.dart' hide equals;
 import 'package:sqflite/sqflite.dart' as sqflite;
 
 import '../dao/dog_dao.dart';
