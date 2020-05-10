@@ -127,7 +127,7 @@ This package is still in an early phase and the API will likely change.
     import 'package:sqflite/sqflite.dart' as sqflite;
 
     import 'dao/person_dao.dart';
-    import 'model/person.dart';
+    import 'entity/person.dart';
 
     part 'database.g.dart'; // the generated code will be there
 
@@ -577,22 +577,19 @@ final database = await $FloorAppDatabase
 ```
 
 ## Testing
-In order to run database tests on your development machine without the need to deploy the code to an actual device, the setup has to be configured as shown in the following.
+Simply instantiate an in-memory database and run the database tests on your local development machine as shown in the following snippet.
 For more test references, check out the [project's tests](https://github.com/vitusortner/floor/tree/develop/floor/test/integration).
 
 In case you're running Linux, make sure to have sqlite3 and libsqlite3-dev installed.
 
-#### database_test.dart
 ```dart
 import 'package:floor/floor.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:matcher/matcher.dart';
-import 'package:sqflite/sqflite.dart';
 
 // your imports follow here
 import 'dao/person_dao.dart';
 import 'database.dart';
-import 'model/person.dart';
+import 'entity/person.dart';
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
