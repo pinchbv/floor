@@ -69,7 +69,7 @@ jobs:
     runs-on: $ {{ matrix.os }}
     strategy:
       matrix:
-        os: [ubuntu-latest, macOS-latest, windows-latest]
+        os: [ubuntu-latest]
     timeout-minutes: 10
 
     steps:
@@ -94,7 +94,7 @@ jobs:
         working-directory: floor
 
       - name: Install SQLite
-#        if: matrix.os == 'ubuntu-latest'
+        #        if: matrix.os == 'ubuntu-latest'
         run: |
           sudo apt-get -y update
           sudo apt-get -y install sqlite3 libsqlite3-dev
