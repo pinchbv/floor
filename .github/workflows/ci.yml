@@ -66,10 +66,7 @@ jobs:
           file: ./floor_generator/coverage/lcov.info
 
   floor:
-    runs-on: $ {{ matrix.os }}
-    strategy:
-      matrix:
-        os: [ubuntu-latest]
+    runs-on: ubuntu-latest
     timeout-minutes: 10
 
     steps:
