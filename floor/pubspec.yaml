@@ -12,6 +12,7 @@ environment:
 dependencies:
   path: ^1.6.4
   sqflite: ^1.2.0
+  sqflite_common_ffi: ^1.0.0+2
   floor_annotation:
     path: ../floor_annotation/
   meta: ^1.1.8
@@ -26,9 +27,4 @@ dev_dependencies:
   floor_generator:
     path: ../floor_generator/
   build_runner: ^1.7.3
-  sqflite_ffi_test:
-    git:
-      url: git://github.com/tekartik/sqflite_more
-      ref: dart2
-      path: sqflite_ffi_test
   matcher: ^0.12.6

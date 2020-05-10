@@ -4,7 +4,6 @@ import 'package:floor/floor.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:path/path.dart' hide equals;
 import 'package:sqflite/sqflite.dart' as sqflite;
-import 'package:sqflite_ffi_test/sqflite_ffi_test.dart';
 
 import '../dao/dog_dao.dart';
 import '../dao/name_dao.dart';
@@ -31,7 +30,6 @@ abstract class ViewTestDatabase extends FloorDatabase {
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
-  sqfliteFfiTestInit();
 
   group('database tests', () {
     ViewTestDatabase database;

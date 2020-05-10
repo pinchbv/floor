@@ -582,34 +582,12 @@ For more test references, check out the [project's tests](https://github.com/vit
 
 In case you're running Linux, make sure to have sqlite3 and libsqlite3-dev installed.
 
-#### pubspec.yaml
-```yaml
-dependencies:
-  flutter:
-    sdk: flutter
-  floor: ^0.12.0
-
-dev_dependencies:
-  floor_generator: ^0.12.0
-  build_runner: ^1.7.3
-
-  # additional dependencies
-  flutter_test:
-    sdk: flutter
-  sqflite_ffi_test:
-    git:
-      url: git://github.com/tekartik/sqflite_more
-      ref: dart2
-      path: sqflite_ffi_test
-```
-
 #### database_test.dart
 ```dart
 import 'package:floor/floor.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:matcher/matcher.dart';
 import 'package:sqflite/sqflite.dart';
-import 'package:sqflite_ffi_test/sqflite_ffi_test.dart';
 
 // your imports follow here
 import 'dao/person_dao.dart';
@@ -618,7 +596,6 @@ import 'model/person.dart';
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
-  sqfliteFfiTestInit();
 
   group('database tests', () {
     TestDatabase database;
