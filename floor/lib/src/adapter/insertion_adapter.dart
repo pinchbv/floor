@@ -1,9 +1,8 @@
 import 'dart:async';
 
+import 'package:floor/src/extension/on_conflict_strategy_extensions.dart';
 import 'package:floor_annotation/floor_annotation.dart';
 import 'package:sqflite/sqlite_api.dart';
-
-import '../extension/on_conflict_strategy_extensions.dart';
 
 class InsertionAdapter<T> {
   final DatabaseExecutor _database;
