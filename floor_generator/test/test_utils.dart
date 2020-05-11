@@ -182,7 +182,7 @@ Future<Entity> getPersonEntity() async {
   return library.classes
       .where((classElement) => classElement.hasAnnotation(annotations.Entity))
       .map((classElement) => EntityProcessor(classElement).process())
-  .first;
+      .first;
 }
 
 extension StringExtension on String {
