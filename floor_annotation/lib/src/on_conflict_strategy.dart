@@ -1,20 +1,20 @@
 /// Set of conflict handling strategies for insert and update methods.
 ///
 /// Check SQLite conflict documentation for details.
-abstract class OnConflictStrategy {
+enum OnConflictStrategy {
   /// OnConflict strategy constant to replace the old data and continue the
   /// transaction.
-  static const replace = 1;
+  replace,
 
   /// OnConflict strategy constant to rollback the transaction.
-  static const rollback = 2;
+  rollback,
 
   /// OnConflict strategy constant to abort the transaction.
-  static const abort = 3;
+  abort,
 
   /// OnConflict strategy constant to fail the transaction.
-  static const fail = 4;
+  fail,
 
   /// OnConflict strategy constant to ignore the conflict.
-  static const ignore = 5;
+  ignore,
 }

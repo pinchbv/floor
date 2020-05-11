@@ -152,23 +152,22 @@ class _$TaskDao extends TaskDao {
 
   @override
   Future<void> insertTask(Task task) async {
-    await _taskInsertionAdapter.insert(task, sqflite.ConflictAlgorithm.abort);
+    await _taskInsertionAdapter.insert(task, OnConflictStrategy.abort);
   }
 
   @override
   Future<void> insertTasks(List<Task> tasks) async {
-    await _taskInsertionAdapter.insertList(
-        tasks, sqflite.ConflictAlgorithm.abort);
+    await _taskInsertionAdapter.insertList(tasks, OnConflictStrategy.abort);
   }
 
   @override
   Future<void> updateTask(Task task) async {
-    await _taskUpdateAdapter.update(task, sqflite.ConflictAlgorithm.abort);
+    await _taskUpdateAdapter.update(task, OnConflictStrategy.abort);
   }
 
   @override
   Future<void> updateTasks(List<Task> task) async {
-    await _taskUpdateAdapter.updateList(task, sqflite.ConflictAlgorithm.abort);
+    await _taskUpdateAdapter.updateList(task, OnConflictStrategy.abort);
   }
 
   @override
