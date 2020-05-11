@@ -2,7 +2,6 @@ import 'package:analyzer/dart/constant/value.dart';
 import 'package:analyzer/dart/element/type.dart';
 
 extension DartObjectExtension on DartObject {
-  // TODO #228 test
   String toEnumValueString() {
     final interfaceType = type as InterfaceType;
     final enumValue = interfaceType.element.fields
