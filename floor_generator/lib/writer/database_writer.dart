@@ -127,7 +127,7 @@ class DatabaseWriter implements Writer {
               await callback?.onCreate?.call(database, version);
             },
           );
-          return floorDatabaseFactory.openDatabase(path, options: databaseOptions);
+          return sqliteDatabaseFactory.openDatabase(path, options: databaseOptions);
           '''));
   }
 

@@ -64,7 +64,7 @@ class DatabaseBuilderWriter extends Writer {
       ..docs.add('/// Creates the database and initializes it.')
       ..body = Code('''
         final path = name != null
-          ? floorDatabaseFactory.getDatabasePath(name)
+          ? sqliteDatabaseFactory.getDatabasePath(name)
           : ':memory:';
         final database = _\$$_databaseName();
         database.database = await database.open(

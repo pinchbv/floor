@@ -43,7 +43,7 @@ class _$FlutterDatabaseBuilder {
   /// Creates the database and initializes it.
   Future<FlutterDatabase> build() async {
     final path =
-        name != null ? floorDatabaseFactory.getDatabasePath(name) : ':memory:';
+        name != null ? sqliteDatabaseFactory.getDatabasePath(name) : ':memory:';
     final database = _$FlutterDatabase();
     database.database = await database.open(
       path,
@@ -84,7 +84,7 @@ class _$FlutterDatabase extends FlutterDatabase {
         await callback?.onCreate?.call(database, version);
       },
     );
-    return floorDatabaseFactory.openDatabase(path, options: databaseOptions);
+    return sqliteDatabaseFactory.openDatabase(path, options: databaseOptions);
   }
 
   @override
