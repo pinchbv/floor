@@ -123,7 +123,6 @@ This package is still in an early phase and the API will likely change.
     // required package imports
     import 'dart:async';
     import 'package:floor/floor.dart';
-    import 'package:path/path.dart';
     import 'package:sqflite/sqflite.dart' as sqflite;
 
     import 'dao/person_dao.dart';
