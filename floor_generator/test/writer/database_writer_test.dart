@@ -37,8 +37,7 @@ void main() {
       
         Future<sqflite.Database> open(String path, List<Migration> migrations,
             [Callback callback]) async {
-          return sqflite.openDatabase(
-            path,
+          final databaseOptions = sqflite.OpenDatabaseOptions(
             version: 1,
             onConfigure: (database) async {
               await database.execute('PRAGMA foreign_keys = ON');
@@ -59,6 +58,7 @@ void main() {
               await callback?.onCreate?.call(database, version);
             },
           );
+          return sqliteDatabaseFactory.openDatabase(path, options: databaseOptions);
         }
       }      
     '''));
@@ -91,8 +91,7 @@ void main() {
         
         Future<sqflite.Database> open(String path, List<Migration> migrations,
             [Callback callback]) async {
-          return sqflite.openDatabase(
-            path,
+          final databaseOptions = sqflite.OpenDatabaseOptions(
             version: 1,
             onConfigure: (database) async {
               await database.execute('PRAGMA foreign_keys = ON');
@@ -113,6 +112,7 @@ void main() {
               await callback?.onCreate?.call(database, version);
             },
           );
+          return sqliteDatabaseFactory.openDatabase(path, options: databaseOptions);
         }
       }      
     '''));
@@ -153,7 +153,7 @@ void main() {
       
         Future<sqflite.Database> open(String path, List<Migration> migrations,
             [Callback callback]) async {
-          return sqflite.openDatabase(
+          final databseOptions = sqflite.OpenDatabaseOptions(
             path,
             version: 1,
             onConfigure: (database) async {
@@ -178,6 +178,7 @@ void main() {
               await callback?.onCreate?.call(database, version);
             },
           );
+          return sqliteDatabaseFactory.openDatabase(path, options: databaseOptions);
         }
       }      
     """));
