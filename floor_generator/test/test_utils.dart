@@ -12,6 +12,7 @@ import 'package:floor_generator/processor/dao_processor.dart';
 import 'package:floor_generator/processor/entity_processor.dart';
 import 'package:floor_generator/processor/view_processor.dart';
 import 'package:floor_generator/value_object/dao.dart';
+import 'package:floor_generator/value_object/entity.dart';
 import 'package:path/path.dart' as path;
 import 'package:source_gen/source_gen.dart';
 import 'package:test/test.dart';
@@ -131,15 +132,7 @@ Future<Dao> createDao(final String methodSignature) async {
         $methodSignature
       }
       
-      @entity
-      class Person {
-        @primaryKey
-        final int id;
-      
-        final String name;
-      
-        Person(this.id, this.name);
-      }
+      $_personEntity
       ''', (resolver) async {
     return LibraryReader(await resolver.findLibraryByName('test'));
   });
@@ -174,3 +167,53 @@ Future<ClassElement> createClassElement(final String clazz) async {
 
   return library.classes.first;
 }
+
+Future<Entity> getPersonEntity() async {
+  final library = await resolveSource('''
+      library test;
+      
+      import 'package:floor_annotation/floor_annotation.dart';
+      
+      $_personEntity
+    ''', (resolver) async {
+    return LibraryReader(await resolver.findLibraryByName('test'));
+  });
+
+  return library.classes
+      .where((classElement) => classElement.hasAnnotation(annotations.Entity))
+      .map((classElement) => EntityProcessor(classElement).process())
+  .first;
+}
+
+extension StringExtension on String {
+  Future<MethodElement> asDaoMethodElement() async {
+    final library = await resolveSource('''
+      library test;
+      
+      import 'package:floor_annotation/floor_annotation.dart';
+      
+      @dao
+      abstract class PersonDao {
+        $this 
+      }
+      
+      $_personEntity
+    ''', (resolver) async {
+      return LibraryReader(await resolver.findLibraryByName('test'));
+    });
+
+    return library.classes.first.methods.first;
+  }
+}
+
+const _personEntity = '''
+  @entity
+  class Person {
+    @primaryKey
+    final int id;
+        
+    final String name;
+        
+    Person(this.id, this.name);
+  }
+''';
