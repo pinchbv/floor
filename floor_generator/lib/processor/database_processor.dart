@@ -1,4 +1,5 @@
 import 'package:analyzer/dart/element/element.dart';
+import 'package:dartx/dartx.dart';
 import 'package:floor_annotation/floor_annotation.dart' as annotations;
 import 'package:floor_generator/misc/annotations.dart';
 import 'package:floor_generator/misc/constants.dart';
@@ -29,17 +30,21 @@ class DatabaseProcessor extends Processor<Database> {
   @override
   Database process() {
     final databaseName = _classElement.displayName;
-    final typeConverters =
+    final databaseTypeConverters =
         _classElement.getTypeConverters(TypeConverterScope.database);
-    final entities = _getEntities(_classElement, typeConverters);
-    final views = _getViews(_classElement, typeConverters);
+    final entities = _getEntities(_classElement, databaseTypeConverters);
+    final views = _getViews(_classElement, databaseTypeConverters);
     final daoGetters = _getDaoGetters(
       databaseName,
       entities,
       views,
-      typeConverters,
+      databaseTypeConverters,
     );
     final version = _getDatabaseVersion();
+    final allTypeConverters = _getAllTypeConverters(
+      databaseTypeConverters,
+      daoGetters,
+    );
 
     return Database(
       _classElement,
@@ -48,7 +53,8 @@ class DatabaseProcessor extends Processor<Database> {
       views,
       daoGetters,
       version,
-      typeConverters,
+      databaseTypeConverters,
+      allTypeConverters,
     );
   }
 
@@ -144,6 +150,20 @@ class DatabaseProcessor extends Processor<Database> {
                 ).process())
             ?.toList() ??
         [];
+  }
+
+  @nonNull
+  Set<TypeConverter> _getAllTypeConverters(
+    final List<TypeConverter> typeConverters,
+    final List<DaoGetter> daoGetters,
+  ) {
+    return (typeConverters +
+            daoGetters
+                .expand((daoGetter) => daoGetter.dao.queryMethods)
+                .expand((queryMethod) => queryMethod.typeConverters)
+                .toList())
+        .filterNotNull()
+        .toSet();
   }
 
   @nonNull

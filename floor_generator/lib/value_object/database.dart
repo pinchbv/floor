@@ -1,4 +1,5 @@
 import 'package:analyzer/dart/element/element.dart';
+import 'package:collection/collection.dart';
 import 'package:floor_generator/misc/extensions/list_equality_extension.dart';
 import 'package:floor_generator/value_object/dao_getter.dart';
 import 'package:floor_generator/value_object/entity.dart';
@@ -13,7 +14,8 @@ class Database {
   final List<View> views;
   final List<DaoGetter> daoGetters;
   final int version;
-  final List<TypeConverter> typeConverters;
+  final List<TypeConverter> databaseTypeConverters;
+  final Set<TypeConverter> allTypeConverters;
 
   Database(
     this.classElement,
@@ -22,7 +24,8 @@ class Database {
     this.views,
     this.daoGetters,
     this.version,
-    this.typeConverters,
+    this.databaseTypeConverters,
+    this.allTypeConverters,
   );
 
   @override
@@ -36,7 +39,9 @@ class Database {
           views.equals(other.views) &&
           daoGetters.equals(other.daoGetters) &&
           version == other.version &&
-          typeConverters.equals(other.typeConverters);
+          databaseTypeConverters.equals(other.databaseTypeConverters) &&
+          const SetEquality<TypeConverter>()
+              .equals(allTypeConverters, other.allTypeConverters);
 
   @override
   int get hashCode =>
@@ -46,10 +51,11 @@ class Database {
       views.hashCode ^
       daoGetters.hashCode ^
       version.hashCode ^
-      typeConverters.hashCode;
+      databaseTypeConverters.hashCode ^
+      allTypeConverters.hashCode;
 
   @override
   String toString() {
-    return 'Database{classElement: $classElement, name: $name, entities: $entities, views: $views, daoGetters: $daoGetters, version: $version, typeConverters: $typeConverters}';
+    return 'Database{classElement: $classElement, name: $name, entities: $entities, views: $views, daoGetters: $daoGetters, version: $version, typeConverters: $databaseTypeConverters, allTypeConverters: $allTypeConverters}';
   }
 }
