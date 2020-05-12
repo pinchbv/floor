@@ -11,7 +11,7 @@ import 'package:floor_generator/writer/dao_writer.dart';
 import 'package:floor_generator/writer/database_builder_writer.dart';
 import 'package:floor_generator/writer/database_writer.dart';
 import 'package:floor_generator/writer/floor_writer.dart';
-import 'package:floor_generator/writer/type_converter_writer.dart';
+import 'package:floor_generator/writer/type_converter_field_writer.dart';
 import 'package:source_gen/source_gen.dart';
 
 /// Floor generator that produces the implementation of the persistence code.

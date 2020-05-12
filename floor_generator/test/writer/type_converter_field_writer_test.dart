@@ -1,5 +1,5 @@
 import 'package:code_builder/code_builder.dart';
-import 'package:floor_generator/writer/type_converter_writer.dart';
+import 'package:floor_generator/writer/type_converter_field_writer.dart';
 import 'package:test/test.dart';
 
 import '../test_utils.dart';
