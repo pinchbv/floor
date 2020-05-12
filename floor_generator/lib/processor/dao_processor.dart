@@ -74,7 +74,6 @@ class DaoProcessor extends Processor<Dao> {
       deletionMethods,
       transactionMethods,
       streamEntities,
-      typeConverters,
     );
   }
 

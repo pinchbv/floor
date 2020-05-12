@@ -49,9 +49,6 @@ class FloorGenerator extends GeneratorForAnnotation<annotations.Database> {
   Set<TypeConverter> _getAllTypeConverters(final Database database) {
     return (database.typeConverters +
             database.daoGetters
-                .expand((daoGetter) => daoGetter.dao.typeConverters)
-                .toList() +
-            database.daoGetters
                 .expand((daoGetter) => daoGetter.dao.queryMethods)
                 .expand((queryMethod) => queryMethod.typeConverters)
                 .toList())
