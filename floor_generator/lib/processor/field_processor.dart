@@ -10,10 +10,13 @@ import 'package:source_gen/source_gen.dart';
 
 class FieldProcessor extends Processor<Field> {
   final FieldElement _fieldElement;
+  final String _prefix;
 
-  FieldProcessor(final FieldElement fieldElement)
+  FieldProcessor(final FieldElement fieldElement, [final String prefix = ''])
       : assert(fieldElement != null),
-        _fieldElement = fieldElement;
+        assert(prefix != null),
+        _fieldElement = fieldElement,
+        _prefix = prefix;
 
   @nonNull
   @override
@@ -21,7 +24,8 @@ class FieldProcessor extends Processor<Field> {
     final name = _fieldElement.name;
     final hasColumnInfoAnnotation =
         _fieldElement.hasAnnotation(annotations.ColumnInfo);
-    final columnName = _getColumnName(hasColumnInfoAnnotation, name);
+    final columnName =
+        '$_prefix${_getColumnName(hasColumnInfoAnnotation, name)}';
     final isNullable = _getIsNullable(hasColumnInfoAnnotation);
 
     return Field(

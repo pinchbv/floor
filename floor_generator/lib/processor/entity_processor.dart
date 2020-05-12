@@ -25,15 +25,17 @@ class EntityProcessor extends QueryableProcessor<Entity> {
   Entity process() {
     final name = _getName();
     final fields = getFields();
+    final embedded = getEmbeddeds();
 
     return Entity(
       classElement,
       name,
       fields,
+      embedded,
       _getPrimaryKey(fields),
       _getForeignKeys(),
       _getIndices(fields, name),
-      getConstructor(fields),
+      getConstructor(fields, embedded),
     );
   }
 

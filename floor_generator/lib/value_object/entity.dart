@@ -1,6 +1,7 @@
 import 'package:analyzer/dart/element/element.dart';
 import 'package:collection/collection.dart';
 import 'package:floor_generator/misc/annotations.dart';
+import 'package:floor_generator/value_object/embedded.dart';
 import 'package:floor_generator/value_object/field.dart';
 import 'package:floor_generator/value_object/foreign_key.dart';
 import 'package:floor_generator/value_object/index.dart';
@@ -16,11 +17,12 @@ class Entity extends Queryable {
     ClassElement classElement,
     String name,
     List<Field> fields,
+    List<Embedded> embedded,
     this.primaryKey,
     this.foreignKeys,
     this.indices,
     String constructor,
-  ) : super(classElement, name, fields, constructor);
+  ) : super(classElement, name, fields, embedded, constructor);
 
   @nonNull
   String getCreateTableStatement() {
@@ -29,6 +31,13 @@ class Entity extends Queryable {
           primaryKey.fields.contains(field) && primaryKey.autoGenerateId;
       return field.getDatabaseDefinition(autoIncrement);
     }).toList();
+
+    final embeddedDefinitions = embeddeds.map((embed) {
+      return embed.fields.map((field) {
+        return field.getDatabaseDefinition(false);
+      }).join(',');
+    }).toList();
+    databaseDefinition.addAll(embeddedDefinitions);
 
     final foreignKeyDefinitions =
         foreignKeys.map((foreignKey) => foreignKey.getDefinition()).toList();
@@ -55,11 +64,25 @@ class Entity extends Queryable {
 
   @nonNull
   String getValueMapping() {
-    final keyValueList = fields.map((field) {
+    final keyValueList = <String>[];
+
+    final fieldKeyValue = fields.map((field) {
       final columnName = field.columnName;
       final attributeValue = _getAttributeValue(field);
-      return "'$columnName': $attributeValue";
+      return "'$columnName': item.$attributeValue";
     }).toList();
+    keyValueList.addAll(fieldKeyValue);
+
+    final embeddedKeyValue = embeddeds.map((embedded) {
+      final className = embedded.fieldElement.displayName;
+
+      return embedded.fields.map((field) {
+        final columnName = field.columnName;
+        final attributeValue = _getAttributeValue(field);
+        return "'$columnName': item.$className.$attributeValue";
+      }).join(',');
+    }).toList();
+    keyValueList.addAll(embeddedKeyValue);
 
     return '<String, dynamic>{${keyValueList.join(', ')}}';
   }
@@ -69,12 +92,12 @@ class Entity extends Queryable {
     final parameterName = field.fieldElement.displayName;
     if (field.fieldElement.type.isDartCoreBool) {
       if (field.isNullable) {
-        return 'item.$parameterName == null ? null : (item.$parameterName ? 1 : 0)';
+        return '$parameterName == null ? null : ($parameterName ? 1 : 0)';
       } else {
-        return 'item.$parameterName ? 1 : 0';
+        return '$parameterName ? 1 : 0';
       }
     } else {
-      return 'item.$parameterName';
+      return '$parameterName';
     }
   }
 
@@ -104,6 +127,6 @@ class Entity extends Queryable {
 
   @override
   String toString() {
-    return 'Entity{classElement: $classElement, name: $name, fields: $fields, primaryKey: $primaryKey, foreignKeys: $foreignKeys, indices: $indices, constructor: $constructor}';
+    return 'Entity{classElement: $classElement, name: $name, fields: $fields, embeddeds: $embeddeds, primaryKey: $primaryKey, foreignKeys: $foreignKeys, indices: $indices, constructor: $constructor}';
   }
 }
