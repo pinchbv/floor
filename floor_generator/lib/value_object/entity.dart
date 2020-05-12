@@ -1,6 +1,6 @@
 import 'package:analyzer/dart/element/element.dart';
-import 'package:collection/collection.dart';
 import 'package:floor_generator/misc/annotations.dart';
+import 'package:floor_generator/misc/extensions/list_equality_extension.dart';
 import 'package:floor_generator/value_object/field.dart';
 import 'package:floor_generator/value_object/foreign_key.dart';
 import 'package:floor_generator/value_object/index.dart';
@@ -62,12 +62,12 @@ class Entity extends Queryable {
           runtimeType == other.runtimeType &&
           classElement == other.classElement &&
           name == other.name &&
-          const ListEquality<Field>().equals(fields, other.fields) &&
+          fields.equals(other.fields) &&
           primaryKey == other.primaryKey &&
-          const ListEquality<ForeignKey>()
-              .equals(foreignKeys, other.foreignKeys) &&
-          const ListEquality<Index>().equals(indices, other.indices) &&
-          constructor == other.constructor;
+          foreignKeys.equals(other.foreignKeys) &&
+          indices.equals(other.indices) &&
+          constructor == other.constructor &&
+          valueMapping == other.valueMapping;
 
   @override
   int get hashCode =>
@@ -77,10 +77,11 @@ class Entity extends Queryable {
       primaryKey.hashCode ^
       foreignKeys.hashCode ^
       indices.hashCode ^
-      constructor.hashCode;
+      constructor.hashCode ^
+      valueMapping.hashCode;
 
   @override
   String toString() {
-    return 'Entity{classElement: $classElement, name: $name, fields: $fields, primaryKey: $primaryKey, foreignKeys: $foreignKeys, indices: $indices, constructor: $constructor}';
+    return 'Entity{classElement: $classElement, name: $name, fields: $fields, primaryKey: $primaryKey, foreignKeys: $foreignKeys, indices: $indices, constructor: $constructor, valueMapping: $valueMapping}';
   }
 }

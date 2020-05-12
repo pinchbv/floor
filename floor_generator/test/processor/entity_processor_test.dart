@@ -35,6 +35,7 @@ void main() {
     const foreignKeys = <ForeignKey>[];
     const indices = <Index>[];
     const constructor = "Person(row['id'] as int, row['name'] as String)";
+    const valueMapping = "<String, dynamic>{'id': item.id, 'name': item.name}";
     final expected = Entity(
       classElement,
       name,
@@ -43,7 +44,7 @@ void main() {
       foreignKeys,
       indices,
       constructor,
-      '', // TODO #165
+      valueMapping,
     );
     expect(actual, equals(expected));
   });
@@ -70,6 +71,7 @@ void main() {
     const foreignKeys = <ForeignKey>[];
     const indices = <Index>[];
     const constructor = "Person(row['id'] as int, row['name'] as String)";
+    const valueMapping = "<String, dynamic>{'id': item.id, 'name': item.name}";
     final expected = Entity(
       classElement,
       name,
@@ -78,7 +80,7 @@ void main() {
       foreignKeys,
       indices,
       constructor,
-      '', // TODO #165
+      valueMapping,
     );
     expect(actual, equals(expected));
   });
@@ -130,6 +132,54 @@ void main() {
         'CASCADE',
         'SET NULL',
       );
+      expect(actual, equals(expected));
+    });
+  });
+
+  group('Value mapping', () {
+    test('Non-nullable boolean value mapping', () async {
+      final classElement = await createClassElement('''
+      @entity
+      class Person {
+        @primaryKey
+        final int id;
+      
+        @ColumnInfo(nullable: false)
+        final bool isSomething;
+      
+        Person(this.id, this.isSomething);
+      }
+    ''');
+
+      final actual = EntityProcessor(classElement, []).process().valueMapping;
+
+      const expected = '<String, dynamic>{'
+          "'id': item.id, "
+          "'isSomething': item.isSomething ? 1 : 0"
+          '}';
+      expect(actual, equals(expected));
+    });
+
+    test('Nullable boolean value mapping', () async {
+      final classElement = await createClassElement('''
+      @entity
+      class Person {
+        @primaryKey
+        final int id;
+      
+        @ColumnInfo(nullable: true)
+        final bool isSomething;
+      
+        Person(this.id, this.isSomething);
+      }
+    ''');
+
+      final actual = EntityProcessor(classElement, []).process().valueMapping;
+
+      const expected = '<String, dynamic>{'
+          "'id': item.id, "
+          "'isSomething': item.isSomething == null ? null : (item.isSomething ? 1 : 0)"
+          '}';
       expect(actual, equals(expected));
     });
   });
