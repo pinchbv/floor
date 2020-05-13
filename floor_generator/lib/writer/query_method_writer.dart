@@ -4,7 +4,7 @@ import 'package:code_builder/code_builder.dart';
 import 'package:dartx/dartx.dart';
 import 'package:floor_generator/misc/annotation_expression.dart';
 import 'package:floor_generator/misc/annotations.dart';
-import 'package:floor_generator/misc/extensions/type_converters_extension.dart';
+import 'package:floor_generator/misc/extension/type_converters_extension.dart';
 import 'package:floor_generator/misc/type_utils.dart';
 import 'package:floor_generator/value_object/query_method.dart';
 import 'package:floor_generator/writer/writer.dart';

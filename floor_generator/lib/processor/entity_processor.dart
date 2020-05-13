@@ -4,7 +4,7 @@ import 'package:dartx/dartx.dart';
 import 'package:floor_annotation/floor_annotation.dart' as annotations;
 import 'package:floor_generator/misc/annotations.dart';
 import 'package:floor_generator/misc/constants.dart';
-import 'package:floor_generator/misc/extensions/type_converters_extension.dart';
+import 'package:floor_generator/misc/extension/type_converters_extension.dart';
 import 'package:floor_generator/misc/foreign_key_action.dart';
 import 'package:floor_generator/misc/type_utils.dart';
 import 'package:floor_generator/processor/error/entity_processor_error.dart';

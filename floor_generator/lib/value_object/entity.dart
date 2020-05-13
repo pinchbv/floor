@@ -1,6 +1,6 @@
 import 'package:analyzer/dart/element/element.dart';
 import 'package:floor_generator/misc/annotations.dart';
-import 'package:floor_generator/misc/extensions/list_equality_extension.dart';
+import 'package:floor_generator/misc/extension/list_equality_extension.dart';
 import 'package:floor_generator/value_object/field.dart';
 import 'package:floor_generator/value_object/foreign_key.dart';
 import 'package:floor_generator/value_object/index.dart';
