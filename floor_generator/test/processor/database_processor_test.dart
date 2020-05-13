@@ -8,7 +8,7 @@ import 'package:test/test.dart';
 import '../test_utils.dart';
 
 void main() {
-  test('exception when database version < 1', () async {
+  test('error when database version < 1', () async {
     final classElement = await _createDatabaseClassElement('''
       @Database(version: 0, entities: [Person])
       abstract class TestDatabase extends FloorDatabase {}
@@ -20,7 +20,7 @@ void main() {
     expect(actual, throwsInvalidGenerationSourceError(error));
   });
 
-  test('exception when database version not supplied', () async {
+  test('error when database version not supplied', () async {
     final classElement = await _createDatabaseClassElement('''
       @Database(entities: [Person])
       abstract class TestDatabase extends FloorDatabase {}

@@ -1,5 +1,4 @@
 import 'package:analyzer/dart/element/element.dart';
-import 'package:dartx/dartx.dart';
 import 'package:floor_annotation/floor_annotation.dart' as annotations;
 import 'package:floor_generator/misc/annotations.dart';
 import 'package:floor_generator/misc/constants.dart';
@@ -41,10 +40,7 @@ class DatabaseProcessor extends Processor<Database> {
       databaseTypeConverters,
     );
     final version = _getDatabaseVersion();
-    final allTypeConverters = _getAllTypeConverters(
-      databaseTypeConverters,
-      daoGetters,
-    );
+    final allTypeConverters = _getAllTypeConverters(daoGetters);
 
     return Database(
       _classElement,
@@ -153,16 +149,11 @@ class DatabaseProcessor extends Processor<Database> {
   }
 
   @nonNull
-  Set<TypeConverter> _getAllTypeConverters(
-    final List<TypeConverter> databaseTypeConverters,
-    final List<DaoGetter> daoGetters,
-  ) {
-    return (databaseTypeConverters +
-            daoGetters
-                .expand((daoGetter) => daoGetter.dao.queryMethods)
-                .expand((queryMethod) => queryMethod.typeConverters)
-                .toList())
-        .filterNotNull()
+  Set<TypeConverter> _getAllTypeConverters(final List<DaoGetter> daoGetters) {
+    // DAO query methods have access to all type converters
+    return daoGetters
+        .expand((daoGetter) => daoGetter.dao.queryMethods)
+        .expand((queryMethod) => queryMethod.typeConverters)
         .toSet();
   }
 
