@@ -154,10 +154,10 @@ class DatabaseProcessor extends Processor<Database> {
 
   @nonNull
   Set<TypeConverter> _getAllTypeConverters(
-    final List<TypeConverter> typeConverters,
+    final List<TypeConverter> databaseTypeConverters,
     final List<DaoGetter> daoGetters,
   ) {
-    return (typeConverters +
+    return (databaseTypeConverters +
             daoGetters
                 .expand((daoGetter) => daoGetter.dao.queryMethods)
                 .expand((queryMethod) => queryMethod.typeConverters)
