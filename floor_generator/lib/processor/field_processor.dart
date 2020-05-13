@@ -1,4 +1,5 @@
 import 'package:analyzer/dart/element/element.dart';
+import 'package:analyzer/dart/element/type.dart';
 import 'package:dartx/dartx.dart';
 import 'package:floor_annotation/floor_annotation.dart' as annotations;
 import 'package:floor_generator/misc/annotations.dart';
@@ -71,32 +72,34 @@ class FieldProcessor extends Processor<Field> {
 
   @nonNull
   String _getSqlType(@nullable final TypeConverter typeConverter) {
-    var type = _fieldElement.type;
-
-    if (!type.isDefaultSqlType && typeConverter != null) {
-      type = typeConverter.databaseType;
-    }
-
-    // TODO #165 make this nicer
-    if (!type.isDefaultSqlType && typeConverter == null) {
+    final type = _fieldElement.type;
+    if (type.isDefaultSqlType) {
+      return type.asSqlType();
+    } else if (typeConverter != null) {
+      return typeConverter.databaseType.asSqlType();
+    } else {
       throw InvalidGenerationSourceError(
         'Column type is not supported for $type.',
         todo: 'Either make to use a supported type or supply a type converter.',
         element: _fieldElement,
       );
     }
+  }
+}
 
-    if (type.isDartCoreInt) {
+extension on DartType {
+  String asSqlType() {
+    if (isDartCoreInt) {
       return SqlType.integer;
-    } else if (type.isDartCoreString) {
+    } else if (isDartCoreString) {
       return SqlType.text;
-    } else if (type.isDartCoreBool) {
+    } else if (isDartCoreBool) {
       return SqlType.integer;
-    } else if (type.isDartCoreDouble) {
+    } else if (isDartCoreDouble) {
       return SqlType.real;
-    } else if (type.isUint8List) {
+    } else if (isUint8List) {
       return SqlType.blob;
     }
-    throw Error(); // unreachable
+    throw StateError('This should really be unreachable');
   }
 }
