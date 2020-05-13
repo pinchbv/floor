@@ -1,7 +1,9 @@
 import 'dart:async';
 
+import 'package:floor/src/extension/on_conflict_strategy_extensions.dart';
 import 'package:floor/src/util/primary_key_helper.dart';
-import 'package:sqflite/sqflite.dart';
+import 'package:floor_annotation/floor_annotation.dart';
+import 'package:sqflite/sqlite_api.dart';
 
 class UpdateAdapter<T> {
   final DatabaseExecutor _database;
@@ -30,37 +32,37 @@ class UpdateAdapter<T> {
 
   Future<void> update(
     final T item,
-    final ConflictAlgorithm conflictAlgorithm,
+    final OnConflictStrategy onConflictStrategy,
   ) async {
-    await _update(item, conflictAlgorithm);
+    await _update(item, onConflictStrategy);
   }
 
   Future<void> updateList(
     final List<T> items,
-    final ConflictAlgorithm conflictAlgorithm,
+    final OnConflictStrategy onConflictStrategy,
   ) async {
     if (items.isEmpty) return;
-    await _updateList(items, conflictAlgorithm);
+    await _updateList(items, onConflictStrategy);
   }
 
   Future<int> updateAndReturnChangedRows(
     final T item,
-    final ConflictAlgorithm conflictAlgorithm,
+    final OnConflictStrategy onConflictStrategy,
   ) {
-    return _update(item, conflictAlgorithm);
+    return _update(item, onConflictStrategy);
   }
 
   Future<int> updateListAndReturnChangedRows(
     final List<T> items,
-    final ConflictAlgorithm conflictAlgorithm,
+    final OnConflictStrategy onConflictStrategy,
   ) async {
     if (items.isEmpty) return 0;
-    return _updateList(items, conflictAlgorithm);
+    return _updateList(items, onConflictStrategy);
   }
 
   Future<int> _update(
     final T item,
-    final ConflictAlgorithm conflictAlgorithm,
+    final OnConflictStrategy onConflictStrategy,
   ) async {
     final values = _valueMapper(item);
 
@@ -72,7 +74,7 @@ class UpdateAdapter<T> {
         _primaryKeyColumnName,
         values,
       ),
-      conflictAlgorithm: conflictAlgorithm,
+      conflictAlgorithm: onConflictStrategy.asSqfliteConflictAlgorithm(),
     );
     if (_changeListener != null && result != 0) {
       _changeListener.add(_entityName);
@@ -82,7 +84,7 @@ class UpdateAdapter<T> {
 
   Future<int> _updateList(
     final List<T> items,
-    final ConflictAlgorithm conflictAlgorithm,
+    final OnConflictStrategy onConflictStrategy,
   ) async {
     final batch = _database.batch();
     for (final item in items) {
@@ -96,7 +98,7 @@ class UpdateAdapter<T> {
           _primaryKeyColumnName,
           values,
         ),
-        conflictAlgorithm: conflictAlgorithm,
+        conflictAlgorithm: onConflictStrategy.asSqfliteConflictAlgorithm(),
       );
     }
     final result = (await batch.commit(noResult: false)).cast<int>();

@@ -20,7 +20,7 @@ void main() {
       expect(actual, equalsDart(r'''
         @override
         Future<void> insertPerson(Person person) async {
-          await _personInsertionAdapter.insert(person, sqflite.ConflictAlgorithm.abort);
+          await _personInsertionAdapter.insert(person, OnConflictStrategy.abort);
         }
       '''));
     });
@@ -36,7 +36,7 @@ void main() {
       expect(actual, equalsDart('''
         @override
         Future<void> insertPersons(List<Person> persons) async {
-          await _personInsertionAdapter.insertList(persons, sqflite.ConflictAlgorithm.abort);
+          await _personInsertionAdapter.insertList(persons, OnConflictStrategy.abort);
         }
       '''));
     });
@@ -54,7 +54,7 @@ void main() {
       expect(actual, equalsDart('''
         @override
         Future<int> insertPersonWithReturn(Person person) {
-          return _personInsertionAdapter.insertAndReturnId(person, sqflite.ConflictAlgorithm.abort);
+          return _personInsertionAdapter.insertAndReturnId(person, OnConflictStrategy.abort);
         }
       '''));
     });
@@ -70,7 +70,7 @@ void main() {
       expect(actual, equalsDart('''
         @override
         Future<List<int>> insertPersonsWithReturn(List<Person> persons) {
-          return _personInsertionAdapter.insertListAndReturnIds(persons, sqflite.ConflictAlgorithm.abort);
+          return _personInsertionAdapter.insertListAndReturnIds(persons, OnConflictStrategy.abort);
         }
       '''));
     });
@@ -87,7 +87,7 @@ void main() {
     expect(actual, equalsDart(r'''
         @override
         Future<void> insertPerson(Person person) async {
-          await _personInsertionAdapter.insert(person, sqflite.ConflictAlgorithm.replace);
+          await _personInsertionAdapter.insert(person, OnConflictStrategy.replace);
         }
       '''));
   });

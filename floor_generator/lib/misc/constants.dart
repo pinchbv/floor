@@ -39,28 +39,3 @@ abstract class SqlType {
   static const real = 'REAL';
   static const blob = 'BLOB';
 }
-
-abstract class OnConflictStrategy {
-  static const replace = 1;
-  static const rollback = 2;
-  static const abort = 3;
-  static const fail = 4;
-  static const ignore = 5;
-
-  /// Sqflite conflict algorithm
-  static String getConflictAlgorithm(final int strategy) {
-    switch (strategy) {
-      case OnConflictStrategy.replace:
-        return 'replace';
-      case OnConflictStrategy.rollback:
-        return 'rollback';
-      case OnConflictStrategy.fail:
-        return 'fail';
-      case OnConflictStrategy.ignore:
-        return 'ignore';
-      case OnConflictStrategy.abort:
-      default:
-        return 'abort';
-    }
-  }
-}
