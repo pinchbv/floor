@@ -80,7 +80,7 @@ class _$FlutterDatabase extends FlutterDatabase {
       },
       onCreate: (database, version) async {
         await database.execute(
-            'CREATE TABLE IF NOT EXISTS `Task` (`id` INTEGER PRIMARY KEY AUTOINCREMENT, `message` TEXT)');
+            'CREATE TABLE IF NOT EXISTS `Task` (`id` INTEGER PRIMARY KEY AUTOINCREMENT, `message` TEXT, `time_created_at` TEXT,`time_updated_at` TEXT)');
 
         await callback?.onCreate?.call(database, version);
       },
@@ -100,22 +100,34 @@ class _$TaskDao extends TaskDao {
         _taskInsertionAdapter = InsertionAdapter(
             database,
             'Task',
-            (Task item) =>
-                <String, dynamic>{'id': item.id, 'message': item.message},
+            (Task item) => <String, dynamic>{
+                  'id': item.id,
+                  'message': item.message,
+                  'time_created_at': item.timestamp.createdAt,
+                  'time_updated_at': item.timestamp.updatedAt
+                },
             changeListener),
         _taskUpdateAdapter = UpdateAdapter(
             database,
             'Task',
             ['id'],
-            (Task item) =>
-                <String, dynamic>{'id': item.id, 'message': item.message},
+            (Task item) => <String, dynamic>{
+                  'id': item.id,
+                  'message': item.message,
+                  'time_created_at': item.timestamp.createdAt,
+                  'time_updated_at': item.timestamp.updatedAt
+                },
             changeListener),
         _taskDeletionAdapter = DeletionAdapter(
             database,
             'Task',
             ['id'],
-            (Task item) =>
-                <String, dynamic>{'id': item.id, 'message': item.message},
+            (Task item) => <String, dynamic>{
+                  'id': item.id,
+                  'message': item.message,
+                  'time_created_at': item.timestamp.createdAt,
+                  'time_updated_at': item.timestamp.updatedAt
+                },
             changeListener);
 
   final sqflite.DatabaseExecutor database;
@@ -124,8 +136,12 @@ class _$TaskDao extends TaskDao {
 
   final QueryAdapter _queryAdapter;
 
-  static final _taskMapper = (Map<String, dynamic> row) =>
-      Task(row['id'] as int, row['message'] as String);
+  static final _taskMapper = (Map<String, dynamic> row) => Task(
+      row['id'] as int,
+      row['message'] as String,
+      Timestamp(
+          createdAt: row['time_created_at'] as String,
+          updatedAt: row['time_updated_at'] as String));
 
   final InsertionAdapter<Task> _taskInsertionAdapter;
 
