@@ -201,7 +201,7 @@ Future<Entity> getPersonEntity() async {
 
   return library.classes
       .where((classElement) => classElement.hasAnnotation(annotations.Entity))
-      .map((classElement) => EntityProcessor(classElement).process())
+      .map((classElement) => EntityProcessor(classElement, []).process())
       .first;
 }
 
@@ -209,7 +209,7 @@ extension StringExtension on String {
   Future<MethodElement> asDaoMethodElement() async {
     final library = await resolveSource('''
       library test;
-      
+            
       import 'package:floor_annotation/floor_annotation.dart';
       
       @dao
