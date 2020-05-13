@@ -79,12 +79,12 @@ void main() {
           
           @override
           Future<void> insertPerson(Person person) async {
-            await _personInsertionAdapter.insert(person, sqflite.ConflictAlgorithm.abort);
+            await _personInsertionAdapter.insert(person, OnConflictStrategy.abort);
           }
           
           @override
           Future<void> updatePerson(Person person) async {
-            await _personUpdateAdapter.update(person, sqflite.ConflictAlgorithm.abort);
+            await _personUpdateAdapter.update(person, OnConflictStrategy.abort);
           }
           
           @override
@@ -162,12 +162,12 @@ void main() {
           
           @override
           Future<void> insertPerson(Person person) async {
-            await _personInsertionAdapter.insert(person, sqflite.ConflictAlgorithm.abort);
+            await _personInsertionAdapter.insert(person, OnConflictStrategy.abort);
           }
           
           @override
           Future<void> updatePerson(Person person) async {
-            await _personUpdateAdapter.update(person, sqflite.ConflictAlgorithm.abort);
+            await _personUpdateAdapter.update(person, OnConflictStrategy.abort);
           }
           
           @override

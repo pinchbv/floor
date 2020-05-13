@@ -5,6 +5,7 @@ import 'package:floor_annotation/floor_annotation.dart' as annotations
 import 'package:floor_generator/misc/annotations.dart';
 import 'package:floor_generator/misc/change_method_processor_helper.dart';
 import 'package:floor_generator/misc/constants.dart';
+import 'package:floor_generator/misc/extension/dart_object_extension.dart';
 import 'package:floor_generator/misc/type_utils.dart';
 import 'package:floor_generator/processor/processor.dart';
 import 'package:floor_generator/value_object/entity.dart';
@@ -83,12 +84,10 @@ class InsertionMethodProcessor implements Processor<InsertionMethod> {
 
   @nonNull
   String _getOnConflictStrategy() {
-    final strategy = _methodElement
+    return _methodElement
         .getAnnotation(annotations.Insert)
         .getField(AnnotationField.onConflict)
-        .toIntValue();
-
-    return 'sqflite.ConflictAlgorithm.${OnConflictStrategy.getConflictAlgorithm(strategy)}';
+        .toEnumValueString();
   }
 
   void _assertMethodReturnsFuture(final DartType returnType) {
