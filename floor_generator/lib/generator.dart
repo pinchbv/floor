@@ -24,23 +24,27 @@ class FloorGenerator extends GeneratorForAnnotation<annotations.Database> {
   ) {
     final database = _getDatabase(element);
     if (database == null) return null;
-    final daoGetters = database.daoGetters;
+    final daos = database.daoGetters.map((daoGetter) => daoGetter.dao);
 
     final databaseClass = DatabaseWriter(database).write();
-    final daoClasses =
-        daoGetters.map((daoGetter) => DaoWriter(daoGetter.dao).write());
-    final typeConverterFields = database.allTypeConverters
-        .map((typeConverter) =>
-            TypeConverterFieldWriter(typeConverter.name).write())
-        .toList();
+    final daoClasses = daos.map((dao) => DaoWriter(dao).write());
+    final typeConverterFields = database.allTypeConverters.map(
+      (typeConverter) => TypeConverterFieldWriter(typeConverter.name).write(),
+    );
 
-    final library = Library((builder) => builder
-      ..body.add(FloorWriter(database.name).write())
-      ..body.add(DatabaseBuilderWriter(database.name).write())
-      ..body.add(databaseClass)
-      ..body.addAll(daoClasses)
-      ..body.add(const Code('// ignore: unused_element\n'))
-      ..body.addAll(typeConverterFields));
+    final library = Library((builder) {
+      builder
+        ..body.add(FloorWriter(database.name).write())
+        ..body.add(DatabaseBuilderWriter(database.name).write())
+        ..body.add(databaseClass)
+        ..body.addAll(daoClasses);
+
+      if (typeConverterFields.isNotEmpty) {
+        builder
+          ..body.add(const Code('// ignore_for_file: unused_element\n'))
+          ..body.addAll(typeConverterFields);
+      }
+    });
 
     return library.accept(DartEmitter()).toString();
   }
