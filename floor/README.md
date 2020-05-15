@@ -1,5 +1,5 @@
 # Floor
-**A supportive SQLite abstraction for your Flutter applications (iOS, Android and macOS)**
+**A supportive SQLite abstraction for your Flutter applications (iOS, Android, Linux, macOS, Windows)**
 
 The Floor library provides a lightweight SQLite abstraction with automatic mapping between in-memory objects and database rows while still offering full control of the database with the use of SQL.
 
