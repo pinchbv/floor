@@ -58,7 +58,7 @@ void main() {
               await callback?.onCreate?.call(database, version);
             },
           );
-          return sqliteDatabaseFactory.openDatabase(path, options: databaseOptions);
+          return sqfliteDatabaseFactory.openDatabase(path, options: databaseOptions);
         }
       }      
     '''));
@@ -112,7 +112,7 @@ void main() {
               await callback?.onCreate?.call(database, version);
             },
           );
-          return sqliteDatabaseFactory.openDatabase(path, options: databaseOptions);
+          return sqfliteDatabaseFactory.openDatabase(path, options: databaseOptions);
         }
       }      
     '''));
@@ -177,7 +177,7 @@ void main() {
               await callback?.onCreate?.call(database, version);
             },
           );
-          return sqliteDatabaseFactory.openDatabase(path, options: databaseOptions);
+          return sqfliteDatabaseFactory.openDatabase(path, options: databaseOptions);
         }
       }      
     """));
