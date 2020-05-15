@@ -153,8 +153,7 @@ void main() {
       
         Future<sqflite.Database> open(String path, List<Migration> migrations,
             [Callback callback]) async {
-          final databseOptions = sqflite.OpenDatabaseOptions(
-            path,
+          final databaseOptions = sqflite.OpenDatabaseOptions(
             version: 1,
             onConfigure: (database) async {
               await database.execute('PRAGMA foreign_keys = ON');
