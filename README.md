@@ -1,4 +1,4 @@
-![FLoor](https://raw.githubusercontent.com/vitusortner/floor/develop/img/floor.pdf)
+![Floor](img/floor.png)
 
 **The typesafe, reactive and lightweight SQLite abstraction for your Flutter applications (iOS, Android, Linux, macOS, Windows)**
 
