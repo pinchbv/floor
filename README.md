@@ -1,15 +1,14 @@
-# Floor
-**The typesafe, reactive and lightweight SQLite abstraction for your Flutter applications (iOS, Android, Linux, macOS, Windows)**
+![Floor](https://raw.githubusercontent.com/vitusortner/floor/develop/img/floor.png)
 
-Floor provides a neat SQLite abstraction inspired by the [Room persistence library](https://developer.android.com/topic/libraries/architecture/room) with automatic mapping between in-memory objects and database rows while still offering full control of the database with the use of SQL.
+Floor provides a neat SQLite abstraction for your Flutter applications inspired by the [Room persistence library](https://developer.android.com/topic/libraries/architecture/room).
+It comes with automatic mapping between in-memory objects and database rows while still offering full control over the database with the use of SQL.
 
 - typesafe
 - reactive
 - lightweight
 - no hidden magic
 - no hidden costs
-- generates code for you
-- database entities are ordinary classes
+- iOS, Android, Linux, macOS, Windows
 
 ⚠️ The library is on its way to its first stable release!
 After integrating type converters, embeddable objects and streamable database views, the API surface won't change until after 1.0.
