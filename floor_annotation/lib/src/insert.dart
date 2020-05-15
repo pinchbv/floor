@@ -3,7 +3,7 @@ import 'package:floor_annotation/src/on_conflict_strategy.dart';
 /// Marks a method as an insert method.
 class Insert {
   /// How to handle conflicts. Defaults to [OnConflictStrategy.abort].
-  final int onConflict;
+  final OnConflictStrategy onConflict;
 
   /// Marks a method as an insert method.
   const Insert({this.onConflict = OnConflictStrategy.abort});
