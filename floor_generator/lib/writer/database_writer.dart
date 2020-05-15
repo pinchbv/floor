@@ -106,8 +106,7 @@ class DatabaseWriter implements Writer {
       ..requiredParameters.addAll([pathParameter, migrationsParameter])
       ..optionalParameters.add(callbackParameter)
       ..body = Code('''
-          return sqflite.openDatabase(
-            path,
+          final databaseOptions = sqflite.OpenDatabaseOptions(
             version: ${database.version},
             onConfigure: (database) async {
               await database.execute('PRAGMA foreign_keys = ON');
@@ -128,6 +127,7 @@ class DatabaseWriter implements Writer {
               await callback?.onCreate?.call(database, version);
             },
           );
+          return sqfliteDatabaseFactory.openDatabase(path, options: databaseOptions);
           '''));
   }
 

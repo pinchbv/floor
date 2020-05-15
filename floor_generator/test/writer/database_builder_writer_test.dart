@@ -37,7 +37,7 @@ void main() {
         /// Creates the database and initializes it.
         Future<FooBar> build() async {
           final path = name != null
-            ? join(await sqflite.getDatabasesPath(), name)
+            ? sqfliteDatabaseFactory.getDatabasePath(name)
             : ':memory:'; 
           final database = _$FooBar();
           database.database = await database.open(

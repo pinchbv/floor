@@ -3,11 +3,9 @@ import 'package:example/main.dart';
 import 'package:example/task_dao.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:sqflite_ffi_test/sqflite_ffi_test.dart';
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
-  sqfliteFfiTestInit();
 
   FlutterDatabase database;
   TaskDao taskDao;

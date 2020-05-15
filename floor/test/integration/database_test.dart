@@ -2,7 +2,6 @@ import 'package:floor/floor.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:matcher/matcher.dart';
 import 'package:sqflite/sqflite.dart';
-import 'package:sqflite_ffi_test/sqflite_ffi_test.dart';
 
 import '../test_util/extensions.dart';
 import 'dao/dog_dao.dart';
@@ -13,7 +12,6 @@ import 'model/person.dart';
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
-  sqfliteFfiTestInit();
 
   group('database tests', () {
     TestDatabase database;
