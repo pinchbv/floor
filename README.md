@@ -29,6 +29,7 @@ This package is still in an early phase and the API will likely change.
 1. [Migrations](#migrations)
 1. [In-Memory Database](#in-memory-database)
 1. [Initialization Callback](#initialization-callback)
+1. [Platform Support](#platform-support)
 1. [Testing](#testing)
 1. [Examples](#examples)
 1. [Naming](#naming)
@@ -574,6 +575,12 @@ final database = await $FloorAppDatabase
     .addCallback(callback)
     .build();
 ```
+
+## Platform Support
+Floor supports iOS, Android, Linux, macOS and Windows.
+The SQLite database access on iOS and Android is provided by [sqflite](https://github.com/tekartik/sqflite/tree/master/sqflite) whereas Linux, macOS and Windows use [sqflite's ffi](https://github.com/tekartik/sqflite/tree/master/sqflite_common_ffi) implementation. 
+
+**There currently is no support for Flutter for web.**
 
 ## Testing
 Simply instantiate an in-memory database and run the database tests on your local development machine as shown in the following snippet.
