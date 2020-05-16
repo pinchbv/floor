@@ -1,5 +1,4 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:sqflite_ffi_test/sqflite_ffi_test.dart';
 
 import 'order.dart';
 import 'order_dao.dart';
@@ -7,7 +6,6 @@ import 'order_database.dart';
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
-  sqfliteFfiTestInit();
 
   OrderDatabase database;
   OrderDao orderDao;
