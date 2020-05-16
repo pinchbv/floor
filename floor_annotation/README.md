@@ -1,5 +1,5 @@
 # Floor
-**A supportive SQLite abstraction for your Flutter applications (iOS, Android and macOS)**
+**The typesafe, reactive and lightweight SQLite abstraction for your Flutter applications (iOS, Android, Linux, macOS, Windows)**
 
 Don't import this package!
 You should be using the [floor](https://pub.dartlang.org/packages/floor) package, which comes with all the annotations.

@@ -1,8 +1,7 @@
 import 'dart:async';
 
 import 'package:floor/floor.dart';
-import 'package:path/path.dart';
-import 'package:sqflite/sqflite.dart' as sqflite;
+import 'package:sqflite/sqlite_api.dart' as sqflite;
 
 import 'dao/dog_dao.dart';
 import 'dao/person_dao.dart';

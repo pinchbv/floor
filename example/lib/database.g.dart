@@ -43,7 +43,7 @@ class _$FlutterDatabaseBuilder {
   /// Creates the database and initializes it.
   Future<FlutterDatabase> build() async {
     final path = name != null
-        ? join(await sqflite.getDatabasesPath(), name)
+        ? sqfliteDatabaseFactory.getDatabasePath(name)
         : ':memory:';
     final database = _$FlutterDatabase();
     database.database = await database.open(
@@ -64,8 +64,7 @@ class _$FlutterDatabase extends FlutterDatabase {
 
   Future<sqflite.Database> open(String path, List<Migration> migrations,
       [Callback callback]) async {
-    return sqflite.openDatabase(
-      path,
+    final databaseOptions = sqflite.OpenDatabaseOptions(
       version: 1,
       onConfigure: (database) async {
         await database.execute('PRAGMA foreign_keys = ON');
@@ -86,6 +85,7 @@ class _$FlutterDatabase extends FlutterDatabase {
         await callback?.onCreate?.call(database, version);
       },
     );
+    return sqfliteDatabaseFactory.openDatabase(path, options: databaseOptions);
   }
 
   @override

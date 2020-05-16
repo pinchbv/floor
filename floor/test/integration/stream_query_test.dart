@@ -1,5 +1,4 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:sqflite_ffi_test/sqflite_ffi_test.dart';
 
 import '../test_util/extensions.dart';
 import 'dao/person_dao.dart';
@@ -8,7 +7,6 @@ import 'model/person.dart';
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
-  sqfliteFfiTestInit();
 
   group('stream query tests', () {
     TestDatabase database;

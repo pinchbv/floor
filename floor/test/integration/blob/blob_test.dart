@@ -5,15 +5,12 @@ import 'package:collection/collection.dart';
 import 'package:floor/floor.dart';
 import 'package:floor_annotation/floor_annotation.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:path/path.dart' hide equals;
 import 'package:sqflite/sqflite.dart' as sqflite;
-import 'package:sqflite_ffi_test/sqflite_ffi_test.dart';
 
 part 'blob_test.g.dart';
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
-  sqfliteFfiTestInit();
 
   group('BLOB tests', () {
     TestDatabase database;

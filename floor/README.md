@@ -1,9 +1,17 @@
-# Floor
-**A supportive SQLite abstraction for your Flutter applications (iOS, Android and macOS)**
+![Floor](https://raw.githubusercontent.com/vitusortner/floor/develop/img/floor.png)
 
-The Floor library provides a lightweight SQLite abstraction with automatic mapping between in-memory objects and database rows while still offering full control of the database with the use of SQL.
+Floor provides a neat SQLite abstraction for your Flutter applications inspired by the [Room persistence library](https://developer.android.com/topic/libraries/architecture/room).
+It comes with automatic mapping between in-memory objects and database rows while still offering full control over the database with the use of SQL.
 
-This package is still in an early phase and the API will likely change.
+- typesafe
+- reactive
+- lightweight
+- no hidden magic
+- no hidden costs
+- iOS, Android, Linux, macOS, Windows
+
+⚠️ The library is on its way to its first stable release!
+After integrating type converters, embeddable objects and streamable database views, the API surface won't change until after 1.0.
 
 [![pub package](https://img.shields.io/pub/v/floor.svg)](https://pub.dartlang.org/packages/floor)
 [![build status](https://github.com/vitusortner/floor/workflows/Continuous%20integration/badge.svg)](https://github.com/vitusortner/floor/actions)
@@ -29,6 +37,7 @@ This package is still in an early phase and the API will likely change.
 1. [Migrations](#migrations)
 1. [In-Memory Database](#in-memory-database)
 1. [Initialization Callback](#initialization-callback)
+1. [Platform Support](#platform-support)
 1. [Testing](#testing)
 1. [Examples](#examples)
 1. [Naming](#naming)
@@ -123,11 +132,10 @@ This package is still in an early phase and the API will likely change.
     // required package imports
     import 'dart:async';
     import 'package:floor/floor.dart';
-    import 'package:path/path.dart';
     import 'package:sqflite/sqflite.dart' as sqflite;
 
     import 'dao/person_dao.dart';
-    import 'model/person.dart';
+    import 'entity/person.dart';
 
     part 'database.g.dart'; // the generated code will be there
 
@@ -576,49 +584,29 @@ final database = await $FloorAppDatabase
     .build();
 ```
 
+## Platform Support
+Floor supports iOS, Android, Linux, macOS and Windows.
+The SQLite database access on iOS and Android is provided by [sqflite](https://github.com/tekartik/sqflite/tree/master/sqflite) whereas Linux, macOS and Windows use [sqflite's ffi](https://github.com/tekartik/sqflite/tree/master/sqflite_common_ffi) implementation. 
+
+**There currently is no support for Flutter for web.**
+
 ## Testing
-In order to run database tests on your development machine without the need to deploy the code to an actual device, the setup has to be configured as shown in the following.
+Simply instantiate an in-memory database and run the database tests on your local development machine as shown in the following snippet.
 For more test references, check out the [project's tests](https://github.com/vitusortner/floor/tree/develop/floor/test/integration).
 
 In case you're running Linux, make sure to have sqlite3 and libsqlite3-dev installed.
 
-#### pubspec.yaml
-```yaml
-dependencies:
-  flutter:
-    sdk: flutter
-  floor: ^0.12.0
-
-dev_dependencies:
-  floor_generator: ^0.12.0
-  build_runner: ^1.7.3
-
-  # additional dependencies
-  flutter_test:
-    sdk: flutter
-  sqflite_ffi_test:
-    git:
-      url: git://github.com/tekartik/sqflite_more
-      ref: dart2
-      path: sqflite_ffi_test
-```
-
-#### database_test.dart
 ```dart
 import 'package:floor/floor.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:matcher/matcher.dart';
-import 'package:sqflite/sqflite.dart';
-import 'package:sqflite_ffi_test/sqflite_ffi_test.dart';
 
 // your imports follow here
 import 'dao/person_dao.dart';
 import 'database.dart';
-import 'model/person.dart';
+import 'entity/person.dart';
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
-  sqfliteFfiTestInit();
 
   group('database tests', () {
     TestDatabase database;
