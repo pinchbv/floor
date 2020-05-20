@@ -142,13 +142,12 @@ class QueryMethodWriter implements Writer {
     @nullable final String arguments,
     @nonNull final String mapper,
   ) {
-    final tableName = _queryMethod.queryable.name;
-    final isView =
-        _queryMethod.queryable.runtimeType == View ? 'true' : 'false';
+    final queryableName = _queryMethod.queryable.name;
+    final isView = (_queryMethod.queryable is View).toString();
     final parameters = StringBuffer()..write("'${_queryMethod.query}', ");
     if (arguments != null) parameters.write('arguments: $arguments, ');
     parameters
-      ..write("tableName: '$tableName', ")
+      ..write("queryableName: '$queryableName', ")
       ..write('isView: $isView, ')
       ..write('mapper: $mapper');
 

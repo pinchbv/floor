@@ -56,7 +56,7 @@ class QueryAdapter {
   Stream<T> queryStream<T>(
     final String sql, {
     final List<dynamic> arguments,
-    @required final String tableName,
+    @required final String queryableName,
     @required final bool isView,
     @required final T Function(Map<String, dynamic>) mapper,
   }) {
@@ -71,8 +71,10 @@ class QueryAdapter {
 
     controller.onListen = () async => executeQueryAndNotifyController();
 
+    // listen on all updates if the stream is on a view, only listen to the
+    // name of the table if the stream is on a entity.
     final subscription = _changeListener.stream
-        .where((updatedTable) => updatedTable == tableName || isView)
+        .where((updatedTable) => updatedTable == queryableName || isView)
         .listen(
           (_) async => executeQueryAndNotifyController(),
           onDone: () => controller.close(),
