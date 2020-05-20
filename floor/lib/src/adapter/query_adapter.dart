@@ -89,7 +89,7 @@ class QueryAdapter {
   Stream<List<T>> queryListStream<T>(
     final String sql, {
     final List<dynamic> arguments,
-    @required final String tableName,
+    @required final String queryableName,
     @required final bool isView,
     @required final T Function(Map<String, dynamic>) mapper,
   }) {
@@ -106,7 +106,7 @@ class QueryAdapter {
 
     // Views listen on all events, Entities only on events that changed the same entity.
     final subscription = _changeListener.stream
-        .where((updatedTable) => isView || updatedTable == tableName)
+        .where((updatedTable) => isView || updatedTable == queryableName)
         .listen(
           (_) async => executeQueryAndNotifyController(),
           onDone: () => controller.close(),

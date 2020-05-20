@@ -14,6 +14,7 @@ import '../model/person.dart';
 
 part 'view_test.g.dart';
 
+//todo test streams
 @Database(
   version: 1,
   entities: [Person, Dog],

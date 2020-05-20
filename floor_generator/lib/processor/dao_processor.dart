@@ -58,8 +58,8 @@ class DaoProcessor extends Processor<Dao> {
     final streamQueryables = queryMethods
         .where((method) => method.returnsStream)
         .map((method) => method.queryable);
-    final streamEntities = streamQueryables.whereType<Entity>().toList();
-    final streamViews = streamQueryables.whereType<View>().toList();
+    final streamEntities = streamQueryables.whereType<Entity>().toSet();
+    final streamViews = streamQueryables.whereType<View>().toSet();
 
     return Dao(
       _classElement,

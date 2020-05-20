@@ -53,12 +53,12 @@ class DaoWriter extends Writer {
           ..name = '_queryAdapter'
           ..type = refer('QueryAdapter')));
 
-      final requiresChangeListener =
+      final queriesRequireChangeListener =
           dao.streamEntities.isNotEmpty || dao.streamViews.isNotEmpty;
 
       constructorBuilder
         ..initializers.add(Code(
-            "_queryAdapter = QueryAdapter(database${requiresChangeListener ? ', changeListener' : ''})"));
+            "_queryAdapter = QueryAdapter(database${queriesRequireChangeListener ? ', changeListener' : ''})"));
 
       final queryMapperFields = queryMethods
           .map((method) => method.queryable)

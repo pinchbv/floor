@@ -162,7 +162,7 @@ void main() {
       when(mockDatabaseExecutor.rawQuery(sql)).thenAnswer((_) => queryResult);
 
       final actual = underTest.queryStream(sql,
-          tableName: entityName, isView: false, mapper: mapper);
+          queryableName: entityName, isView: false, mapper: mapper);
 
       expect(actual, emits(person));
     });
@@ -179,7 +179,7 @@ void main() {
       final actual = underTest.queryStream(
         sql,
         arguments: arguments,
-        tableName: entityName,
+        queryableName: entityName,
         isView: false,
         mapper: mapper,
       );
@@ -195,7 +195,7 @@ void main() {
       when(mockDatabaseExecutor.rawQuery(sql)).thenAnswer((_) => queryResult);
 
       final actual = underTest.queryStream(sql,
-          tableName: entityName, isView: false, mapper: mapper);
+          queryableName: entityName, isView: false, mapper: mapper);
       streamController.add(entityName);
 
       expect(actual, emitsInOrder(<Person>[person, person]));
@@ -211,7 +211,7 @@ void main() {
       when(mockDatabaseExecutor.rawQuery(sql)).thenAnswer((_) => queryResult);
 
       final actual = underTest.queryListStream(sql,
-          tableName: entityName, isView: false, mapper: mapper);
+          queryableName: entityName, isView: false, mapper: mapper);
 
       expect(actual, emits([person, person2]));
     });
@@ -230,7 +230,7 @@ void main() {
       final actual = underTest.queryListStream(
         sql,
         arguments: arguments,
-        tableName: entityName,
+        queryableName: entityName,
         isView: false,
         mapper: mapper,
       );
@@ -248,7 +248,7 @@ void main() {
       when(mockDatabaseExecutor.rawQuery(sql)).thenAnswer((_) => queryResult);
 
       final actual = underTest.queryListStream(sql,
-          tableName: entityName, isView: false, mapper: mapper);
+          queryableName: entityName, isView: false, mapper: mapper);
       streamController.add(entityName);
 
       expect(
@@ -259,5 +259,6 @@ void main() {
         ]),
       );
     });
+    //TODO test view updates every time
   });
 }

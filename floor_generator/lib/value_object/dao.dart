@@ -1,5 +1,5 @@
 import 'package:analyzer/dart/element/element.dart';
-import 'package:collection/equality.dart';
+import 'package:collection/collection.dart';
 import 'package:floor_generator/value_object/deletion_method.dart';
 import 'package:floor_generator/value_object/entity.dart';
 import 'package:floor_generator/value_object/insertion_method.dart';
@@ -16,8 +16,8 @@ class Dao {
   final List<UpdateMethod> updateMethods;
   final List<DeletionMethod> deletionMethods;
   final List<TransactionMethod> transactionMethods;
-  final List<Entity> streamEntities;
-  final List<View> streamViews;
+  final Set<Entity> streamEntities;
+  final Set<View> streamViews;
 
   Dao(
     this.classElement,
@@ -38,13 +38,19 @@ class Dao {
           runtimeType == other.runtimeType &&
           classElement == other.classElement &&
           name == other.name &&
-          const ListEquality<QueryMethod>().equals(queryMethods, other.queryMethods) &&
-          const ListEquality<InsertionMethod>().equals(insertionMethods, other.insertionMethods) &&
-          const ListEquality<UpdateMethod>().equals(updateMethods, other.updateMethods) &&
-          const ListEquality<DeletionMethod>().equals(deletionMethods, other.deletionMethods) &&
-          const ListEquality<TransactionMethod>().equals(transactionMethods, other.transactionMethods) &&
-          const ListEquality<Entity>().equals(streamEntities, other.streamEntities) &&
-          const ListEquality<View>().equals(streamViews, other.streamViews);
+          const ListEquality<QueryMethod>()
+              .equals(queryMethods, other.queryMethods) &&
+          const ListEquality<InsertionMethod>()
+              .equals(insertionMethods, other.insertionMethods) &&
+          const ListEquality<UpdateMethod>()
+              .equals(updateMethods, other.updateMethods) &&
+          const ListEquality<DeletionMethod>()
+              .equals(deletionMethods, other.deletionMethods) &&
+          const ListEquality<TransactionMethod>()
+              .equals(transactionMethods, other.transactionMethods) &&
+          const SetEquality<Entity>()
+              .equals(streamEntities, other.streamEntities) &&
+          const SetEquality<View>().equals(streamViews, other.streamViews);
 
   @override
   int get hashCode =>
