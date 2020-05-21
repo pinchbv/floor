@@ -417,13 +417,10 @@ Future<Dao> _createDao(final String dao) async {
       }
 
       @DatabaseView("SELECT name FROM Person")
-      class Person {
-        @primaryKey
-        final int id;
-      
+      class Name {
         final String name;
       
-        Person(this.id, this.name);
+        Name(this.name);
       }
       ''', (resolver) async {
     return LibraryReader(await resolver.findLibraryByName('test'));

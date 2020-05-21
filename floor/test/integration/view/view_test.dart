@@ -4,6 +4,7 @@ import 'package:floor/floor.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:sqflite/sqflite.dart' as sqflite;
 
+import '../../test_util/separate_queries.dart';
 import '../dao/dog_dao.dart';
 import '../dao/name_dao.dart';
 import '../dao/person_dao.dart';
@@ -14,7 +15,6 @@ import '../model/person.dart';
 
 part 'view_test.g.dart';
 
-//todo test streams
 @Database(
   version: 1,
   entities: [Person, Dog],
@@ -60,6 +60,24 @@ void main() {
         expect(actual, equals(expected));
       });
 
+// TODO this currently won't work as all `null` results won't be added to the Stream.
+// this is not specific to Views.
+//      test('query view with exact value as stream', () async {
+//        final person = Person(1, 'Frank');
+//
+//        final actual = nameDao.findExactNameStream('Frank');
+//        expect(actual, emits(null));
+//
+//        await personDao.insertPerson(person);
+//        expect(actual, emits(person));
+//
+//        final personRenamed = Person(1, 'Simon');
+//
+//        await personDao.updatePerson(personRenamed);
+//        expect(actual, emits(null));
+//
+//      });
+
       test('query view with LIKE', () async {
         final persons = [Person(1, 'Leo'), Person(2, 'Frank')];
         await personDao.insertPersons(persons);
@@ -84,6 +102,48 @@ void main() {
 
         final expected = [Name('Frank'), Name('Leo'), Name('Romeo')];
         expect(actual, equals(expected));
+      });
+
+      test('query view with all values as stream', () async {
+        final actual = nameDao.findAllNamesAsStream();
+        expect(
+            actual,
+            emitsInOrder(<List<Name>>[
+              [], //initial state
+              [Name('Frank'), Name('Leo')], // after inserting Persons
+              [
+                // after inserting Dog:
+                Name('Frank'),
+                Name('Leo'),
+                Name('Romeo')
+              ],
+              [
+                // after updating Leo:
+                Name('Frank'),
+                Name('Leonhard'),
+                Name('Romeo')
+              ],
+              [Name('Frank')], // after removing Person (and associated Dog)
+            ]));
+
+        final persons = [Person(1, 'Leo'), Person(2, 'Frank')];
+        await personDao.insertPersons(persons);
+
+        await simulateDoingSomethingElse();
+
+        final dog = Dog(1, 'Romeo', 'Rome', 1);
+        await dogDao.insertDog(dog);
+
+        await simulateDoingSomethingElse();
+
+        final renamedPerson = Person(1, 'Leonhard');
+        await personDao.updatePerson(renamedPerson);
+
+        await simulateDoingSomethingElse();
+
+        // Also removes the dog which belonged to
+        // Leonhard through ForeignKey relations
+        await personDao.deletePerson(renamedPerson);
       });
 
       test('query multiline query view to find name', () async {

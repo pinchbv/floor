@@ -137,6 +137,22 @@ void main() {
     '''));
   });
 
+  test('query list stream from view', () async {
+    final queryMethod = await _createQueryMethod('''
+      @Query('SELECT * FROM Name')
+      Stream<List<Name>> findAllAsStream();
+    ''');
+
+    final actual = QueryMethodWriter(queryMethod).write();
+
+    expect(actual, equalsDart(r'''
+      @override
+      Stream<List<Name>> findAllAsStream() {
+        return _queryAdapter.queryListStream('SELECT * FROM Name', queryableName: 'Name', isView: true, mapper: _nameMapper);
+      }
+    '''));
+  });
+
   test('Query with IN clause', () async {
     final queryMethod = await _createQueryMethod('''
       @Query('SELECT * FROM Person WHERE id IN (:ids)')
