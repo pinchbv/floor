@@ -78,7 +78,7 @@ class DaoProcessor extends Processor<Dao> {
     return methods
         .where((method) => method.hasAnnotation(annotations.Query))
         .map((method) =>
-            QueryMethodProcessor(method, _entities, _views).process())
+            QueryMethodProcessor(method, [..._entities, ..._views]).process())
         .toList();
   }
 

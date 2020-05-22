@@ -7,27 +7,22 @@ import 'package:floor_generator/misc/constants.dart';
 import 'package:floor_generator/misc/type_utils.dart';
 import 'package:floor_generator/processor/error/query_method_processor_error.dart';
 import 'package:floor_generator/processor/processor.dart';
-import 'package:floor_generator/value_object/entity.dart';
 import 'package:floor_generator/value_object/query_method.dart';
-import 'package:floor_generator/value_object/view.dart';
+import 'package:floor_generator/value_object/queryable.dart';
 
 class QueryMethodProcessor extends Processor<QueryMethod> {
   final QueryMethodProcessorError _processorError;
 
   final MethodElement _methodElement;
-  final List<Entity> _entities;
-  final List<View> _views;
+  final List<Queryable> _queryables;
 
   QueryMethodProcessor(
     final MethodElement methodElement,
-    final List<Entity> entities,
-    final List<View> views,
+    final List<Queryable> queryables,
   )   : assert(methodElement != null),
-        assert(entities != null),
-        assert(views != null),
+        assert(queryables != null),
         _methodElement = methodElement,
-        _entities = entities,
-        _views = views,
+        _queryables = queryables,
         _processorError = QueryMethodProcessorError(methodElement);
 
   @nonNull
@@ -47,16 +42,11 @@ class QueryMethodProcessor extends Processor<QueryMethod> {
       returnsStream,
     );
 
-    final queryable = _entities.firstWhere(
-            (entity) =>
-                entity.classElement.displayName ==
-                flattenedReturnType.getDisplayString(),
-            orElse: () => null) ??
-        _views.firstWhere(
-            (view) =>
-                view.classElement.displayName ==
-                flattenedReturnType.getDisplayString(),
-            orElse: () => null); // doesn't return entity nor view
+    final queryable = _queryables.firstWhere(
+        (queryable) =>
+            queryable.classElement.displayName ==
+            flattenedReturnType.getDisplayString(),
+        orElse: () => null);
 
     return QueryMethod(
       _methodElement,
