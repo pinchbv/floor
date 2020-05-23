@@ -43,7 +43,7 @@ class _$FlutterDatabaseBuilder {
   /// Creates the database and initializes it.
   Future<FlutterDatabase> build() async {
     final path = name != null
-        ? sqfliteDatabaseFactory.getDatabasePath(name)
+        ? await sqfliteDatabaseFactory.getDatabasePath(name)
         : ':memory:';
     final database = _$FlutterDatabase();
     database.database = await database.open(
