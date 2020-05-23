@@ -27,7 +27,8 @@ class FloorGenerator extends GeneratorForAnnotation<annotations.Database> {
     final daos = database.daoGetters.map((daoGetter) => daoGetter.dao);
 
     final databaseClass = DatabaseWriter(database).write();
-    final daoClasses = daos.map((dao) => DaoWriter(dao).write());
+    final daoClasses = daos.map((dao) => DaoWriter(
+            dao, database.streamEntities, database.hasViewStreams).write());
     final typeConverterFields = database.allTypeConverters.map(
       (typeConverter) => TypeConverterFieldWriter(typeConverter.name).write(),
     );

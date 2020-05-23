@@ -11,8 +11,6 @@ import 'model/dog.dart';
 import 'model/person.dart';
 
 void main() {
-  TestWidgetsFlutterBinding.ensureInitialized();
-
   group('database tests', () {
     TestDatabase database;
     PersonDao personDao;

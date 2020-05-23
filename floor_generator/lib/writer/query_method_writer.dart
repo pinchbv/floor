@@ -7,6 +7,7 @@ import 'package:floor_generator/misc/annotations.dart';
 import 'package:floor_generator/misc/extension/type_converters_extension.dart';
 import 'package:floor_generator/misc/type_utils.dart';
 import 'package:floor_generator/value_object/query_method.dart';
+import 'package:floor_generator/value_object/view.dart';
 import 'package:floor_generator/writer/writer.dart';
 
 class QueryMethodWriter implements Writer {
@@ -137,11 +138,14 @@ class QueryMethodWriter implements Writer {
     @nullable final String arguments,
     @nonNull final String mapper,
   ) {
-    final entityName = _queryMethod.queryable.name;
-
+    final queryableName = _queryMethod.queryable.name;
+    final isView = _queryMethod.queryable is View;
     final parameters = StringBuffer()..write("'${_queryMethod.query}', ");
     if (arguments != null) parameters.write('arguments: $arguments, ');
-    parameters..write("tableName: '$entityName', ")..write('mapper: $mapper');
+    parameters
+      ..write("queryableName: '$queryableName', ")
+      ..write('isView: $isView, ')
+      ..write('mapper: $mapper');
 
     if (_queryMethod.returnsList) {
       return 'return _queryAdapter.queryListStream($parameters);';

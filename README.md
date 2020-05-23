@@ -1,17 +1,19 @@
 ![Floor](https://raw.githubusercontent.com/vitusortner/floor/develop/img/floor.png)
 
 Floor provides a neat SQLite abstraction for your Flutter applications inspired by the [Room persistence library](https://developer.android.com/topic/libraries/architecture/room).
-It comes with automatic mapping between in-memory objects and database rows while still offering full control over the database with the use of SQL.
+It comes with automatic mapping between in-memory objects and database rows while still offering full control of the database with the use of SQL.
+As a consequence, it's necessary to have an understanding of SQL and SQLite in order to harvest Floor's full potential.
 
 - typesafe
 - reactive
 - lightweight
+- SQL centric
 - no hidden magic
 - no hidden costs
 - iOS, Android, Linux, macOS, Windows
 
 ⚠️ The library is on its way to its first stable release!
-After integrating type converters, embeddable objects and streamable database views, the API surface won't change until after 1.0.
+After integrating type converters and embeddable objects, the API surface won't change until after 1.0.
 
 [![pub package](https://img.shields.io/pub/v/floor.svg)](https://pub.dartlang.org/packages/floor)
 [![build status](https://github.com/vitusortner/floor/workflows/Continuous%20integration/badge.svg)](https://github.com/vitusortner/floor/actions)
@@ -349,7 +351,9 @@ abstract class AppDatabase extends FloorDatabase {
 You can then query the view via a DAO function like an entity.
 
 #### Limitations
-- Be aware it is currently not possible to return a `Stream` object from a function which queries a database view.
+- It is now possible to return a `Stream` object from a DAO method which queries a database view. But it will fire on **any** 
+  `@update`, `@insert`, `@delete` events in the whole database, which can get quite taxing on the runtime. Please add it only if you know what you are doing!
+  This is mostly due to the complexity of detecting which entities are involved in a database view.
 
 ## Data Access Objects
 These components are responsible for managing access to the underlying SQLite database and are defined as abstract classes with method signatures and query statements.
@@ -473,7 +477,8 @@ StreamBuilder<List<Person>>(
 #### Limitations
 - Only methods annotated with `@insert`, `@update` and `@delete` trigger `Stream` emissions. 
   Inserting data by using the `@Query()` annotation doesn't.
-- It is not possible to return a `Stream` if the function queries a database view.
+- It is now possible to return a `Stream` if the function queries a database view. But it will fire on **any** 
+  `@update`, `@insert`, `@delete` events in the whole database, which can get quite taxing on the runtime. Please add it only if you know what you are doing!
   This is mostly due to the complexity of detecting which entities are involved in a database view.
 
 ### Transactions
@@ -606,8 +611,6 @@ import 'database.dart';
 import 'entity/person.dart';
 
 void main() {
-  TestWidgetsFlutterBinding.ensureInitialized();
-
   group('database tests', () {
     TestDatabase database;
     PersonDao personDao;

@@ -8,8 +8,6 @@ import 'package:sqflite/sqflite.dart' as sqflite;
 part 'dao_inheritance_test.g.dart';
 
 void main() {
-  TestWidgetsFlutterBinding.ensureInitialized();
-
   group('dao inheritance tests', () {
     TestDatabase database;
     PersonDao personDao;

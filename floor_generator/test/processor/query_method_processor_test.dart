@@ -28,7 +28,8 @@ void main() {
     ''');
 
     final actual =
-        QueryMethodProcessor(methodElement, entities, views, []).process();
+        QueryMethodProcessor(methodElement, [...entities, ...views], [])
+            .process();
 
     expect(
       actual,
@@ -54,7 +55,8 @@ void main() {
     ''');
 
     final actual =
-        QueryMethodProcessor(methodElement, entities, views, []).process();
+        QueryMethodProcessor(methodElement, [...entities, ...views], [])
+            .process();
 
     expect(
       actual,
@@ -81,7 +83,7 @@ void main() {
     ''');
 
       final actual =
-          QueryMethodProcessor(methodElement, [], [], []).process().query;
+          QueryMethodProcessor(methodElement, [], []).process().query;
 
       expect(actual, equals('SELECT * FROM Person WHERE id = ?'));
     });
@@ -96,7 +98,7 @@ void main() {
       """);
 
       final actual =
-          QueryMethodProcessor(methodElement, [], [], []).process().query;
+          QueryMethodProcessor(methodElement, [], []).process().query;
 
       expect(
         actual,
@@ -112,7 +114,7 @@ void main() {
       ''');
 
       final actual =
-          QueryMethodProcessor(methodElement, [], [], []).process().query;
+          QueryMethodProcessor(methodElement, [], []).process().query;
 
       expect(
         actual,
@@ -127,7 +129,7 @@ void main() {
     ''');
 
       final actual =
-          QueryMethodProcessor(methodElement, [], [], []).process().query;
+          QueryMethodProcessor(methodElement, [], []).process().query;
 
       expect(
         actual,
@@ -142,7 +144,7 @@ void main() {
     ''');
 
       final actual =
-          QueryMethodProcessor(methodElement, [], [], []).process().query;
+          QueryMethodProcessor(methodElement, [], []).process().query;
 
       expect(
         actual,
@@ -160,7 +162,7 @@ void main() {
     ''');
 
       final actual =
-          QueryMethodProcessor(methodElement, [], [], []).process().query;
+          QueryMethodProcessor(methodElement, [], []).process().query;
 
       expect(
         actual,
@@ -178,7 +180,7 @@ void main() {
     ''');
 
       final actual =
-          QueryMethodProcessor(methodElement, [], [], []).process().query;
+          QueryMethodProcessor(methodElement, [], []).process().query;
 
       expect(actual, equals('SELECT * FROM Persons WHERE name LIKE ?'));
     });
@@ -190,7 +192,7 @@ void main() {
     ''');
 
       final actual =
-          QueryMethodProcessor(methodElement, [], [], []).process().query;
+          QueryMethodProcessor(methodElement, [], []).process().query;
 
       expect(actual, equals('SELECT * FROM ?, ?'));
     });
@@ -203,8 +205,8 @@ void main() {
       List<Person> findAllPersons();
     ''');
 
-      final actual = () =>
-          QueryMethodProcessor(methodElement, entities, views, []).process();
+      final actual =
+          () => QueryMethodProcessor(methodElement, entities, views).process();
 
       final error =
           QueryMethodProcessorError(methodElement).doesNotReturnFutureNorStream;
@@ -217,8 +219,8 @@ void main() {
       Future<List<Person>> findAllPersons();
     ''');
 
-      final actual = () =>
-          QueryMethodProcessor(methodElement, entities, views, []).process();
+      final actual =
+          () => QueryMethodProcessor(methodElement, entities, views).process();
 
       final error = QueryMethodProcessorError(methodElement).noQueryDefined;
       expect(actual, throwsInvalidGenerationSourceError(error));
@@ -230,8 +232,8 @@ void main() {
       Future<List<Person>> findAllPersons();
     ''');
 
-      final actual = () =>
-          QueryMethodProcessor(methodElement, entities, views, []).process();
+      final actual =
+          () => QueryMethodProcessor(methodElement, entities, views).process();
 
       final error = QueryMethodProcessorError(methodElement).noQueryDefined;
       expect(actual, throwsInvalidGenerationSourceError(error));
@@ -244,8 +246,8 @@ void main() {
       Future<Person> findPersonByIdAndName(int id);
     ''');
 
-      final actual = () =>
-          QueryMethodProcessor(methodElement, entities, views, []).process();
+      final actual =
+          () => QueryMethodProcessor(methodElement, entities, views).process();
 
       final error = QueryMethodProcessorError(methodElement)
           .queryArgumentsAndMethodParametersDoNotMatch;
@@ -259,26 +261,11 @@ void main() {
       Future<Person> findPersonByIdAndName(int id, String name);
     ''');
 
-      final actual = () =>
-          QueryMethodProcessor(methodElement, entities, views, []).process();
+      final actual =
+          () => QueryMethodProcessor(methodElement, entities, views).process();
 
       final error = QueryMethodProcessorError(methodElement)
           .queryArgumentsAndMethodParametersDoNotMatch;
-      expect(actual, throwsInvalidGenerationSourceError(error));
-    });
-
-    test(
-        'exception when a query returns Stream<X> while querying a DatabaseView',
-        () async {
-      final methodElement = await _createQueryMethodElement('''
-      @Query('SELECT * FROM Name')
-      Stream<List<Name>> allNamesAsStream();
-    ''');
-
-      final actual = () =>
-          QueryMethodProcessor(methodElement, entities, views, []).process();
-
-      final error = QueryMethodProcessorError(methodElement).viewNotStreamable;
       expect(actual, throwsInvalidGenerationSourceError(error));
     });
   });

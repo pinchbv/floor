@@ -8,8 +8,6 @@ import 'package:sqflite/sqflite.dart' as sqflite;
 part 'bool_test.g.dart';
 
 void main() {
-  TestWidgetsFlutterBinding.ensureInitialized();
-
   group('Bool tests', () {
     TestDatabase database;
     BoolDao boolDao;

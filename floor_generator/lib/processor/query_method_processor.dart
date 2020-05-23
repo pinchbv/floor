@@ -8,7 +8,6 @@ import 'package:floor_generator/misc/extension/type_converter_element_extension.
 import 'package:floor_generator/misc/type_utils.dart';
 import 'package:floor_generator/processor/error/query_method_processor_error.dart';
 import 'package:floor_generator/processor/processor.dart';
-import 'package:floor_generator/value_object/entity.dart';
 import 'package:floor_generator/value_object/query_method.dart';
 import 'package:floor_generator/value_object/queryable.dart';
 import 'package:floor_generator/value_object/type_converter.dart';
@@ -18,22 +17,18 @@ class QueryMethodProcessor extends Processor<QueryMethod> {
   final QueryMethodProcessorError _processorError;
 
   final MethodElement _methodElement;
-  final List<Entity> _entities;
-  final List<View> _views;
+  final List<Queryable> _queryables;
   final List<TypeConverter> _typeConverters;
 
   QueryMethodProcessor(
     final MethodElement methodElement,
-    final List<Entity> entities,
-    final List<View> views,
+    final List<Queryable> queryables,
     final List<TypeConverter> typeConverters,
   )   : assert(methodElement != null),
-        assert(entities != null),
-        assert(views != null),
+        assert(queryables != null),
         assert(typeConverters != null),
         _methodElement = methodElement,
-        _entities = entities,
-        _views = views,
+        _queryables = queryables,
         _typeConverters = typeConverters,
         _processorError = QueryMethodProcessorError(methodElement);
 
@@ -54,17 +49,11 @@ class QueryMethodProcessor extends Processor<QueryMethod> {
       returnsStream,
     );
 
-    final queryable = _entities.firstWhere(
-            (entity) =>
-                entity.classElement.displayName ==
-                flattenedReturnType.getDisplayString(),
-            orElse: () => null) ??
-        _views.firstWhere(
-            (view) =>
-                view.classElement.displayName ==
-                flattenedReturnType.getDisplayString(),
-            orElse: () => null); // doesn't return entity nor view
-    _assertViewQueryDoesNotReturnStream(queryable, returnsStream);
+    final queryable = _queryables.firstWhere(
+        (queryable) =>
+            queryable.classElement.displayName ==
+            flattenedReturnType.getDisplayString(),
+        orElse: () => null);
 
     final parameterTypeConverters = parameters
         .expand((parameter) =>
@@ -156,15 +145,6 @@ class QueryMethodProcessor extends Processor<QueryMethod> {
   ) {
     if (!rawReturnType.isDartAsyncFuture && !returnsStream) {
       throw _processorError.doesNotReturnFutureNorStream;
-    }
-  }
-
-  void _assertViewQueryDoesNotReturnStream(
-    final Queryable queryable,
-    final bool returnsStream,
-  ) {
-    if (queryable != null && queryable is View && returnsStream) {
-      throw _processorError.viewNotStreamable;
     }
   }
 

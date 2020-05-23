@@ -1,5 +1,6 @@
 import 'package:floor/floor.dart';
 
+import '../model/dog.dart';
 import '../model/person.dart';
 
 @dao
@@ -72,4 +73,8 @@ abstract class PersonDao {
 
   @Query('DELETE FROM person')
   Future<void> deleteAllPersons();
+
+  // Used in regression test for Streams on Entities with update methods in other Dao
+  @Query('SELECT * FROM Dog WHERE owner_id = :id')
+  Stream<List<Dog>> findAllDogsOfPersonAsStream(int id);
 }

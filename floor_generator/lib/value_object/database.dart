@@ -16,6 +16,8 @@ class Database {
   final int version;
   final List<TypeConverter> databaseTypeConverters;
   final Set<TypeConverter> allTypeConverters;
+  final bool hasViewStreams;
+  final Set<Entity> streamEntities;
 
   Database(
     this.classElement,
@@ -26,7 +28,9 @@ class Database {
     this.version,
     this.databaseTypeConverters,
     this.allTypeConverters,
-  );
+  )   : streamEntities =
+            daoGetters.expand((dg) => dg.dao.streamEntities).toSet(),
+        hasViewStreams = daoGetters.any((dg) => dg.dao.streamViews.isNotEmpty);
 
   @override
   bool operator ==(Object other) =>
@@ -35,13 +39,17 @@ class Database {
           runtimeType == other.runtimeType &&
           classElement == other.classElement &&
           name == other.name &&
-          entities.equals(other.entities) &&
-          views.equals(other.views) &&
-          daoGetters.equals(other.daoGetters) &&
+          const ListEquality<Entity>().equals(entities, other.entities) &&
+          const ListEquality<View>().equals(views, other.views) &&
+          const ListEquality<DaoGetter>()
+              .equals(daoGetters, other.daoGetters) &&
           version == other.version &&
           databaseTypeConverters.equals(other.databaseTypeConverters) &&
           const SetEquality<TypeConverter>()
-              .equals(allTypeConverters, other.allTypeConverters);
+              .equals(allTypeConverters, other.allTypeConverters) &&
+          hasViewStreams == hasViewStreams &&
+          const SetEquality<Entity>()
+              .equals(streamEntities, other.streamEntities);
 
   @override
   int get hashCode =>
@@ -52,10 +60,13 @@ class Database {
       daoGetters.hashCode ^
       version.hashCode ^
       databaseTypeConverters.hashCode ^
-      allTypeConverters.hashCode;
+      allTypeConverters.hashCode ^
+      hasViewStreams.hashCode ^
+      streamEntities.hashCode;
 
   @override
   String toString() {
-    return 'Database{classElement: $classElement, name: $name, entities: $entities, views: $views, daoGetters: $daoGetters, version: $version, typeConverters: $databaseTypeConverters, allTypeConverters: $allTypeConverters}';
+    // TODO #165
+    return 'Database{classElement: $classElement, name: $name, entities: $entities, views: $views, daoGetters: $daoGetters, version: $version, hasViewStreams: $hasViewStreams, streamEntities: $streamEntities}';
   }
 }

@@ -43,7 +43,7 @@ class _$FlutterDatabaseBuilder {
   /// Creates the database and initializes it.
   Future<FlutterDatabase> build() async {
     final path = name != null
-        ? sqfliteDatabaseFactory.getDatabasePath(name)
+        ? await sqfliteDatabaseFactory.getDatabasePath(name)
         : ':memory:';
     final database = _$FlutterDatabase();
     database.database = await database.open(
@@ -148,8 +148,8 @@ class _$TaskDao extends TaskDao {
   @override
   Stream<List<Task>> findAllTasksAsStream() {
     return _queryAdapter.queryListStream('SELECT * FROM task',
-        tableName: 'Task',
-        mapper: (Map<String, dynamic> row) =>
+        queryableName: 'Task',
+       isView: false, mapper: (Map<String, dynamic> row) =>
             Task(row['id'] as int, row['message'] as String));
   }
 

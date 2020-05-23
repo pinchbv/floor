@@ -1,10 +1,12 @@
 import 'package:analyzer/dart/element/element.dart';
+import 'package:collection/collection.dart';
 import 'package:floor_generator/value_object/deletion_method.dart';
 import 'package:floor_generator/value_object/entity.dart';
 import 'package:floor_generator/value_object/insertion_method.dart';
 import 'package:floor_generator/value_object/query_method.dart';
 import 'package:floor_generator/value_object/transaction_method.dart';
 import 'package:floor_generator/value_object/update_method.dart';
+import 'package:floor_generator/value_object/view.dart';
 
 class Dao {
   final ClassElement classElement;
@@ -14,7 +16,8 @@ class Dao {
   final List<UpdateMethod> updateMethods;
   final List<DeletionMethod> deletionMethods;
   final List<TransactionMethod> transactionMethods;
-  final List<Entity> streamEntities;
+  final Set<Entity> streamEntities;
+  final Set<View> streamViews;
 
   Dao(
     this.classElement,
@@ -25,6 +28,7 @@ class Dao {
     this.deletionMethods,
     this.transactionMethods,
     this.streamEntities,
+    this.streamViews,
   );
 
   @override
@@ -34,12 +38,19 @@ class Dao {
           runtimeType == other.runtimeType &&
           classElement == other.classElement &&
           name == other.name &&
-          queryMethods == other.queryMethods &&
-          insertionMethods == other.insertionMethods &&
-          updateMethods == other.updateMethods &&
-          deletionMethods == other.deletionMethods &&
-          transactionMethods == other.transactionMethods &&
-          streamEntities == other.streamEntities;
+          const ListEquality<QueryMethod>()
+              .equals(queryMethods, other.queryMethods) &&
+          const ListEquality<InsertionMethod>()
+              .equals(insertionMethods, other.insertionMethods) &&
+          const ListEquality<UpdateMethod>()
+              .equals(updateMethods, other.updateMethods) &&
+          const ListEquality<DeletionMethod>()
+              .equals(deletionMethods, other.deletionMethods) &&
+          const ListEquality<TransactionMethod>()
+              .equals(transactionMethods, other.transactionMethods) &&
+          const SetEquality<Entity>()
+              .equals(streamEntities, other.streamEntities) &&
+          const SetEquality<View>().equals(streamViews, other.streamViews);
 
   @override
   int get hashCode =>
@@ -50,10 +61,11 @@ class Dao {
       updateMethods.hashCode ^
       deletionMethods.hashCode ^
       transactionMethods.hashCode ^
-      streamEntities.hashCode;
+      streamEntities.hashCode ^
+      streamViews.hashCode;
 
   @override
   String toString() {
-    return 'Dao{classElement: $classElement, name: $name, queryMethods: $queryMethods, insertionMethods: $insertionMethods, updateMethods: $updateMethods, deletionMethods: $deletionMethods, transactionMethods: $transactionMethods, streamEntities: $streamEntities}';
+    return 'Dao{classElement: $classElement, name: $name, queryMethods: $queryMethods, insertionMethods: $insertionMethods, updateMethods: $updateMethods, deletionMethods: $deletionMethods, transactionMethods: $transactionMethods, streamEntities: $streamEntities, streamViews: $streamViews}';
   }
 }

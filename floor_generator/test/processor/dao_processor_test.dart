@@ -4,15 +4,19 @@ import 'package:floor_annotation/floor_annotation.dart' as annotations;
 import 'package:floor_generator/misc/type_utils.dart';
 import 'package:floor_generator/processor/dao_processor.dart';
 import 'package:floor_generator/processor/entity_processor.dart';
+import 'package:floor_generator/processor/view_processor.dart';
 import 'package:floor_generator/value_object/dao.dart';
 import 'package:floor_generator/value_object/entity.dart';
+import 'package:floor_generator/value_object/view.dart';
 import 'package:source_gen/source_gen.dart';
 import 'package:test/test.dart';
 
 void main() {
   List<Entity> entities;
+  List<View> views;
 
   setUpAll(() async => entities = await _getEntities());
+  setUpAll(() async => views = await _getViews());
 
   test('Includes methods from abstract parent class', () async {
     final classElement = await _createDao('''
@@ -28,7 +32,7 @@ void main() {
       }
     ''');
 
-    final actual = DaoProcessor(classElement, '', '', entities, [], [])
+    final actual = DaoProcessor(classElement, '', '', entities, views, [])
         .process()
         .methodsLength;
 
@@ -55,7 +59,7 @@ void main() {
       }
     ''');
 
-    final actual = DaoProcessor(classElement, '', '', entities, [], [])
+    final actual = DaoProcessor(classElement, '', '', entities, views, [])
         .process()
         .methodsLength;
 
@@ -76,7 +80,7 @@ void main() {
       }
     ''');
 
-    final actual = DaoProcessor(classElement, '', '', entities, [], [])
+    final actual = DaoProcessor(classElement, '', '', entities, views, [])
         .process()
         .methodsLength;
 
@@ -97,7 +101,7 @@ void main() {
       }
     ''');
 
-    final actual = DaoProcessor(classElement, '', '', entities, [], [])
+    final actual = DaoProcessor(classElement, '', '', entities, views, [])
         .process()
         .methodsLength;
 
@@ -118,11 +122,39 @@ void main() {
       }
     ''');
 
-    final actual = DaoProcessor(classElement, '', '', entities, [], [])
+    final actual = DaoProcessor(classElement, '', '', entities, views, [])
         .process()
         .methodsLength;
 
     expect(actual, equals(2));
+  });
+
+  test('Includes streamable view method from super class', () async {
+    final classElement = await _createDao('''
+        @dao
+        abstract class PersonDao extends SuperClassDao<Person> {
+          @Query('SELECT * FROM person')
+          Future<List<Person>> findAllPersons();
+
+          @Query('SELECT Name.name from Name')
+          Stream<List<Name>> getAllNamesStream();
+        }
+
+        class SuperClassDao<T> {
+          @insert
+          Future<void> insertItem(T item);
+
+          @Query('SELECT DISTINCT Name.name from Name')
+          Stream<List<Name>> getAllDistinctNamesStream();
+        }
+      ''');
+
+    final processedDao =
+        DaoProcessor(classElement, '', '', entities, views).process();
+
+    expect(processedDao.methodsLength, equals(4));
+    expect(processedDao.streamViews, equals(views));
+    expect(processedDao.streamEntities, equals(<Entity>[]));
   });
 }
 
@@ -155,6 +187,14 @@ Future<ClassElement> _createDao(final String dao) async {
       
         Person(this.id, this.name);
       }
+      
+      @DatabaseView("SELECT name FROM Person")
+      class Name {
+        final String name;
+      
+        Person(this.name);
+      }
+
       ''', (resolver) async {
     return LibraryReader(await resolver.findLibraryByName('test'));
   });
@@ -184,5 +224,28 @@ Future<List<Entity>> _getEntities() async {
   return library.classes
       .where((classElement) => classElement.hasAnnotation(annotations.Entity))
       .map((classElement) => EntityProcessor(classElement, []).process())
+      .toList();
+}
+
+Future<List<View>> _getViews() async {
+  final library = await resolveSource('''
+      library test;
+      
+      import 'package:floor_annotation/floor_annotation.dart';
+      
+      @DatabaseView("SELECT name FROM Person")
+      class Name {
+        final String name;
+      
+        Person(this.name);
+      }
+    ''', (resolver) async {
+    return LibraryReader(await resolver.findLibraryByName('test'));
+  });
+
+  return library.classes
+      .where((classElement) =>
+          classElement.hasAnnotation(annotations.DatabaseView))
+      .map((classElement) => ViewProcessor(classElement).process())
       .toList();
 }
