@@ -2,7 +2,7 @@
 
 Floor provides a neat SQLite abstraction for your Flutter applications inspired by the [Room persistence library](https://developer.android.com/topic/libraries/architecture/room).
 It comes with automatic mapping between in-memory objects and database rows while still offering full control of the database with the use of SQL.
-In order to harvest Floor's full potential, it's necessary to have an understanding of SQL and SQLite.
+As a consequence, it's necessary to have an understanding of SQL and SQLite in order to harvest Floor's full potential.
 
 - typesafe
 - reactive
@@ -13,7 +13,7 @@ In order to harvest Floor's full potential, it's necessary to have an understand
 - iOS, Android, Linux, macOS, Windows
 
 ⚠️ The library is on its way to its first stable release!
-After integrating type converters, embeddable objects and streamable database views, the API surface won't change until after 1.0.
+After integrating type converters and embeddable objects, the API surface won't change until after 1.0.
 
 [![pub package](https://img.shields.io/pub/v/floor.svg)](https://pub.dartlang.org/packages/floor)
 [![build status](https://github.com/vitusortner/floor/workflows/Continuous%20integration/badge.svg)](https://github.com/vitusortner/floor/actions)
@@ -611,8 +611,6 @@ import 'database.dart';
 import 'entity/person.dart';
 
 void main() {
-  TestWidgetsFlutterBinding.ensureInitialized();
-
   group('database tests', () {
     TestDatabase database;
     PersonDao personDao;
