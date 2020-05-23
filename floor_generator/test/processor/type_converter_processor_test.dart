@@ -5,10 +5,11 @@ import 'package:test/test.dart';
 import '../test_utils.dart';
 
 void main() {
-  test('Creates type converter', () async {
-    const typeConverterScope = TypeConverterScope.dao;
-    final classElement = await '''
-      class DateTimeToIntConverter extends TypeConverter<DateTime, int> {
+  group('TypeConverterProcessor', () {
+    test('Creates type converter with given scope', () async {
+      const typeConverterScope = TypeConverterScope.dao;
+      final classElement = await '''
+      class DateTimeConverter extends TypeConverter<DateTime, int> {
         @override
         int encode(DateTime value) {
           return value.millisecondsSinceEpoch;
@@ -20,19 +21,20 @@ void main() {
         }
       }
     '''
-        .asClassElement();
+          .asClassElement();
 
-    final actual = TypeConverterProcessor(
-      classElement,
-      typeConverterScope,
-    ).process();
+      final actual = TypeConverterProcessor(
+        classElement,
+        typeConverterScope,
+      ).process();
 
-    final expected = TypeConverter(
-      'DateTimeToIntConverter',
-      await 'DateTime.now()'.asDartType(),
-      await '1'.asDartType(),
-      typeConverterScope,
-    );
-    expect(actual, equals(expected));
+      final expected = TypeConverter(
+        'DateTimeConverter',
+        await 'DateTime.now()'.asDartType(),
+        await '1'.asDartType(),
+        typeConverterScope,
+      );
+      expect(actual, equals(expected));
+    });
   });
 }
