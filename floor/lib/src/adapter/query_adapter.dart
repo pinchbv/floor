@@ -56,7 +56,8 @@ class QueryAdapter {
   Stream<T> queryStream<T>(
     final String sql, {
     final List<dynamic> arguments,
-    @required final String tableName,
+    @required final String queryableName,
+    @required final bool isView,
     @required final T Function(Map<String, dynamic>) mapper,
   }) {
     assert(_changeListener != null);
@@ -70,8 +71,10 @@ class QueryAdapter {
 
     controller.onListen = () async => executeQueryAndNotifyController();
 
+    // listen on all updates if the stream is on a view, only listen to the
+    // name of the table if the stream is on a entity.
     final subscription = _changeListener.stream
-        .where((updatedTable) => updatedTable == tableName)
+        .where((updatedTable) => updatedTable == queryableName || isView)
         .listen(
           (_) async => executeQueryAndNotifyController(),
           onDone: () => controller.close(),
@@ -86,7 +89,8 @@ class QueryAdapter {
   Stream<List<T>> queryListStream<T>(
     final String sql, {
     final List<dynamic> arguments,
-    @required final String tableName,
+    @required final String queryableName,
+    @required final bool isView,
     @required final T Function(Map<String, dynamic>) mapper,
   }) {
     assert(_changeListener != null);
@@ -100,8 +104,9 @@ class QueryAdapter {
 
     controller.onListen = () async => executeQueryAndNotifyController();
 
+    // Views listen on all events, Entities only on events that changed the same entity.
     final subscription = _changeListener.stream
-        .where((updatedTable) => updatedTable == tableName)
+        .where((updatedTable) => isView || updatedTable == queryableName)
         .listen(
           (_) async => executeQueryAndNotifyController(),
           onDone: () => controller.close(),

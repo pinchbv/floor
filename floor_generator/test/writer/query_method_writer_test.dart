@@ -116,7 +116,7 @@ void main() {
     expect(actual, equalsDart(r'''
       @override
       Stream<Person> findByIdAsStream(int id) {
-        return _queryAdapter.queryStream('SELECT * FROM Person WHERE id = ?', arguments: <dynamic>[id], tableName: 'Person', mapper: _personMapper);
+        return _queryAdapter.queryStream('SELECT * FROM Person WHERE id = ?', arguments: <dynamic>[id], queryableName: 'Person', isView: false, mapper: _personMapper);
       }
     '''));
   });
@@ -132,7 +132,23 @@ void main() {
     expect(actual, equalsDart(r'''
       @override
       Stream<List<Person>> findAllAsStream() {
-        return _queryAdapter.queryListStream('SELECT * FROM Person', tableName: 'Person', mapper: _personMapper);
+        return _queryAdapter.queryListStream('SELECT * FROM Person', queryableName: 'Person', isView: false, mapper: _personMapper);
+      }
+    '''));
+  });
+
+  test('query list stream from view', () async {
+    final queryMethod = await _createQueryMethod('''
+      @Query('SELECT * FROM Name')
+      Stream<List<Name>> findAllAsStream();
+    ''');
+
+    final actual = QueryMethodWriter(queryMethod).write();
+
+    expect(actual, equalsDart(r'''
+      @override
+      Stream<List<Name>> findAllAsStream() {
+        return _queryAdapter.queryListStream('SELECT * FROM Name', queryableName: 'Name', isView: true, mapper: _nameMapper);
       }
     '''));
   });

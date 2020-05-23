@@ -133,6 +133,8 @@ Future<Dao> createDao(final String methodSignature) async {
       }
       
       $_personEntity
+      
+      $_nameView
       ''', (resolver) async {
     return LibraryReader(await resolver.findLibraryByName('test'));
   });
@@ -216,4 +218,14 @@ const _personEntity = '''
         
     Person(this.id, this.name);
   }
+''';
+
+const _nameView = '''
+  @DatabaseView("SELECT name FROM Person")
+  class Name {
+    final String name;
+  
+    Name(this.name);
+  }
+
 ''';

@@ -83,6 +83,48 @@ void main() {
         expect(actual, equals(expected));
       });
 
+      test('query view with all values as stream', () async {
+        final actual = nameDao.findAllNamesAsStream();
+        expect(
+            actual,
+            emitsInOrder(<List<Name>>[
+              [], // initial state
+              [Name('Frank'), Name('Leo')], // after inserting Persons
+              [
+                // after inserting Dog:
+                Name('Frank'),
+                Name('Leo'),
+                Name('Romeo')
+              ],
+              [
+                // after updating Leo:
+                Name('Frank'),
+                Name('Leonhard'),
+                Name('Romeo')
+              ],
+              [Name('Frank')], // after removing Person (and associated Dog)
+            ]));
+
+        final persons = [Person(1, 'Leo'), Person(2, 'Frank')];
+        await personDao.insertPersons(persons);
+
+        await Future<void>.delayed(const Duration(milliseconds: 100));
+
+        final dog = Dog(1, 'Romeo', 'Rome', 1);
+        await dogDao.insertDog(dog);
+
+        await Future<void>.delayed(const Duration(milliseconds: 100));
+
+        final renamedPerson = Person(1, 'Leonhard');
+        await personDao.updatePerson(renamedPerson);
+
+        await Future<void>.delayed(const Duration(milliseconds: 100));
+
+        // Also removes the dog which belonged to
+        // Leonhard through ForeignKey relations
+        await personDao.deletePerson(renamedPerson);
+      });
+
       test('query multiline query view to find name', () async {
         final person = Person(1, 'Frank');
         await personDao.insertPerson(person);

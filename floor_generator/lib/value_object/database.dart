@@ -12,6 +12,8 @@ class Database {
   final List<View> views;
   final List<DaoGetter> daoGetters;
   final int version;
+  final bool hasViewStreams;
+  final Set<Entity> streamEntities;
 
   Database(
     this.classElement,
@@ -20,7 +22,9 @@ class Database {
     this.views,
     this.daoGetters,
     this.version,
-  );
+  )   : streamEntities =
+            daoGetters.expand((dg) => dg.dao.streamEntities).toSet(),
+        hasViewStreams = daoGetters.any((dg) => dg.dao.streamViews.isNotEmpty);
 
   @override
   bool operator ==(Object other) =>
@@ -33,7 +37,10 @@ class Database {
           const ListEquality<View>().equals(views, other.views) &&
           const ListEquality<DaoGetter>()
               .equals(daoGetters, other.daoGetters) &&
-          version == other.version;
+          version == other.version &&
+          hasViewStreams == hasViewStreams &&
+          const SetEquality<Entity>()
+              .equals(streamEntities, other.streamEntities);
 
   @override
   int get hashCode =>
@@ -42,10 +49,12 @@ class Database {
       entities.hashCode ^
       views.hashCode ^
       daoGetters.hashCode ^
-      version.hashCode;
+      version.hashCode ^
+      hasViewStreams.hashCode ^
+      streamEntities.hashCode;
 
   @override
   String toString() {
-    return 'Database{classElement: $classElement, name: $name, entities: $entities, views: $views, daoGetters: $daoGetters, version: $version}';
+    return 'Database{classElement: $classElement, name: $name, entities: $entities, views: $views, daoGetters: $daoGetters, version: $version, hasViewStreams: $hasViewStreams, streamEntities: $streamEntities}';
   }
 }

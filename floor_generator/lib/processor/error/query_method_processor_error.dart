@@ -31,12 +31,4 @@ class QueryMethodProcessorError {
       element: _methodElement,
     );
   }
-
-  InvalidGenerationSourceError get viewNotStreamable {
-    return InvalidGenerationSourceError(
-      'Queries on a view can not be returned as a Stream yet.',
-      todo: 'Don\'t use Stream as the return type of a Query on a View.',
-      element: _methodElement,
-    );
-  }
 }
