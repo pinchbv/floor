@@ -259,6 +259,30 @@ void main() {
         ]),
       );
     });
-    //TODO test view updates every time
+
+    test('query stream from view with same and different triggering entity',
+        () async {
+      final person = Person(1, 'Frank');
+      final person2 = Person(2, 'Peter');
+      final queryResult = Future(() => [
+            <String, dynamic>{'id': person.id, 'name': person.name},
+            <String, dynamic>{'id': person2.id, 'name': person2.name},
+          ]);
+      when(mockDatabaseExecutor.rawQuery(sql)).thenAnswer((_) => queryResult);
+
+      final actual = underTest.queryListStream(sql,
+          queryableName: entityName, isView: true, mapper: mapper);
+      expect(
+        actual,
+        emitsInOrder(<List<Person>>[
+          <Person>[person, person2],
+          <Person>[person, person2],
+          <Person>[person, person2]
+        ]),
+      );
+
+      streamController.add(entityName);
+      streamController.add('otherEntity');
+    });
   });
 }

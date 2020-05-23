@@ -1,7 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 
 import '../test_util/extensions.dart';
-import '../test_util/separate_queries.dart';
 import 'dao/person_dao.dart';
 import 'database.dart';
 import 'model/dog.dart';
@@ -143,7 +142,7 @@ void main() {
             [dog1], // after inserting dog1
             [dog1], // after inserting dog2
             //[], // after removing person1. Does not work because
-            // ForeignKey-relations are not considered. (TODO)
+            // ForeignKey-relations are not considered yet (#321)
           ]));
 
       await personDao.insertPerson(person1);
@@ -155,7 +154,7 @@ void main() {
 
       // avoid that delete happens before the re-execution of
       // the select query for the stream
-      await simulateDoingSomethingElse();
+      await Future<void>.delayed(const Duration(milliseconds: 100));
 
       await database.personDao.deletePerson(person1);
     });

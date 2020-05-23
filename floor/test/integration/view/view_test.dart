@@ -4,7 +4,6 @@ import 'package:floor/floor.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:sqflite/sqflite.dart' as sqflite;
 
-import '../../test_util/separate_queries.dart';
 import '../dao/dog_dao.dart';
 import '../dao/name_dao.dart';
 import '../dao/person_dao.dart';
@@ -59,24 +58,6 @@ void main() {
         final expected = Name('Frank');
         expect(actual, equals(expected));
       });
-
-// TODO this currently won't work as all `null` results won't be added to the Stream.
-// this is not specific to Views.
-//      test('query view with exact value as stream', () async {
-//        final person = Person(1, 'Frank');
-//
-//        final actual = nameDao.findExactNameStream('Frank');
-//        expect(actual, emits(null));
-//
-//        await personDao.insertPerson(person);
-//        expect(actual, emits(person));
-//
-//        final personRenamed = Person(1, 'Simon');
-//
-//        await personDao.updatePerson(personRenamed);
-//        expect(actual, emits(null));
-//
-//      });
 
       test('query view with LIKE', () async {
         final persons = [Person(1, 'Leo'), Person(2, 'Frank')];
@@ -134,12 +115,12 @@ void main() {
         final dog = Dog(1, 'Romeo', 'Rome', 1);
         await dogDao.insertDog(dog);
 
-        await simulateDoingSomethingElse();
+        await Future<void>.delayed(const Duration(milliseconds: 100));
 
         final renamedPerson = Person(1, 'Leonhard');
         await personDao.updatePerson(renamedPerson);
 
-        await simulateDoingSomethingElse();
+        await Future<void>.delayed(const Duration(milliseconds: 100));
 
         // Also removes the dog which belonged to
         // Leonhard through ForeignKey relations

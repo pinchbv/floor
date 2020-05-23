@@ -261,22 +261,6 @@ void main() {
           .queryArgumentsAndMethodParametersDoNotMatch;
       expect(actual, throwsInvalidGenerationSourceError(error));
     });
-
-    //TODO test Stream Queries on DatabaseViews
-//    test(
-//        'exception when a query returns Stream<X> while querying a DatabaseView',
-//        () async {
-//      final methodElement = await _createQueryMethodElement('''
-//      @Query('SELECT * FROM Name')
-//      Stream<List<Name>> allNamesAsStream();
-//    ''');
-//
-//      final actual =
-//          () => QueryMethodProcessor(methodElement, entities, views).process();
-//
-//      final error = QueryMethodProcessorError(methodElement).viewNotStreamable;
-//      expect(actual, throwsInvalidGenerationSourceError(error));
-//    });
   });
 }
 
