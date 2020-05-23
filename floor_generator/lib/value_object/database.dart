@@ -13,7 +13,7 @@ class Database {
   final List<DaoGetter> daoGetters;
   final int version;
   final bool hasViewStreams;
-  final Set<Entity> entityStreams;
+  final Set<Entity> streamEntities;
 
   Database(
     this.classElement,

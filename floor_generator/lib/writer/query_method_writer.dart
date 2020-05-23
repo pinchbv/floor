@@ -143,7 +143,7 @@ class QueryMethodWriter implements Writer {
     @nonNull final String mapper,
   ) {
     final queryableName = _queryMethod.queryable.name;
-    final isView = (_queryMethod.queryable is View).toString();
+    final isView = _queryMethod.queryable is View;
     final parameters = StringBuffer()..write("'${_queryMethod.query}', ");
     if (arguments != null) parameters.write('arguments: $arguments, ');
     parameters

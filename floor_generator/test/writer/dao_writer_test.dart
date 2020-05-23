@@ -269,13 +269,13 @@ void main() {
     ''');
     // simulate DB is aware of another streamed Entity and no View
     final otherEntity = Entity(
-      null, //ClassElement classElement,
-      'Dog', //String name,
-      [], //List<Field> fields,
-      null, // this.primaryKey,
-      [], // this.foreignKeys,
-      [], // this.indices,
-      '', // String constructor
+      null, // classElement,
+      'Dog', // name,
+      [], // fields,
+      null, // primaryKey,
+      [], // foreignKeys,
+      [], // indices,
+      '', // constructor
     );
     final actual = DaoWriter(dao, {otherEntity}, false).write();
 

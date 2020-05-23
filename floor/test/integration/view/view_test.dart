@@ -109,7 +109,7 @@ void main() {
         expect(
             actual,
             emitsInOrder(<List<Name>>[
-              [], //initial state
+              [], // initial state
               [Name('Frank'), Name('Leo')], // after inserting Persons
               [
                 // after inserting Dog:
@@ -129,7 +129,7 @@ void main() {
         final persons = [Person(1, 'Leo'), Person(2, 'Frank')];
         await personDao.insertPersons(persons);
 
-        await simulateDoingSomethingElse();
+        await Future<void>.delayed(const Duration(milliseconds: 100));
 
         final dog = Dog(1, 'Romeo', 'Rome', 1);
         await dogDao.insertDog(dog);
