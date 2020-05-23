@@ -608,8 +608,6 @@ import 'database.dart';
 import 'entity/person.dart';
 
 void main() {
-  TestWidgetsFlutterBinding.ensureInitialized();
-
   group('database tests', () {
     TestDatabase database;
     PersonDao personDao;

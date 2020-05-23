@@ -10,8 +10,6 @@ import 'package:sqflite/sqflite.dart' as sqflite;
 part 'blob_test.g.dart';
 
 void main() {
-  TestWidgetsFlutterBinding.ensureInitialized();
-
   group('BLOB tests', () {
     TestDatabase database;
     PersonDao personDao;

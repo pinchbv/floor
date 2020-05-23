@@ -6,8 +6,6 @@ import 'database.dart';
 import 'model/person.dart';
 
 void main() {
-  TestWidgetsFlutterBinding.ensureInitialized();
-
   group('stream query tests', () {
     TestDatabase database;
     PersonDao personDao;

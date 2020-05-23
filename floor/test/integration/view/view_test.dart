@@ -28,8 +28,6 @@ abstract class ViewTestDatabase extends FloorDatabase {
 }
 
 void main() {
-  TestWidgetsFlutterBinding.ensureInitialized();
-
   group('database tests', () {
     ViewTestDatabase database;
     PersonDao personDao;
