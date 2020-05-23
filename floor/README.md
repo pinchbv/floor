@@ -36,6 +36,7 @@ After integrating type converters and embeddable objects, the API surface won't 
     1. [Streams](#streams)
     1. [Transactions](#transactions)
     1. [Inheritance](#inheritance)
+1. [Type Converters](#type-converters)    
 1. [Migrations](#migrations)
 1. [In-Memory Database](#in-memory-database)
 1. [Initialization Callback](#initialization-callback)
@@ -516,6 +517,64 @@ await personDao.insertItem(person);
 
 final result = await personDao.findPersonById(1);
 ```
+
+## Type Converters
+SQLite allows storing values of only a handful types.
+Whenever more complex Dart in-memory objects should be stored, there sometimes is the need for converting between Dart and SQLite compatible types.
+Dart's `DateTime`, for instance, provides an object-oriented API for handling time.
+Objects of this class can simply be represented as `int` values by mapping `DateTime` as its timestamp.
+Instead of repeatedly mapping between these types, when reading and writing, type converters come to the rescue.
+It's just required to define the conversion from a database to an in-memory type (and vice versa) once, which then is reused over and over again.
+
+The implementation and usage of the mentioned `DateTime` to `int` converter is described in the following.
+
+1. Create a converter class that implements the abstract `TypeConverter` and supply the in-memory object type and database type as parameterized types.
+    This class inherits the `decode()` and `encode()` functions which define the conversion from one to the other type.
+```dart
+class DateTimeConverter extends TypeConverter<DateTime, int> {
+  @override
+  DateTime decode(int databaseValue) {
+    return DateTime.fromMillisecondsSinceEpoch(databaseValue);
+  }
+
+  @override
+  int encode(DateTime value) {
+    return value.millisecondsSinceEpoch;
+  }
+}
+```
+ 
+2. Apply the created type converter to the database by using the `@TypeConverters` annotation.
+```dart
+@TypeConverters([DateTimeConverter])
+@Database(version: 1, entities: [Order])
+abstract class OrderDatabase extends FloorDatabase {
+  OrderDao get orderDao;
+}
+```
+
+3. Use the non-default `DateTime` type in an entity.
+```dart
+@entity
+class Order {
+  @primaryKey
+  final int id;
+
+  final DateTime date;
+
+  Order(this.id, this.date);
+}
+```
+
+Be aware that type converters can be applied to:
+1. databases
+1. DAOs
+1. entities/views
+1. entity/view fields
+1. DAO methods
+1. DAO method parameters
+
+The type converter is added to the scope of the element so if you put it on a class, all methods/fields in that class will be able to use the converters.
 
 ## Migrations
 Whenever you are doing changes to your entities, you're required to also migrate the old data.
