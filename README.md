@@ -13,7 +13,7 @@ As a consequence, it's necessary to have an understanding of SQL and SQLite in o
 - iOS, Android, Linux, macOS, Windows
 
 ⚠️ The library is on its way to its first stable release!
-After integrating type converters, embeddable objects and streamable database views, the API surface won't change until after 1.0.
+After integrating type converters and embeddable objects, the API surface won't change until after 1.0.
 
 [![pub package](https://img.shields.io/pub/v/floor.svg)](https://pub.dartlang.org/packages/floor)
 [![build status](https://github.com/vitusortner/floor/workflows/Continuous%20integration/badge.svg)](https://github.com/vitusortner/floor/actions)
