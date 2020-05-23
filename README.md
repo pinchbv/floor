@@ -566,7 +566,7 @@ class Order {
 }
 ```
 
-Be aware that type converters can be applied to:
+#### Be aware that type converters can be applied to:
 1. databases
 1. DAOs
 1. entities/views
