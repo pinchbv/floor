@@ -147,7 +147,7 @@ class _$TaskDao extends TaskDao {
   @override
   Stream<List<Task>> findAllTasksAsStream() {
     return _queryAdapter.queryListStream('SELECT * FROM task',
-        tableName: 'Task', mapper: _taskMapper);
+        queryableName: 'Task', isView: false, mapper: _taskMapper);
   }
 
   @override

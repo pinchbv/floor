@@ -351,7 +351,9 @@ abstract class AppDatabase extends FloorDatabase {
 You can then query the view via a DAO function like an entity.
 
 #### Limitations
-- Be aware it is currently not possible to return a `Stream` object from a function which queries a database view.
+- It is now possible to return a `Stream` object from a DAO method which queries a database view. But it will fire on **any** 
+  `@update`, `@insert`, `@delete` events in the whole database, which can get quite taxing on the runtime. Please add it only if you know what you are doing!
+  This is mostly due to the complexity of detecting which entities are involved in a database view.
 
 ## Data Access Objects
 These components are responsible for managing access to the underlying SQLite database and are defined as abstract classes with method signatures and query statements.
@@ -475,7 +477,8 @@ StreamBuilder<List<Person>>(
 #### Limitations
 - Only methods annotated with `@insert`, `@update` and `@delete` trigger `Stream` emissions. 
   Inserting data by using the `@Query()` annotation doesn't.
-- It is not possible to return a `Stream` if the function queries a database view.
+- It is now possible to return a `Stream` if the function queries a database view. But it will fire on **any** 
+  `@update`, `@insert`, `@delete` events in the whole database, which can get quite taxing on the runtime. Please add it only if you know what you are doing!
   This is mostly due to the complexity of detecting which entities are involved in a database view.
 
 ### Transactions
