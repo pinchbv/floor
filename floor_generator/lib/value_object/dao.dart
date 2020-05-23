@@ -1,5 +1,6 @@
 import 'package:analyzer/dart/element/element.dart';
-import 'package:collection/collection.dart';
+import 'package:floor_generator/misc/extension/list_equality_extension.dart';
+import 'package:floor_generator/misc/extension/set_equality_extension.dart';
 import 'package:floor_generator/value_object/deletion_method.dart';
 import 'package:floor_generator/value_object/entity.dart';
 import 'package:floor_generator/value_object/insertion_method.dart';
@@ -38,19 +39,13 @@ class Dao {
           runtimeType == other.runtimeType &&
           classElement == other.classElement &&
           name == other.name &&
-          const ListEquality<QueryMethod>()
-              .equals(queryMethods, other.queryMethods) &&
-          const ListEquality<InsertionMethod>()
-              .equals(insertionMethods, other.insertionMethods) &&
-          const ListEquality<UpdateMethod>()
-              .equals(updateMethods, other.updateMethods) &&
-          const ListEquality<DeletionMethod>()
-              .equals(deletionMethods, other.deletionMethods) &&
-          const ListEquality<TransactionMethod>()
-              .equals(transactionMethods, other.transactionMethods) &&
-          const SetEquality<Entity>()
-              .equals(streamEntities, other.streamEntities) &&
-          const SetEquality<View>().equals(streamViews, other.streamViews);
+          queryMethods.equals(other.queryMethods) &&
+          insertionMethods.equals(other.insertionMethods) &&
+          updateMethods.equals(other.updateMethods) &&
+          deletionMethods.equals(other.deletionMethods) &&
+          transactionMethods.equals(other.transactionMethods) &&
+          streamEntities.equals(streamEntities) &&
+          streamViews.equals(other.streamViews);
 
   @override
   int get hashCode =>
