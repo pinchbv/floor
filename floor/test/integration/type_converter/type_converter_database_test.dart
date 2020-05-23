@@ -5,8 +5,6 @@ import 'order_dao.dart';
 import 'order_database.dart';
 
 void main() {
-  TestWidgetsFlutterBinding.ensureInitialized();
-
   OrderDatabase database;
   OrderDao orderDao;
 
