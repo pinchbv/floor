@@ -66,9 +66,6 @@ void main() {
         
           final QueryAdapter _queryAdapter;
         
-          static final _personMapper = (Map<String, dynamic> row) =>
-              Person(row['id'] as int, row['name'] as String);
-        
           final InsertionAdapter<Person> _personInsertionAdapter;
         
           final UpdateAdapter<Person> _personUpdateAdapter;
@@ -77,7 +74,7 @@ void main() {
         
           @override
           Future<List<Person>> findAllPersons() async {
-            return _queryAdapter.queryList('SELECT * FROM person', mapper: _personMapper);
+            return _queryAdapter.queryList('SELECT * FROM person', mapper: (Map<String, dynamic> row) => Person(row['id'] as int, row['name'] as String));
           }
           
           @override
@@ -151,9 +148,6 @@ void main() {
         
           final QueryAdapter _queryAdapter;
         
-          static final _personMapper = (Map<String, dynamic> row) =>
-              Person(row['id'] as int, row['name'] as String);
-        
           final InsertionAdapter<Person> _personInsertionAdapter;
         
           final UpdateAdapter<Person> _personUpdateAdapter;
@@ -162,7 +156,7 @@ void main() {
         
           @override
           Stream<List<Person>> findAllPersonsAsStream() {
-            return _queryAdapter.queryListStream('SELECT * FROM person', queryableName: 'Person', isView: false, mapper: _personMapper);
+            return _queryAdapter.queryListStream('SELECT * FROM person', queryableName: 'Person', isView: false, mapper: (Map<String, dynamic> row) => Person(row['id'] as int, row['name'] as String));
           }
           
           @override
