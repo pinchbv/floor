@@ -133,7 +133,7 @@ void main() {
 
       expect(
         actual,
-        equals(r'update sports set rated = 1 where id in ($valueList1)'),
+        equals(r'update sports set rated = 1 where id in ($valueList0)'),
       );
     });
 
@@ -149,8 +149,8 @@ void main() {
       expect(
         actual,
         equals(
-          r'update sports set rated = 1 where id in ($valueList1) '
-          r'and where foo in ($valueList2)',
+          r'update sports set rated = 1 where id in ($valueList0) '
+          r'and where foo in ($valueList1)',
         ),
       );
     });
@@ -167,7 +167,7 @@ void main() {
       expect(
         actual,
         equals(
-          r'update sports set rated = 1 where id in ($valueList1) '
+          r'update sports set rated = 1 where id in ($valueList0) '
           r'AND foo = ?',
         ),
       );
@@ -205,8 +205,9 @@ void main() {
       List<Person> findAllPersons();
     ''');
 
-      final actual =
-          () => QueryMethodProcessor(methodElement, entities, views).process();
+      final actual = () =>
+          QueryMethodProcessor(methodElement, [...entities, ...views], [])
+              .process();
 
       final error =
           QueryMethodProcessorError(methodElement).doesNotReturnFutureNorStream;
@@ -219,8 +220,9 @@ void main() {
       Future<List<Person>> findAllPersons();
     ''');
 
-      final actual =
-          () => QueryMethodProcessor(methodElement, entities, views).process();
+      final actual = () =>
+          QueryMethodProcessor(methodElement, [...entities, ...views], [])
+              .process();
 
       final error = QueryMethodProcessorError(methodElement).noQueryDefined;
       expect(actual, throwsInvalidGenerationSourceError(error));
@@ -232,8 +234,9 @@ void main() {
       Future<List<Person>> findAllPersons();
     ''');
 
-      final actual =
-          () => QueryMethodProcessor(methodElement, entities, views).process();
+      final actual = () =>
+          QueryMethodProcessor(methodElement, [...entities, ...views], [])
+              .process();
 
       final error = QueryMethodProcessorError(methodElement).noQueryDefined;
       expect(actual, throwsInvalidGenerationSourceError(error));
@@ -246,8 +249,9 @@ void main() {
       Future<Person> findPersonByIdAndName(int id);
     ''');
 
-      final actual =
-          () => QueryMethodProcessor(methodElement, entities, views).process();
+      final actual = () =>
+          QueryMethodProcessor(methodElement, [...entities, ...views], [])
+              .process();
 
       final error = QueryMethodProcessorError(methodElement)
           .queryArgumentsAndMethodParametersDoNotMatch;
@@ -261,8 +265,9 @@ void main() {
       Future<Person> findPersonByIdAndName(int id, String name);
     ''');
 
-      final actual =
-          () => QueryMethodProcessor(methodElement, entities, views).process();
+      final actual = () =>
+          QueryMethodProcessor(methodElement, [...entities, ...views], [])
+              .process();
 
       final error = QueryMethodProcessorError(methodElement)
           .queryArgumentsAndMethodParametersDoNotMatch;

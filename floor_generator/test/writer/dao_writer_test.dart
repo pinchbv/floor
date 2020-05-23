@@ -276,6 +276,7 @@ void main() {
       [], // foreignKeys,
       [], // indices,
       '', // constructor
+      '', // valueMapping
     );
     final actual = DaoWriter(dao, {otherEntity}, false).write();
 

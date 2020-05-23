@@ -150,7 +150,7 @@ void main() {
       ''');
 
     final processedDao =
-        DaoProcessor(classElement, '', '', entities, views).process();
+        DaoProcessor(classElement, '', '', entities, views, []).process();
 
     expect(processedDao.methodsLength, equals(4));
     expect(processedDao.streamViews, equals(views));
@@ -246,6 +246,6 @@ Future<List<View>> _getViews() async {
   return library.classes
       .where((classElement) =>
           classElement.hasAnnotation(annotations.DatabaseView))
-      .map((classElement) => ViewProcessor(classElement).process())
+      .map((classElement) => ViewProcessor(classElement, []).process())
       .toList();
 }

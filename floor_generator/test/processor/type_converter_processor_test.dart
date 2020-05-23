@@ -6,6 +6,7 @@ import '../test_utils.dart';
 
 void main() {
   test('Creates type converter', () async {
+    const typeConverterScope = TypeConverterScope.dao;
     final classElement = await '''
       class DateTimeToIntConverter extends TypeConverter<DateTime, int> {
         @override
@@ -23,14 +24,14 @@ void main() {
 
     final actual = TypeConverterProcessor(
       classElement,
-      TypeConverterScope.dao,
+      typeConverterScope,
     ).process();
 
     final expected = TypeConverter(
       'DateTimeToIntConverter',
       await 'DateTime.now()'.asDartType(),
       await '1'.asDartType(),
-      TypeConverterScope.dao,
+      typeConverterScope,
     );
     expect(actual, equals(expected));
   });
