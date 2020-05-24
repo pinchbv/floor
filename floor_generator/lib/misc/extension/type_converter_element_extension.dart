@@ -23,14 +23,6 @@ extension TypeConverterElementExtension on Element {
             element: this);
       }
 
-      if (typeConverterElements.any((element) => element is! ClassElement)) {
-        throw InvalidGenerationSourceError(
-          'Only classes can be used as type converters.',
-          todo: 'Make sure use a class that inherits from TypeConverter.',
-          element: this,
-        );
-      }
-
       final typeConverterClassElements =
           typeConverterElements.cast<ClassElement>();
 
@@ -43,11 +35,9 @@ extension TypeConverterElementExtension on Element {
         );
       }
 
-      final typeConverters = typeConverterClassElements
+      return typeConverterClassElements
           .map((element) => TypeConverterProcessor(element, scope).process())
           .toList();
-
-      return typeConverters;
     } else {
       return [];
     }
