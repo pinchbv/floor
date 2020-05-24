@@ -42,7 +42,7 @@ void main() {
           await getDartTypeWithPerson('Person'),
           [],
           entities.first,
-          [],
+          {},
         ),
       ),
     );
@@ -69,7 +69,7 @@ void main() {
           await getDartTypeWithName('Name'),
           [],
           views.first,
-          [],
+          {},
         ),
       ),
     );

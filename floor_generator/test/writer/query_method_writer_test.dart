@@ -1,9 +1,17 @@
+import 'package:build_test/build_test.dart';
 import 'package:code_builder/code_builder.dart';
+import 'package:floor_annotation/floor_annotation.dart' as annotations;
+import 'package:floor_generator/misc/type_utils.dart';
+import 'package:floor_generator/processor/dao_processor.dart';
+import 'package:floor_generator/processor/entity_processor.dart';
+import 'package:floor_generator/value_object/dao.dart';
 import 'package:floor_generator/value_object/query_method.dart';
+import 'package:floor_generator/value_object/type_converter.dart';
 import 'package:floor_generator/writer/query_method_writer.dart';
 import 'package:source_gen/source_gen.dart';
 import 'package:test/test.dart';
 
+import '../dart_type.dart';
 import '../test_utils.dart';
 
 void main() {
@@ -55,6 +63,79 @@ void main() {
         return _queryAdapter.query('SELECT * FROM Person WHERE id = ?', arguments: <dynamic>[id], mapper: (Map<String, dynamic> row) => Person(row['id'] as int, row['name'] as String));
       }
     '''));
+  });
+
+  group('type converters', () {
+    test('generates method with external type converter', () async {
+      final typeConverter = TypeConverter(
+        'DateTimeConverter',
+        await dateTimeDartType,
+        await intDartType,
+        TypeConverterScope.database,
+      );
+      final queryMethod = await '''
+      @Query('SELECT * FROM Order WHERE id = :id')
+      Future<Order> findById(int id);
+    '''
+          .asOrderQueryMethod({typeConverter});
+
+      final actual = QueryMethodWriter(queryMethod).write();
+
+      expect(actual, equalsDart(r'''
+      @override
+      Future<Order> findById(int id) async {
+        return _queryAdapter.query('SELECT * FROM Order WHERE id = ?', arguments: <dynamic>[id], mapper: (Map<String, dynamic> row) => Order(row['id'] as int, _dateTimeConverter.decode(row['dateTime'] as int)));
+      }
+    '''));
+    });
+
+    test('generates method with local method type converter', () async {
+      final typeConverter = TypeConverter(
+        'ExternalTypeConverter',
+        await dateTimeDartType,
+        await intDartType,
+        TypeConverterScope.database,
+      );
+      final queryMethod = await '''
+      @TypeConverters([DateTimeConverter])
+      @Query('SELECT * FROM Order WHERE dateTime = :dateTime')
+      Future<Order> findByDateTime(DateTime dateTime);
+    '''
+          .asOrderQueryMethod({typeConverter});
+
+      final actual = QueryMethodWriter(queryMethod).write();
+
+      expect(actual, equalsDart(r'''
+      @override
+      Future<Order> findByDateTime(DateTime dateTime) async {
+        return _queryAdapter.query('SELECT * FROM Order WHERE dateTime = ?', arguments: <dynamic>[_dateTimeConverter.encode(dateTime)], mapper: (Map<String, dynamic> row) => Order(row['id'] as int, _externalTypeConverter.decode(row['dateTime'] as int)));
+      }
+    '''));
+    });
+
+    test('generates method with local method parameter type converter',
+        () async {
+      final typeConverter = TypeConverter(
+        'ExternalTypeConverter',
+        await dateTimeDartType,
+        await intDartType,
+        TypeConverterScope.database,
+      );
+      final queryMethod = await '''
+      @Query('SELECT * FROM Order WHERE dateTime = :dateTime')
+      Future<Order> findByDateTime(@TypeConverters([DateTimeConverter]) DateTime dateTime);
+    '''
+          .asOrderQueryMethod({typeConverter});
+
+      final actual = QueryMethodWriter(queryMethod).write();
+
+      expect(actual, equalsDart(r'''
+      @override
+      Future<Order> findByDateTime(DateTime dateTime) async {
+        return _queryAdapter.query('SELECT * FROM Order WHERE dateTime = ?', arguments: <dynamic>[_dateTimeConverter.encode(dateTime)], mapper: (Map<String, dynamic> row) => Order(row['id'] as int, _externalTypeConverter.decode(row['dateTime'] as int)));
+      }
+    '''));
+    });
   });
 
   test('query boolean parameter', () async {
@@ -203,4 +284,73 @@ void main() {
 Future<QueryMethod> _createQueryMethod(final String methodSignature) async {
   final dao = await createDao(methodSignature);
   return dao.queryMethods.first;
+}
+
+extension on String {
+  Future<QueryMethod> asOrderQueryMethod(
+    final Set<TypeConverter> typeConverters,
+  ) async {
+    final dao = await createOrderDao(this, typeConverters);
+    return dao.queryMethods.first;
+  }
+}
+
+Future<Dao> createOrderDao(
+  final String methodSignature,
+  final Set<TypeConverter> typeConverters,
+) async {
+  final library = await resolveSource('''
+      library test;
+      
+      import 'package:floor_annotation/floor_annotation.dart';
+      
+      @dao
+      abstract class OrderDao {
+        $methodSignature
+      }
+      
+      @entity
+      class Order {
+        @primaryKey
+        final int id;
+        
+        final DateTime dateTime;
+        
+        Order(this.id, this.dateTime);
+      }
+      
+      class DateTimeConverter extends TypeConverter<DateTime, int> {
+        @override
+        int encode(DateTime value) {
+          return value.millisecondsSinceEpoch;
+        }
+              
+        @override
+        DateTime decode(int databaseValue) {
+          return DateTime.fromMillisecondsSinceEpoch(databaseValue);
+        }
+      }
+      ''', (resolver) async {
+    return LibraryReader(await resolver.findLibraryByName('test'));
+  });
+
+  final daoClass = library.classes.firstWhere((classElement) =>
+      classElement.hasAnnotation(annotations.dao.runtimeType));
+
+  final entities = library.classes
+      .where((classElement) => classElement.hasAnnotation(annotations.Entity))
+      .map((classElement) => EntityProcessor(
+            classElement,
+            typeConverters,
+          ).process())
+      .toList();
+
+  return DaoProcessor(
+    daoClass,
+    'orderDao',
+    'TestDatabase',
+    entities,
+    [],
+    typeConverters,
+  ).process();
 }
