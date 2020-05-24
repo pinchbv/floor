@@ -1,6 +1,8 @@
 import 'package:analyzer/dart/element/element.dart';
+import 'package:floor_generator/misc/type_utils.dart';
 import 'package:floor_generator/processor/processor.dart';
 import 'package:floor_generator/value_object/type_converter.dart';
+import 'package:source_gen/source_gen.dart';
 
 class TypeConverterProcessor extends Processor<TypeConverter> {
   final ClassElement _classElement;
@@ -15,10 +17,22 @@ class TypeConverterProcessor extends Processor<TypeConverter> {
   @override
   TypeConverter process() {
     final typeArguments = _classElement.supertype.typeArguments;
+    final fieldType = typeArguments[0];
+    final databaseType = typeArguments[1];
+
+    if (!databaseType.isDefaultSqlType) {
+      throw InvalidGenerationSourceError(
+        'Type converters have to convert to a database-compatible type.',
+        todo:
+            'Make the class convert to either int, double, String, bool or Uint8List.',
+        element: _classElement,
+      );
+    }
+
     return TypeConverter(
       _classElement.displayName,
-      typeArguments[0],
-      typeArguments[1],
+      fieldType,
+      databaseType,
       _typeConverterScope,
     );
   }

@@ -36,5 +36,30 @@ void main() {
       );
       expect(actual, equals(expected));
     });
+
+    test("throws error when converter's database type is not supported",
+        () async {
+      final classElement = await '''
+      class DateTimeConverter extends TypeConverter<DateTime, DateTime> {
+        @override
+        DateTime encode(DateTime value) {
+          return value;
+        }
+      
+        @override
+        DateTime decode(DateTime databaseValue) {
+          return DateTime.fromMillisecondsSinceEpoch(databaseValue);
+        }
+      }
+    '''
+          .asClassElement();
+
+      final actual = () => TypeConverterProcessor(
+            classElement,
+            TypeConverterScope.dao,
+          ).process();
+
+      expect(actual, throwsInvalidGenerationSourceError());
+    });
   });
 }
