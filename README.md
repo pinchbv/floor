@@ -523,8 +523,8 @@ SQLite allows storing values of only a handful types.
 Whenever more complex Dart in-memory objects should be stored, there sometimes is the need for converting between Dart and SQLite compatible types.
 Dart's `DateTime`, for instance, provides an object-oriented API for handling time.
 Objects of this class can simply be represented as `int` values by mapping `DateTime` as its timestamp in milliseconds.
-Instead of repeatedly mapping between these types, when reading and writing, type converters come to the rescue.
-It's just required to define the conversion from a database to an in-memory type (and vice versa) once, which then is reused over and over again.
+Instead of manually mapping between these types repeatedly, when reading and writing, type converters can be used.
+It's sufficient to define the conversion from a database to an in-memory type and vice versa once, which then is reused automatically.
 
 The implementation and usage of the mentioned `DateTime` to `int` converter is described in the following.
 
