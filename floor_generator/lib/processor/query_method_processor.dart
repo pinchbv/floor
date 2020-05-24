@@ -17,12 +17,12 @@ class QueryMethodProcessor extends Processor<QueryMethod> {
 
   final MethodElement _methodElement;
   final List<Queryable> _queryables;
-  final List<TypeConverter> _typeConverters;
+  final Set<TypeConverter> _typeConverters;
 
   QueryMethodProcessor(
     final MethodElement methodElement,
     final List<Queryable> queryables,
-    final List<TypeConverter> typeConverters,
+    final Set<TypeConverter> typeConverters,
   )   : assert(methodElement != null),
         assert(queryables != null),
         assert(typeConverters != null),

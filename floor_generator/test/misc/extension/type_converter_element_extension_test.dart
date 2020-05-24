@@ -34,7 +34,7 @@ void main() {
         await '1'.asDartType(),
         typeConverterScope,
       );
-      expect(actual, equals([expected]));
+      expect(actual, equals({expected}));
     });
 
     test('throws error when null in annotation', () async {

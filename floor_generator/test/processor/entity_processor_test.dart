@@ -25,7 +25,7 @@ void main() {
       }
     ''');
 
-    final actual = EntityProcessor(classElement, []).process();
+    final actual = EntityProcessor(classElement, {}).process();
 
     const name = 'Person';
     final fields = classElement.fields
@@ -61,7 +61,7 @@ void main() {
       }
     ''');
 
-    final actual = EntityProcessor(classElement, []).process();
+    final actual = EntityProcessor(classElement, {}).process();
 
     const name = 'Person';
     final fields = classElement.fields
@@ -123,7 +123,7 @@ void main() {
     ''');
 
       final actual =
-          EntityProcessor(classElements[1], []).process().foreignKeys[0];
+          EntityProcessor(classElements[1], {}).process().foreignKeys[0];
 
       final expected = ForeignKey(
         'Person',
@@ -151,7 +151,7 @@ void main() {
       }
     ''');
 
-      final actual = EntityProcessor(classElement, []).process().valueMapping;
+      final actual = EntityProcessor(classElement, {}).process().valueMapping;
 
       const expected = '<String, dynamic>{'
           "'id': item.id, "
@@ -174,7 +174,7 @@ void main() {
       }
     ''');
 
-      final actual = EntityProcessor(classElement, []).process().valueMapping;
+      final actual = EntityProcessor(classElement, {}).process().valueMapping;
 
       const expected = '<String, dynamic>{'
           "'id': item.id, "

@@ -55,7 +55,7 @@ void main() {
       }
     ''');
 
-      final actual = TestProcessor(classElement, [typeConverter]).process();
+      final actual = TestProcessor(classElement, {typeConverter}).process();
 
       final idField = FieldProcessor(classElement.fields[0], null).process();
       final dateTimeField =
@@ -149,7 +149,7 @@ void main() {
     ''');
 
       final actual =
-          TestProcessor(classElement, [externalTypeConverter]).process();
+          TestProcessor(classElement, {externalTypeConverter}).process();
 
       final typeConverter = TypeConverter(
         'DateTimeConverter',
@@ -588,8 +588,8 @@ class TestQueryable extends Queryable {
 class TestProcessor extends QueryableProcessor<TestQueryable> {
   TestProcessor(
     ClassElement classElement, [
-    List<TypeConverter> typeConverters,
-  ]) : super(classElement, typeConverters ?? []);
+    Set<TypeConverter> typeConverters,
+  ]) : super(classElement, typeConverters ?? {});
 
   @override
   TestQueryable process() {

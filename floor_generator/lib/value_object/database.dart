@@ -14,7 +14,7 @@ class Database {
   final List<View> views;
   final List<DaoGetter> daoGetters;
   final int version;
-  final List<TypeConverter> databaseTypeConverters;
+  final Set<TypeConverter> databaseTypeConverters;
   final Set<TypeConverter> allTypeConverters;
   final bool hasViewStreams;
   final Set<Entity> streamEntities;

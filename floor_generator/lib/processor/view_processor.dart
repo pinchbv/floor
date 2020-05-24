@@ -13,7 +13,7 @@ class ViewProcessor extends QueryableProcessor<View> {
 
   ViewProcessor(
     final ClassElement classElement,
-    final List<TypeConverter> typeConverters,
+    final Set<TypeConverter> typeConverters,
   )   : _processorError = ViewProcessorError(classElement),
         super(classElement, typeConverters);
 

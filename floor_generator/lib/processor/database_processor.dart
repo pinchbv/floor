@@ -77,7 +77,7 @@ class DatabaseProcessor extends Processor<Database> {
     final String databaseName,
     final List<Entity> entities,
     final List<View> views,
-    final List<TypeConverter> typeConverters,
+    final Set<TypeConverter> typeConverters,
   ) {
     return _classElement.fields.where(_isDao).map((field) {
       final classElement = field.type.element as ClassElement;
@@ -111,7 +111,7 @@ class DatabaseProcessor extends Processor<Database> {
   @nonNull
   List<Entity> _getEntities(
     final ClassElement databaseClassElement,
-    final List<TypeConverter> typeConverters,
+    final Set<TypeConverter> typeConverters,
   ) {
     final entities = _classElement
         .getAnnotation(annotations.Database)
@@ -136,7 +136,7 @@ class DatabaseProcessor extends Processor<Database> {
   @nonNull
   List<View> _getViews(
     final ClassElement databaseClassElement,
-    final List<TypeConverter> typeConverters,
+    final Set<TypeConverter> typeConverters,
   ) {
     return _classElement
             .getAnnotation(annotations.Database)

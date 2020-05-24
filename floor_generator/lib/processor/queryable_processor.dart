@@ -3,6 +3,7 @@ import 'package:analyzer/dart/element/type.dart';
 import 'package:dartx/dartx.dart';
 import 'package:floor_annotation/floor_annotation.dart' as annotations;
 import 'package:floor_generator/misc/annotations.dart';
+import 'package:floor_generator/misc/extension/set_extension.dart';
 import 'package:floor_generator/misc/extension/type_converter_element_extension.dart';
 import 'package:floor_generator/misc/extension/type_converters_extension.dart';
 import 'package:floor_generator/misc/type_utils.dart';
@@ -20,12 +21,12 @@ abstract class QueryableProcessor<T extends Queryable> extends Processor<T> {
   @protected
   final ClassElement classElement;
 
-  final List<TypeConverter> queryableTypeConverters;
+  final Set<TypeConverter> queryableTypeConverters;
 
   @protected
   QueryableProcessor(
     this.classElement,
-    final List<TypeConverter> typeConverters,
+    final Set<TypeConverter> typeConverters,
   )   : assert(classElement != null),
         assert(typeConverters != null),
         _queryableProcessorError = QueryableProcessorError(classElement),

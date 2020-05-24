@@ -1,5 +1,6 @@
 import 'package:analyzer/dart/element/element.dart';
 import 'package:floor_annotation/floor_annotation.dart' as annotations;
+import 'package:floor_generator/misc/extension/set_extension.dart';
 import 'package:floor_generator/misc/extension/type_converter_element_extension.dart';
 import 'package:floor_generator/misc/type_utils.dart';
 import 'package:floor_generator/processor/deletion_method_processor.dart';
@@ -24,7 +25,7 @@ class DaoProcessor extends Processor<Dao> {
   final String _databaseName;
   final List<Entity> _entities;
   final List<View> _views;
-  final List<TypeConverter> _typeConverters;
+  final Set<TypeConverter> _typeConverters;
 
   DaoProcessor(
     final ClassElement classElement,
@@ -32,7 +33,7 @@ class DaoProcessor extends Processor<Dao> {
     final String databaseName,
     final List<Entity> entities,
     final List<View> views,
-    final List<TypeConverter> typeConverters,
+    final Set<TypeConverter> typeConverters,
   )   : assert(classElement != null),
         assert(daoGetterName != null),
         assert(databaseName != null),
@@ -79,14 +80,13 @@ class DaoProcessor extends Processor<Dao> {
       transactionMethods,
       streamEntities,
       streamViews,
-      typeConverters
-          .toSet(), // TODO #165 make all type converter collections sets
+      typeConverters,
     );
   }
 
   List<QueryMethod> _getQueryMethods(
     final List<MethodElement> methods,
-    final List<TypeConverter> typeConverters,
+    final Set<TypeConverter> typeConverters,
   ) {
     return methods
         .where((method) => method.hasAnnotation(annotations.Query))

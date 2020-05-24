@@ -18,7 +18,7 @@ void main() {
       }
     ''');
 
-    final actual = ViewProcessor(classElement, []).process();
+    final actual = ViewProcessor(classElement, {}).process();
 
     const name = 'Person';
     final fields = classElement.fields
@@ -51,7 +51,7 @@ void main() {
       }
     """);
 
-    final actual = ViewProcessor(classElement, []).process().query;
+    final actual = ViewProcessor(classElement, {}).process().query;
 
     const expected = '''
         SELECT * 
@@ -73,7 +73,7 @@ void main() {
       }
     ''');
 
-    final actual = ViewProcessor(classElement, []).process().query;
+    final actual = ViewProcessor(classElement, {}).process().query;
 
     const expected = 'SELECT * from otherentity';
     expect(actual, equals(expected));
@@ -91,7 +91,7 @@ void main() {
       }
     ''');
 
-    final actual = ViewProcessor(classElement, []).process();
+    final actual = ViewProcessor(classElement, {}).process();
 
     const name = 'personview';
     final fields = classElement.fields

@@ -28,7 +28,7 @@ void main() {
     ''');
 
     final actual =
-        QueryMethodProcessor(methodElement, [...entities, ...views], [])
+        QueryMethodProcessor(methodElement, [...entities, ...views], {})
             .process();
 
     expect(
@@ -55,7 +55,7 @@ void main() {
     ''');
 
     final actual =
-        QueryMethodProcessor(methodElement, [...entities, ...views], [])
+        QueryMethodProcessor(methodElement, [...entities, ...views], {})
             .process();
 
     expect(
@@ -83,7 +83,7 @@ void main() {
     ''');
 
       final actual =
-          QueryMethodProcessor(methodElement, [], []).process().query;
+          QueryMethodProcessor(methodElement, [], {}).process().query;
 
       expect(actual, equals('SELECT * FROM Person WHERE id = ?'));
     });
@@ -98,7 +98,7 @@ void main() {
       """);
 
       final actual =
-          QueryMethodProcessor(methodElement, [], []).process().query;
+          QueryMethodProcessor(methodElement, [], {}).process().query;
 
       expect(
         actual,
@@ -114,7 +114,7 @@ void main() {
       ''');
 
       final actual =
-          QueryMethodProcessor(methodElement, [], []).process().query;
+          QueryMethodProcessor(methodElement, [], {}).process().query;
 
       expect(
         actual,
@@ -129,7 +129,7 @@ void main() {
     ''');
 
       final actual =
-          QueryMethodProcessor(methodElement, [], []).process().query;
+          QueryMethodProcessor(methodElement, [], {}).process().query;
 
       expect(
         actual,
@@ -144,7 +144,7 @@ void main() {
     ''');
 
       final actual =
-          QueryMethodProcessor(methodElement, [], []).process().query;
+          QueryMethodProcessor(methodElement, [], {}).process().query;
 
       expect(
         actual,
@@ -162,7 +162,7 @@ void main() {
     ''');
 
       final actual =
-          QueryMethodProcessor(methodElement, [], []).process().query;
+          QueryMethodProcessor(methodElement, [], {}).process().query;
 
       expect(
         actual,
@@ -180,7 +180,7 @@ void main() {
     ''');
 
       final actual =
-          QueryMethodProcessor(methodElement, [], []).process().query;
+          QueryMethodProcessor(methodElement, [], {}).process().query;
 
       expect(actual, equals('SELECT * FROM Persons WHERE name LIKE ?'));
     });
@@ -192,7 +192,7 @@ void main() {
     ''');
 
       final actual =
-          QueryMethodProcessor(methodElement, [], []).process().query;
+          QueryMethodProcessor(methodElement, [], {}).process().query;
 
       expect(actual, equals('SELECT * FROM ?, ?'));
     });
@@ -206,7 +206,7 @@ void main() {
     ''');
 
       final actual = () =>
-          QueryMethodProcessor(methodElement, [...entities, ...views], [])
+          QueryMethodProcessor(methodElement, [...entities, ...views], {})
               .process();
 
       final error =
@@ -221,7 +221,7 @@ void main() {
     ''');
 
       final actual = () =>
-          QueryMethodProcessor(methodElement, [...entities, ...views], [])
+          QueryMethodProcessor(methodElement, [...entities, ...views], {})
               .process();
 
       final error = QueryMethodProcessorError(methodElement).noQueryDefined;
@@ -235,7 +235,7 @@ void main() {
     ''');
 
       final actual = () =>
-          QueryMethodProcessor(methodElement, [...entities, ...views], [])
+          QueryMethodProcessor(methodElement, [...entities, ...views], {})
               .process();
 
       final error = QueryMethodProcessorError(methodElement).noQueryDefined;
@@ -250,7 +250,7 @@ void main() {
     ''');
 
       final actual = () =>
-          QueryMethodProcessor(methodElement, [...entities, ...views], [])
+          QueryMethodProcessor(methodElement, [...entities, ...views], {})
               .process();
 
       final error = QueryMethodProcessorError(methodElement)
@@ -266,7 +266,7 @@ void main() {
     ''');
 
       final actual = () =>
-          QueryMethodProcessor(methodElement, [...entities, ...views], [])
+          QueryMethodProcessor(methodElement, [...entities, ...views], {})
               .process();
 
       final error = QueryMethodProcessorError(methodElement)
@@ -333,7 +333,7 @@ Future<List<Entity>> _getEntities() async {
 
   return library.classes
       .where((classElement) => classElement.hasAnnotation(annotations.Entity))
-      .map((classElement) => EntityProcessor(classElement, []).process())
+      .map((classElement) => EntityProcessor(classElement, {}).process())
       .toList();
 }
 
@@ -356,6 +356,6 @@ Future<List<View>> _getViews() async {
   return library.classes
       .where((classElement) =>
           classElement.hasAnnotation(annotations.DatabaseView))
-      .map((classElement) => ViewProcessor(classElement, []).process())
+      .map((classElement) => ViewProcessor(classElement, {}).process())
       .toList();
 }

@@ -8,11 +8,10 @@ import 'package:floor_generator/value_object/type_converter.dart';
 import 'package:source_gen/source_gen.dart';
 
 extension TypeConverterElementExtension on Element {
-  /// Returns a list of [TypeConverter]s found in the @TypeConverters
+  /// Returns a set of [TypeConverter]s found in the @TypeConverters
   /// annotation on this element
   @nonNull
-  // TODO #165 return set instead
-  List<TypeConverter> getTypeConverters(final TypeConverterScope scope) {
+  Set<TypeConverter> getTypeConverters(final TypeConverterScope scope) {
     if (hasAnnotation(annotations.TypeConverters)) {
       final typeConverterElements = getAnnotation(annotations.TypeConverters)
           .getField(AnnotationField.typeConverterValue)
@@ -40,9 +39,9 @@ extension TypeConverterElementExtension on Element {
 
       return typeConverterClassElements
           .map((element) => TypeConverterProcessor(element, scope).process())
-          .toList();
+          .toSet();
     } else {
-      return [];
+      return {};
     }
   }
 }
