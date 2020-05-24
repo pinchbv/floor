@@ -4,6 +4,7 @@ import 'package:dartx/dartx.dart';
 import 'package:floor_annotation/floor_annotation.dart' as annotations;
 import 'package:floor_generator/misc/annotations.dart';
 import 'package:floor_generator/misc/constants.dart';
+import 'package:floor_generator/misc/extension/set_extension.dart';
 import 'package:floor_generator/misc/extension/type_converter_element_extension.dart';
 import 'package:floor_generator/misc/type_utils.dart';
 import 'package:floor_generator/processor/error/query_method_processor_error.dart';
@@ -57,7 +58,7 @@ class QueryMethodProcessor extends Processor<QueryMethod> {
     final parameterTypeConverters = parameters
         .expand((parameter) =>
             parameter.getTypeConverters(TypeConverterScope.daoMethodParameter))
-        .toList();
+        .toSet();
 
     final allTypeConverters = _typeConverters +
         _methodElement.getTypeConverters(TypeConverterScope.daoMethod) +
@@ -65,7 +66,7 @@ class QueryMethodProcessor extends Processor<QueryMethod> {
 
     if (queryable != null) {
       final fieldTypeConverters =
-          queryable.fields.mapNotNull((field) => field.typeConverter).toList();
+          queryable.fields.mapNotNull((field) => field.typeConverter);
       allTypeConverters.addAll(fieldTypeConverters);
     }
 
