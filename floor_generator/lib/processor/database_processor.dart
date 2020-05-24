@@ -3,6 +3,7 @@ import 'package:dartx/dartx.dart';
 import 'package:floor_annotation/floor_annotation.dart' as annotations;
 import 'package:floor_generator/misc/annotations.dart';
 import 'package:floor_generator/misc/constants.dart';
+import 'package:floor_generator/misc/extension/set_extension.dart';
 import 'package:floor_generator/misc/extension/type_converter_element_extension.dart';
 import 'package:floor_generator/misc/type_utils.dart';
 import 'package:floor_generator/processor/dao_processor.dart';
@@ -161,22 +162,21 @@ class DatabaseProcessor extends Processor<Database> {
     // DAO query methods have access to all type converters
     final daoQueryMethodTypeConverters = daoGetters
         .expand((daoGetter) => daoGetter.dao.queryMethods)
-        .expand((queryMethod) => queryMethod.typeConverters);
+        .expand((queryMethod) => queryMethod.typeConverters)
+        .toSet();
 
     // but when no query methods are defined, we need to collect them differently
     final daoTypeConverters =
-        daoGetters.expand((daoGetter) => daoGetter.dao.typeConverters);
+        daoGetters.expand((daoGetter) => daoGetter.dao.typeConverters).toSet();
 
     final fieldTypeConverters = queryables
         .expand((queryable) => queryable.fields)
-        .map((field) => field.typeConverter) // nullable
-        .filterNotNull();
+        .mapNotNull((field) => field.typeConverter)
+        .toSet();
 
-    return {
-      ...daoQueryMethodTypeConverters,
-      ...daoTypeConverters,
-      ...fieldTypeConverters,
-    };
+    return daoQueryMethodTypeConverters +
+        daoTypeConverters +
+        fieldTypeConverters;
   }
 
   @nonNull
