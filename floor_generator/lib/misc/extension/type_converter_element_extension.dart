@@ -8,6 +8,8 @@ import 'package:floor_generator/value_object/type_converter.dart';
 import 'package:source_gen/source_gen.dart';
 
 extension TypeConverterElementExtension on Element {
+  /// Returns a list of [TypeConverter]s found in the @TypeConverters
+  /// annotation on this element
   @nonNull
   List<TypeConverter> getTypeConverters(final TypeConverterScope scope) {
     if (hasAnnotation(annotations.TypeConverters)) {
