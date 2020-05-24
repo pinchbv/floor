@@ -1,7 +1,6 @@
 import 'package:floor/floor.dart';
 
 import 'order.dart';
-import 'type_converter.dart';
 
 @dao
 abstract class OrderDao {
@@ -18,8 +17,7 @@ abstract class OrderDao {
   Future<Order> findOrderById(int id);
 
   @Query('SELECT * FROM `Order` WHERE date = :date')
-  Future<List<Order>> findOrdersByDate(
-      @TypeConverters([DateTimeToMicrosecondsConverter]) DateTime date);
+  Future<List<Order>> findOrdersByDate(DateTime date);
 
   @Query('SELECT * FROM `Order`')
   Future<List<Order>> findAllOrders();
