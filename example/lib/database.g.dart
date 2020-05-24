@@ -149,7 +149,8 @@ class _$TaskDao extends TaskDao {
   Stream<List<Task>> findAllTasksAsStream() {
     return _queryAdapter.queryListStream('SELECT * FROM task',
         queryableName: 'Task',
-       isView: false, mapper: (Map<String, dynamic> row) =>
+        isView: false,
+        mapper: (Map<String, dynamic> row) =>
             Task(row['id'] as int, row['message'] as String));
   }
 
