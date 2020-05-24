@@ -33,10 +33,10 @@ class FieldProcessor extends Processor<Field> {
         _fieldElement.hasAnnotation(annotations.ColumnInfo);
     final columnName = _getColumnName(hasColumnInfoAnnotation, name);
     final isNullable = _getIsNullable(hasColumnInfoAnnotation);
-    final typeConverter = [
+    final typeConverter = {
       ..._fieldElement.getTypeConverters(TypeConverterScope.field),
       _typeConverter
-    ].filterNotNull().closestOrNull;
+    }.filterNotNull().closestOrNull;
 
     return Field(
       _fieldElement,
