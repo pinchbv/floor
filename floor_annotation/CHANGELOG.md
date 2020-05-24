@@ -2,8 +2,7 @@
 
 # 0.8.0
 
-**⚠️ You need to migrate the explicit usages of `OnConflictStrategy` and `ForeignKeyAction` from snake case 
-to camel case.**
+**⚠️ You need to migrate the explicit usages of `OnConflictStrategy` and `ForeignKeyAction` from snake case to camel case.**
 
 * Apply camel case to constants
 
