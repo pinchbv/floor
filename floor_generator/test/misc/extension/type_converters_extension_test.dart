@@ -58,7 +58,7 @@ void main() {
     test('returns null when not type converter for DartType found', () async {
       final typeConverter = TypeConverter(
         'database type converter',
-        await stringDartTpe,
+        await stringDartType,
         await intDartType,
         TypeConverterScope.database,
       );
@@ -94,7 +94,7 @@ void main() {
     test('throws error when no type converter found for DartType', () async {
       final typeConverter = TypeConverter(
         'database type converter',
-        await stringDartTpe,
+        await stringDartType,
         await intDartType,
         TypeConverterScope.database,
       );
