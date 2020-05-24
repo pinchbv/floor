@@ -1,5 +1,38 @@
 # Changelog
 
+# 0.13.0
+
+### ⚠️ Breaking Changes
+
+**You need to migrate the explicit usages of `OnConflictStrategy` and `ForeignKeyAction` from snake case to camel case.**
+
+* Apply camel case to constants
+
+### Changes
+
+* Mention SQL centricity of Floor in README
+* Add banner to README
+* Update the description of the library
+* Migrate OnConflictStrategy to enum
+* Add more precise limitations of entity class and streams to README
+* Add DAO inheritance example to README
+* Fix database and DAO usage example in the README
+* Update README.md
+* Assert example app's behavior
+* Mention that floor uses first constructor found in entity class
+* Remove snapshot version instructions from README
+
+### 🚀 Features
+
+* Support Linux, macOS, Windows
+* Implement simple Streams on DatabaseViews, fix multi-dao changelistener
+
+### 🐛 Bug Fixes
+
+* Await database path retrieval
+* Fix boolean conversion issues, add regression test, fix indentation
+* Fix wrongly parsed arguments in @Query
+
 # 0.12.0
 
 ### Changes
