@@ -1,4 +1,5 @@
 import 'package:analyzer/dart/element/element.dart';
+import 'package:dartx/dartx.dart';
 import 'package:floor_annotation/floor_annotation.dart' as annotations;
 import 'package:floor_generator/misc/annotations.dart';
 import 'package:floor_generator/misc/constants.dart';
@@ -12,6 +13,7 @@ import 'package:floor_generator/processor/view_processor.dart';
 import 'package:floor_generator/value_object/dao_getter.dart';
 import 'package:floor_generator/value_object/database.dart';
 import 'package:floor_generator/value_object/entity.dart';
+import 'package:floor_generator/value_object/queryable.dart';
 import 'package:floor_generator/value_object/type_converter.dart';
 import 'package:floor_generator/value_object/view.dart';
 
@@ -40,7 +42,10 @@ class DatabaseProcessor extends Processor<Database> {
       databaseTypeConverters,
     );
     final version = _getDatabaseVersion();
-    final allTypeConverters = _getAllTypeConverters(daoGetters);
+    final allTypeConverters = _getAllTypeConverters(
+      daoGetters,
+      [...entities, ...views],
+    );
 
     return Database(
       _classElement,
@@ -149,12 +154,29 @@ class DatabaseProcessor extends Processor<Database> {
   }
 
   @nonNull
-  Set<TypeConverter> _getAllTypeConverters(final List<DaoGetter> daoGetters) {
+  Set<TypeConverter> _getAllTypeConverters(
+    final List<DaoGetter> daoGetters,
+    final List<Queryable> queryables,
+  ) {
     // DAO query methods have access to all type converters
-    return daoGetters
+    final daoQueryMethodTypeConverters = daoGetters
         .expand((daoGetter) => daoGetter.dao.queryMethods)
-        .expand((queryMethod) => queryMethod.typeConverters)
-        .toSet();
+        .expand((queryMethod) => queryMethod.typeConverters);
+
+    // but when no query methods are defined, we need to collect them differently
+    final daoTypeConverters =
+        daoGetters.expand((daoGetter) => daoGetter.dao.typeConverters);
+
+    final fieldTypeConverters = queryables
+        .expand((queryable) => queryable.fields)
+        .map((field) => field.typeConverter) // nullable
+        .filterNotNull();
+
+    return {
+      ...daoQueryMethodTypeConverters,
+      ...daoTypeConverters,
+      ...fieldTypeConverters,
+    };
   }
 
   @nonNull

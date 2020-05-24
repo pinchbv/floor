@@ -11,6 +11,7 @@ extension TypeConverterElementExtension on Element {
   /// Returns a list of [TypeConverter]s found in the @TypeConverters
   /// annotation on this element
   @nonNull
+  // TODO #165 return set instead
   List<TypeConverter> getTypeConverters(final TypeConverterScope scope) {
     if (hasAnnotation(annotations.TypeConverters)) {
       final typeConverterElements = getAnnotation(annotations.TypeConverters)

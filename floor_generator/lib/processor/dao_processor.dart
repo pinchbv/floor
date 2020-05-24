@@ -79,6 +79,8 @@ class DaoProcessor extends Processor<Dao> {
       transactionMethods,
       streamEntities,
       streamViews,
+      typeConverters
+          .toSet(), // TODO #165 make all type converter collections sets
     );
   }
 
