@@ -2,8 +2,8 @@ import 'package:floor_generator/misc/extension/type_converters_extension.dart';
 import 'package:floor_generator/value_object/type_converter.dart';
 import 'package:test/test.dart';
 
-import '../dart_type.dart';
-import '../test_utils.dart';
+import '../../dart_type.dart';
+import '../../test_utils.dart';
 
 void main() {
   group('closestOrNull', () {
