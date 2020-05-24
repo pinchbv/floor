@@ -174,7 +174,7 @@ After integrating type converters and embeddable objects, the API surface won't 
     final result = await personDao.findPersonById(1);
     ```
 
-For further examples take a look at the [example](https://github.com/vitusortner/floor/tree/develop/example) and [floor_test](https://github.com/vitusortner/floor/tree/develop/floor_test) directories.
+For further examples take a look at the [example](https://github.com/vitusortner/floor/tree/develop/example) and [floor_test](https://github.com/vitusortner/floor/tree/develop/floor/test/integration) directories.
 
 ## Architecture
 The components for storing and accessing data are **Entity**, **Data Access Object (DAO)** and **Database**.
@@ -233,6 +233,8 @@ Floor entities can hold values of the following Dart types which map to their co
 - `String` - TEXT
 - `bool` - REAL (0 = false, 1 = true)
 - `Uint8List` - BLOB
+
+In case you want to store sophisticated Dart objects that can be represented by one of the above types, take a look at [Type Converters](#type-converters). 
 
 ### Primary Keys
 Whenever a compound primary key is required (e.g. *n-m* relationships), the syntax for setting the keys differs from the previously mentioned way of setting primary keys.
