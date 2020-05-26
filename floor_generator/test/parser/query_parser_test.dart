@@ -1,4 +1,3 @@
-import 'package:floor_generator/query_analyzer/query_parser.dart';
 import 'package:sqlparser/sqlparser.dart';
 
 import 'package:test/test.dart';

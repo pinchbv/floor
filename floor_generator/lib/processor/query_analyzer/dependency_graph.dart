@@ -71,18 +71,18 @@ class DependencyGraph {
 //    return output;
 //  }
 
-  void _resolveIndirectDependencies(String reference){
-    if (!_indirectDependencyCache.containsKey(reference)) {
-      Set<String> result={reference};
-      if(_directDependencies.containsKey(reference)) {
-        for (String dep in _directDependencies[reference]){
-          // recursively resolve all dependencies
-          _resolveIndirectDependencies(dep);
-          result.addAll(_indirectDependencyCache[dep]);
-        }
-      }
-    }
-  }
+//  void _resolveIndirectDependencies(String reference){
+//    if (!_indirectDependencyCache.containsKey(reference)) {
+//      Set<String> result={reference};
+//      if(_directDependencies.containsKey(reference)) {
+//        for (String dep in _directDependencies[reference]){
+//          // recursively resolve all dependencies
+//          _resolveIndirectDependencies(dep);
+//          result.addAll(_indirectDependencyCache[dep]);
+//        }
+//      }
+//    }
+//  }
 
 
 }
