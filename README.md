@@ -211,13 +211,6 @@ With the annotation, it's possible to give columns a custom name and define if t
 - Floor automatically uses the **first** constructor defined in the entity class for creating in-memory objects from database rows.
 - There needs to be a constructor.  
 
-`@Embedded` includes annotationed class fields to be embedded to SQL query as if they are fields but from another class. 
-You can specifies a `prefix` to prepend the column names of the fields in the embedded fields.
-
-#### Limitations
-- Floor automatically uses the **first** constructor defined in the entity class for creating in-memory objects from database rows.
-- There needs to be a constructor.  
-
 ```dart
 @Entity(tableName: 'person')
 class Person {
@@ -227,16 +220,7 @@ class Person {
   @ColumnInfo(name: 'custom_name', nullable: false)
   final String name;
 
-  @Embedded(prefix: 'custom_prefix')
-  final Address address;
-
-  Person(this.id, this.name, this.address);
-}
-
-class Address {
-  final String street;
-  
-  Address(this.street);
+  Person(this.id, this.name);
 }
 ```
 

@@ -80,7 +80,7 @@ class _$FlutterDatabase extends FlutterDatabase {
       },
       onCreate: (database, version) async {
         await database.execute(
-            'CREATE TABLE IF NOT EXISTS `Task` (`id` INTEGER PRIMARY KEY AUTOINCREMENT, `message` TEXT, `time_created_at` TEXT,`time_updated_at` TEXT)');
+            'CREATE TABLE IF NOT EXISTS `Task` (`id` INTEGER PRIMARY KEY AUTOINCREMENT, `message` TEXT, `time_created_at` TEXT, `time_updated_at` TEXT)');
 
         await callback?.onCreate?.call(database, version);
       },
@@ -103,8 +103,8 @@ class _$TaskDao extends TaskDao {
             (Task item) => <String, dynamic>{
                   'id': item.id,
                   'message': item.message,
-                  'time_created_at': item.timestamp.createdAt,
-                  'time_updated_at': item.timestamp.updatedAt
+                  'time_created_at': item.timestamp?.createdAt,
+                  'time_updated_at': item.timestamp?.updatedAt
                 },
             changeListener),
         _taskUpdateAdapter = UpdateAdapter(
@@ -114,8 +114,8 @@ class _$TaskDao extends TaskDao {
             (Task item) => <String, dynamic>{
                   'id': item.id,
                   'message': item.message,
-                  'time_created_at': item.timestamp.createdAt,
-                  'time_updated_at': item.timestamp.updatedAt
+                  'time_created_at': item.timestamp?.createdAt,
+                  'time_updated_at': item.timestamp?.updatedAt
                 },
             changeListener),
         _taskDeletionAdapter = DeletionAdapter(
@@ -125,8 +125,8 @@ class _$TaskDao extends TaskDao {
             (Task item) => <String, dynamic>{
                   'id': item.id,
                   'message': item.message,
-                  'time_created_at': item.timestamp.createdAt,
-                  'time_updated_at': item.timestamp.updatedAt
+                  'time_created_at': item.timestamp?.createdAt,
+                  'time_updated_at': item.timestamp?.updatedAt
                 },
             changeListener);
 
@@ -195,4 +195,8 @@ class _$TaskDao extends TaskDao {
   Future<void> deleteTasks(List<Task> tasks) async {
     await _taskDeletionAdapter.deleteList(tasks);
   }
+}
+
+extension on bool {
+  int toInt() => this == null ? null : (this ? 1 : 0);
 }

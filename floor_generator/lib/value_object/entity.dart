@@ -17,12 +17,12 @@ class Entity extends Queryable {
     ClassElement classElement,
     String name,
     List<Field> fields,
-    List<Embedded> embedded,
+    List<Embedded> embeddeds,
     this.primaryKey,
     this.foreignKeys,
     this.indices,
     String constructor,
-  ) : super(classElement, name, fields, embedded, constructor);
+  ) : super(classElement, name, fields, embeddeds, constructor);
 
   @nonNull
   String getCreateTableStatement() {
@@ -32,11 +32,23 @@ class Entity extends Queryable {
       return field.getDatabaseDefinition(autoIncrement);
     }).toList();
 
-    final embeddedDefinitions = embeddeds.map((embed) {
-      return embed.fields.map((field) {
-        return field.getDatabaseDefinition(false);
-      }).join(',');
-    }).toList();
+    final embeddedDefinitions = embeddeds
+
+        // dig into children to expand fields
+        .expand((embedded) {
+          final fields = <Field>[];
+
+          void dig(final Embedded child) {
+            fields.addAll(child.fields);
+            child.children.forEach(dig);
+          }
+
+          dig(embedded);
+
+          return fields;
+        })
+        .map((field) => field.getDatabaseDefinition(false))
+        .toList();
     databaseDefinition.addAll(embeddedDefinitions);
 
     final foreignKeyDefinitions =
@@ -73,14 +85,25 @@ class Entity extends Queryable {
     }).toList();
     keyValueList.addAll(fieldKeyValue);
 
-    final embeddedKeyValue = embeddeds.map((embedded) {
-      final className = embedded.fieldElement.displayName;
+    final embeddedKeyValue = embeddeds.expand((embedded) {
+      final keyValue = <String>[];
+      final className = <String>[];
 
-      return embedded.fields.map((field) {
-        final columnName = field.columnName;
-        final attributeValue = _getAttributeValue(field);
-        return "'$columnName': item.$className.$attributeValue";
-      }).join(',');
+      void dig(final Embedded child) {
+        className.add(child.fieldElement.displayName);
+        for (final field in child.fields) {
+          final columnName = field.columnName;
+          final attributeValue =
+              [...className, _getAttributeValue(field)].join('?.');
+          keyValue.add("'$columnName': item.$attributeValue");
+        }
+
+        child.children.forEach(dig);
+      }
+
+      dig(embedded);
+
+      return keyValue;
     }).toList();
     keyValueList.addAll(embeddedKeyValue);
 
@@ -91,11 +114,7 @@ class Entity extends Queryable {
   String _getAttributeValue(final Field field) {
     final parameterName = field.fieldElement.displayName;
     if (field.fieldElement.type.isDartCoreBool) {
-      if (field.isNullable) {
-        return '$parameterName == null ? null : ($parameterName ? 1 : 0)';
-      } else {
-        return '$parameterName ? 1 : 0';
-      }
+      return '$parameterName?.toInt()';
     } else {
       return '$parameterName';
     }
@@ -109,6 +128,7 @@ class Entity extends Queryable {
           classElement == other.classElement &&
           name == other.name &&
           const ListEquality<Field>().equals(fields, other.fields) &&
+          const ListEquality<Embedded>().equals(embeddeds, other.embeddeds) &&
           primaryKey == other.primaryKey &&
           const ListEquality<ForeignKey>()
               .equals(foreignKeys, other.foreignKeys) &&
@@ -120,6 +140,7 @@ class Entity extends Queryable {
       classElement.hashCode ^
       name.hashCode ^
       fields.hashCode ^
+      embeddeds.hashCode ^
       primaryKey.hashCode ^
       foreignKeys.hashCode ^
       indices.hashCode ^

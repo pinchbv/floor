@@ -1,5 +1,4 @@
 import 'package:floor_generator/misc/constants.dart';
-import 'package:floor_generator/value_object/embedded.dart';
 import 'package:floor_generator/value_object/field.dart';
 import 'package:floor_generator/value_object/view.dart';
 import 'package:mockito/mockito.dart';
@@ -27,7 +26,6 @@ void main() {
     SqlType.text,
   );
   final allFields = [field, nullableField];
-  final allEmbeddeds = <Embedded>[];
 
   tearDown(() {
     clearInteractions(mockClassElement);
@@ -43,7 +41,7 @@ void main() {
       mockClassElement,
       'entityName',
       allFields,
-      allEmbeddeds,
+      [],
       'SELECT * FROM x',
       '',
     );

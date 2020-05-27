@@ -178,7 +178,15 @@ class TasksTextField extends StatelessWidget {
     if (message.trim().isEmpty) {
       _textEditingController.clear();
     } else {
-      final task = Task(null, message, Timestamp.now());
+      final task = Task(
+        null,
+        message,
+        Timestamp(
+          createdAt: DateTime.now().toString(),
+          updatedAt: DateTime.now().toString(),
+        ),
+      );
+
       await dao.insertTask(task);
       _textEditingController.clear();
     }

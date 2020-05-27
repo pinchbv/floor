@@ -26,7 +26,7 @@ class ViewProcessor extends QueryableProcessor<View> {
       fields,
       embeddeds,
       _getQuery(),
-      getConstructor(fields, embeddeds),
+      getConstructor([...fields, ...embeddeds]),
     );
   }
 

@@ -2,14 +2,26 @@ import 'package:floor/floor.dart';
 
 class Timestamp {
   @ColumnInfo(name: 'created_at')
-  String createdAt;
+  final String createdAt;
 
   @ColumnInfo(name: 'updated_at')
-  String updatedAt;
+  final String updatedAt;
 
   Timestamp({this.createdAt, this.updatedAt});
 
-  Timestamp.now()
-      : createdAt = DateTime.now().toString(),
-        updatedAt = DateTime.now().toString();
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is Timestamp &&
+          runtimeType == other.runtimeType &&
+          createdAt == other.createdAt &&
+          updatedAt == other.updatedAt;
+
+  @override
+  int get hashCode => createdAt.hashCode ^ updatedAt.hashCode;
+
+  @override
+  String toString() {
+    return 'Task{createdAt: $createdAt, updatedAt: $updatedAt}';
+  }
 }

@@ -22,10 +22,10 @@ class Task {
           message == other.message;
 
   @override
-  int get hashCode => id.hashCode ^ message.hashCode;
+  int get hashCode => id.hashCode ^ message.hashCode ^ timestamp.hashCode;
 
   @override
   String toString() {
-    return 'Task{id: $id, message: $message}';
+    return 'Task{id: $id, message: $message, timestamp: $timestamp}';
   }
 }

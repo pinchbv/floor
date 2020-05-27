@@ -1,6 +1,5 @@
 import 'package:analyzer/dart/element/element.dart';
 import 'package:analyzer/dart/element/type.dart';
-import 'package:floor_annotation/floor_annotation.dart' as annotations;
 import 'package:floor_generator/misc/annotations.dart';
 import 'package:floor_generator/misc/type_utils.dart';
 import 'package:floor_generator/processor/embedded_processor.dart';
@@ -9,7 +8,9 @@ import 'package:floor_generator/processor/field_processor.dart';
 import 'package:floor_generator/processor/processor.dart';
 import 'package:floor_generator/value_object/embedded.dart';
 import 'package:floor_generator/value_object/field.dart';
+import 'package:floor_generator/value_object/fieldable.dart';
 import 'package:floor_generator/value_object/queryable.dart';
+import 'package:floor_generator/extension/field_element_extension.dart';
 import 'package:meta/meta.dart';
 
 abstract class QueryableProcessor<T extends Queryable> extends Processor<T> {
@@ -17,16 +18,17 @@ abstract class QueryableProcessor<T extends Queryable> extends Processor<T> {
 
   @protected
   final ClassElement classElement;
+  @protected
+  final List<FieldElement> _fields;
 
   @protected
   QueryableProcessor(this.classElement)
       : assert(classElement != null),
-        _queryableProcessorError = QueryableProcessorError(classElement);
-
-  List<FieldElement> get _allFields => [
-        ...classElement.fields,
-        ...classElement.allSupertypes.expand((type) => type.element.fields),
-      ];
+        _queryableProcessorError = QueryableProcessorError(classElement),
+        _fields = [
+          ...classElement.fields,
+          ...classElement.allSupertypes.expand((type) => type.element.fields),
+        ];
 
   @nonNull
   @protected
@@ -35,7 +37,7 @@ abstract class QueryableProcessor<T extends Queryable> extends Processor<T> {
       throw _queryableProcessorError.prohibitedMixinUsage;
     }
 
-    return _allFields
+    return _fields
         .where((fieldElement) => fieldElement.shouldBeIncluded())
         .map((field) => FieldProcessor(field).process())
         .toList();
@@ -44,84 +46,58 @@ abstract class QueryableProcessor<T extends Queryable> extends Processor<T> {
   @nonNull
   @protected
   List<Embedded> getEmbeddeds() {
-    return _allFields
-        .where((fieldElement) => fieldElement.shouldEmbedded())
+    return _fields
+        .where((fieldElement) => fieldElement.isEmbedded)
         .map((embedded) => EmbeddedProcessor(embedded).process())
         .toList();
   }
 
   @nonNull
   @protected
-  String getConstructor(
-    final List<Field> fields,
-    final List<Embedded> embeddeds,
-  ) {
-    final constructorBuffer = StringBuffer();
-    final constructorParameters = classElement.constructors.first.parameters;
+  String getConstructor(final List<Fieldable> items) {
+    final buffer = StringBuffer();
 
-    constructorBuffer.write('${classElement.displayName}(');
+    void write(final ClassElement classElement, final List<Fieldable> items) {
+      final parameters = classElement.constructors.first.parameters;
 
-    constructorBuffer.write(
-      constructorParameters
-          .map((parameterElement) =>
-              _getParameterValue(parameterElement, fields))
-          .where((parameterValue) => parameterValue != null)
-          .join(', '),
-    );
+      buffer.write('${classElement.displayName}(');
 
-    for (final embedded in embeddeds) {
-      final parameterName = embedded.fieldElement.displayName;
-      final field = constructorParameters.firstWhere(
-        (parameterElement) => parameterElement.name == parameterName,
-        orElse: () => null,
-      );
+      parameters.asMap().forEach((index, parameter) {
+        final parameterName = parameter.displayName;
 
-      constructorBuffer.write(', ');
+        if (parameter.isNamed) {
+          buffer.write('$parameterName: ');
+        }
 
-      if (field.isNamed) {
-        constructorBuffer.write('$parameterName: ');
-      }
+        final item = items.firstWhere(
+          (item) => item.fieldElement.displayName == parameterName,
+          // whenever field is `@ignored`
+          orElse: () {
+            buffer.write('null');
+            return null;
+          },
+        );
 
-      constructorBuffer.write('${embedded.classElement.displayName}(');
+        if (item is Field) {
+          final parameterValue = "row['${item.columnName}']";
+          final castedParameterValue = _castParameterValue(
+              parameter.type, parameterValue, item.isNullable);
+          buffer.write(castedParameterValue);
+        }
 
-      constructorBuffer.write(
-        embedded.classElement.constructors.first.parameters
-            .map((parameterElement) =>
-                _getParameterValue(parameterElement, embedded.fields))
-            .where((parameterValue) => parameterValue != null)
-            .join(', '),
-      );
+        if (item is Embedded)
+          write(item.classElement, [...item.fields, ...item.children]);
 
-      constructorBuffer.write(')');
+        /// ignore comma seprator if reach end
+        if (parameters.length - 1 != index) buffer.write(', ');
+      });
+
+      buffer.write(')');
     }
 
-    constructorBuffer.write(')');
+    write(classElement, items);
 
-    return constructorBuffer.toString();
-  }
-
-  /// Returns `null` whenever field is @ignored
-  @nullable
-  String _getParameterValue(
-    final ParameterElement parameterElement,
-    final List<Field> fields,
-  ) {
-    final parameterName = parameterElement.displayName;
-    final field = fields.firstWhere(
-      (field) => field.name == parameterName,
-      orElse: () => null, // whenever field is @ignored
-    );
-    if (field != null) {
-      final parameterValue = "row['${field.columnName}']";
-      final castedParameterValue = _castParameterValue(
-          parameterElement.type, parameterValue, field.isNullable);
-      if (parameterElement.isNamed) {
-        return '$parameterName: $castedParameterValue';
-      }
-      return castedParameterValue; // also covers positional parameter
-    } else {
-      return null;
-    }
+    return buffer.toString();
   }
 
   @nonNull
@@ -147,16 +123,5 @@ abstract class QueryableProcessor<T extends Queryable> extends Processor<T> {
     } else {
       return '$parameterValue as double'; // must be double
     }
-  }
-}
-
-extension on FieldElement {
-  bool shouldBeIncluded() {
-    final isIgnored = hasAnnotation(annotations.ignore.runtimeType);
-    return !(isStatic || isSynthetic || isIgnored || shouldEmbedded());
-  }
-
-  bool shouldEmbedded() {
-    return hasAnnotation(annotations.Embedded) && type.element is ClassElement;
   }
 }

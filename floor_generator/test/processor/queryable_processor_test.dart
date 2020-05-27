@@ -419,7 +419,7 @@ void main() {
 
       final actual = TestProcessor(classElement).process().constructor;
 
-      const expected = "Person(row['id'] as int, row['name'] as String)";
+      const expected = "Person(row['id'] as int, row['name'] as String, null)";
       expect(actual, equals(expected));
     });
   });
@@ -464,7 +464,7 @@ class TestProcessor extends QueryableProcessor<TestQueryable> {
       classElement,
       fields,
       embeddeds,
-      getConstructor(fields, embeddeds),
+      getConstructor([...fields, ...embeddeds]),
     );
   }
 }
