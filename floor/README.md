@@ -393,6 +393,8 @@ abstract class AppDatabase extends FloorDatabase {
 
 You can then query the view via a DAO function like an entity.
 
+It is possible for DatabaseViews to inherit common fields from a base class, just like in entities.
+
 #### Limitations
 - It is now possible to return a `Stream` object from a DAO method which queries a database view. But it will fire on **any** 
   `@update`, `@insert`, `@delete` events in the whole database, which can get quite taxing on the runtime. Please add it only if you know what you are doing!
