@@ -319,6 +319,49 @@ class Person {
   Person(this.id, this.name);
 }
 ```
+
+### Inheritance
+
+Just like Daos, entities (and database views) can inherit from a common base class and use their fields. The entity just has to `extend` the base class.
+This construct will be treated as if all the fields in the base class are part of the entity, meaning the database table will 
+have all columns of the entity and the base class. 
+
+The base class does not have to have a separate annotation for the class. Its fields can be annotated just like normal entity columns.
+Foreign keys and indices have to be declared in the entity and can't be defined in the base class.
+
+```dart
+class BaseObject {
+  @PrimaryKey()
+  final int id;
+
+  @ColumnInfo(name: 'create_time', nullable: false)
+  final String createTime;
+
+  @ColumnInfo(name: 'update_time')
+  final String updateTime;
+
+  BaseObject(
+    this.id,
+    this.updateTime, {
+    String createTime,
+  }) : this.createTime = createTime ?? DateTime.now().toString();
+
+  @override
+  List<Object> get props => [];
+}
+
+@Entity(tableName: 'comments')
+class Comment extends BaseObject {
+  final String author;
+
+  final String content;
+
+  Comment(this.author,
+      {int id, this.content = '', String createTime, String updateTime})
+      : super(id, updateTime, createTime: createTime);
+}
+```
+
 ## Database Views
 If you want to define static `SELECT`-statements which return different types than your entities, your best option is to use `@DatabaseView`.
 A database view can be understood as a virtual table, which can be queried like a real table.
