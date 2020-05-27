@@ -227,10 +227,10 @@ class Person {
 ### Supported Types
 Floor entities can hold values of the following Dart types which map to their corresponding SQLite types and vice versa.
 
-- `int` - REAL
+- `int` - INTEGER
 - `double` - REAL
 - `String` - TEXT
-- `bool` - REAL (0 = false, 1 = true)
+- `bool` - INTEGER (0 = false, 1 = true)
 - `Uint8List` - BLOB
 
 ### Primary Keys
