@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:floor/floor.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:matcher/matcher.dart';
@@ -140,9 +138,9 @@ void main() {
           //should fail and trigger rollback because ids are the same
           try {
             await personDao.replacePersons(newPersons);
-          }catch (sfe) {
+          } catch (sfe) {
             // the type SqfliteFfiException is not in scope, so we have to do it this way
-            expect(sfe.runtimeType.toString() ,equals('SqfliteFfiException'));
+            expect(sfe.runtimeType.toString(), equals('SqfliteFfiException'));
           }
 
           final actual = await personDao.findAllPersons();
