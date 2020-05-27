@@ -7,7 +7,6 @@ import 'package:sqflite/sqflite.dart' as sqflite;
 
 part 'entity_inheritance_test.g.dart';
 
-
 void main() {
   group('dao inheritance tests', () {
     TestDatabase database;
@@ -33,8 +32,6 @@ void main() {
   });
 }
 
-
-
 // data models:
 class BaseObject {
   @PrimaryKey()
@@ -47,10 +44,10 @@ class BaseObject {
   final String updateTime;
 
   BaseObject(
-      this.id,
-      this.updateTime, {
-        String createTime,
-      }) : createTime = createTime ?? DateTime.now().toString();
+    this.id,
+    this.updateTime, {
+    String createTime,
+  }) : createTime = createTime ?? DateTime.now().toString();
 }
 
 @Entity(tableName: 'comments')
@@ -75,14 +72,18 @@ class Comment extends BaseObject {
           updateTime == other.updateTime;
 
   @override
-  int get hashCode => id.hashCode ^ author.hashCode ^ content.hashCode ^ createTime.hashCode ^ updateTime.hashCode;
+  int get hashCode =>
+      id.hashCode ^
+      author.hashCode ^
+      content.hashCode ^
+      createTime.hashCode ^
+      updateTime.hashCode;
 
   @override
   String toString() {
     return 'Comment{id: $id, author: $author, content: $content, createTime: $createTime, updateTime: $updateTime}';
   }
 }
-
 
 // daos:
 @Database(version: 1, entities: [Comment])
