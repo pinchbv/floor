@@ -126,7 +126,10 @@ class QueryMethodWriter implements Writer {
     @nullable final String arguments,
     @nonNull final String mapper,
   ) {
-    final parameters = StringBuffer()..write("'${_queryMethod.query}', ");
+    final parameters = StringBuffer()
+      ..write(literalString(_queryMethod.query))
+      ..write(', ');
+
     if (arguments != null) parameters.write('arguments: $arguments, ');
     parameters.write('mapper: $mapper');
 

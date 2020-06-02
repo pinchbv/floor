@@ -188,6 +188,22 @@ void main() {
     '''));
   });
 
+  test('Query with \' characters', () async {
+    final queryMethod = await _createQueryMethod(r'''
+      @Query('SELECT * FROM Person WHERE name = \'\'')
+      Future<List<Person>> findEmptyNames();
+    ''');
+
+    final actual = QueryMethodWriter(queryMethod).write();
+
+    expect(actual, equalsDart(r'''
+      @override
+      Future<List<Person>> findEmptyNames() async {
+        return _queryAdapter.queryList('SELECT * FROM Person WHERE name = \'\'', mapper: _personMapper);
+      }
+    '''));
+  });
+
   test('query with unsupported type throws', () async {
     final queryMethod = await _createQueryMethod('''
       @Query('SELECT * FROM Person WHERE id = :person')
