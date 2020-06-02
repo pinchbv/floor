@@ -15,4 +15,11 @@ class QueryAnalyzerError {
       element: _methodElement,
     );
   }
+
+  InvalidGenerationSourceError fromAnalysisError(AnalysisError error) {
+    return InvalidGenerationSourceError(
+      'The query contained errors: ${error.message}',
+      element: _methodElement,
+    );
+  }
 }

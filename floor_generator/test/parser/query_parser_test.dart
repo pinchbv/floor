@@ -34,36 +34,23 @@ void main(){
     print('Das hier ist die zweite Query:');
     print(result.rootNode.runtimeType);
 
+
+    const queryParamTest= 'SELECT ?2, ?4, ? , ?, ?, ?5, ?1, ?3';
+    final analyzed=engine.analyze(queryParamTest);
+    VariableVisitor().visitBaseSelectStatement(analyzed.root, null);
+
   });
 }
 
+class VariableVisitor extends RecursiveVisitor<void,void>{
+  @override
+  void visitNumberedVariable(NumberedVariable e, void _s) {
+    print('variable $e has index ${e.resolvedIndex}');
 
-/*
-final dynamic _initialized=(){print("This Xd class was initialized");}();
-
-class Xd{
-
-  void thatf(){
-
+    return super.visitNumberedVariable(e, _s);
   }
 }
 
 
-void main() {
-
-  test('Includes methods from abstract parent class', () async {
-    final parser=QueryParser("SELECT * FROM STUFF JOIN OTHERSTUFF WHERE x is y group by this having ws=3 order by 2");
-    final deps=parser.getDependencies();
-
-//    final parser3=QueryParser("DELETE FROM thattable");
-//    final deps3=parser3.getDependencies();
-//
-//    final parser2=QueryParser("DELETE FROM thattable WHERE :condition");
-//    final deps2=parser2.getDependencies();
-
-//    print('$deps2,$deps3');
-    expect(deps.length, equals(2));
-  });
-
-
-}*/
+//TODO: list parameters out-of-order with normal parameters in-between,
+// double-use, strings containing `:abc`, erroring out on `?` vars

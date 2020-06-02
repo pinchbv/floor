@@ -1,4 +1,5 @@
 import 'package:analyzer/dart/element/element.dart';
+import 'package:floor_generator/value_object/field.dart';
 import 'package:source_gen/source_gen.dart';
 import 'package:sqlparser/sqlparser.dart';
 import 'package:sqlparser/src/analysis/analysis.dart';
@@ -35,6 +36,16 @@ class ViewProcessorError {
 
   InvalidGenerationSourceError nullableMismatch(String columnName, String fieldName) {
     // TODO sqlparser is nulltype and field is not nullable
+
+    return null;
+  }
+  InvalidGenerationSourceError nullableMismatch2(Field column, ResolvedType parsertype) {
+    // TODO sqlparser type is nullable and field is not nullable
+
+    return null;
+  }
+  InvalidGenerationSourceError typeMismatch(Field column, ResolvedType parsertype) {
+    // TODO sqlparser type is a different one than the field type
 
     return null;
   }
