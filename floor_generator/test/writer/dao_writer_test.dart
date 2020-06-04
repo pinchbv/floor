@@ -77,7 +77,7 @@ void main() {
         
           @override
           Future<List<Person>> findAllPersons() async {
-            return _queryAdapter.queryList('SELECT * FROM person', mapper: _personMapper);
+            return _queryAdapter.queryList(r""" SELECT * FROM person """, mapper: _personMapper);
           }
           
           @override
@@ -162,7 +162,7 @@ void main() {
         
           @override
           Stream<List<Person>> findAllPersonsAsStream() {
-            return _queryAdapter.queryListStream('SELECT * FROM person', queryableName: 'Person', isView: false, mapper: _personMapper);
+            return _queryAdapter.queryListStream(r""" SELECT * FROM person """, queryableName: 'Person', isView: false, mapper: _personMapper);
           }
           
           @override

@@ -116,7 +116,7 @@ class QueryMethodWriter implements Writer {
 
   @nonNull
   String _generateNoReturnQuery(@nullable final String arguments) {
-    final parameters = StringBuffer()..write("'${_queryMethod.query}'");
+    final parameters = StringBuffer()..write('r""" ${_queryMethod.query} """');
     if (arguments != null) parameters.write(', arguments: $arguments');
     return 'await _queryAdapter.queryNoReturn($parameters);';
   }
@@ -127,7 +127,7 @@ class QueryMethodWriter implements Writer {
     @nonNull final String mapper,
   ) {
     final parameters = StringBuffer()
-      ..write(literalString(_queryMethod.query))
+      ..write('r""" ${_queryMethod.query} """')
       ..write(', ');
 
     if (arguments != null) parameters.write('arguments: $arguments, ');
@@ -147,7 +147,8 @@ class QueryMethodWriter implements Writer {
   ) {
     final queryableName = _queryMethod.queryable.name;
     final isView = _queryMethod.queryable is View;
-    final parameters = StringBuffer()..write("'${_queryMethod.query}', ");
+    final parameters = StringBuffer()
+      ..write('r""" ${_queryMethod.query} """, ');
     if (arguments != null) parameters.write('arguments: $arguments, ');
     parameters
       ..write("queryableName: '$queryableName', ")
