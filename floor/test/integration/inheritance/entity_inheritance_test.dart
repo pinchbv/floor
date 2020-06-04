@@ -8,7 +8,7 @@ import 'package:sqflite/sqflite.dart' as sqflite;
 part 'entity_inheritance_test.g.dart';
 
 void main() {
-  group('dao inheritance tests', () {
+  group('entity inheritance tests', () {
     TestDatabase database;
     CommentDao commentDao;
 
@@ -21,7 +21,7 @@ void main() {
       await database.close();
     });
 
-    test('use generated inherited insert function', () async {
+    test('use inherited entity object by inserting and finding', () async {
       final comment = Comment(1, 'Simon');
       await commentDao.addComment(comment);
 
