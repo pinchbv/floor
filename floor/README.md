@@ -228,10 +228,10 @@ class Person {
 ### Supported Types
 Floor entities can hold values of the following Dart types which map to their corresponding SQLite types and vice versa.
 
-- `int` - REAL
+- `int` - INTEGER
 - `double` - REAL
 - `String` - TEXT
-- `bool` - REAL (0 = false, 1 = true)
+- `bool` - INTEGER (0 = false, 1 = true)
 - `Uint8List` - BLOB
 
 ### Primary Keys
@@ -500,12 +500,11 @@ Future<int> deletePersons(List<Person> person);
 ```
 
 ### Streams
-As already mentioned, queries can not only return a value once when called but also a continuous stream of query results.
-The returned stream keeps you in sync with the changes happening to the database table.
-This feature plays really well with the `StreamBuilder` widget.
+As already mentioned, queries cannot only return values once when called but also continuous streams of query results.
+The returned streams keep you in sync with the changes happening in the database tables.
+This feature plays well with the `StreamBuilder` widget which accepts a stream of values and rebuilds itself whenever there is a new emission.
 
-These methods return a broadcast stream.
-Thus, it can have multiple listeners.
+These methods return broadcast streams and thus, can have multiple listeners.
 ```dart
 // definition
 @Query('SELECT * FROM Person')
@@ -526,6 +525,7 @@ StreamBuilder<List<Person>>(
 - It is now possible to return a `Stream` if the function queries a database view. But it will fire on **any** 
   `@update`, `@insert`, `@delete` events in the whole database, which can get quite taxing on the runtime. Please add it only if you know what you are doing!
   This is mostly due to the complexity of detecting which entities are involved in a database view.
+- Functions returning a stream of single items such as `Stream<Person>` do not emit when there is no query result.
 
 ### Transactions
 Whenever you want to perform some operations in a transaction you have to add the `@transaction` annotation to the method.
