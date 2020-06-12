@@ -46,7 +46,7 @@ void main() {
     });
 
     test('falls back to abort when null', () {
-      final actual = null.asSqfliteConflictAlgorithm();
+      final ConflictAlgorithm actual = null.asSqfliteConflictAlgorithm();
 
       expect(actual, equals(ConflictAlgorithm.abort));
     });
