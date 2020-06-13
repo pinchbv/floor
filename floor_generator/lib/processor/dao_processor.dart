@@ -5,6 +5,7 @@ import 'package:floor_generator/misc/type_utils.dart';
 import 'package:floor_generator/processor/deletion_method_processor.dart';
 import 'package:floor_generator/processor/insertion_method_processor.dart';
 import 'package:floor_generator/processor/processor.dart';
+import 'package:floor_generator/processor/query_analyzer/engine.dart';
 import 'package:floor_generator/processor/query_method_processor.dart';
 import 'package:floor_generator/processor/transaction_method_processor.dart';
 import 'package:floor_generator/processor/update_method_processor.dart';
@@ -23,6 +24,7 @@ class DaoProcessor extends Processor<Dao> {
   final String _databaseName;
   final List<Entity> _entities;
   final List<View> _views;
+  final AnalyzerEngine _analyzerEngine;
 
   DaoProcessor(
     final ClassElement classElement,
@@ -30,16 +32,19 @@ class DaoProcessor extends Processor<Dao> {
     final String databaseName,
     final List<Entity> entities,
     final List<View> views,
+    final AnalyzerEngine analyzerEngine,
   )   : assert(classElement != null),
         assert(daoGetterName != null),
         assert(databaseName != null),
         assert(entities != null),
         assert(views != null),
+        assert(analyzerEngine != null),
         _classElement = classElement,
         _daoGetterName = daoGetterName,
         _databaseName = databaseName,
         _entities = entities,
-        _views = views;
+        _views = views,
+        _analyzerEngine = analyzerEngine;
 
   @override
   Dao process() {
@@ -55,11 +60,10 @@ class DaoProcessor extends Processor<Dao> {
     final deletionMethods = _getDeletionMethods(methods);
     final transactionMethods = _getTransactionMethods(methods);
 
-    final streamQueryables = queryMethods
-        .where((method) => method.returnsStream)
-        .map((method) => method.queryable);
-    final streamEntities = streamQueryables.whereType<Entity>().toSet();
-    final streamViews = streamQueryables.whereType<View>().toSet();
+    final streamEntities = queryMethods
+        .where((method) => method.returnType.isStream)
+        .expand((method) => method.sqliteContext.dependencies)
+        .toSet();
 
     return Dao(
       _classElement,
@@ -70,15 +74,15 @@ class DaoProcessor extends Processor<Dao> {
       deletionMethods,
       transactionMethods,
       streamEntities,
-      streamViews,
     );
   }
 
   List<QueryMethod> _getQueryMethods(final List<MethodElement> methods) {
     return methods
         .where((method) => method.hasAnnotation(annotations.Query))
-        .map((method) =>
-            QueryMethodProcessor(method, [..._entities, ..._views]).process())
+        .map((method) => QueryMethodProcessor(
+                method, [..._entities, ..._views], _analyzerEngine)
+            .process())
         .toList();
   }
 

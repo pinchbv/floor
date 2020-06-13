@@ -17,7 +17,6 @@ class Dao {
   final List<DeletionMethod> deletionMethods;
   final List<TransactionMethod> transactionMethods;
   final Set<Entity> streamEntities;
-  final Set<View> streamViews;
 
   Dao(
     this.classElement,
@@ -28,7 +27,6 @@ class Dao {
     this.deletionMethods,
     this.transactionMethods,
     this.streamEntities,
-    this.streamViews,
   );
 
   @override
@@ -49,8 +47,7 @@ class Dao {
           const ListEquality<TransactionMethod>()
               .equals(transactionMethods, other.transactionMethods) &&
           const SetEquality<Entity>()
-              .equals(streamEntities, other.streamEntities) &&
-          const SetEquality<View>().equals(streamViews, other.streamViews);
+              .equals(streamEntities, other.streamEntities);
 
   @override
   int get hashCode =>
@@ -61,11 +58,10 @@ class Dao {
       updateMethods.hashCode ^
       deletionMethods.hashCode ^
       transactionMethods.hashCode ^
-      streamEntities.hashCode ^
-      streamViews.hashCode;
+      streamEntities.hashCode;
 
   @override
   String toString() {
-    return 'Dao{classElement: $classElement, name: $name, queryMethods: $queryMethods, insertionMethods: $insertionMethods, updateMethods: $updateMethods, deletionMethods: $deletionMethods, transactionMethods: $transactionMethods, streamEntities: $streamEntities, streamViews: $streamViews}';
+    return 'Dao{classElement: $classElement, name: $name, queryMethods: $queryMethods, insertionMethods: $insertionMethods, updateMethods: $updateMethods, deletionMethods: $deletionMethods, transactionMethods: $transactionMethods, streamEntities: $streamEntities}';
   }
 }

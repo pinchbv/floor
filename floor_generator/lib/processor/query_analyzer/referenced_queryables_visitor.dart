@@ -31,6 +31,6 @@ Set<TableWrite> findWrittenTables(AstNode root) {
 /// If you want to use both [findWrittenTables] and this on the same ast node,
 /// follow the advice on [findWrittenTables] to only walk the ast once.
 Set<NamedResultSet> findReferencedTablesOrViews(AstNode root) {
-  final visitor=(ReferencedTablesVisitor()..visit(root, null));
-  return {...visitor.foundTables,...visitor.foundViews};
+  final visitor = (ReferencedTablesVisitor()..visit(root, null));
+  return {...visitor.foundTables, ...visitor.foundViews};
 }

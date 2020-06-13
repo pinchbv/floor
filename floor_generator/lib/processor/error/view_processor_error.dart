@@ -20,31 +20,36 @@ class ViewProcessorError {
     );
   }
 
-  InvalidGenerationSourceError parseErrorFromSqlparser(ParsingError parsingError) {
+  InvalidGenerationSourceError parseErrorFromSqlparser(
+      ParsingError parsingError) {
     return InvalidGenerationSourceError(
         'The following error occurred while parsing the SQL-Statement in ${_classElement.displayName}: ${parsingError.message}',
-        element: _classElement
-    );
+        element: _classElement);
   }
 
-  InvalidGenerationSourceError lintErrorFromSqlparser(AnalysisError lintingError) {
+  InvalidGenerationSourceError lintErrorFromSqlparser(
+      AnalysisError lintingError) {
     return InvalidGenerationSourceError(
         'The following error occurred while analyzing the SQL-Statement in ${_classElement.displayName}: ${lintingError.message}',
-        element: _classElement
-    );
+        element: _classElement);
   }
 
-  InvalidGenerationSourceError nullableMismatch(String columnName, String fieldName) {
+  InvalidGenerationSourceError nullableMismatch(
+      String columnName, String fieldName) {
     // TODO sqlparser is nulltype and field is not nullable
 
     return null;
   }
-  InvalidGenerationSourceError nullableMismatch2(Field column, ResolvedType parsertype) {
+
+  InvalidGenerationSourceError nullableMismatch2(
+      Field column, ResolvedType parsertype) {
     // TODO sqlparser type is nullable and field is not nullable
 
     return null;
   }
-  InvalidGenerationSourceError typeMismatch(Field column, ResolvedType parsertype) {
+
+  InvalidGenerationSourceError typeMismatch(
+      Field column, ResolvedType parsertype) {
     // TODO sqlparser type is a different one than the field type
 
     return null;

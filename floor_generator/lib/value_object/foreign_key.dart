@@ -29,6 +29,11 @@ class ForeignKey {
         ' ON DELETE $onDelete';
   }
 
+  // The following foreignKeyActions could change the child table, `NO ACTION` and `RESTRICT` will not.
+  static const updateActions = {'SET NULL', 'SET DEFAULT', 'CASCADE'};
+  bool get canChangeChild =>
+      updateActions.contains(onUpdate) || updateActions.contains(onDelete);
+
   final _listEquality = const ListEquality<String>();
 
   @override

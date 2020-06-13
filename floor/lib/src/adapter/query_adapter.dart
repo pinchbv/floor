@@ -19,9 +19,18 @@ class QueryAdapter {
   Future<T> query<T>(
     final String sql, {
     final List<dynamic> arguments,
+    final Set<String> changedEntities,
     @required final T Function(Map<String, dynamic>) mapper,
   }) async {
     final rows = await _database.rawQuery(sql, arguments);
+
+    if (rows != null &&
+        _changeListener != null &&
+        changedEntities != null &&
+        changedEntities.isNotEmpty) {
+      //MAYBE use Set<String> for changelistener to indicate the changes of multiple tables at the same time
+      changedEntities.forEach(_changeListener.add);
+    }
 
     if (rows.isEmpty) {
       return null;
@@ -36,28 +45,42 @@ class QueryAdapter {
   Future<List<T>> queryList<T>(
     final String sql, {
     final List<dynamic> arguments,
+    final Set<String> changedEntities,
     @required final T Function(Map<String, dynamic>) mapper,
   }) async {
     final rows = await _database.rawQuery(sql, arguments);
+
+    if (rows != null &&
+        _changeListener != null &&
+        changedEntities != null &&
+        changedEntities.isNotEmpty) {
+      //MAYBE use Set<String> for changelistener to indicate the changes of multiple tables at the same time
+      changedEntities.forEach(_changeListener.add);
+    }
+
     return rows.map((row) => mapper(row)).toList();
   }
 
   Future<void> queryNoReturn(
     final String sql, {
     final List<dynamic> arguments,
+    final Set<String> changedEntities,
   }) async {
-    // TODO #94 differentiate between different query kinds (select, update, delete, insert)
-    //  this enables to notify the observers
-    //  also requires extracting the table name :(
     await _database.rawQuery(sql, arguments);
+
+    if (_changeListener != null &&
+        changedEntities != null &&
+        changedEntities.isNotEmpty) {
+      //MAYBE use Set<String> for changelistener to indicate the changes of multiple tables at the same time
+      changedEntities.forEach(_changeListener.add);
+    }
   }
 
   /// Executes a SQLite query that returns a stream of single query results.
   Stream<T> queryStream<T>(
     final String sql, {
     final List<dynamic> arguments,
-    @required final String queryableName,
-    @required final bool isView,
+    @required final Set<String> dependencies,
     @required final T Function(Map<String, dynamic>) mapper,
   }) {
     assert(_changeListener != null);
@@ -71,14 +94,13 @@ class QueryAdapter {
 
     controller.onListen = () async => executeQueryAndNotifyController();
 
-    // listen on all updates if the stream is on a view, only listen to the
-    // name of the table if the stream is on a entity.
-    final subscription = _changeListener.stream
-        .where((updatedTable) => updatedTable == queryableName || isView)
-        .listen(
-          (_) async => executeQueryAndNotifyController(),
-          onDone: () => controller.close(),
-        );
+    // listen on all updates where the updated table
+    // is one of the dependencies of this query.
+    final subscription =
+        _changeListener.stream.where(dependencies.contains).listen(
+              (_) async => executeQueryAndNotifyController(),
+              onDone: () => controller.close(),
+            );
 
     controller.onCancel = () => subscription.cancel();
 
@@ -89,8 +111,7 @@ class QueryAdapter {
   Stream<List<T>> queryListStream<T>(
     final String sql, {
     final List<dynamic> arguments,
-    @required final String queryableName,
-    @required final bool isView,
+    @required final Set<String> dependencies,
     @required final T Function(Map<String, dynamic>) mapper,
   }) {
     assert(_changeListener != null);
@@ -104,13 +125,13 @@ class QueryAdapter {
 
     controller.onListen = () async => executeQueryAndNotifyController();
 
-    // Views listen on all events, Entities only on events that changed the same entity.
-    final subscription = _changeListener.stream
-        .where((updatedTable) => isView || updatedTable == queryableName)
-        .listen(
-          (_) async => executeQueryAndNotifyController(),
-          onDone: () => controller.close(),
-        );
+    // listen on all updates where the updated table
+    // is one of the dependencies of this query.
+    final subscription =
+        _changeListener.stream.where(dependencies.contains).listen(
+              (_) async => executeQueryAndNotifyController(),
+              onDone: () => controller.close(),
+            );
 
     controller.onCancel = () => subscription.cancel();
 

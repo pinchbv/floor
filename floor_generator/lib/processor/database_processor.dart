@@ -8,6 +8,7 @@ import 'package:floor_generator/processor/dao_processor.dart';
 import 'package:floor_generator/processor/entity_processor.dart';
 import 'package:floor_generator/processor/error/database_processor_error.dart';
 import 'package:floor_generator/processor/processor.dart';
+import 'package:floor_generator/processor/query_analyzer/engine.dart';
 import 'package:floor_generator/processor/view_processor.dart';
 import 'package:floor_generator/value_object/dao_getter.dart';
 import 'package:floor_generator/value_object/database.dart';
@@ -27,10 +28,18 @@ class DatabaseProcessor extends Processor<Database> {
   @nonNull
   @override
   Database process() {
+    final analyzerEngine = AnalyzerEngine();
+
     final databaseName = _classElement.displayName;
+
     final entities = _getEntities(_classElement);
+    entities.forEach(analyzerEngine.registerEntity);
+
     final views = _getViews(_classElement);
-    final daoGetters = _getDaoGetters(databaseName, entities, views);
+    views.forEach(analyzerEngine.checkAndRegisterView);
+
+    final daoGetters =
+        _getDaoGetters(databaseName, entities, views, analyzerEngine);
     final version = _getDatabaseVersion();
 
     return Database(
@@ -61,6 +70,7 @@ class DatabaseProcessor extends Processor<Database> {
     final String databaseName,
     final List<Entity> entities,
     final List<View> views,
+    final AnalyzerEngine analyzerEngine,
   ) {
     return _classElement.fields.where(_isDao).map((field) {
       final classElement = field.type.element as ClassElement;
@@ -72,6 +82,7 @@ class DatabaseProcessor extends Processor<Database> {
         databaseName,
         entities,
         views,
+        analyzerEngine,
       ).process();
 
       return DaoGetter(field, name, dao);

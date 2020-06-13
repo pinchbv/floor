@@ -7,7 +7,10 @@ import 'package:floor_generator/misc/constants.dart';
 import 'package:floor_generator/misc/type_utils.dart';
 import 'package:floor_generator/processor/error/query_method_processor_error.dart';
 import 'package:floor_generator/processor/processor.dart';
+import 'package:floor_generator/processor/query_analyzer/analyzed_query.dart';
+import 'package:floor_generator/processor/query_analyzer/engine.dart';
 import 'package:floor_generator/value_object/query_method.dart';
+import 'package:floor_generator/value_object/query_method_return_type.dart';
 import 'package:floor_generator/value_object/queryable.dart';
 
 class QueryMethodProcessor extends Processor<QueryMethod> {
@@ -15,14 +18,18 @@ class QueryMethodProcessor extends Processor<QueryMethod> {
 
   final MethodElement _methodElement;
   final List<Queryable> _queryables;
+  final AnalyzerEngine _analyzerEngine;
 
   QueryMethodProcessor(
     final MethodElement methodElement,
     final List<Queryable> queryables,
+    final AnalyzerEngine analyzerEngine,
   )   : assert(methodElement != null),
         assert(queryables != null),
+        assert(analyzerEngine != null),
         _methodElement = methodElement,
         _queryables = queryables,
+        _analyzerEngine = analyzerEngine,
         _processorError = QueryMethodProcessorError(methodElement);
 
   @nonNull
@@ -30,32 +37,19 @@ class QueryMethodProcessor extends Processor<QueryMethod> {
   QueryMethod process() {
     final name = _methodElement.displayName;
     final parameters = _methodElement.parameters;
-    final rawReturnType = _methodElement.returnType;
+    final returnType = _getAndCheckReturnType();
 
-    final query = _getQuery();
-    final returnsStream = rawReturnType.isStream;
+    final sqliteContext =
+        _analyzerEngine.analyzeQuery(_getQuery(), _methodElement);
 
-    _assertReturnsFutureOrStream(rawReturnType, returnsStream);
-
-    final flattenedReturnType = _getFlattenedReturnType(
-      rawReturnType,
-      returnsStream,
-    );
-
-    final queryable = _queryables.firstWhere(
-        (queryable) =>
-            queryable.classElement.displayName ==
-            flattenedReturnType.getDisplayString(),
-        orElse: () => null);
+    _assertMatchingReturnType(returnType, sqliteContext.outputTypes);
 
     return QueryMethod(
       _methodElement,
       name,
-      query,
-      rawReturnType,
-      flattenedReturnType,
+      sqliteContext,
+      returnType,
       parameters,
-      queryable,
     );
   }
 
@@ -65,75 +59,50 @@ class QueryMethodProcessor extends Processor<QueryMethod> {
         .getAnnotation(annotations.Query)
         .getField(AnnotationField.queryValue)
         ?.toStringValue()
-        ?.replaceAll('\n', ' ')
-        ?.replaceAll(RegExp(r'[ ]{2,}'), ' ')
         ?.trim();
 
     if (query == null || query.isEmpty) throw _processorError.noQueryDefined;
 
-    final substitutedQuery = query.replaceAll(RegExp(r':[.\w]+'), '?');
-    _assertQueryParameters(substitutedQuery, _methodElement.parameters);
-    return _replaceInClauseArguments(substitutedQuery);
+    return query;
   }
 
   @nonNull
-  String _replaceInClauseArguments(final String query) {
-    var index = 0;
-    return query.replaceAllMapped(
-      RegExp(r'( in )\([?]\)', caseSensitive: false),
-      (match) {
-        index++;
-        final matchedString = match.input.substring(match.start, match.end);
-        return matchedString.replaceFirst(
-          RegExp(r'(\?)'),
-          '\$valueList$index',
-        );
-      },
-    );
+  QueryMethodReturnType _getAndCheckReturnType() {
+    final returnType = QueryMethodReturnType(_methodElement.returnType);
+
+    _assertReturnsFutureOrStream(returnType);
+
+    // find a matching queryable (view or entity) for the return type
+    returnType.queryable = _queryables.firstWhere(
+        (queryable) =>
+            queryable.classElement.displayName ==
+            returnType.flattened.getDisplayString(),
+        orElse: () => null);
+
+    _assertReturnsPrimitiveOrQueryable(returnType);
+
+    return returnType;
   }
 
-  @nonNull
-  DartType _getFlattenedReturnType(
-    final DartType rawReturnType,
-    final bool returnsStream,
-  ) {
-    final returnsList = _getReturnsList(rawReturnType, returnsStream);
-
-    final type = returnsStream
-        ? _methodElement.returnType.flatten()
-        : _methodElement.library.typeSystem.flatten(rawReturnType);
-    if (returnsList) {
-      return type.flatten();
-    }
-    return type;
-  }
-
-  @nonNull
-  bool _getReturnsList(final DartType returnType, final bool returnsStream) {
-    final type = returnsStream
-        ? returnType.flatten()
-        : _methodElement.library.typeSystem.flatten(returnType);
-
-    return type.isDartCoreList;
-  }
-
-  void _assertReturnsFutureOrStream(
-    final DartType rawReturnType,
-    final bool returnsStream,
-  ) {
-    if (!rawReturnType.isDartAsyncFuture && !returnsStream) {
+  void _assertReturnsFutureOrStream(final QueryMethodReturnType type) {
+    if (!type.isFuture && !type.isStream) {
       throw _processorError.doesNotReturnFutureNorStream;
     }
   }
 
-  void _assertQueryParameters(
-    final String query,
-    final List<ParameterElement> parameterElements,
-  ) {
-    final queryParameterCount = RegExp(r'\?').allMatches(query).length;
-
-    if (queryParameterCount != parameterElements.length) {
-      throw _processorError.queryArgumentsAndMethodParametersDoNotMatch;
+  void _assertReturnsPrimitiveOrQueryable(final QueryMethodReturnType type) {
+    if (type.queryable == null && !type.isPrimitive) {
+      throw _processorError.doesNotReturnQueryableOrPrimitive;
     }
+  }
+
+  void _assertMatchingReturnType(
+      QueryMethodReturnType dartType, SqlReturnType sqliteType) {
+    // TODO typeconverters
+    if (sqliteType.columnTypes.isEmpty) {
+      if (!dartType.isVoid || !dartType.isFuture) {
+        throw _processorError.doesNotReturnVoidFuture;
+      }
+    } else if (!sqliteType.multipleRows) {}
   }
 }

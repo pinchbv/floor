@@ -23,12 +23,12 @@ class QueryMethodWriter implements Writer {
   Method _generateQueryMethod() {
     final builder = MethodBuilder()
       ..annotations.add(overrideAnnotationExpression)
-      ..returns = refer(_queryMethod.rawReturnType.getDisplayString())
+      ..returns = refer(_queryMethod.returnType.raw.getDisplayString())
       ..name = _queryMethod.name
       ..requiredParameters.addAll(_generateMethodParameters())
       ..body = Code(_generateMethodBody());
 
-    if (!_queryMethod.returnsStream || _queryMethod.returnsVoid) {
+    if (_queryMethod.returnType.isFuture) {
       builder..modifier = MethodModifier.async;
     }
 
@@ -51,6 +51,8 @@ class QueryMethodWriter implements Writer {
   }
 
   String _generateMethodBody() {
+    //TODO revamp, don't use exponential branches but sequential ifs;
+
     final _methodBody = StringBuffer();
 
     final valueLists = _generateInClauseValueLists();
@@ -59,13 +61,15 @@ class QueryMethodWriter implements Writer {
     }
 
     final arguments = _generateArguments();
-    if (_queryMethod.returnsVoid) {
+    if (_queryMethod.returnType.isVoid) {
       _methodBody.write(_generateNoReturnQuery(arguments));
       return _methodBody.toString();
     }
 
-    final mapper = '_${_queryMethod.queryable.name.decapitalize()}Mapper';
-    if (_queryMethod.returnsStream) {
+    //TODO queryable can be null; mapper has to be generated as column name (Map<String, dynamic> row) => row.values.first as <type>
+    final mapper =
+        '_${_queryMethod.returnType.queryable.name.decapitalize()}Mapper';
+    if (_queryMethod.returnType.isStream) {
       _methodBody.write(_generateStreamQuery(arguments, mapper));
     } else {
       _methodBody.write(_generateQuery(arguments, mapper));
@@ -76,6 +80,7 @@ class QueryMethodWriter implements Writer {
 
   @nonNull
   List<String> _generateInClauseValueLists() {
+    //TODO replace whole
     var index = 0;
     return _queryMethod.parameters
         .map((parameter) {
@@ -92,6 +97,8 @@ class QueryMethodWriter implements Writer {
 
   @nonNull
   List<String> _generateParameters() {
+    //TODO Typeconverters
+    //maybe replace partially
     return _queryMethod.parameters
         .map((parameter) {
           if (!parameter.type.isDartCoreList) {
@@ -110,6 +117,7 @@ class QueryMethodWriter implements Writer {
 
   @nullable
   String _generateArguments() {
+    //TODO replace wholly
     final parameters = _generateParameters();
     return parameters.isNotEmpty ? '<dynamic>[${parameters.join(', ')}]' : null;
   }
