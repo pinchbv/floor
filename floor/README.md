@@ -29,13 +29,14 @@ After integrating type converters and embeddable objects, the API surface won't 
     1. [Primary Keys](#primary-keys)
     1. [Indices](#indices)
     1. [Ignoring Fields](#ignoring-fields)
+    1. [Inheritance](#inheritance)
 1. [Database Views](#database-views)
 1. [Data Access Objects](#data-access-objects)
     1. [Queries](#queries)
     1. [Data Changes](#data-changes)
     1. [Streams](#streams)
     1. [Transactions](#transactions)
-    1. [Inheritance](#inheritance)
+    1. [Inheritance](#inheritance-1)
 1. [Type Converters](#type-converters)    
 1. [Migrations](#migrations)
 1. [In-Memory Database](#in-memory-database)
@@ -228,10 +229,10 @@ class Person {
 ### Supported Types
 Floor entities can hold values of the following Dart types which map to their corresponding SQLite types and vice versa.
 
-- `int` - REAL
+- `int` - INTEGER
 - `double` - REAL
 - `String` - TEXT
-- `bool` - REAL (0 = false, 1 = true)
+- `bool` - INTEGER (0 = false, 1 = true)
 - `Uint8List` - BLOB
 
 In case you want to store sophisticated Dart objects that can be represented by one of the above types, take a look at [Type Converters](#type-converters). 
@@ -322,6 +323,49 @@ class Person {
   Person(this.id, this.name);
 }
 ```
+
+### Inheritance
+
+Just like Daos, entities (and database views) can inherit from a common base class and use their fields. The entity just has to `extend` the base class.
+This construct will be treated as if all the fields in the base class are part of the entity, meaning the database table will 
+have all columns of the entity and the base class. 
+
+The base class does not have to have a separate annotation for the class. Its fields can be annotated just like normal entity columns.
+Foreign keys and indices have to be declared in the entity and can't be defined in the base class.
+
+```dart
+class BaseObject {
+  @PrimaryKey()
+  final int id;
+
+  @ColumnInfo(name: 'create_time', nullable: false)
+  final String createTime;
+
+  @ColumnInfo(name: 'update_time')
+  final String updateTime;
+
+  BaseObject(
+    this.id,
+    this.updateTime, {
+    String createTime,
+  }) : this.createTime = createTime ?? DateTime.now().toString();
+
+  @override
+  List<Object> get props => [];
+}
+
+@Entity(tableName: 'comments')
+class Comment extends BaseObject {
+  final String author;
+
+  final String content;
+
+  Comment(this.author,
+      {int id, this.content = '', String createTime, String updateTime})
+      : super(id, updateTime, createTime: createTime);
+}
+```
+
 ## Database Views
 If you want to define static `SELECT`-statements which return different types than your entities, your best option is to use `@DatabaseView`.
 A database view can be understood as a virtual table, which can be queried like a real table.
@@ -352,6 +396,8 @@ abstract class AppDatabase extends FloorDatabase {
 ```
 
 You can then query the view via a DAO function like an entity.
+
+It is possible for DatabaseViews to inherit common fields from a base class, just like in entities.
 
 #### Limitations
 - It is now possible to return a `Stream` object from a DAO method which queries a database view. But it will fire on **any** 
@@ -457,12 +503,11 @@ Future<int> deletePersons(List<Person> person);
 ```
 
 ### Streams
-As already mentioned, queries can not only return a value once when called but also a continuous stream of query results.
-The returned stream keeps you in sync with the changes happening to the database table.
-This feature plays really well with the `StreamBuilder` widget.
+As already mentioned, queries cannot only return values once when called but also continuous streams of query results.
+The returned streams keep you in sync with the changes happening in the database tables.
+This feature plays well with the `StreamBuilder` widget which accepts a stream of values and rebuilds itself whenever there is a new emission.
 
-These methods return a broadcast stream.
-Thus, it can have multiple listeners.
+These methods return broadcast streams and thus, can have multiple listeners.
 ```dart
 // definition
 @Query('SELECT * FROM Person')
@@ -483,6 +528,7 @@ StreamBuilder<List<Person>>(
 - It is now possible to return a `Stream` if the function queries a database view. But it will fire on **any** 
   `@update`, `@insert`, `@delete` events in the whole database, which can get quite taxing on the runtime. Please add it only if you know what you are doing!
   This is mostly due to the complexity of detecting which entities are involved in a database view.
+- Functions returning a stream of single items such as `Stream<Person>` do not emit when there is no query result.
 
 ### Transactions
 Whenever you want to perform some operations in a transaction you have to add the `@transaction` annotation to the method.
