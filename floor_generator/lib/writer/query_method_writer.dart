@@ -55,6 +55,14 @@ class QueryMethodWriter implements Writer {
 
     final _methodBody = StringBuffer();
 
+    //value list generator for query
+
+    //parameter mapper
+
+    //if stream: dependencies
+    //handling list output
+    //inner output mapper
+
     final valueLists = _generateInClauseValueLists();
     if (valueLists.isNotEmpty) {
       _methodBody.write(valueLists.join(''));
