@@ -88,11 +88,14 @@ class EntityProcessor extends QueryableProcessor<Entity> {
 
           final onUpdateAnnotationValue =
               foreignKeyObject.getField(ForeignKeyField.onUpdate)?.toIntValue();
-          final onUpdate = ForeignKeyAction.getString(onUpdateAnnotationValue);
+          _assertForeignKeyActionValue(onUpdateAnnotationValue, isUpdate: true);
+          final onUpdate = AnnotationConverter.fromInt(onUpdateAnnotationValue);
 
           final onDeleteAnnotationValue =
               foreignKeyObject.getField(ForeignKeyField.onDelete)?.toIntValue();
-          final onDelete = ForeignKeyAction.getString(onDeleteAnnotationValue);
+          _assertForeignKeyActionValue(onDeleteAnnotationValue,
+              isUpdate: false);
+          final onDelete = AnnotationConverter.fromInt(onDeleteAnnotationValue);
 
           return ForeignKey(
             parentName,
@@ -220,5 +223,11 @@ class EntityProcessor extends QueryableProcessor<Entity> {
             .getField(AnnotationField.entityWithoutRowid)
             .toBoolValue() ??
         false;
+  }
+
+  void _assertForeignKeyActionValue(int foreignKeyAction, {bool isUpdate}) {
+    if (foreignKeyAction < 0 || foreignKeyAction > 4) {
+      throw _processorError.wrongForeignKeyAction(foreignKeyAction, isUpdate);
+    }
   }
 }

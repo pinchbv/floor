@@ -1,15 +1,13 @@
 import 'package:floor_generator/misc/annotations.dart';
 
-abstract class ForeignKeyAction {
-  static const noAction = 1;
-  static const restrict = 2;
-  static const setNull = 3;
-  static const setDefault = 4;
-  static const cascade = 5;
+enum ForeignKeyAction { noAction, restrict, setNull, setDefault, cascade }
 
+extension AnnotationConverter on ForeignKeyAction {
   @nonNull
-  static String getString(final int action) {
-    switch (action) {
+  String get toSQL {
+    switch (this) {
+      case ForeignKeyAction.noAction:
+        return 'NO ACTION';
       case ForeignKeyAction.restrict:
         return 'RESTRICT';
       case ForeignKeyAction.setNull:
@@ -18,9 +16,21 @@ abstract class ForeignKeyAction {
         return 'SET DEFAULT';
       case ForeignKeyAction.cascade:
         return 'CASCADE';
-      case ForeignKeyAction.noAction:
       default:
-        return 'NO ACTION';
+        assert(false, 'Unexpected enum case $this');
+        return null;
     }
+  }
+
+  static ForeignKeyAction fromInt(int i) {
+    // the position of the value in this list has to match the
+    // integer of the annotation.
+    return <ForeignKeyAction>[
+      ForeignKeyAction.noAction,
+      ForeignKeyAction.restrict,
+      ForeignKeyAction.setNull,
+      ForeignKeyAction.setDefault,
+      ForeignKeyAction.cascade
+    ][i];
   }
 }

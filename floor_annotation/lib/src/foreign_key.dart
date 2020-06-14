@@ -41,7 +41,7 @@ abstract class ForeignKeyAction {
   /// When a parent key is modified or deleted from the database, no special
   /// action is taken. This means that SQLite will not make any effort to fix
   /// the constraint failure, instead, reject the change.
-  static const noAction = 1;
+  static const noAction = 0;
 
   /// Possible value for [ForeignKey.onDelete] or [ForeignKey.onUpdate].
   ///
@@ -57,7 +57,7 @@ abstract class ForeignKeyAction {
   /// Even if the foreign key constraint it is attached to is deferred(),
   /// configuring a RESTRICT action causes SQLite to return an error immediately
   /// if a parent key with dependent child keys is deleted or modified.
-  static const restrict = 2;
+  static const restrict = 1;
 
   /// Possible value for [ForeignKey.onDelete] or [ForeignKey.onUpdate].
   ///
@@ -65,14 +65,14 @@ abstract class ForeignKeyAction {
   /// (for [ForeignKey.onDelete]) or modified (for [ForeignKey.onUpdate]), the
   /// child key columns of all rows in the child table that mapped to the parent
   /// key are set to contain NULL values.
-  static const setNull = 3;
+  static const setNull = 2;
 
   /// Possible value for [ForeignKey.onDelete] or [ForeignKey.onUpdate].
   ///
   /// The 'SET DEFAULT' actions are similar to SET_NULL, except that each of the
   /// child key columns is set to contain the columns default value instead of
   /// NULL.
-  static const setDefault = 4;
+  static const setDefault = 3;
 
   /// Possible value for [ForeignKey.onDelete] or [ForeignKey.onUpdate].
   ///
@@ -82,5 +82,5 @@ abstract class ForeignKeyAction {
   /// deleted parent row is also deleted. For an [ForeignKey.onUpdate] action,
   /// it means that the values stored in each dependent child key are modified
   /// to match the new parent key values.
-  static const cascade = 5;
+  static const cascade = 4;
 }

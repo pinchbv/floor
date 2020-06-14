@@ -70,11 +70,21 @@ class EntityProcessorError {
     );
   }
 
+  InvalidGenerationSourceError wrongForeignKeyAction(
+      int foreignKeyAction, bool isUpdate) {
+    return InvalidGenerationSourceError(
+      'No ForeignKeyAction with the value $foreignKeyAction exists for the on${isUpdate ? 'Update' : 'Delete'} trigger.',
+      todo:
+          'Make sure to add a correct ForeignKeyAction like `ForeignKeyAction.noAction` or leave it out entirely.',
+      element: _classElement,
+    );
+  }
+
   InvalidGenerationSourceError get autoIncrementInWithoutRowid {
     return InvalidGenerationSourceError(
       'autoGenerate is not allowed in WITHOUT ROWID tables',
       todo:
-          'Remove autoGenerate in @PrimaryKey() or withoutRowid in @Entity().',
+      'Remove autoGenerate in @PrimaryKey() or withoutRowid in @Entity().',
       element: _classElement,
     );
   }

@@ -1,5 +1,6 @@
 import 'package:analyzer/dart/element/element.dart';
 import 'package:build_test/build_test.dart';
+import 'package:floor_generator/misc/foreign_key_action.dart';
 import 'package:floor_generator/processor/entity_processor.dart';
 import 'package:floor_generator/processor/field_processor.dart';
 import 'package:floor_generator/value_object/entity.dart';
@@ -126,8 +127,8 @@ void main() {
         'Person',
         ['id'],
         ['owner_id'],
-        'CASCADE',
-        'SET NULL',
+        ForeignKeyAction.cascade,
+        ForeignKeyAction.setNull,
       );
       expect(actual, equals(expected));
     });
