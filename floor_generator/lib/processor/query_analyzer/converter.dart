@@ -1,11 +1,10 @@
 import 'package:floor_generator/misc/constants.dart';
-import 'package:floor_generator/misc/foreign_key_action.dart';
 import 'package:floor_generator/processor/error/view_processor_error.dart';
 import 'package:floor_generator/processor/query_analyzer/engine.dart';
 import 'package:floor_generator/value_object/entity.dart';
 import 'package:floor_generator/value_object/field.dart';
 import 'package:floor_generator/value_object/view.dart';
-import 'package:sqlparser/sqlparser.dart' hide View;
+import 'package:sqlparser/sqlparser.dart' hide View, Queryable;
 import 'package:sqlparser/sqlparser.dart' as sqlparser show View;
 
 extension ToTableColumn on Field {
@@ -57,11 +56,14 @@ extension ToTable on Entity {
             ForeignKeyTableConstraint(
               '${name}FKConstraint$i', //just a unique name
               columns: f.childColumns
-                  .map((col) => Reference(tableName: name, columnName: col)),
+                  .map((col) => Reference(tableName: name, columnName: col))
+                  .toList(growable: false),
               clause: ForeignKeyClause(
                 foreignTable: TableReference(f.parentName),
-                columnNames: f.parentColumns.map((col) =>
-                    Reference(tableName: f.parentName, columnName: col)),
+                columnNames: f.parentColumns
+                    .map((col) =>
+                        Reference(tableName: f.parentName, columnName: col))
+                    .toList(growable: false),
                 onDelete: _toReferenceAction(f.onDelete),
                 onUpdate: _toReferenceAction(f.onUpdate),
               ),
@@ -76,7 +78,8 @@ extension ToTable on Entity {
             KeyClause(
               '${name}IdxConstraint$i', //just a unique name
               indexedColumns: index.columnNames
-                  .map((col) => Reference(tableName: name, columnName: col)),
+                  .map((col) => Reference(tableName: name, columnName: col))
+                  .toList(growable: false),
               isPrimaryKey: false,
             )))
         .values);
@@ -84,14 +87,17 @@ extension ToTable on Entity {
     //Add primary key
     constraints.add(KeyClause(
       '${name}PrimaryKey', //just a unique name
-      indexedColumns: primaryKey.fields.map(
-          (field) => Reference(tableName: name, columnName: field.columnName)),
+      indexedColumns: primaryKey.fields
+          .map((field) =>
+              Reference(tableName: name, columnName: field.columnName))
+          .toList(growable: false),
       isPrimaryKey: true,
     ));
 
     return Table(
       name: name,
-      resolvedColumns: fields.map((field) => field.asTableColumn()),
+      resolvedColumns:
+          fields.map((field) => field.asTableColumn()).toList(growable: false),
       tableConstraints: constraints,
     );
   }
@@ -121,7 +127,7 @@ extension ToSqlparserView on View {
     final viewStmt = CreateViewStatement(
       ifNotExists: true,
       viewName: name,
-      columns: fields.map((f) => f.columnName),
+      columns: fields.map((f) => f.columnName).toList(growable: false),
       query: ctx.root as BaseSelectStatement,
     );
 
@@ -153,7 +159,7 @@ extension ToSqlparserView on View {
 
       if (resolvedColumnType.type != BasicType.nullType) {
         if (ToTableColumn._toBasicType(fields[i].sqlType) !=
-            resolvedColumnType) {
+            resolvedColumnType.type) {
           throw ViewProcessorError(classElement)
               .typeMismatch(fields[i], resolvedColumnType);
         }

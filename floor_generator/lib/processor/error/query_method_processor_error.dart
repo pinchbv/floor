@@ -50,4 +50,22 @@ class QueryMethodProcessorError {
       element: _methodElement,
     );
   }
+
+  InvalidGenerationSourceError get voidReturnCannotBeList {
+    return InvalidGenerationSourceError(
+      'The given query cannot return a List<void>.',
+      todo:
+          "Set the return type to Future<void> or don't use void for the return type.",
+      element: _methodElement,
+    );
+  }
+
+  InvalidGenerationSourceError get voidReturnCannotBeStream {
+    return InvalidGenerationSourceError(
+      'The given query cannot return a Stream<void>.',
+      todo:
+          "Set the return type to Future<void> or don't use void for the return type.",
+      element: _methodElement,
+    );
+  }
 }

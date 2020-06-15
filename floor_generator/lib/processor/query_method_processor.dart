@@ -1,5 +1,4 @@
 import 'package:analyzer/dart/element/element.dart';
-import 'package:analyzer/dart/element/type.dart';
 import 'package:floor_annotation/floor_annotation.dart' as annotations
     show Query;
 import 'package:floor_generator/misc/annotations.dart';
@@ -7,8 +6,8 @@ import 'package:floor_generator/misc/constants.dart';
 import 'package:floor_generator/misc/type_utils.dart';
 import 'package:floor_generator/processor/error/query_method_processor_error.dart';
 import 'package:floor_generator/processor/processor.dart';
-import 'package:floor_generator/processor/query_analyzer/analyzed_query.dart';
 import 'package:floor_generator/processor/query_analyzer/engine.dart';
+import 'package:floor_generator/processor/query_analyzer/sqlite_types.dart';
 import 'package:floor_generator/value_object/query_method.dart';
 import 'package:floor_generator/value_object/query_method_return_type.dart';
 import 'package:floor_generator/value_object/queryable.dart';
@@ -81,6 +80,8 @@ class QueryMethodProcessor extends Processor<QueryMethod> {
 
     _assertReturnsPrimitiveOrQueryable(returnType);
 
+    _assertVoidReturnIsFuture(returnType);
+
     return returnType;
   }
 
@@ -97,12 +98,24 @@ class QueryMethodProcessor extends Processor<QueryMethod> {
   }
 
   void _assertMatchingReturnType(
-      QueryMethodReturnType dartType, SqlReturnType sqliteType) {
+      QueryMethodReturnType dartType, List<SqlResultColumn> sqliteColumns) {
     // TODO typeconverters
-    if (sqliteType.columnTypes.isEmpty) {
+    if (sqliteColumns.isEmpty) {
       if (!dartType.isVoid || !dartType.isFuture) {
         throw _processorError.doesNotReturnVoidFuture;
       }
-    } else if (!sqliteType.multipleRows) {}
+    } else {
+      //TODO check types
+    }
+  }
+
+  void _assertVoidReturnIsFuture(QueryMethodReturnType returnType) {
+    if (returnType.isVoid && returnType.isList) {
+      throw _processorError.voidReturnCannotBeList;
+    }
+
+    if (returnType.isVoid && returnType.isStream) {
+      throw _processorError.voidReturnCannotBeStream;
+    }
   }
 }

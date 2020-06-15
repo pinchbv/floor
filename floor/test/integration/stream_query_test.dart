@@ -137,16 +137,20 @@ void main() {
           actual,
           emitsInOrder(<List<Dog>>[
             [], // initial state,
+            [], // after inserting person1,
+            [], // after inserting person2,
             [dog1], // after inserting dog1
             [dog1], // after inserting dog2
-            //[], // after removing person1. Does not work because
-            // ForeignKey-relations are not considered yet (#321)
+            [], // after removing person1.
           ]));
 
       await personDao.insertPerson(person1);
+      await Future<void>.delayed(const Duration(milliseconds: 100));
       await personDao.insertPerson(person2);
+      await Future<void>.delayed(const Duration(milliseconds: 100));
 
       await database.dogDao.insertDog(dog1);
+      await Future<void>.delayed(const Duration(milliseconds: 100));
 
       await database.dogDao.insertDog(dog2);
 

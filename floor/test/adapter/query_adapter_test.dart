@@ -162,7 +162,7 @@ void main() {
       when(mockDatabaseExecutor.rawQuery(sql)).thenAnswer((_) => queryResult);
 
       final actual = underTest.queryStream(sql,
-          queryableName: entityName, isView: false, mapper: mapper);
+          dependencies: {entityName}, mapper: mapper);
 
       expect(actual, emits(person));
     });
@@ -179,8 +179,7 @@ void main() {
       final actual = underTest.queryStream(
         sql,
         arguments: arguments,
-        queryableName: entityName,
-        isView: false,
+        dependencies: {entityName},
         mapper: mapper,
       );
 
@@ -195,7 +194,7 @@ void main() {
       when(mockDatabaseExecutor.rawQuery(sql)).thenAnswer((_) => queryResult);
 
       final actual = underTest.queryStream(sql,
-          queryableName: entityName, isView: false, mapper: mapper);
+          dependencies: {entityName}, mapper: mapper);
       streamController.add(entityName);
 
       expect(actual, emitsInOrder(<Person>[person, person]));
@@ -211,7 +210,7 @@ void main() {
       when(mockDatabaseExecutor.rawQuery(sql)).thenAnswer((_) => queryResult);
 
       final actual = underTest.queryListStream(sql,
-          queryableName: entityName, isView: false, mapper: mapper);
+          dependencies: {entityName}, mapper: mapper);
 
       expect(actual, emits([person, person2]));
     });
@@ -230,8 +229,7 @@ void main() {
       final actual = underTest.queryListStream(
         sql,
         arguments: arguments,
-        queryableName: entityName,
-        isView: false,
+        dependencies: {entityName},
         mapper: mapper,
       );
 
@@ -248,7 +246,7 @@ void main() {
       when(mockDatabaseExecutor.rawQuery(sql)).thenAnswer((_) => queryResult);
 
       final actual = underTest.queryListStream(sql,
-          queryableName: entityName, isView: false, mapper: mapper);
+          dependencies: {entityName}, mapper: mapper);
       streamController.add(entityName);
 
       expect(
@@ -262,6 +260,7 @@ void main() {
 
     test('query stream from view with same and different triggering entity',
         () async {
+      const otherEntity = 'otherEntity';
       final person = Person(1, 'Frank');
       final person2 = Person(2, 'Peter');
       final queryResult = Future(() => [
@@ -271,7 +270,7 @@ void main() {
       when(mockDatabaseExecutor.rawQuery(sql)).thenAnswer((_) => queryResult);
 
       final actual = underTest.queryListStream(sql,
-          queryableName: entityName, isView: true, mapper: mapper);
+          dependencies: {entityName, otherEntity}, mapper: mapper);
       expect(
         actual,
         emitsInOrder(<List<Person>>[
@@ -282,7 +281,7 @@ void main() {
       );
 
       streamController.add(entityName);
-      streamController.add('otherEntity');
+      streamController.add(otherEntity);
     });
   });
 }

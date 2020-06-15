@@ -19,18 +19,9 @@ class QueryAdapter {
   Future<T> query<T>(
     final String sql, {
     final List<dynamic> arguments,
-    final Set<String> changedEntities,
     @required final T Function(Map<String, dynamic>) mapper,
   }) async {
     final rows = await _database.rawQuery(sql, arguments);
-
-    if (rows != null &&
-        _changeListener != null &&
-        changedEntities != null &&
-        changedEntities.isNotEmpty) {
-      //MAYBE use Set<String> for changelistener to indicate the changes of multiple tables at the same time
-      changedEntities.forEach(_changeListener.add);
-    }
 
     if (rows.isEmpty) {
       return null;
@@ -45,18 +36,9 @@ class QueryAdapter {
   Future<List<T>> queryList<T>(
     final String sql, {
     final List<dynamic> arguments,
-    final Set<String> changedEntities,
     @required final T Function(Map<String, dynamic>) mapper,
   }) async {
     final rows = await _database.rawQuery(sql, arguments);
-
-    if (rows != null &&
-        _changeListener != null &&
-        changedEntities != null &&
-        changedEntities.isNotEmpty) {
-      //MAYBE use Set<String> for changelistener to indicate the changes of multiple tables at the same time
-      changedEntities.forEach(_changeListener.add);
-    }
 
     return rows.map((row) => mapper(row)).toList();
   }

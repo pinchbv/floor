@@ -5,7 +5,7 @@ class DependencyGraph {
   void add(String name, Iterable<String> dependencies) {
     _directDependencies.update(
         name, (existingDeps) => {...existingDeps, ...dependencies},
-        ifAbsent: () => dependencies);
+        ifAbsent: () => dependencies.toSet());
   }
 
   Set<String> indirectDependencies(String name) {
