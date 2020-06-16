@@ -1,4 +1,3 @@
-import 'package:floor_generator/misc/foreign_key_action.dart';
 import 'package:floor_generator/value_object/foreign_key.dart';
 import 'package:test/test.dart';
 

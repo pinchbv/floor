@@ -1,3 +1,4 @@
+import 'package:analyzer/dart/constant/value.dart';
 import 'package:analyzer/dart/element/element.dart';
 import 'package:source_gen/source_gen.dart';
 
@@ -71,9 +72,9 @@ class EntityProcessorError {
   }
 
   InvalidGenerationSourceError wrongForeignKeyAction(
-      int foreignKeyAction, bool isUpdate) {
+      DartObject field, bool isUpdate) {
     return InvalidGenerationSourceError(
-      'No ForeignKeyAction with the value $foreignKeyAction exists for the on${isUpdate ? 'Update' : 'Delete'} trigger.',
+      'No ForeignKeyAction with the value $field exists for the on${isUpdate ? 'Update' : 'Delete'} trigger.',
       todo:
           'Make sure to add a correct ForeignKeyAction like `ForeignKeyAction.noAction` or leave it out entirely.',
       element: _classElement,

@@ -1,5 +1,5 @@
 import 'package:floor_generator/misc/constants.dart';
-import 'package:floor_generator/misc/foreign_key_action.dart';
+import 'package:floor_generator/misc/extension/foreign_key_action.dart';
 import 'package:floor_generator/value_object/entity.dart';
 import 'package:floor_generator/value_object/field.dart';
 import 'package:floor_generator/value_object/foreign_key.dart';

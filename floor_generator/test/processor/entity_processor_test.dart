@@ -1,6 +1,5 @@
 import 'package:analyzer/dart/element/element.dart';
 import 'package:build_test/build_test.dart';
-import 'package:floor_generator/misc/foreign_key_action.dart';
 import 'package:floor_generator/processor/entity_processor.dart';
 import 'package:floor_generator/processor/error/entity_processor_error.dart';
 import 'package:floor_generator/processor/field_processor.dart';
@@ -11,6 +10,7 @@ import 'package:floor_generator/value_object/primary_key.dart';
 import 'package:source_gen/source_gen.dart';
 import 'package:test/test.dart';
 
+import '../mocks.dart';
 import '../test_utils.dart';
 
 void main() {
@@ -152,7 +152,7 @@ void main() {
                 childColumns: ['owner_id'],
                 parentColumns: ['id'],
                 entity: Person,
-                onUpdate: 6
+                onUpdate: null
                 onDelete: ForeignKeyAction.setNull,
               )
             ],
@@ -175,7 +175,7 @@ void main() {
           processor.process,
           throwsInvalidGenerationSourceError(
               EntityProcessorError(classElements[1])
-                  .wrongForeignKeyAction(6, true)));
+                  .wrongForeignKeyAction(MockDartObject(), true)));
     });
   });
 

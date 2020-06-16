@@ -1,9 +1,9 @@
 import 'package:analyzer/dart/constant/value.dart';
 import 'package:analyzer/dart/element/element.dart';
 import 'package:floor_annotation/floor_annotation.dart' as annotations;
+import 'package:floor_generator/misc/extension/dart_object_extension.dart';
 import 'package:floor_generator/misc/annotations.dart';
 import 'package:floor_generator/misc/constants.dart';
-import 'package:floor_generator/misc/foreign_key_action.dart';
 import 'package:floor_generator/misc/type_utils.dart';
 import 'package:floor_generator/processor/error/entity_processor_error.dart';
 import 'package:floor_generator/processor/queryable_processor.dart';
@@ -12,6 +12,7 @@ import 'package:floor_generator/value_object/field.dart';
 import 'package:floor_generator/value_object/foreign_key.dart';
 import 'package:floor_generator/value_object/index.dart';
 import 'package:floor_generator/value_object/primary_key.dart';
+import 'package:meta/meta.dart';
 
 class EntityProcessor extends QueryableProcessor<Entity> {
   final EntityProcessorError _processorError;
@@ -86,16 +87,11 @@ class EntityProcessor extends QueryableProcessor<Entity> {
             throw _processorError.missingParentColumns;
           }
 
-          final onUpdateAnnotationValue =
-              foreignKeyObject.getField(ForeignKeyField.onUpdate)?.toIntValue();
-          _assertForeignKeyActionValue(onUpdateAnnotationValue, isUpdate: true);
-          final onUpdate = AnnotationConverter.fromInt(onUpdateAnnotationValue);
+          final onUpdate =
+              _getForeignKeyAction(foreignKeyObject, isUpdate: true);
 
-          final onDeleteAnnotationValue =
-              foreignKeyObject.getField(ForeignKeyField.onDelete)?.toIntValue();
-          _assertForeignKeyActionValue(onDeleteAnnotationValue,
-              isUpdate: false);
-          final onDelete = AnnotationConverter.fromInt(onDeleteAnnotationValue);
+          final onDelete =
+              _getForeignKeyAction(foreignKeyObject, isUpdate: false);
 
           return ForeignKey(
             parentName,
@@ -225,9 +221,23 @@ class EntityProcessor extends QueryableProcessor<Entity> {
         false;
   }
 
-  void _assertForeignKeyActionValue(int foreignKeyAction, {bool isUpdate}) {
-    if (foreignKeyAction < 0 || foreignKeyAction > 4) {
-      throw _processorError.wrongForeignKeyAction(foreignKeyAction, isUpdate);
+  @nonNull
+  annotations.ForeignKeyAction _getForeignKeyAction(DartObject foreignKeyObject,
+      {@required bool isUpdate}) {
+    final fieldName =
+    isUpdate ? ForeignKeyField.onUpdate : ForeignKeyField.onDelete;
+
+    final field = foreignKeyObject.getField(fieldName);
+    if (field == null) {
+      // field was not defined, return default value
+      return annotations.ForeignKeyAction.noAction;
     }
+
+    final fka = field.toForeignKeyAction();
+    if (fka == null) {
+      // field was not defined correctly
+      throw _processorError.wrongForeignKeyAction(field, isUpdate);
+    }
+    return fka;
   }
 }
