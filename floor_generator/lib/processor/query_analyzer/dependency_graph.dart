@@ -1,4 +1,4 @@
-//TODO inefficient! is not memoized.
+//maybe inefficient! is not memoized.
 class DependencyGraph {
   final Map<String, Set<String>> _directDependencies = {};
 

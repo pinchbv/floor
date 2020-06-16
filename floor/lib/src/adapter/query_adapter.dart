@@ -53,7 +53,6 @@ class QueryAdapter {
     if (_changeListener != null &&
         changedEntities != null &&
         changedEntities.isNotEmpty) {
-      //MAYBE use Set<String> for changelistener to indicate the changes of multiple tables at the same time
       changedEntities.forEach(_changeListener.add);
     }
   }

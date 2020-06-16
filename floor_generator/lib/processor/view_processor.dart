@@ -38,15 +38,9 @@ class ViewProcessor extends QueryableProcessor<View> {
 
   @nonNull
   String _getQuery() {
-    final query = classElement
+    return classElement
         .getAnnotation(annotations.DatabaseView)
         .getField(AnnotationField.viewQuery)
         ?.toStringValue();
-
-    //TODO remove select here as converter is much more rigorous
-    if (query == null || !query.trimLeft().toLowerCase().startsWith('select')) {
-      throw _processorError.missingSelectQuery;
-    }
-    return query;
   }
 }

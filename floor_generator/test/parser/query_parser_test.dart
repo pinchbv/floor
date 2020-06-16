@@ -51,3 +51,5 @@ class VariableVisitor extends RecursiveVisitor<void, void> {
 
 //TODO: list parameters out-of-order with normal parameters in-between,
 // double-use, strings containing `:abc`, erroring out on `?` vars
+
+//todo test wrong parameters and add error

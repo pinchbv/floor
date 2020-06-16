@@ -20,7 +20,7 @@ export 'package:sqlparser/utils/find_referenced_tables.dart' show TableWrite;
 ///
 Set<TableWrite> findWrittenTables(AstNode root) {
   return (UpdatedTablesVisitor()..visit(root, null)).writtenTables;
-}
+} //TODO dupe of upstream method
 
 /// Finds all tables referenced in [root] or a descendant.
 ///
@@ -33,4 +33,4 @@ Set<TableWrite> findWrittenTables(AstNode root) {
 Set<NamedResultSet> findReferencedTablesOrViews(AstNode root) {
   final visitor = (ReferencedTablesVisitor()..visit(root, null));
   return {...visitor.foundTables, ...visitor.foundViews};
-}
+} //TODO is the only function here, move to usage place

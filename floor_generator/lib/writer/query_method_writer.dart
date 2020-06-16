@@ -4,9 +4,7 @@ import 'package:floor_generator/misc/annotations.dart';
 import 'package:floor_generator/misc/string_utils.dart';
 import 'package:floor_generator/misc/type_utils.dart';
 import 'package:floor_generator/processor/query_analyzer/engine.dart';
-import 'package:floor_generator/value_object/entity.dart';
 import 'package:floor_generator/value_object/query_method.dart';
-import 'package:floor_generator/value_object/view.dart';
 import 'package:floor_generator/writer/writer.dart';
 import 'package:source_gen/source_gen.dart';
 

@@ -95,6 +95,7 @@ class AnalyzerEngine {
   @nonNull
   static ResolvedType _getSqlparserType(VariableElement parameter,
       {bool flattenLists = false}) {
+    //TODO typeconverters
     var type = parameter.type;
     if (flattenLists && type.isDartCoreList) {
       type = type.flatten();

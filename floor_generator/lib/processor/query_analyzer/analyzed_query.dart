@@ -1,6 +1,6 @@
+import 'package:floor_generator/misc/annotations.dart';
 import 'package:floor_generator/processor/query_analyzer/engine.dart';
 import 'package:floor_generator/processor/query_analyzer/referenced_queryables_visitor.dart';
-import 'package:floor_generator/processor/query_analyzer/sqlite_types.dart';
 import 'package:floor_generator/value_object/entity.dart';
 import 'package:sqlparser/sqlparser.dart' hide Queryable;
 
@@ -53,4 +53,22 @@ class AnalyzeResult {
       return [];
     }
   }
+}
+
+class SqlResultColumn {
+  @nonNull
+  final String name;
+
+  final BasicType sqltype;
+
+  final bool isNullable;
+
+  @nonNull
+  final bool isResolved;
+
+  SqlResultColumn(this.name, ResolveResult type)
+      : assert(type != null),
+        sqltype = type.type?.type,
+        isNullable = type.type?.nullable,
+        isResolved = !type.unknown;
 }
