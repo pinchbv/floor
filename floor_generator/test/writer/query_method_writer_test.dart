@@ -1,7 +1,6 @@
 import 'package:code_builder/code_builder.dart';
 import 'package:floor_generator/value_object/query_method.dart';
 import 'package:floor_generator/writer/query_method_writer.dart';
-import 'package:source_gen/source_gen.dart';
 import 'package:test/test.dart';
 
 import '../test_utils.dart';
@@ -20,7 +19,8 @@ void main() {
     expect(actual, equalsDart(r'''
       @override
       Future<void> deleteAll() async {
-        await _queryAdapter.queryNoReturn('DELETE FROM Person');
+        await _queryAdapter
+            .queryNoReturn(r""" DELETE FROM Person """, changedEntities: {'Person'});
       }
     '''));
   });
@@ -36,7 +36,8 @@ void main() {
     expect(actual, equalsDart(r'''
       @override
       Future<void> deletePersonById(int id) async {
-        await _queryAdapter.queryNoReturn('DELETE FROM Person WHERE id = ?', arguments: <dynamic>[id]);
+        await _queryAdapter.queryNoReturn(r""" DELETE FROM Person WHERE id = ?1 """,
+            arguments: <dynamic>[id], changedEntities: {'Person'});
       }
     '''));
   });
@@ -52,14 +53,15 @@ void main() {
     expect(actual, equalsDart(r'''
       @override
       Future<Person> findById(int id) async {
-        return _queryAdapter.query('SELECT * FROM Person WHERE id = ?', arguments: <dynamic>[id], mapper: _personMapper);
+        return _queryAdapter.query(r""" SELECT * FROM Person WHERE id = ?1 """,
+            mapper: _personMapper, arguments: <dynamic>[id]);
       }
     '''));
   });
 
   test('query boolean parameter', () async {
     final queryMethod = await _createQueryMethod('''
-      @Query('SELECT * FROM Person WHERE flag = :flag')
+      @Query('SELECT * FROM Person WHERE (name = name) = :flag')
       Future<List<Person>> findWithFlag(bool flag);
     ''');
 
@@ -68,7 +70,7 @@ void main() {
     expect(actual, equalsDart(r'''
       @override
       Future<List<Person>> findWithFlag(bool flag) async {
-        return _queryAdapter.queryList('SELECT * FROM Person WHERE flag = ?', arguments: <dynamic>[flag == null ? null : (flag ? 1 : 0)], mapper: _personMapper);
+        return _queryAdapter.queryList(r""" SELECT * FROM Person WHERE (name = name) = ?1 """, mapper: _personMapper, arguments: <dynamic>[flag == null ? null : (flag ? 1 : 0)]);
       }
     '''));
   });
@@ -84,7 +86,7 @@ void main() {
     expect(actual, equalsDart(r'''
       @override
       Future<Person> findById(int id, String name) async {
-        return _queryAdapter.query('SELECT * FROM Person WHERE id = ? AND name = ?', arguments: <dynamic>[id, name], mapper: _personMapper);
+        return _queryAdapter.query(r""" SELECT * FROM Person WHERE id = ?1 AND name = ?2 """, mapper: _personMapper, arguments: <dynamic>[id, name]);
       }
     '''));
   });
@@ -100,7 +102,7 @@ void main() {
     expect(actual, equalsDart('''
       @override
       Future<List<Person>> findAll() async {
-        return _queryAdapter.queryList('SELECT * FROM Person', mapper: _personMapper);
+        return _queryAdapter.queryList(r""" SELECT * FROM Person """, mapper: _personMapper);
       }
     '''));
   });
@@ -116,7 +118,7 @@ void main() {
     expect(actual, equalsDart(r'''
       @override
       Stream<Person> findByIdAsStream(int id) {
-        return _queryAdapter.queryStream('SELECT * FROM Person WHERE id = ?', arguments: <dynamic>[id], queryableName: 'Person', isView: false, mapper: _personMapper);
+        return _queryAdapter.queryStream(r""" SELECT * FROM Person WHERE id = ?1 """, mapper: _personMapper, arguments: <dynamic>[id], dependencies: {'Person'});
       }
     '''));
   });
@@ -132,7 +134,7 @@ void main() {
     expect(actual, equalsDart(r'''
       @override
       Stream<List<Person>> findAllAsStream() {
-        return _queryAdapter.queryListStream('SELECT * FROM Person', queryableName: 'Person', isView: false, mapper: _personMapper);
+        return _queryAdapter.queryListStream(r""" SELECT * FROM Person """, mapper: _personMapper, dependencies: {'Person'});
       }
     '''));
   });
@@ -148,7 +150,7 @@ void main() {
     expect(actual, equalsDart(r'''
       @override
       Stream<List<Name>> findAllAsStream() {
-        return _queryAdapter.queryListStream('SELECT * FROM Name', queryableName: 'Name', isView: true, mapper: _nameMapper);
+        return _queryAdapter.queryListStream(r""" SELECT * FROM Name """, mapper: _nameMapper, dependencies: {'Person'});
       }
     '''));
   });
@@ -164,8 +166,16 @@ void main() {
     expect(actual, equalsDart(r'''
       @override
       Future<List<Person>> findWithIds(List<int> ids) async {
-        final valueList1 = ids.map((value) => "'$value'").join(', ');
-        return _queryAdapter.queryList('SELECT * FROM Person WHERE id IN ($valueList1)', mapper: _personMapper);
+        int _start = 1;
+        final _sqliteVariablesForIds =
+            Iterable<String>.generate(ids.length, (i) => '?${i + _start}')
+                .join(',');
+        return _queryAdapter.queryList(
+            r""" SELECT * FROM Person WHERE id IN ( """ +
+                _sqliteVariablesForIds +
+                r""" ) """,
+            mapper: _personMapper,
+            arguments: <dynamic>[...ids]);
       }
     '''));
   });
@@ -181,14 +191,76 @@ void main() {
     expect(actual, equalsDart(r'''
       @override
       Future<List<Person>> findWithIds(List<int> ids, List<int> idx) async {
-        final valueList1 = ids.map((value) => "'$value'").join(', ');
-        final valueList2 = idx.map((value) => "'$value'").join(', ');
-        return _queryAdapter.queryList('SELECT * FROM Person WHERE id IN ($valueList1) AND id IN ($valueList2)', mapper: _personMapper);
+        int _start = 1;
+        final _sqliteVariablesForIds =
+            Iterable<String>.generate(ids.length, (i) => '?${i + _start}').join(',');
+        _start += ids.length;
+        final _sqliteVariablesForIdx =
+            Iterable<String>.generate(idx.length, (i) => '?${i + _start}').join(',');
+        return _queryAdapter.queryList(
+        r""" SELECT * FROM Person WHERE id IN ( """ +
+                _sqliteVariablesForIds +
+                r""" ) AND id IN ( """ +
+                _sqliteVariablesForIdx +
+                r""" ) """,
+            mapper: _personMapper,
+            arguments: <dynamic>[...ids,...idx]);
       }
     '''));
   });
 
-  test('query with unsupported type throws', () async {
+  test('Query with \' characters', () async {
+    final queryMethod = await _createQueryMethod(r'''
+      @Query('SELECT * FROM Person WHERE name = \'\'')
+      Future<List<Person>> findEmptyNames();
+    ''');
+
+    final actual = QueryMethodWriter(queryMethod).write();
+
+    expect(actual, equalsDart(r'''
+      @override
+      Future<List<Person>> findEmptyNames() async {
+        return _queryAdapter.queryList(r""" SELECT * FROM Person WHERE name = '' """, mapper: _personMapper);
+      }
+    '''));
+  });
+
+  test('Query with \" characters', () async {
+    final queryMethod = await _createQueryMethod(r'''
+      @Query('SELECT * FROM Person WHERE "name" = \'\'')
+      Future<List<Person>> findEmptyNames();
+    ''');
+
+    final actual = QueryMethodWriter(queryMethod).write();
+
+    expect(actual, equalsDart(r'''
+      @override
+      Future<List<Person>> findEmptyNames() async {
+        return _queryAdapter.queryList(r""" SELECT * FROM Person WHERE "name" = '' """, mapper: _personMapper);
+      }
+    '''));
+  });
+
+  test('Query with ` characters', () async {
+    final queryMethod = await _createQueryMethod(r'''
+      @Query('SELECT * FROM Person WHERE `name` = \'\'')
+      Future<List<Person>> findEmptyNames();
+    ''');
+
+    final actual = QueryMethodWriter(queryMethod).write();
+
+    expect(actual, equalsDart(r'''
+      @override
+      Future<List<Person>> findEmptyNames() async {
+        return _queryAdapter.queryList(r""" SELECT * FROM Person WHERE `name` = '' """, mapper: _personMapper);
+      }
+    '''));
+  },
+      skip:
+          'Not yet working because of https://github.com/simolus3/moor/pull/634.');
+
+  //TODO maybe move this to processor test
+/*  test('query with unsupported type throws', () async {
     final queryMethod = await _createQueryMethod('''
       @Query('SELECT * FROM Person WHERE id = :person')
       Future<Person> findById(Person person);
@@ -197,7 +269,7 @@ void main() {
     final actual = () => QueryMethodWriter(queryMethod).write();
 
     expect(actual, throwsA(const TypeMatcher<InvalidGenerationSourceError>()));
-  });
+  });*/
 }
 
 Future<QueryMethod> _createQueryMethod(final String methodSignature) async {

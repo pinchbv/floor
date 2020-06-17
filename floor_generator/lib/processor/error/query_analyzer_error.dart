@@ -22,4 +22,13 @@ class QueryAnalyzerError {
       element: _methodElement,
     );
   }
+
+  InvalidGenerationSourceError queryParameterMissingInMethod(
+      ColonNamedVariable variable) {
+    throw InvalidGenerationSourceError(
+        'Invalid named variable $variable in statement of `@Query` annotation does not exist in the method parameters.',
+        todo:
+            'Please add a method parameter for the variable $variable with the name ${variable.name.substring(1)}.',
+        element: _methodElement);
+  }
 }

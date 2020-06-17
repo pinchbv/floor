@@ -2,7 +2,7 @@ import 'package:analyzer/dart/element/element.dart';
 import 'package:floor_generator/misc/annotations.dart';
 import 'package:floor_generator/misc/type_utils.dart';
 import 'package:floor_generator/processor/error/query_analyzer_error.dart';
-import 'package:floor_generator/processor/query_analyzer/variable_visitor.dart';
+import 'package:floor_generator/processor/query_analyzer/visitors.dart';
 import 'package:floor_generator/value_object/entity.dart';
 import 'package:floor_generator/value_object/queryable.dart';
 import 'package:floor_generator/value_object/view.dart' as floor;
@@ -12,7 +12,6 @@ import 'package:sqlparser/sqlparser.dart' hide Queryable;
 import 'analyzed_query.dart';
 import 'converter.dart';
 import 'dependency_graph.dart';
-import 'referenced_queryables_visitor.dart';
 
 const String varlistPlaceholder = ':varlist';
 
@@ -142,7 +141,7 @@ class AnalyzerEngine {
     // reverse List and (1-x)replace var name with parameter or(0) map span to name
     final newQuery = StringBuffer();
     int currentLast = 0;
-    final listPositions = <int, String>{};
+    final listPositions = <ListParameter>[];
     for (final v in visitor.variables) {
       newQuery.write(query.substring(currentLast, v.firstPosition));
       final varIndexInMethod = indices[v.name];
@@ -150,7 +149,7 @@ class AnalyzerEngine {
         newQuery.write('?');
         newQuery.write(varIndexInMethod);
       } else {
-        listPositions[newQuery.length] = v.name.substring(1);
+        listPositions.add(ListParameter(newQuery.length, v.name.substring(1)));
         newQuery.write(varlistPlaceholder);
       }
       currentLast = v.lastPosition;

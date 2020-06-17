@@ -93,6 +93,7 @@ class QueryMethodProcessor extends Processor<QueryMethod> {
 
   void _assertReturnsPrimitiveOrQueryable(final QueryMethodReturnType type) {
     if (type.queryable == null && !type.isPrimitive) {
+      print('TTYYPPEE: $type, KnownQueryables: $_queryables');
       throw _processorError.doesNotReturnQueryableOrPrimitive;
     }
   }

@@ -3,16 +3,11 @@ import 'package:floor_annotation/floor_annotation.dart' as annotations;
 import 'package:floor_generator/misc/annotations.dart';
 import 'package:floor_generator/misc/constants.dart';
 import 'package:floor_generator/misc/type_utils.dart';
-import 'package:floor_generator/processor/error/view_processor_error.dart';
 import 'package:floor_generator/processor/queryable_processor.dart';
 import 'package:floor_generator/value_object/view.dart';
 
 class ViewProcessor extends QueryableProcessor<View> {
-  final ViewProcessorError _processorError;
-
-  ViewProcessor(final ClassElement classElement)
-      : _processorError = ViewProcessorError(classElement),
-        super(classElement);
+  ViewProcessor(final ClassElement classElement) : super(classElement);
 
   @nonNull
   @override

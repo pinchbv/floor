@@ -148,7 +148,8 @@ class QueryMethodWriter implements Writer {
       } else {
         code.write('_start+=$lastParam.length;');
       }
-      code.write('final _sqliteVariablesFor${listParam.displayName}=');
+      code.write(
+          'final _sqliteVariablesFor${listParam.displayName.capitalize()}=');
       code.write('Iterable<String>.generate(');
       code.write("${listParam.displayName}.length,(i)=>'?\${i+_start}'");
       code.write(").join(',');");
@@ -165,12 +166,13 @@ class QueryMethodWriter implements Writer {
     final code = StringBuffer();
     int start = 0;
     final originalQuery = _queryMethod.sqliteContext.processedQuery;
-    for (final posAndName
-        in _queryMethod.sqliteContext.listInsertionPositions.entries) {
-      code.write('r""" ${originalQuery.substring(start, posAndName.key)} """');
+    for (final listParameter
+        in _queryMethod.sqliteContext.listInsertionPositions) {
+      code.write(
+          'r""" ${originalQuery.substring(start, listParameter.position)} """');
 
-      code.write('+ _sqliteVariablesFor${posAndName.value} +');
-      start = posAndName.key + varlistPlaceholder.length;
+      code.write('+ _sqliteVariablesFor${listParameter.name.capitalize()} +');
+      start = listParameter.position + varlistPlaceholder.length;
     }
     code.write('r""" ${originalQuery.substring(start)} """');
 

@@ -6,7 +6,6 @@ import 'package:floor_generator/value_object/insertion_method.dart';
 import 'package:floor_generator/value_object/query_method.dart';
 import 'package:floor_generator/value_object/transaction_method.dart';
 import 'package:floor_generator/value_object/update_method.dart';
-import 'package:floor_generator/value_object/view.dart';
 
 class Dao {
   final ClassElement classElement;

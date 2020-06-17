@@ -118,13 +118,14 @@ void main() {
     '''));
   });
 
+  //TODO use same test just with wrong column reference to test validation
   test('open database with view', () async {
     final database = await _createDatabase('''
       @Database(version: 1, entities: [Person], views: [Name])
       abstract class TestDatabase extends FloorDatabase {}
       
       @DatabaseView(
-          'SELECT custom_name as name FROM person',
+          'SELECT upper(name) as name FROM person',
           viewName: 'names')
       class Name {
         final String name;
@@ -172,7 +173,7 @@ void main() {
                   'CREATE TABLE IF NOT EXISTS `Person` (`id` INTEGER, `name` TEXT, PRIMARY KEY (`id`))');
                   
               await database.execute(
-                  '''CREATE VIEW IF NOT EXISTS `names` AS SELECT custom_name as name FROM person''');
+                  '''CREATE VIEW IF NOT EXISTS `names` AS SELECT upper(name) as name FROM person''');
 
               await callback?.onCreate?.call(database, version);
             },

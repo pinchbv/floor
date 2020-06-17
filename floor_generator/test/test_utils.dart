@@ -10,6 +10,7 @@ import 'package:floor_annotation/floor_annotation.dart' as annotations;
 import 'package:floor_generator/misc/type_utils.dart';
 import 'package:floor_generator/processor/dao_processor.dart';
 import 'package:floor_generator/processor/entity_processor.dart';
+import 'package:floor_generator/processor/query_analyzer/engine.dart';
 import 'package:floor_generator/processor/view_processor.dart';
 import 'package:floor_generator/value_object/dao.dart';
 import 'package:floor_generator/value_object/entity.dart';
@@ -152,7 +153,12 @@ Future<Dao> createDao(final String methodSignature) async {
       .map((classElement) => ViewProcessor(classElement).process())
       .toList();
 
-  return DaoProcessor(daoClass, 'personDao', 'TestDatabase', entities, views)
+  final engine = AnalyzerEngine();
+  entities.forEach(engine.registerEntity);
+  views.forEach(engine.checkAndRegisterView);
+
+  return DaoProcessor(
+          daoClass, 'personDao', 'TestDatabase', entities, views, engine)
       .process();
 }
 

@@ -16,14 +16,6 @@ class QueryMethodProcessorError {
     );
   }
 
-  /*InvalidGenerationSourceError get queryArgumentsAndMethodParametersDoNotMatch {
-    return InvalidGenerationSourceError(
-      'SQL query arguments and method parameters have to match.',
-      todo: 'Make sure to supply one parameter per SQL query argument.',
-      element: _methodElement,
-    );
-  }*/
-
   InvalidGenerationSourceError get doesNotReturnFutureNorStream {
     return InvalidGenerationSourceError(
       'All query methods have to return a Future or Stream.',
@@ -38,7 +30,8 @@ class QueryMethodProcessorError {
       'The inner return type of a query method can only return a type which '
       'was defined as a @DatabaseView or an @Entity or a primitive type '
       '(void, int, double, String or Uint8List)',
-      todo: 'Define the return type as Future or Stream.',
+      todo: 'Define the return type in a way that contains no types other than '
+          'primitive types and Entities/DatabaseViews.',
       element: _methodElement,
     );
   }

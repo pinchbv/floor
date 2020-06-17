@@ -2,7 +2,6 @@ import 'package:analyzer/dart/element/element.dart';
 import 'package:floor_generator/value_object/field.dart';
 import 'package:source_gen/source_gen.dart';
 import 'package:sqlparser/sqlparser.dart';
-import 'package:sqlparser/src/analysis/analysis.dart';
 
 class ViewProcessorError {
   final ClassElement _classElement;

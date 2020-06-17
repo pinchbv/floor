@@ -1,6 +1,7 @@
+import 'package:collection/collection.dart';
 import 'package:floor_generator/misc/annotations.dart';
 import 'package:floor_generator/processor/query_analyzer/engine.dart';
-import 'package:floor_generator/processor/query_analyzer/referenced_queryables_visitor.dart';
+import 'package:floor_generator/processor/query_analyzer/visitors.dart';
 import 'package:floor_generator/value_object/entity.dart';
 import 'package:sqlparser/sqlparser.dart' hide Queryable;
 
@@ -13,7 +14,7 @@ class AnalyzeResult {
 
   //map name to int as start of span with fixed width
   //TODO should be a list to make sure it is sorted.
-  final Map<int, String> listInsertionPositions;
+  final List<ListParameter> listInsertionPositions;
 
   AnalyzeResult(this.processedQuery, this.listInsertionPositions,
       this.analysisContext, this.engine);
@@ -53,6 +54,35 @@ class AnalyzeResult {
       return [];
     }
   }
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is AnalyzeResult &&
+          runtimeType == other.runtimeType &&
+          processedQuery == other.processedQuery &&
+          const ListEquality<ListParameter>()
+              .equals(listInsertionPositions, other.listInsertionPositions);
+
+  @override
+  int get hashCode => processedQuery.hashCode ^ listInsertionPositions.hashCode;
+}
+
+class ListParameter {
+  final int position;
+  final String name;
+  ListParameter(this.position, this.name);
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is ListParameter &&
+          runtimeType == other.runtimeType &&
+          position == other.position &&
+          name == other.name;
+
+  @override
+  int get hashCode => position.hashCode ^ name.hashCode;
 }
 
 class SqlResultColumn {
