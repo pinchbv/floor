@@ -88,10 +88,11 @@ void main() {
       Future<Person> findPerson(int id);
     ''');
 
-      final actual = QueryMethodProcessor(methodElement, [...entities, ...views], engine)
-          .process()
-          .sqliteContext
-          .processedQuery;
+      final actual =
+          QueryMethodProcessor(methodElement, [...entities, ...views], engine)
+              .process()
+              .sqliteContext
+              .processedQuery;
 
       expect(actual, equals('SELECT * FROM Person WHERE id = ?1'));
     });
@@ -105,10 +106,11 @@ void main() {
         Future<Person> findPersonByIdAndName(int id, String name);
       """);
 
-      final actual = QueryMethodProcessor(methodElement, [...entities, ...views], engine)
-          .process()
-          .sqliteContext
-          .processedQuery;
+      final actual =
+          QueryMethodProcessor(methodElement, [...entities, ...views], engine)
+              .process()
+              .sqliteContext
+              .processedQuery;
 
       expect(
         actual,
@@ -123,10 +125,11 @@ void main() {
         Future<Person> findPersonByIdAndName(int id, String name);    
       ''');
 
-      final actual = QueryMethodProcessor(methodElement, [...entities, ...views], engine)
-          .process()
-          .sqliteContext
-          .processedQuery;
+      final actual =
+          QueryMethodProcessor(methodElement, [...entities, ...views], engine)
+              .process()
+              .sqliteContext
+              .processedQuery;
 
       expect(
         actual,
@@ -197,10 +200,11 @@ void main() {
       Future<List<Person>> findPersonsWithNamesLike(String name);
     ''');
 
-      final actual = QueryMethodProcessor(methodElement, [...entities, ...views], engine)
-          .process()
-          .sqliteContext
-          .processedQuery;
+      final actual =
+          QueryMethodProcessor(methodElement, [...entities, ...views], engine)
+              .process()
+              .sqliteContext
+              .processedQuery;
 
       expect(actual, equals('SELECT * FROM Person WHERE name LIKE ?1'));
     });
@@ -211,10 +215,11 @@ void main() {
       Future<void> findPersonsWithNamesLike(String table, String otherTable);
     ''');
 
-      final actual = QueryMethodProcessor(methodElement, [...entities, ...views], engine)
-          .process()
-          .sqliteContext
-          .processedQuery;
+      final actual =
+          QueryMethodProcessor(methodElement, [...entities, ...views], engine)
+              .process()
+              .sqliteContext
+              .processedQuery;
 
       expect(actual, equals('SELECT ?1, ?2'));
     });
