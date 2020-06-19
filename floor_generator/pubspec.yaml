@@ -23,7 +23,7 @@ dependencies:
     git:
       url: git://github.com/simolus3/moor.git
       path: sqlparser
-      ref: 01e5a47
+      ref: c342b29
 
 
 dev_dependencies:

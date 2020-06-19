@@ -255,9 +255,7 @@ void main() {
         return _queryAdapter.queryList(r""" SELECT * FROM Person WHERE `name` = '' """, mapper: _personMapper);
       }
     '''));
-  },
-      skip:
-          'Not yet working because of https://github.com/simolus3/moor/pull/634.');
+  });
 
   //TODO maybe move this to processor test
 /*  test('query with unsupported type throws', () async {
