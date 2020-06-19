@@ -13,8 +13,8 @@ class DependencyGraph {
       return {name};
     }
 
-    Set<String> output = {name};
-    Set<String> todo = {name};
+    final Set<String> output = {name};
+    final Set<String> todo = {name};
     while (todo.isNotEmpty) {
       final element = todo.first;
       todo.remove(element);
