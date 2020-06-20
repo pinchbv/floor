@@ -1,7 +1,7 @@
 import 'package:analyzer/dart/element/element.dart';
 import 'package:collection/collection.dart';
 
-import 'package:floor_generator/processor/query_analyzer/analyzed_query.dart';
+import 'package:floor_generator/value_object/query.dart';
 import 'package:floor_generator/value_object/query_method_return_type.dart';
 
 /// Wraps a method annotated with Query
@@ -12,7 +12,7 @@ class QueryMethod {
   final String name;
 
   /// The annotated and analyzed Query
-  final AnalyzeResult sqliteContext;
+  final Query query;
 
   final QueryMethodReturnType returnType;
 
@@ -21,7 +21,7 @@ class QueryMethod {
   QueryMethod(
     this.methodElement,
     this.name,
-    this.sqliteContext,
+    this.query,
     this.returnType,
     this.parameters,
   );
@@ -33,7 +33,7 @@ class QueryMethod {
           runtimeType == other.runtimeType &&
           methodElement == other.methodElement &&
           name == other.name &&
-          sqliteContext == other.sqliteContext &&
+          query == other.query &&
           returnType == other.returnType &&
           const ListEquality<ParameterElement>()
               .equals(parameters, other.parameters);
@@ -42,12 +42,12 @@ class QueryMethod {
   int get hashCode =>
       methodElement.hashCode ^
       name.hashCode ^
-      sqliteContext.hashCode ^
+      query.hashCode ^
       returnType.hashCode ^
       parameters.hashCode;
 
   @override
   String toString() {
-    return 'QueryMethod{methodElement: $methodElement, name: $name, sqliteContext: $sqliteContext, returnType: $returnType, parameters: $parameters}';
+    return 'QueryMethod{methodElement: $methodElement, name: $name, query: $query, returnType: $returnType, parameters: $parameters}';
   }
 }

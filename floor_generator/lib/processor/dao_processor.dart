@@ -62,7 +62,7 @@ class DaoProcessor extends Processor<Dao> {
 
     final streamEntities = queryMethods
         .where((method) => method.returnType.isStream)
-        .expand((method) => method.sqliteContext.dependencies)
+        .expand((method) => method.query.dependencies)
         .toSet();
 
     return Dao(

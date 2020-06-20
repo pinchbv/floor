@@ -20,7 +20,7 @@ void main() {
       @override
       Future<void> deleteAll() async {
         await _queryAdapter
-            .queryNoReturn(r""" DELETE FROM Person """, changedEntities: {'Person'});
+            .queryNoReturn('DELETE FROM Person', changedEntities: {'Person'});
       }
     '''));
   });
@@ -36,7 +36,7 @@ void main() {
     expect(actual, equalsDart(r'''
       @override
       Future<void> deletePersonById(int id) async {
-        await _queryAdapter.queryNoReturn(r""" DELETE FROM Person WHERE id = ?1 """,
+        await _queryAdapter.queryNoReturn('DELETE FROM Person WHERE id = ?1',
             arguments: <dynamic>[id], changedEntities: {'Person'});
       }
     '''));
@@ -53,7 +53,7 @@ void main() {
     expect(actual, equalsDart(r'''
       @override
       Future<Person> findById(int id) async {
-        return _queryAdapter.query(r""" SELECT * FROM Person WHERE id = ?1 """,
+        return _queryAdapter.query('SELECT * FROM Person WHERE id = ?1',
             mapper: _personMapper, arguments: <dynamic>[id]);
       }
     '''));
@@ -70,7 +70,7 @@ void main() {
     expect(actual, equalsDart(r'''
       @override
       Future<List<Person>> findWithFlag(bool flag) async {
-        return _queryAdapter.queryList(r""" SELECT * FROM Person WHERE (name = name) = ?1 """, mapper: _personMapper, arguments: <dynamic>[flag == null ? null : (flag ? 1 : 0)]);
+        return _queryAdapter.queryList('SELECT * FROM Person WHERE (name = name) = ?1', mapper: _personMapper, arguments: <dynamic>[flag == null ? null : (flag ? 1 : 0)]);
       }
     '''));
   });
@@ -86,7 +86,7 @@ void main() {
     expect(actual, equalsDart(r'''
       @override
       Future<Person> findById(int id, String name) async {
-        return _queryAdapter.query(r""" SELECT * FROM Person WHERE id = ?1 AND name = ?2 """, mapper: _personMapper, arguments: <dynamic>[id, name]);
+        return _queryAdapter.query('SELECT * FROM Person WHERE id = ?1 AND name = ?2', mapper: _personMapper, arguments: <dynamic>[id, name]);
       }
     '''));
   });
@@ -102,7 +102,7 @@ void main() {
     expect(actual, equalsDart('''
       @override
       Future<List<Person>> findAll() async {
-        return _queryAdapter.queryList(r""" SELECT * FROM Person """, mapper: _personMapper);
+        return _queryAdapter.queryList('SELECT * FROM Person', mapper: _personMapper);
       }
     '''));
   });
@@ -118,7 +118,7 @@ void main() {
     expect(actual, equalsDart(r'''
       @override
       Stream<Person> findByIdAsStream(int id) {
-        return _queryAdapter.queryStream(r""" SELECT * FROM Person WHERE id = ?1 """, mapper: _personMapper, arguments: <dynamic>[id], dependencies: {'Person'});
+        return _queryAdapter.queryStream('SELECT * FROM Person WHERE id = ?1', mapper: _personMapper, arguments: <dynamic>[id], dependencies: {'Person'});
       }
     '''));
   });
@@ -134,7 +134,7 @@ void main() {
     expect(actual, equalsDart(r'''
       @override
       Stream<List<Person>> findAllAsStream() {
-        return _queryAdapter.queryListStream(r""" SELECT * FROM Person """, mapper: _personMapper, dependencies: {'Person'});
+        return _queryAdapter.queryListStream('SELECT * FROM Person', mapper: _personMapper, dependencies: {'Person'});
       }
     '''));
   });
@@ -150,7 +150,7 @@ void main() {
     expect(actual, equalsDart(r'''
       @override
       Stream<List<Name>> findAllAsStream() {
-        return _queryAdapter.queryListStream(r""" SELECT * FROM Name """, mapper: _nameMapper, dependencies: {'Person'});
+        return _queryAdapter.queryListStream('SELECT * FROM Name', mapper: _nameMapper, dependencies: {'Person'});
       }
     '''));
   });
@@ -171,9 +171,9 @@ void main() {
             Iterable<String>.generate(ids.length, (i) => '?${i + _start}')
                 .join(',');
         return _queryAdapter.queryList(
-            r""" SELECT * FROM Person WHERE id IN ( """ +
+            'SELECT * FROM Person WHERE id IN (' +
                 _sqliteVariablesForIds +
-                r""" ) """,
+                ')',
             mapper: _personMapper,
             arguments: <dynamic>[...ids]);
       }
@@ -198,11 +198,11 @@ void main() {
         final _sqliteVariablesForIdx =
             Iterable<String>.generate(idx.length, (i) => '?${i + _start}').join(',');
         return _queryAdapter.queryList(
-        r""" SELECT * FROM Person WHERE id IN ( """ +
+        'SELECT * FROM Person WHERE id IN (' +
                 _sqliteVariablesForIds +
-                r""" ) AND id IN ( """ +
+                ') AND id IN (' +
                 _sqliteVariablesForIdx +
-                r""" ) """,
+                ')',
             mapper: _personMapper,
             arguments: <dynamic>[...ids,...idx]);
       }
@@ -220,7 +220,7 @@ void main() {
     expect(actual, equalsDart(r'''
       @override
       Future<List<Person>> findEmptyNames() async {
-        return _queryAdapter.queryList(r""" SELECT * FROM Person WHERE name = '' """, mapper: _personMapper);
+        return _queryAdapter.queryList('SELECT * FROM Person WHERE name = \'\'', mapper: _personMapper);
       }
     '''));
   });
@@ -236,7 +236,7 @@ void main() {
     expect(actual, equalsDart(r'''
       @override
       Future<List<Person>> findEmptyNames() async {
-        return _queryAdapter.queryList(r""" SELECT * FROM Person WHERE "name" = '' """, mapper: _personMapper);
+        return _queryAdapter.queryList('SELECT * FROM Person WHERE \"name\" = \'\'', mapper: _personMapper);
       }
     '''));
   });
@@ -252,7 +252,7 @@ void main() {
     expect(actual, equalsDart(r'''
       @override
       Future<List<Person>> findEmptyNames() async {
-        return _queryAdapter.queryList(r""" SELECT * FROM Person WHERE `name` = '' """, mapper: _personMapper);
+        return _queryAdapter.queryList('SELECT * FROM Person WHERE `name` = \'\'', mapper: _personMapper);
       }
     '''));
   });

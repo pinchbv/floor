@@ -64,7 +64,7 @@ class DaoWriter extends Writer {
           .toSet()
           .map((entity) {
         final constructor = entity.constructor;
-        final name = '_${entity.name.decapitalize()}Mapper';
+        final name = '_${entity.classElement.displayName.decapitalize()}Mapper';
 
         return Field((builder) => builder
           ..name = name
@@ -99,7 +99,7 @@ class DaoWriter extends Writer {
 
         constructorBuilder
           ..initializers.add(Code(
-              "$fieldName = InsertionAdapter(database, '${entity.name}', $valueMapper${requiresChangeListener ? ', changeListener' : ''})"));
+              "$fieldName = InsertionAdapter(database, ${entity.name.toLiteral()}, $valueMapper${requiresChangeListener ? ', changeListener' : ''})"));
       }
     }
 
@@ -126,7 +126,7 @@ class DaoWriter extends Writer {
 
         constructorBuilder
           ..initializers.add(Code(
-              "$fieldName = UpdateAdapter(database, '${entity.name}', ${entity.primaryKey.fields.map((field) => '\'${field.columnName}\'').toList()}, $valueMapper${requiresChangeListener ? ', changeListener' : ''})"));
+              "$fieldName = UpdateAdapter(database, ${entity.name.toLiteral()}, ${entity.primaryKey.fields.map((field) => field.columnName.toLiteral()).toList()}, $valueMapper${requiresChangeListener ? ', changeListener' : ''})"));
       }
     }
 
@@ -153,7 +153,7 @@ class DaoWriter extends Writer {
 
         constructorBuilder
           ..initializers.add(Code(
-              "$fieldName = DeletionAdapter(database, '${entity.name}', ${entity.primaryKey.fields.map((field) => '\'${field.columnName}\'').toList()}, $valueMapper${requiresChangeListener ? ', changeListener' : ''})"));
+              "$fieldName = DeletionAdapter(database, ${entity.name.toLiteral()}, ${entity.primaryKey.fields.map((field) => field.columnName.toLiteral()).toList()}, $valueMapper${requiresChangeListener ? ', changeListener' : ''})"));
       }
     }
 

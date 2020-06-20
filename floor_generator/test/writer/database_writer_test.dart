@@ -173,7 +173,7 @@ void main() {
                   'CREATE TABLE IF NOT EXISTS `Person` (`id` INTEGER, `name` TEXT, PRIMARY KEY (`id`))');
                   
               await database.execute(
-                  '''CREATE VIEW IF NOT EXISTS `names` AS SELECT upper(name) as name FROM person''');
+                  'CREATE VIEW IF NOT EXISTS `names` AS SELECT upper(name) as name FROM person');
 
               await callback?.onCreate?.call(database, version);
             },

@@ -103,7 +103,7 @@ class QueryMethodWriter implements Writer {
   String _generateNoReturnQuery(
       @nonNull final String query, @nullable final String arguments) {
     final affected =
-        _generateSetStringOrNull(_queryMethod.sqliteContext.affectedEntities);
+        _generateSetStringOrNull(_queryMethod.query.affectedEntities);
 
     final parameters = StringBuffer()..write(query);
     if (arguments != null) parameters.write(', arguments: $arguments');
@@ -120,7 +120,7 @@ class QueryMethodWriter implements Writer {
     final mapper = _generateMapper();
     final deps = _queryMethod.returnType.isStream
         ? _generateSetStringOrNull(
-            _queryMethod.sqliteContext.dependencies.map((e) => e.name))
+            _queryMethod.query.dependencies.map((e) => e.name))
         : null;
 
     final parameters = StringBuffer()..write(query)..write(', mapper: $mapper');
@@ -165,29 +165,28 @@ class QueryMethodWriter implements Writer {
   String _generateQueryString() {
     final code = StringBuffer();
     int start = 0;
-    final originalQuery = _queryMethod.sqliteContext.processedQuery;
-    for (final listParameter
-        in _queryMethod.sqliteContext.listInsertionPositions) {
+    final originalQuery = _queryMethod.query.sql;
+    for (final listParameter in _queryMethod.query.listParameters) {
       code.write(
-          'r""" ${originalQuery.substring(start, listParameter.position)} """');
+          originalQuery.substring(start, listParameter.position).toLiteral());
 
       code.write('+ _sqliteVariablesFor${listParameter.name.capitalize()} +');
       start = listParameter.position + varlistPlaceholder.length;
     }
-    code.write('r""" ${originalQuery.substring(start)} """');
+    code.write(originalQuery.substring(start).toLiteral());
 
     return code.toString();
   }
 
   @nullable
   String _generateSetStringOrNull(Iterable<String> input) {
-    final iter = input.map((e) => "'${e.replaceAll("'", "\\'")}'");
+    final iter = input.map((e) => e.toLiteral());
     return iter.isNotEmpty ? '{ ${iter.join(', ')} }' : null;
   }
 
   @nonNull
   String _generateMapper() {
     //TODO queryable can be null; mapper has to be generated as column name (Map<String, dynamic> row) => row.values.first as <type>
-    return '_${_queryMethod.returnType.queryable.name.decapitalize()}Mapper';
+    return '_${_queryMethod.returnType.queryable.classElement.displayName.decapitalize()}Mapper';
   }
 }

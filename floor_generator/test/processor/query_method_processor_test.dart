@@ -6,6 +6,7 @@ import 'package:floor_generator/processor/entity_processor.dart';
 import 'package:floor_generator/processor/error/query_method_processor_error.dart';
 import 'package:floor_generator/processor/query_analyzer/engine.dart';
 import 'package:floor_generator/processor/query_method_processor.dart';
+import 'package:floor_generator/processor/query_processor.dart';
 import 'package:floor_generator/processor/view_processor.dart';
 import 'package:floor_generator/value_object/entity.dart';
 import 'package:floor_generator/value_object/query_method.dart';
@@ -46,7 +47,8 @@ void main() {
         QueryMethod(
           methodElement,
           'findAllPersons',
-          engine.analyzeQuery('SELECT * FROM Person', methodElement),
+          QueryProcessor(methodElement, 'SELECT * FROM Person', engine)
+              .process(),
           QueryMethodReturnType(
               await getDartTypeWithPerson('Future<List<Person>>'))
             ..queryable = entities.first,
@@ -72,7 +74,7 @@ void main() {
         QueryMethod(
           methodElement,
           'findAllNames',
-          engine.analyzeQuery('SELECT * FROM name', methodElement),
+          QueryProcessor(methodElement, 'SELECT * FROM name', engine).process(),
           QueryMethodReturnType(await getDartTypeWithName('Future<List<Name>>'))
             ..queryable = views.first,
           [],
@@ -91,8 +93,8 @@ void main() {
       final actual =
           QueryMethodProcessor(methodElement, [...entities, ...views], engine)
               .process()
-              .sqliteContext
-              .processedQuery;
+              .query
+              .sql;
 
       expect(actual, equals('SELECT * FROM Person WHERE id = ?1'));
     });
@@ -109,12 +111,13 @@ void main() {
       final actual =
           QueryMethodProcessor(methodElement, [...entities, ...views], engine)
               .process()
-              .sqliteContext
-              .processedQuery;
+              .query
+              .sql;
 
       expect(
         actual,
-        equals('SELECT * FROM person\n          WHERE id = ?1 AND name = ?2'),
+        equals(
+            '          SELECT * FROM person\n          WHERE id = ?1 AND name = ?2\n        '),
       );
     });
 
@@ -128,8 +131,8 @@ void main() {
       final actual =
           QueryMethodProcessor(methodElement, [...entities, ...views], engine)
               .process()
-              .sqliteContext
-              .processedQuery;
+              .query
+              .sql;
 
       expect(
         actual,
@@ -143,10 +146,8 @@ void main() {
       Future<void> setRated(List<int> ids);
     ''');
 
-      final actual = QueryMethodProcessor(methodElement, [], engine)
-          .process()
-          .sqliteContext
-          .processedQuery;
+      final actual =
+          QueryMethodProcessor(methodElement, [], engine).process().query.sql;
 
       expect(
         actual,
@@ -160,10 +161,8 @@ void main() {
       Future<void> setRated(List<int> ids, List<String> bar);
     ''');
 
-      final actual = QueryMethodProcessor(methodElement, [], engine)
-          .process()
-          .sqliteContext
-          .processedQuery;
+      final actual =
+          QueryMethodProcessor(methodElement, [], engine).process().query.sql;
 
       expect(
         actual,
@@ -180,10 +179,8 @@ void main() {
       Future<void> setRated(List<int> ids, int bar);
     ''');
 
-      final actual = QueryMethodProcessor(methodElement, [], engine)
-          .process()
-          .sqliteContext
-          .processedQuery;
+      final actual =
+          QueryMethodProcessor(methodElement, [], engine).process().query.sql;
 
       expect(
         actual,
@@ -203,8 +200,8 @@ void main() {
       final actual =
           QueryMethodProcessor(methodElement, [...entities, ...views], engine)
               .process()
-              .sqliteContext
-              .processedQuery;
+              .query
+              .sql;
 
       expect(actual, equals('SELECT * FROM Person WHERE name LIKE ?1'));
     });
@@ -218,8 +215,8 @@ void main() {
       final actual =
           QueryMethodProcessor(methodElement, [...entities, ...views], engine)
               .process()
-              .sqliteContext
-              .processedQuery;
+              .query
+              .sql;
 
       expect(actual, equals('SELECT ?1, ?2'));
     });

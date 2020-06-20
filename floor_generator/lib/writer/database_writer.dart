@@ -4,6 +4,7 @@ import 'package:floor_generator/misc/annotations.dart';
 import 'package:floor_generator/value_object/database.dart';
 import 'package:floor_generator/value_object/entity.dart';
 import 'package:floor_generator/writer/writer.dart';
+import 'package:floor_generator/misc/string_utils.dart';
 
 /// Takes care of generating the database implementation.
 class DatabaseWriter implements Writer {
@@ -77,16 +78,19 @@ class DatabaseWriter implements Writer {
   Method _generateOpenMethod(final Database database) {
     final createTableStatements =
         _generateCreateTableSqlStatements(database.entities)
-            .map((statement) => "await database.execute('$statement');")
+            .map((statement) => statement.toLiteral())
+            .map((statement) => 'await database.execute($statement);')
             .join('\n');
     final createIndexStatements = database.entities
         .map((entity) => entity.indices.map((index) => index.createQuery()))
         .expand((statements) => statements)
-        .map((statement) => "await database.execute('$statement');")
+        .map((statement) => statement.toLiteral())
+        .map((statement) => 'await database.execute($statement);')
         .join('\n');
     final createViewStatements = database.views
         .map((view) => view.getCreateViewStatement())
-        .map((statement) => "await database.execute('''$statement''');")
+        .map((statement) => statement.toLiteral())
+        .map((statement) => 'await database.execute($statement);')
         .join('\n');
 
     final pathParameter = Parameter((builder) => builder
