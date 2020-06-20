@@ -72,9 +72,9 @@ class EntityProcessorError {
   }
 
   InvalidGenerationSourceError wrongForeignKeyAction(
-      DartObject field, bool isUpdate) {
+      DartObject field, String triggerName) {
     return InvalidGenerationSourceError(
-      'No ForeignKeyAction with the value $field exists for the on${isUpdate ? 'Update' : 'Delete'} trigger.',
+      'No ForeignKeyAction with the value $field exists for the $triggerName trigger.',
       todo:
           'Make sure to add a correct ForeignKeyAction like `ForeignKeyAction.noAction` or leave it out entirely.',
       element: _classElement,

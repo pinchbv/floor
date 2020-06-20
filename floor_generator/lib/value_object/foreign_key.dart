@@ -29,8 +29,8 @@ class ForeignKey {
 
     return 'FOREIGN KEY ($escapedChildColumns)'
         ' REFERENCES `$parentName` ($escapedParentColumns)'
-        ' ON UPDATE ${onUpdate.toSQL}'
-        ' ON DELETE ${onDelete.toSQL}';
+        ' ON UPDATE ${onUpdate.toSql()}'
+        ' ON DELETE ${onDelete.toSql()}';
   }
 
   final _listEquality = const ListEquality<String>();

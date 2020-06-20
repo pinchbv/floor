@@ -1,4 +1,5 @@
 import 'package:floor_generator/processor/insertion_method_processor.dart';
+import 'package:source_gen/source_gen.dart';
 import 'package:test/test.dart';
 
 import '../test_utils.dart';
@@ -17,5 +18,19 @@ void main() {
         .onConflict;
 
     expect(actual, equals('OnConflictStrategy.replace'));
+  });
+
+  test('Error on wrong onConflict value', () async {
+    final insertionMethod = await '''
+      @Insert(onConflict: OnConflictStrategy.doesnotexist)
+      Future<void> insertPerson(Person person);
+    '''
+        .asDaoMethodElement();
+    final entities = await getPersonEntity();
+
+    final actual =
+        () => InsertionMethodProcessor(insertionMethod, [entities]).process();
+
+    expect(actual, throwsA(const TypeMatcher<InvalidGenerationSourceError>()));
   });
 }

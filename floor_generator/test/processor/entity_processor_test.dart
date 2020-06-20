@@ -1,5 +1,6 @@
 import 'package:analyzer/dart/element/element.dart';
 import 'package:build_test/build_test.dart';
+import 'package:floor_generator/misc/constants.dart';
 import 'package:floor_generator/processor/entity_processor.dart';
 import 'package:floor_generator/processor/error/entity_processor_error.dart';
 import 'package:floor_generator/processor/field_processor.dart';
@@ -174,8 +175,8 @@ void main() {
       expect(
           processor.process,
           throwsInvalidGenerationSourceError(
-              EntityProcessorError(classElements[1])
-                  .wrongForeignKeyAction(MockDartObject(), true)));
+              EntityProcessorError(classElements[1]).wrongForeignKeyAction(
+                  MockDartObject(), ForeignKeyField.onUpdate)));
     });
   });
 

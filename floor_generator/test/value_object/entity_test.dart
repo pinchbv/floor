@@ -137,8 +137,8 @@ void main() {
           'FOREIGN KEY (`${foreignKey.childColumns[0]}`) '
           'REFERENCES `${foreignKey.parentName}` '
           '(`${foreignKey.parentColumns[0]}`) '
-          'ON UPDATE ${foreignKey.onUpdate.toSQL} '
-          'ON DELETE ${foreignKey.onDelete.toSQL}'
+          'ON UPDATE ${foreignKey.onUpdate.toSql()} '
+          'ON DELETE ${foreignKey.onDelete.toSql()}'
           ')';
       expect(actual, equals(expected));
     });

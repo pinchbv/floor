@@ -12,7 +12,6 @@ import 'package:floor_generator/value_object/field.dart';
 import 'package:floor_generator/value_object/foreign_key.dart';
 import 'package:floor_generator/value_object/index.dart';
 import 'package:floor_generator/value_object/primary_key.dart';
-import 'package:meta/meta.dart';
 
 class EntityProcessor extends QueryableProcessor<Entity> {
   final EntityProcessorError _processorError;
@@ -88,10 +87,10 @@ class EntityProcessor extends QueryableProcessor<Entity> {
           }
 
           final onUpdate =
-              _getForeignKeyAction(foreignKeyObject, isUpdate: true);
+              _getForeignKeyAction(foreignKeyObject, ForeignKeyField.onUpdate);
 
           final onDelete =
-              _getForeignKeyAction(foreignKeyObject, isUpdate: false);
+              _getForeignKeyAction(foreignKeyObject, ForeignKeyField.onDelete);
 
           return ForeignKey(
             parentName,
@@ -222,22 +221,16 @@ class EntityProcessor extends QueryableProcessor<Entity> {
   }
 
   @nonNull
-  annotations.ForeignKeyAction _getForeignKeyAction(DartObject foreignKeyObject,
-      {@required bool isUpdate}) {
-    final fieldName =
-    isUpdate ? ForeignKeyField.onUpdate : ForeignKeyField.onDelete;
-
-    final field = foreignKeyObject.getField(fieldName);
+  annotations.ForeignKeyAction _getForeignKeyAction(
+      DartObject foreignKeyObject, String triggerName) {
+    final field = foreignKeyObject.getField(triggerName);
     if (field == null) {
       // field was not defined, return default value
       return annotations.ForeignKeyAction.noAction;
     }
 
-    final fka = field.toForeignKeyAction();
-    if (fka == null) {
-      // field was not defined correctly
-      throw _processorError.wrongForeignKeyAction(field, isUpdate);
-    }
-    return fka;
+    return field.toForeignKeyAction(
+        orElse: () =>
+            throw _processorError.wrongForeignKeyAction(field, triggerName));
   }
 }

@@ -5,33 +5,32 @@ import 'package:test/test.dart';
 void main() {
   group('foreign key action strings', () {
     test('NO ACTION', () {
-      final actual = annotations.ForeignKeyAction.noAction.toSQL;
+      final actual = annotations.ForeignKeyAction.noAction.toSql();
       expect(actual, equals('NO ACTION'));
     });
 
     test('RESTRICT', () {
-      final actual = annotations.ForeignKeyAction.restrict.toSQL;
+      final actual = annotations.ForeignKeyAction.restrict.toSql();
       expect(actual, equals('RESTRICT'));
     });
 
     test('SET NULL', () {
-      final actual = annotations.ForeignKeyAction.setNull.toSQL;
+      final actual = annotations.ForeignKeyAction.setNull.toSql();
       expect(actual, equals('SET NULL'));
     });
 
     test('SET DEFAULT', () {
-      final actual = annotations.ForeignKeyAction.setDefault.toSQL;
+      final actual = annotations.ForeignKeyAction.setDefault.toSql();
       expect(actual, equals('SET DEFAULT'));
     });
 
     test('CASCADE', () {
-      final actual = annotations.ForeignKeyAction.cascade.toSQL;
+      final actual = annotations.ForeignKeyAction.cascade.toSql();
       expect(actual, equals('CASCADE'));
     });
 
-    test('null annotation returns null', () {
-      final actual = null.toSQL;
-      expect(actual, isNull);
+    test('null throws ArgumentError', () {
+      expect(() => null.toSql(), throwsArgumentError);
     });
   });
 }

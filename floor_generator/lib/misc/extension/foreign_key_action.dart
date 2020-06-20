@@ -3,7 +3,7 @@ import 'package:floor_generator/misc/annotations.dart';
 
 extension ToSQL on ForeignKeyAction {
   @nonNull
-  String get toSQL {
+  String toSql() {
     switch (this) {
       case ForeignKeyAction.noAction:
         return 'NO ACTION';
@@ -15,8 +15,9 @@ extension ToSQL on ForeignKeyAction {
         return 'SET DEFAULT';
       case ForeignKeyAction.cascade:
         return 'CASCADE';
-      default:
-        return null;
+      default: // can only match null
+        throw ArgumentError('toSql() should not be called on a null value. '
+            'This is a bug in floor.');
     }
   }
 }
