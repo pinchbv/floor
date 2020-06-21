@@ -295,7 +295,7 @@ void main() {
               .process();
       expect(
           actual, throwsA(const TypeMatcher<InvalidGenerationSourceError>()));
-    }, skip: 'TODO: no mismatch error detection for that yet');
+    });
   });
 }
 

@@ -34,23 +34,32 @@ class ViewProcessorError {
   }
 
   InvalidGenerationSourceError nullableMismatch(
-      String columnName, String fieldName) {
-    // TODO sqlparser is nulltype and field is not nullable
-
-    return null;
+      String columnName, FieldElement el) {
+    return InvalidGenerationSourceError(
+        'The query returns `null` for `$columnName` but the type of the field is not nullable',
+        todo: 'Either make the field nullable or alter your query.',
+        element: el);
   }
 
-  InvalidGenerationSourceError nullableMismatch2(
-      Field column, ResolvedType parsertype) {
-    // TODO sqlparser type is nullable and field is not nullable
-
-    return null;
+  InvalidGenerationSourceError nullableMismatch2(Field field) {
+    return InvalidGenerationSourceError(
+        'The query could return `null` for `${field.columnName}` but the type of the field is not nullable',
+        todo: 'Either make the field nullable or alter your query.',
+        element: field.fieldElement);
   }
 
   InvalidGenerationSourceError typeMismatch(
-      Field column, ResolvedType parsertype) {
-    // TODO sqlparser type is a different one than the field type
+      Field field, ResolvedType parsertype) {
+    return InvalidGenerationSourceError(
+        'The query returns a column of type ${parsertype.type} for `${field.columnName}` but the type of the field is derived as ${field.sqlType}',
+        todo: 'Either change the field type or alter your query.',
+        element: field.fieldElement);
+  }
 
-    return null;
+  InvalidGenerationSourceError unexpectedVariable(Variable variable) {
+    return InvalidGenerationSourceError(
+        'The query should not contain any variable references\n${variable.span.highlight()}',
+        todo: 'Remove all variables by altering the query.',
+        element: _classElement);
   }
 }

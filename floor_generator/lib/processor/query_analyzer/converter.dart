@@ -1,6 +1,7 @@
 import 'package:floor_generator/misc/constants.dart';
 import 'package:floor_generator/processor/error/view_processor_error.dart';
 import 'package:floor_generator/processor/query_analyzer/engine.dart';
+import 'package:floor_generator/processor/query_analyzer/visitors.dart';
 import 'package:floor_generator/value_object/entity.dart';
 import 'package:floor_generator/value_object/field.dart';
 import 'package:floor_generator/value_object/view.dart';
@@ -118,7 +119,7 @@ extension ToSqlparserView on View {
       throw ViewProcessorError(classElement).missingSelectQuery;
     }
 
-    //TODO let VariableVisitor run and report an error if any were found
+    _assertNoVariables(parserCtx.rootNode);
 
     // analyze query (derive types)
     final ctx = engine.analyzeParsed(parserCtx);
@@ -154,7 +155,7 @@ extension ToSqlparserView on View {
       if (resolvedColumnType.type == BasicType.nullType &&
           !fields[i].isNullable) {
         throw ViewProcessorError(classElement)
-            .nullableMismatch(fields[i].columnName, fields[i].name);
+            .nullableMismatch(fields[i].columnName, fields[i].fieldElement);
       }
 
       if (resolvedColumnType.type != BasicType.nullType) {
@@ -164,11 +165,22 @@ extension ToSqlparserView on View {
               .typeMismatch(fields[i], resolvedColumnType);
         }
         if (resolvedColumnType.nullable && !fields[i].isNullable) {
-          throw ViewProcessorError(classElement)
-              .nullableMismatch2(fields[i], resolvedColumnType);
+          throw ViewProcessorError(classElement).nullableMismatch2(fields[i]);
         }
       }
     }
     return view;
+  }
+
+  void _assertNoVariables(AstNode query) {
+    final visitor = VariableVisitor(null, numberedVarsAllowed: true)
+      ..visitStatement(query, null);
+    final errors = ViewProcessorError(classElement);
+    if (visitor.variables.isNotEmpty) {
+      throw errors.unexpectedVariable(visitor.variables.first);
+    }
+    if (visitor.numberedVariables.isNotEmpty) {
+      throw errors.unexpectedVariable(visitor.numberedVariables.first);
+    }
   }
 }

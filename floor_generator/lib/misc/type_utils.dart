@@ -47,21 +47,6 @@ extension AnnotationChecker on Element {
   DartObject getAnnotation(final Type type) {
     return _typeChecker(type).firstAnnotationOfExact(this);
   }
-
-  /// Returns the first annotation object with type [type]
-  ElementAnnotation getAnnotationElement(final Type type) {
-    for (var i = 0; i < metadata.length; i++) {
-      final annotation = metadata[i];
-      final value = annotation.computeConstantValue();
-
-      //maybe:  if value=null, annotation could not be resolved
-
-      if (value?.type != null && _typeChecker(type).isExactlyType(value.type)) {
-        return annotation;
-      }
-    }
-    return null;
-  }
 }
 
 @nonNull

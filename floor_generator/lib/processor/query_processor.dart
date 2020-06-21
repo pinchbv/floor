@@ -54,7 +54,9 @@ class QueryProcessor extends Processor<Query> {
       throw _processorError.fromParsingError(parsed.errors.first);
     }
 
-    //TODO first walk variables and search for missing ones here?
+    // check if parameter names of method and query match and make sure that no
+    // numbered variables were used
+    _assertMatchingParameters(parsed.rootNode);
 
     // analyze query with named parameters only
     final analyzed = _engine.inner.analyzeParsed(parsed,
@@ -85,8 +87,7 @@ class QueryProcessor extends Processor<Query> {
     }
 
     // get List of query variables via VariableVisitor
-    final visitor = VariableVisitor(_processorError,
-        checkIfVariableExists: indices.keys.toSet(), numberedVarsAllowed: false)
+    final visitor = VariableVisitor(_processorError, numberedVarsAllowed: false)
       ..visitStatement(ctx.root, null);
 
     // reverse List and (1-x)replace var name with parameter or(0) map span to name
@@ -124,7 +125,14 @@ class QueryProcessor extends Processor<Query> {
   }
 
   void _assertNoNamedVarsLeft(String newQuery) {
-    //TODO
+    final parsed = _engine.inner.parse(newQuery);
+    final visitor = VariableVisitor(_processorError, numberedVarsAllowed: true)
+      ..visitStatement(parsed.rootNode, null);
+    for (final v in visitor.variables) {
+      if (v.name != varlistPlaceholder) {
+        throw _processorError.unexpectedNamedVariableInTransformedQuery(v);
+      }
+    }
   }
 
   List<SqlResultColumn> _getOutputColumnTypes(AnalysisContext analysisContext) {
@@ -136,6 +144,22 @@ class QueryProcessor extends Processor<Query> {
     } else {
       // any other statement where SQLite does not return anything.
       return [];
+    }
+  }
+
+  void _assertMatchingParameters(AstNode statement) {
+    final parameterNames = _parameters.map((p) => p.displayName).toSet();
+
+    final visitor = VariableVisitor(_processorError,
+        numberedVarsAllowed: false, checkIfVariableExists: parameterNames)
+      ..visitStatement(statement, null);
+
+    final references =
+        visitor.variables.map((v) => v.name.substring(1)).toSet();
+    for (final param in _parameters) {
+      if (!references.contains(param.displayName)) {
+        throw _processorError.methodParameterMissingInQuery(param);
+      }
     }
   }
 }

@@ -4,45 +4,60 @@ import 'package:sqlparser/sqlparser.dart';
 
 class QueryProcessorError {
   final MethodElement _methodElement;
-  //final Element _annotation;
 
   QueryProcessorError(final MethodElement methodElement)
       : assert(methodElement != null),
         _methodElement = methodElement;
 
-  //TODO use annotationElement
   InvalidGenerationSourceError fromParsingError(ParsingError error) {
     return InvalidGenerationSourceError(
-      'The query contained errors: ${error.message}',
+      'The query contained parser errors: ${error.toString()}',
       element: _methodElement,
     );
   }
 
-  //TODO use annotationElement
   InvalidGenerationSourceError fromAnalysisError(AnalysisError error) {
     return InvalidGenerationSourceError(
-      'The query contained errors: ${error.message}',
+      'The query contained analyzer errors: ${error.toString()}',
       element: _methodElement,
     );
   }
 
-  //TODO use annotationElement?
   InvalidGenerationSourceError queryParameterMissingInMethod(
       ColonNamedVariable variable) {
-    throw InvalidGenerationSourceError(
-        'Invalid named variable $variable in statement of `@Query` annotation does not exist in the method parameters.',
+    return InvalidGenerationSourceError(
+        'Named variable in statement of `@Query` annotation should exist in the method parameters.\n${variable.span.highlight()}',
         todo:
-            'Please add a method parameter for the variable $variable with the name ${variable.name.substring(1)}.',
+            'Please add a method parameter for the variable `${variable.name}` with the name `${variable.name.substring(1)}`.',
         element: _methodElement);
   }
 
-  //TODO use annotationElement
+  InvalidGenerationSourceError methodParameterMissingInQuery(
+      ParameterElement parameter) {
+    return InvalidGenerationSourceError(
+        'Method parameter should be referenced in statement of `@Query` annotation',
+        todo:
+            'Please reference this parameter with `:${parameter.displayName}` or remove it from the parameters.',
+        element: parameter);
+  }
+
   InvalidGenerationSourceError shouldNotHaveNumberedVars(NumberedVariable e) {
-    throw InvalidGenerationSourceError(
-        'Invalid numbered variable $e in statement of `@Query` annotation. '
-        'Statements used in floor can only have named parameters with colons.',
+    return InvalidGenerationSourceError(
+        'Invalid numbered variable in statement of `@Query` annotation. '
+        'Statements used in floor should only have named parameters with colons.\n${e.span.highlight()}',
         todo:
             'Please use a named variable (`:name`) instead of numbered variables (`?` or `?3`).',
+        element: _methodElement);
+  }
+
+  InvalidGenerationSourceError unexpectedNamedVariableInTransformedQuery(
+      ColonNamedVariable v) {
+    final builder = StringBuffer()
+      ..writeln(
+          'The named variable ${v.name} should not be in the transformed query string! This is a bug in floor.')
+      ..writeln(v.span.highlight());
+    return InvalidGenerationSourceError(builder.toString(),
+        todo: 'Please report the bug and include some context.',
         element: _methodElement);
   }
 }

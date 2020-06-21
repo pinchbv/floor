@@ -33,7 +33,7 @@ class VariableVisitor extends RecursiveVisitor<void, void> {
   @override
   void visitNamedVariable(ColonNamedVariable e, void arg) {
     if (checkIfVariableExists != null &&
-        !checkIfVariableExists.contains(e.name)) {
+        !checkIfVariableExists.contains(e.name.substring(1))) {
       throw _processorError.queryParameterMissingInMethod(e);
     }
     variables.add(e);

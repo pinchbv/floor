@@ -186,7 +186,12 @@ class QueryMethodWriter implements Writer {
 
   @nonNull
   String _generateMapper() {
-    //TODO queryable can be null; mapper has to be generated as column name (Map<String, dynamic> row) => row.values.first as <type>
-    return '_${_queryMethod.returnType.queryable.classElement.displayName.decapitalize()}Mapper';
+    if (_queryMethod.returnType.queryable == null) {
+      //TODO Typeconverters, use QueryableProcessor._castParameterValue
+      const type = 'int';
+      return '(Map<String, dynamic> row) => row.values.first as $type';
+    } else {
+      return '_${_queryMethod.returnType.queryable.classElement.displayName.decapitalize()}Mapper';
+    }
   }
 }
