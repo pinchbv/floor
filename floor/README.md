@@ -396,11 +396,6 @@ You can then query the view via a DAO function like an entity.
 
 It is possible for DatabaseViews to inherit common fields from a base class, just like in entities.
 
-#### Limitations
-- It is now possible to return a `Stream` object from a DAO method which queries a database view. But it will fire on **any** 
-  `@update`, `@insert`, `@delete` events in the whole database, which can get quite taxing on the runtime. Please add it only if you know what you are doing!
-  This is mostly due to the complexity of detecting which entities are involved in a database view.
-
 ## Data Access Objects
 These components are responsible for managing access to the underlying SQLite database and are defined as abstract classes with method signatures and query statements.
 DAO classes can use inherited methods by implementing and extending classes while also using mixins.
@@ -421,9 +416,8 @@ abstract class PersonDao {
 
 ### Queries
 Method signatures turn into query methods by adding the `@Query()` annotation with the query in parenthesis to them.
-Be patient about the correctness of your SQL statements.
-They are only partly validated while generating the code.
-These queries have to return either a `Future` or a `Stream` of an entity or `void`.
+Your SQL queries will be validated completely while generating the code.
+These queries have to return either a `Future` or a `Stream` of an entity, a view, a primitive value or `void`.
 Returning `Future<void>` comes in handy whenever you want to delete the full content of a table, for instance.
 Some query method examples can be seen in the following.
 
@@ -459,6 +453,13 @@ Future<List<Person>> findPersonsWithNamesLike(String name);
 final name = '%foo%';
 await dao.findPersonsWithNamesLike(name);
 ```
+
+#### Limitations
+- Supplying more than one query (separated by a semicolon) will not work. 
+  Please use transactions or successive calls to DAO-Methods instead.
+- The underlying frameworks only support up to 999 different parameters. This 
+  seems like a big number, but each element of a list parameter counts towards it
+  and the length of these lists could change at runtime.  
 
 ### Data Changes
 Use the `@insert`, `@update` and `@delete` annotations for inserting and changing persistent data.
@@ -520,11 +521,6 @@ StreamBuilder<List<Person>>(
 ```
 
 #### Limitations
-- Only methods annotated with `@insert`, `@update` and `@delete` trigger `Stream` emissions. 
-  Inserting data by using the `@Query()` annotation doesn't.
-- It is now possible to return a `Stream` if the function queries a database view. But it will fire on **any** 
-  `@update`, `@insert`, `@delete` events in the whole database, which can get quite taxing on the runtime. Please add it only if you know what you are doing!
-  This is mostly due to the complexity of detecting which entities are involved in a database view.
 - Functions returning a stream of single items such as `Stream<Person>` do not emit when there is no query result.
 
 ### Transactions

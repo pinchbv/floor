@@ -299,6 +299,7 @@ void main() {
   });
 }
 
+//TODO test multiple queries separated by semicolon
 Future<MethodElement> _createQueryMethodElement(
   final String method,
 ) async {
