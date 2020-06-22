@@ -36,7 +36,21 @@ class InsertionAdapter<T> {
     final OnConflictStrategy onConflictStrategy,
   ) async {
     if (items.isEmpty) return;
-    await _insertListVoid(items, onConflictStrategy);
+    final batch = _database.batch();
+    for (final item in items) {
+      batch.insert(
+        _entityName,
+        _valueMapper(item),
+        conflictAlgorithm: onConflictStrategy.asSqfliteConflictAlgorithm(),
+      );
+    }
+
+    await batch.commit(noResult: true);
+
+    if (_changeListener != null) {
+      _changeListener.add(_entityName);
+    }
+  }
   }
 
   Future<int> insertAndReturnId(
