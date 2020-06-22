@@ -3,24 +3,30 @@ import 'package:build_test/build_test.dart';
 import 'package:floor_annotation/floor_annotation.dart' as annotations;
 import 'package:floor_generator/misc/type_utils.dart';
 import 'package:floor_generator/processor/entity_processor.dart';
-import 'package:floor_generator/processor/error/query_method_processor_error.dart';
 import 'package:floor_generator/processor/query_analyzer/engine.dart';
-import 'package:floor_generator/processor/query_method_processor.dart';
 import 'package:floor_generator/processor/query_processor.dart';
 import 'package:floor_generator/processor/view_processor.dart';
 import 'package:floor_generator/value_object/entity.dart';
-import 'package:floor_generator/value_object/query_method.dart';
-import 'package:floor_generator/value_object/query_method_return_type.dart';
+import 'package:floor_generator/value_object/query.dart';
 import 'package:floor_generator/value_object/view.dart';
 import 'package:source_gen/source_gen.dart';
+import 'package:sqlparser/sqlparser.dart' hide View;
 import 'package:test/test.dart';
 
-import '../test_utils.dart';
-
-// TODO update tests (list incomplete)
-// todo put parsing into query processor test
-// todo add return type checking test, e.g. delete query with wrong return types
-// TODO test multiple queries separated by semicolon
+//TODO new tests:
+// Errors:
+// - parsing error
+// - analyzer error (e.g. "IN (5,'3')" )
+// - numbered variables in query
+// - sql/method parameter mismatch 1 (mayb copied from qm-processor-test)
+// - sql/method parameter mismatch 2 (mayb copied from qm-processor-test)
+// Normal behaviour:
+// - complex variable scenario (multiple lists, used many times with normal vars in between)
+// - no-dependencies scenario in select
+// - proper outputs (dependencies, affected, output) for update
+// - proper outputs (dependencies, affected, output) for delete
+// - proper outputs (dependencies, affected, output) for insert
+//
 
 void main() {
   List<Entity> entities;
@@ -36,68 +42,78 @@ void main() {
     views = await _getViews();
     views.forEach(engine.checkAndRegisterView);
   });
-  test('create query method', () async {
+
+  test('create simple query object', () async {
     final methodElement = await _createQueryMethodElement('''
       @Query('SELECT * FROM Person')
       Future<List<Person>> findAllPersons();      
     ''');
 
     final actual =
-        QueryMethodProcessor(methodElement, [...entities, ...views], engine)
-            .process();
+        QueryProcessor(methodElement, 'SELECT * FROM Person', engine).process();
 
     expect(
       actual,
-      equals(
-        QueryMethod(
-          methodElement,
-          'findAllPersons',
-          QueryProcessor(methodElement, 'SELECT * FROM Person', engine)
-              .process(),
-          QueryMethodReturnType(
-              await getDartTypeWithPerson('Future<List<Person>>'))
-            ..queryable = entities.first,
-          [],
-        ),
-      ),
+      equals(Query(
+        'SELECT * FROM Person',
+        [],
+        [
+          SqlResultColumn(
+              'id',
+              const ResolveResult(
+                  ResolvedType(type: BasicType.int, nullable: true))),
+          SqlResultColumn(
+              'name',
+              const ResolveResult(
+                  ResolvedType(type: BasicType.text, nullable: true))),
+        ],
+        {entities.firstWhere((e) => e.name == 'Person')},
+        {},
+      )),
     );
   });
 
-  test('create query method for a view', () async {
+  test('create complex query object', () async {
     final methodElement = await _createQueryMethodElement('''
-      @Query('SELECT * FROM name')
-      Future<List<Name>> findAllNames();      
+      @Query("SELECT *, name='Jules', length(name), :arg1 as X FROM Name WHERE length(name) in (:lengths)")
+      Future<void> findAllPersons(List<int> lengths, Uint8List arg1);      
     ''');
 
-    final actual =
-        QueryMethodProcessor(methodElement, [...entities, ...views], engine)
-            .process();
+    final actual = QueryProcessor(
+            methodElement,
+            'SELECT *, name=\'Jules\', length(name), :arg1 as X FROM Name WHERE length(name) in (:lengths)',
+            engine)
+        .process();
 
     expect(
       actual,
-      equals(
-        QueryMethod(
-          methodElement,
-          'findAllNames',
-          QueryProcessor(methodElement, 'SELECT * FROM name', engine).process(),
-          QueryMethodReturnType(await getDartTypeWithName('Future<List<Name>>'))
-            ..queryable = views.first,
-          [],
-        ),
-      ),
+      equals(Query(
+        'SELECT *, name=\'Jules\', length(name), ?1 as X FROM Name WHERE length(name) in (:varlist)',
+        [ListParameter(79, 'lengths')],
+        [
+          SqlResultColumn(
+              'name',
+              const ResolveResult(
+                  ResolvedType(type: BasicType.text, nullable: true))),
+          SqlResultColumn(
+              'name=\'Jules\'',
+              const ResolveResult(ResolvedType(
+                  type: BasicType.int, nullable: false, hint: IsBoolean()))),
+          SqlResultColumn(
+              'length(name)',
+              const ResolveResult(
+                  ResolvedType(type: BasicType.int, nullable: false))),
+          SqlResultColumn(
+              'X',
+              const ResolveResult(
+                  ResolvedType(type: BasicType.blob, nullable: true))),
+        ],
+        {entities.firstWhere((e) => e.name == 'Person')},
+        {},
+      )),
     );
   });
-// TODO fix this test which got moved from the writer test
-/*  test('query with unsupported type throws', () async {
-    final queryMethod = await _createQueryMethod('''
-      @Query('SELECT * FROM Person WHERE id = :person')
-      Future<Person> findById(Person person);
-    ''');
-
-    final actual = () => QueryMethodWriter(queryMethod).write();
-
-    expect(actual, throwsA(const TypeMatcher<InvalidGenerationSourceError>()));
-  });*/
+/*
   group('query parsing', () {
     test('parse query', () async {
       final methodElement = await _createQueryMethodElement('''
@@ -311,7 +327,7 @@ void main() {
       expect(
           actual, throwsA(const TypeMatcher<InvalidGenerationSourceError>()));
     });
-  });
+  });*/
 }
 
 Future<MethodElement> _createQueryMethodElement(
@@ -320,8 +336,9 @@ Future<MethodElement> _createQueryMethodElement(
   final library = await resolveSource('''
       library test;
       
+      import 'dart:typed_data';
       import 'package:floor_annotation/floor_annotation.dart';
-      
+
       @dao
       abstract class PersonDao {
         $method
@@ -355,6 +372,7 @@ Future<List<Entity>> _getEntities() async {
       library test;
       
       import 'package:floor_annotation/floor_annotation.dart';
+      
       
       @entity
       class Person {

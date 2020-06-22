@@ -1,16 +1,22 @@
-//maybe inefficient! is not memoized.
 class DependencyGraph {
   final Map<String, Set<String>> _directDependencies = {};
+
+  final Map<String, Set<String>> _dependencyCache = {};
 
   void add(String name, Iterable<String> dependencies) {
     _directDependencies.update(
         name, (existingDeps) => {...existingDeps, ...dependencies},
         ifAbsent: () => dependencies.toSet());
+    _dependencyCache.clear();
   }
 
   Set<String> indirectDependencies(String name) {
     if (!_directDependencies.containsKey(name)) {
       return {name};
+    }
+
+    if (_dependencyCache.containsKey(name)) {
+      return _dependencyCache[name];
     }
 
     final Set<String> output = {name};
@@ -27,6 +33,7 @@ class DependencyGraph {
         }
       }
     }
+    _dependencyCache[name] = output;
     return output;
   }
 }

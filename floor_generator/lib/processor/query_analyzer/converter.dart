@@ -8,6 +8,10 @@ import 'package:floor_generator/value_object/view.dart';
 import 'package:sqlparser/sqlparser.dart' hide View, Queryable;
 import 'package:sqlparser/sqlparser.dart' as sqlparser show View;
 
+//todo single test for testing engine registrations and dependencies
+//todo test dependency graph
+//todo test visitors with example queries
+//todo add tests
 extension ToTableColumn on Field {
   static BasicType _toBasicType(String type) {
     final mapping = {
@@ -20,11 +24,16 @@ extension ToTableColumn on Field {
   }
 
   TableColumn asTableColumn() {
-    //todo map bool value or other non-basic types
+    final boolHint =
+        fieldElement.type.isDartCoreBool ? const IsBoolean() : null;
+
     return TableColumn(
       columnName,
       ResolvedType(
-          type: _toBasicType(sqlType), nullable: isNullable, isArray: false),
+          type: _toBasicType(sqlType),
+          nullable: isNullable,
+          isArray: false,
+          hint: boolHint),
     );
   }
 }

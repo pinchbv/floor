@@ -6,6 +6,13 @@ import 'package:test/test.dart';
 import '../test_utils.dart';
 
 void main() {
+  //TODO new tests for validator:
+  // - use wrong column reference to test validation
+  // - use wrong syntax reference to test parser
+  // - use wrong types 1,2,3
+  // - use variables
+  // - no select query
+  // - check converter by parallel construction
   test('Process view', () async {
     final classElement = await createClassElement('''
       @DatabaseView("SELECT * from otherentity")

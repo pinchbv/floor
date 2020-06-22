@@ -118,7 +118,6 @@ void main() {
     '''));
   });
 
-  //TODO use same test just with wrong column reference to test validation
   test('open database with view', () async {
     final database = await _createDatabase('''
       @Database(version: 1, entities: [Person], views: [Name])

@@ -256,18 +256,6 @@ void main() {
       }
     '''));
   });
-
-  //TODO maybe move this to processor test
-/*  test('query with unsupported type throws', () async {
-    final queryMethod = await _createQueryMethod('''
-      @Query('SELECT * FROM Person WHERE id = :person')
-      Future<Person> findById(Person person);
-    ''');
-
-    final actual = () => QueryMethodWriter(queryMethod).write();
-
-    expect(actual, throwsA(const TypeMatcher<InvalidGenerationSourceError>()));
-  });*/
 }
 
 Future<QueryMethod> _createQueryMethod(final String methodSignature) async {

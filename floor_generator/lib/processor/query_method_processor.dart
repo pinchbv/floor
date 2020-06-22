@@ -100,12 +100,12 @@ class QueryMethodProcessor extends Processor<QueryMethod> {
 
   void _assertMatchingReturnType(
       QueryMethodReturnType dartType, List<SqlResultColumn> sqliteColumns) {
-    // TODO typeconverters
     if (sqliteColumns.isEmpty) {
       if (!dartType.isVoid || !dartType.isFuture) {
         throw _processorError.doesNotReturnVoidFuture;
       }
     } else {
+      // TODO typeconverters
       //TODO check types
     }
   }
