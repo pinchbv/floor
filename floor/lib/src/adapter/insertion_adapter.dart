@@ -36,7 +36,18 @@ class InsertionAdapter<T> {
     final OnConflictStrategy onConflictStrategy,
   ) async {
     if (items.isEmpty) return;
-    await _insertList(items, onConflictStrategy);
+    final batch = _database.batch();
+    for (final item in items) {
+      batch.insert(
+        _entityName,
+        _valueMapper(item),
+        conflictAlgorithm: onConflictStrategy.asSqfliteConflictAlgorithm(),
+      );
+    }
+    await batch.commit(noResult: true);
+    if (_changeListener != null) {
+      _changeListener.add(_entityName);
+    }
   }
 
   Future<int> insertAndReturnId(
@@ -51,7 +62,19 @@ class InsertionAdapter<T> {
     final OnConflictStrategy onConflictStrategy,
   ) async {
     if (items.isEmpty) return [];
-    return _insertList(items, onConflictStrategy);
+    final batch = _database.batch();
+    for (final item in items) {
+      batch.insert(
+        _entityName,
+        _valueMapper(item),
+        conflictAlgorithm: onConflictStrategy.asSqfliteConflictAlgorithm(),
+      );
+    }
+    final result = (await batch.commit(noResult: false)).cast<int>();
+    if (_changeListener != null && result.isNotEmpty) {
+      _changeListener.add(_entityName);
+    }
+    return result;
   }
 
   Future<int> _insert(
@@ -64,25 +87,6 @@ class InsertionAdapter<T> {
       conflictAlgorithm: onConflictStrategy.asSqfliteConflictAlgorithm(),
     );
     if (_changeListener != null && result != null) {
-      _changeListener.add(_entityName);
-    }
-    return result;
-  }
-
-  Future<List<int>> _insertList(
-    final List<T> items,
-    final OnConflictStrategy onConflictStrategy,
-  ) async {
-    final batch = _database.batch();
-    for (final item in items) {
-      batch.insert(
-        _entityName,
-        _valueMapper(item),
-        conflictAlgorithm: onConflictStrategy.asSqfliteConflictAlgorithm(),
-      );
-    }
-    final result = (await batch.commit(noResult: false)).cast<int>();
-    if (_changeListener != null && result.isNotEmpty) {
       _changeListener.add(_entityName);
     }
     return result;
