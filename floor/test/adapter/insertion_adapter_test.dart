@@ -49,10 +49,7 @@ void main() {
         final person1 = Person(1, 'Simon');
         final person2 = Person(2, 'Frank');
         final persons = [person1, person2];
-        final primaryKeys = persons.map((person) => person.id).toList();
         when(mockDatabaseExecutor.batch()).thenReturn(mockDatabaseBatch);
-        when(mockDatabaseBatch.commit(noResult: true))
-            .thenAnswer((_) => Future(() => primaryKeys));
 
         await underTest.insertList(persons, onConflictStrategy);
 
