@@ -228,19 +228,6 @@ void main() {
       verify(mockStreamController.add(entityName));
     });
 
-    test('do not notify when nothing changed', () async {
-      final person1 = Person(1, 'Simon');
-      final person2 = Person(2, 'Frank');
-      final persons = [person1, person2];
-      when(mockDatabaseExecutor.batch()).thenReturn(mockDatabaseBatch);
-      when(mockDatabaseBatch.commit(noResult: false))
-          .thenAnswer((_) => Future(() => <int>[]));
-
-      await underTest.insertList(persons, onConflictStrategy);
-
-      verifyZeroInteractions(mockStreamController);
-    });
-
     test('insert empty list', () async {
       await underTest.insertList([], onConflictStrategy);
 
