@@ -88,10 +88,10 @@ class InsertionAdapter<T> {
     return result;
   }
   
-    Future<void> _insertListVoid(
-      final List<T> items,
-      final ConflictAlgorithm conflictAlgorithm,
-      ) async {
+  Future<void> _insertListVoid(
+    final List<T> items,
+    final ConflictAlgorithm conflictAlgorithm,
+  ) async {
     final batch = _database.batch();
     for (final item in items) {
       batch.insert(
