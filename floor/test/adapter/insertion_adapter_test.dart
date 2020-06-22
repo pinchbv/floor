@@ -51,7 +51,7 @@ void main() {
         final persons = [person1, person2];
         final primaryKeys = persons.map((person) => person.id).toList();
         when(mockDatabaseExecutor.batch()).thenReturn(mockDatabaseBatch);
-        when(mockDatabaseBatch.commit(noResult: false))
+        when(mockDatabaseBatch.commit(noResult: true))
             .thenAnswer((_) => Future(() => primaryKeys));
 
         await underTest.insertList(persons, onConflictStrategy);
@@ -76,7 +76,7 @@ void main() {
             values2,
             conflictAlgorithm: conflictAlgorithm,
           ),
-          mockDatabaseBatch.commit(noResult: false),
+          mockDatabaseBatch.commit(noResult: true),
         ]);
       });
 
