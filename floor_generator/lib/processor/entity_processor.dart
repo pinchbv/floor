@@ -212,6 +212,7 @@ class EntityProcessor extends QueryableProcessor<Entity> {
     return classElement
             .getAnnotation(annotations.Entity)
             .getField(AnnotationField.entityWithoutRowid)
-            .toBoolValue() ?? false;
+            .toBoolValue() ??
+        false;
   }
 }
