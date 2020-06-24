@@ -11,6 +11,7 @@ class Entity extends Queryable {
   final PrimaryKey primaryKey;
   final List<ForeignKey> foreignKeys;
   final List<Index> indices;
+  final bool withoutRowid;
 
   Entity(
     ClassElement classElement,
@@ -19,6 +20,7 @@ class Entity extends Queryable {
     this.primaryKey,
     this.foreignKeys,
     this.indices,
+    this.withoutRowid,
     String constructor,
   ) : super(classElement, name, fields, constructor);
 
@@ -39,7 +41,9 @@ class Entity extends Queryable {
       databaseDefinition.add(primaryKeyDefinition);
     }
 
-    return 'CREATE TABLE IF NOT EXISTS `$name` (${databaseDefinition.join(', ')})';
+    final withoutRowidClause = withoutRowid ? ' WITHOUT ROWID' : '';
+
+    return 'CREATE TABLE IF NOT EXISTS `$name` (${databaseDefinition.join(', ')})$withoutRowidClause';
   }
 
   @nullable
@@ -90,6 +94,7 @@ class Entity extends Queryable {
           const ListEquality<ForeignKey>()
               .equals(foreignKeys, other.foreignKeys) &&
           const ListEquality<Index>().equals(indices, other.indices) &&
+          withoutRowid == other.withoutRowid &&
           constructor == other.constructor;
 
   @override
@@ -100,7 +105,8 @@ class Entity extends Queryable {
       primaryKey.hashCode ^
       foreignKeys.hashCode ^
       indices.hashCode ^
-      constructor.hashCode;
+      constructor.hashCode ^
+      withoutRowid.hashCode;
 
   @override
   String toString() {

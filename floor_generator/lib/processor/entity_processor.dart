@@ -33,6 +33,7 @@ class EntityProcessor extends QueryableProcessor<Entity> {
       _getPrimaryKey(fields),
       _getForeignKeys(),
       _getIndices(fields, name),
+      _getWithoutRowid(),
       getConstructor(fields),
     );
   }
@@ -204,5 +205,13 @@ class EntityProcessor extends QueryableProcessor<Entity> {
         false;
 
     return PrimaryKey([primaryKeyField], autoGenerate);
+  }
+
+  @nonNull
+  bool _getWithoutRowid() {
+    return classElement
+            .getAnnotation(annotations.Entity)
+            .getField(AnnotationField.entityWithoutRowid)
+            .toBoolValue() ?? false;
   }
 }

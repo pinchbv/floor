@@ -42,6 +42,7 @@ void main() {
       primaryKey,
       foreignKeys,
       indices,
+      false,
       constructor,
     );
     expect(actual, equals(expected));
@@ -76,6 +77,7 @@ void main() {
       primaryKey,
       foreignKeys,
       indices,
+      false,
       constructor,
     );
     expect(actual, equals(expected));

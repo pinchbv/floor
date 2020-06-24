@@ -48,6 +48,7 @@ void main() {
         primaryKey,
         [],
         [],
+        false,
         '',
       );
 
@@ -69,6 +70,7 @@ void main() {
         primaryKey,
         [],
         [],
+        false,
         '',
       );
 
@@ -91,6 +93,7 @@ void main() {
         primaryKey,
         [],
         [],
+        false,
         '',
       );
 
@@ -122,6 +125,7 @@ void main() {
         primaryKey,
         [foreignKey],
         [],
+        false,
         '',
       );
 
@@ -148,6 +152,7 @@ void main() {
       primaryKey,
       [],
       [],
+      false,
       '',
     );
     const fieldElementDisplayName = 'foo';
@@ -187,6 +192,7 @@ void main() {
         primaryKey,
         [],
         [],
+        false,
         '',
       );
       when(mockDartType.isDartCoreBool).thenReturn(true);
