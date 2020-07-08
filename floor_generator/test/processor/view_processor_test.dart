@@ -270,7 +270,7 @@ void main() {
           actual,
           throwsInvalidGenerationSourceErrorWithMessagePrefix(
               InvalidGenerationSourceError(
-                  'The following error occurred while analyzing the SQL-Statement in ',
+                  'The following error occurred while comparing the DatabaseView to the SQL-Statement in ',
                   todo: '',
                   element: classElement)));
     });

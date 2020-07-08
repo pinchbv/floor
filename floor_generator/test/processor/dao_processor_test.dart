@@ -18,11 +18,8 @@ void main() {
   setUpAll(() async {
     engine = AnalyzerEngine();
 
-    entities = await getEntities();
-    entities.forEach(engine.registerEntity);
-
-    views = await getViews();
-    views.forEach(engine.checkAndRegisterView);
+    entities = await getEntities(engine);
+    views = await getViews(engine);
   });
 
   test('Includes methods from abstract parent class', () async {

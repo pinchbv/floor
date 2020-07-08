@@ -29,19 +29,18 @@ class AnalyzerEngine {
     inner.registerTable(entity.asTable());
 
     registry[entity.name] = entity;
-    //register dependencies
 
+    //register dependencies
     final directDependencies = entity.foreignKeys
         .where((e) => e.canChangeChild)
         .map((e) => e.parentName);
     dependencies.add(entity.name, directDependencies);
   }
 
-  void checkAndRegisterView(floor.View floorView) {
-    registry[floorView.name] = floorView;
-
-    final convertedView = floorView.asSqlparserView(inner);
+  void registerView(floor.View floorView, View convertedView) {
     inner.registerView(convertedView);
+
+    registry[floorView.name] = floorView;
 
     //register dependencies
     final references = findReferencedTablesOrViews(convertedView.definition);

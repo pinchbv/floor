@@ -33,6 +33,13 @@ class ViewProcessorError {
         element: _classElement);
   }
 
+  InvalidGenerationSourceError lintingErrorFromSqlparser(
+      AnalysisError lintingError) {
+    return InvalidGenerationSourceError(
+        'The following error occurred while comparing the DatabaseView to the SQL-Statement in ${_classElement.displayName}: ${lintingError.toString()}',
+        element: _classElement);
+  }
+
   InvalidGenerationSourceError nullableMismatch(Field field) {
     return InvalidGenerationSourceError(
         'The query returns `null` for `${field.columnName}` but the type of the field is not nullable',

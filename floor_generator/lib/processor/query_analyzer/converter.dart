@@ -15,16 +15,6 @@ import 'package:sqlparser/sqlparser.dart' as sqlparser show View;
 //TODO test: check converter by parallel construction: field, entity
 
 extension ToTableColumn on Field {
-  static BasicType _toBasicType(String type) {
-    final mapping = {
-      SqlType.blob: BasicType.blob,
-      SqlType.integer: BasicType.int,
-      SqlType.real: BasicType.real,
-      SqlType.text: BasicType.text,
-    };
-    return mapping[type];
-  }
-
   TableColumn asTableColumn() {
     final boolHint =
         fieldElement.type.isDartCoreBool ? const IsBoolean() : null;
@@ -32,7 +22,7 @@ extension ToTableColumn on Field {
     return TableColumn(
       columnName,
       ResolvedType(
-          type: _toBasicType(sqlType),
+          type: sqlToBasicType[sqlType],
           nullable: isNullable,
           isArray: false,
           hint: boolHint),
@@ -115,83 +105,9 @@ extension ToTable on Entity {
   }
 }
 
-extension ToSqlparserView on View {
-  sqlparser.View asSqlparserView(SqlEngine engine) {
-    final _processorError = ViewProcessorError(classElement);
-    // parse query
-    final parserCtx = engine.parse(query);
-
-    if (parserCtx.errors.isNotEmpty) {
-      throw _processorError.parseErrorFromSqlparser(parserCtx.errors.first);
-    }
-
-    // check if query is a select statement
-    if (!(parserCtx.rootNode is BaseSelectStatement)) {
-      throw _processorError.missingSelectQuery;
-    }
-
-    _assertNoVariables(parserCtx.rootNode);
-
-    // analyze query (derive types)
-    final ctx = engine.analyzeParsed(parserCtx);
-    if (ctx.errors.isNotEmpty) {
-      throw _processorError.analysisErrorFromSqlparser(ctx.errors.first);
-    }
-
-    // create a Parser node for sqlparser
-    final viewStmt = CreateViewStatement(
-      ifNotExists: true,
-      viewName: name,
-      columns: fields.map((f) => f.columnName).toList(growable: false),
-      query: ctx.root as BaseSelectStatement,
-    );
-
-    // check if any issues occurred while parsing and analyzing the query,
-    // such as a mismatch between the count of the result of the query and
-    // the count of fields in the view class
-    LintingVisitor(getDefaultEngineOptions(), ctx)
-        .visitCreateViewStatement(viewStmt, null);
-    if (ctx.errors.isNotEmpty) {
-      throw _processorError.analysisErrorFromSqlparser(ctx.errors.first);
-    }
-
-    // let sqlparser convert the parser node into a sqlparser view
-    final view = const SchemaFromCreateTable(moorExtensions: false)
-        .readView(ctx, viewStmt);
-
-    // check for type mismatches
-    //TODO carve out to generic type mismatch checker
-    for (int i = 0; i < fields.length; ++i) {
-      final resolvedColumnType = view.resolvedColumns[i].type;
-
-      //be strict here, but could be too strict.
-      if (resolvedColumnType.type == BasicType.nullType &&
-          !fields[i].isNullable) {
-        throw _processorError.nullableMismatch(fields[i]);
-      }
-
-      if (resolvedColumnType.type != BasicType.nullType) {
-        if (ToTableColumn._toBasicType(fields[i].sqlType) !=
-            resolvedColumnType.type) {
-          throw _processorError.typeMismatch(fields[i], resolvedColumnType);
-        }
-        if (resolvedColumnType.nullable && !fields[i].isNullable) {
-          throw _processorError.nullableMismatch2(fields[i]);
-        }
-      }
-    }
-    return view;
-  }
-
-  void _assertNoVariables(AstNode query) {
-    final visitor = VariableVisitor(null, numberedVarsAllowed: true)
-      ..visitStatement(query, null);
-    final errors = ViewProcessorError(classElement);
-    if (visitor.variables.isNotEmpty) {
-      throw errors.unexpectedVariable(visitor.variables.first);
-    }
-    if (visitor.numberedVariables.isNotEmpty) {
-      throw errors.unexpectedVariable(visitor.numberedVariables.first);
-    }
-  }
-}
+const sqlToBasicType = {
+  SqlType.blob: BasicType.blob,
+  SqlType.integer: BasicType.int,
+  SqlType.real: BasicType.real,
+  SqlType.text: BasicType.text,
+};
