@@ -32,11 +32,9 @@ class DatabaseProcessor extends Processor<Database> {
 
     final databaseName = _classElement.displayName;
 
-    final entities = _getEntities(_classElement);
-    entities.forEach(analyzerEngine.registerEntity);
+    final entities = _getEntities(_classElement, analyzerEngine);
 
-    final views = _getViews(_classElement);
-    views.forEach(analyzerEngine.checkAndRegisterView);
+    final views = _getViews(_classElement, analyzerEngine);
 
     final daoGetters =
         _getDaoGetters(databaseName, entities, views, analyzerEngine);
@@ -102,7 +100,8 @@ class DatabaseProcessor extends Processor<Database> {
   }
 
   @nonNull
-  List<Entity> _getEntities(final ClassElement databaseClassElement) {
+  List<Entity> _getEntities(final ClassElement databaseClassElement,
+      final AnalyzerEngine analyzerEngine) {
     final entities = _classElement
         .getAnnotation(annotations.Database)
         .getField(AnnotationField.databaseEntities)
@@ -110,7 +109,8 @@ class DatabaseProcessor extends Processor<Database> {
         ?.map((object) => object.toTypeValue().element)
         ?.whereType<ClassElement>()
         ?.where(_isEntity)
-        ?.map((classElement) => EntityProcessor(classElement).process())
+        ?.map((classElement) =>
+            EntityProcessor(classElement, analyzerEngine).process())
         ?.toList();
 
     if (entities == null || entities.isEmpty) {
@@ -121,7 +121,8 @@ class DatabaseProcessor extends Processor<Database> {
   }
 
   @nonNull
-  List<View> _getViews(final ClassElement databaseClassElement) {
+  List<View> _getViews(final ClassElement databaseClassElement,
+      final AnalyzerEngine analyzerEngine) {
     return _classElement
         .getAnnotation(annotations.Database)
         .getField(AnnotationField.databaseViews)
@@ -129,7 +130,8 @@ class DatabaseProcessor extends Processor<Database> {
         ?.map((object) => object.toTypeValue().element)
         ?.whereType<ClassElement>()
         ?.where(_isView)
-        ?.map((classElement) => ViewProcessor(classElement).process())
+        ?.map((classElement) =>
+            ViewProcessor(classElement, analyzerEngine).process())
         ?.toList();
   }
 

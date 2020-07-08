@@ -259,6 +259,6 @@ void main() {
 }
 
 Future<QueryMethod> _createQueryMethod(final String methodSignature) async {
-  final dao = await createDao(methodSignature);
+  final dao = await createDaoMethod(methodSignature);
   return dao.queryMethods.first;
 }

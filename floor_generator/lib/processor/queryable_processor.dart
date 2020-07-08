@@ -6,6 +6,7 @@ import 'package:floor_generator/misc/type_utils.dart';
 import 'package:floor_generator/processor/error/queryable_processor_error.dart';
 import 'package:floor_generator/processor/field_processor.dart';
 import 'package:floor_generator/processor/processor.dart';
+import 'package:floor_generator/processor/query_analyzer/engine.dart';
 import 'package:floor_generator/value_object/field.dart';
 import 'package:floor_generator/value_object/queryable.dart';
 import 'package:meta/meta.dart';
@@ -17,7 +18,10 @@ abstract class QueryableProcessor<T extends Queryable> extends Processor<T> {
   final ClassElement classElement;
 
   @protected
-  QueryableProcessor(this.classElement)
+  final AnalyzerEngine analyzerEngine;
+
+  @protected
+  QueryableProcessor(this.classElement, this.analyzerEngine)
       : assert(classElement != null),
         _queryableProcessorError = QueryableProcessorError(classElement);
 

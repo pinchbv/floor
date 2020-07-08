@@ -80,6 +80,6 @@ void main() {
 Future<DeletionMethod> _createDeletionMethod(
   final String methodSignature,
 ) async {
-  final dao = await createDao(methodSignature);
+  final dao = await createDaoMethod(methodSignature);
   return dao.deletionMethods.first;
 }

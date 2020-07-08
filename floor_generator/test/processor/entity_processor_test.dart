@@ -2,6 +2,7 @@ import 'package:analyzer/dart/element/element.dart';
 import 'package:build_test/build_test.dart';
 import 'package:floor_generator/processor/entity_processor.dart';
 import 'package:floor_generator/processor/field_processor.dart';
+import 'package:floor_generator/processor/query_analyzer/engine.dart';
 import 'package:floor_generator/value_object/entity.dart';
 import 'package:floor_generator/value_object/foreign_key.dart';
 import 'package:floor_generator/value_object/index.dart';
@@ -25,7 +26,7 @@ void main() {
       }
     ''');
 
-    final actual = EntityProcessor(classElement).process();
+    final actual = EntityProcessor(classElement, AnalyzerEngine()).process();
 
     const name = 'Person';
     final fields = classElement.fields
@@ -59,7 +60,7 @@ void main() {
       }
     ''');
 
-    final actual = EntityProcessor(classElement).process();
+    final actual = EntityProcessor(classElement, AnalyzerEngine()).process();
 
     const name = 'Person';
     final fields = classElement.fields
@@ -118,7 +119,9 @@ void main() {
         }
     ''');
 
-      final actual = EntityProcessor(classElements[1]).process().foreignKeys[0];
+      final actual = EntityProcessor(classElements[1], AnalyzerEngine())
+          .process()
+          .foreignKeys[0];
 
       final expected = ForeignKey(
         'Person',

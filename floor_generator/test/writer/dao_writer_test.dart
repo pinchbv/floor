@@ -1,15 +1,7 @@
-import 'package:build_test/build_test.dart';
 import 'package:code_builder/code_builder.dart';
-import 'package:floor_annotation/floor_annotation.dart' as annotations;
-import 'package:floor_generator/misc/type_utils.dart';
-import 'package:floor_generator/processor/dao_processor.dart';
-import 'package:floor_generator/processor/entity_processor.dart';
-import 'package:floor_generator/processor/query_analyzer/engine.dart';
-import 'package:floor_generator/processor/view_processor.dart';
-import 'package:floor_generator/value_object/dao.dart';
+
 import 'package:floor_generator/value_object/entity.dart';
 import 'package:floor_generator/writer/dao_writer.dart';
-import 'package:source_gen/source_gen.dart';
 import 'package:test/test.dart';
 
 import '../test_utils.dart';
@@ -18,7 +10,7 @@ void main() {
   useDartfmt();
 
   test('create DAO no stream query', () async {
-    final dao = await _createDao('''
+    final dao = await createDao('''
         @dao
         abstract class PersonDao {
           @Query('SELECT * FROM person')
@@ -98,7 +90,7 @@ void main() {
   });
 
   test('create DAO stream query', () async {
-    final dao = await _createDao('''
+    final dao = await createDao('''
         @dao
         abstract class PersonDao {
           @Query('SELECT * FROM person')
@@ -181,7 +173,7 @@ void main() {
   });
 
   test('create DAO aware of other entity stream query', () async {
-    final dao = await _createDao('''
+    final dao = await createDao('''
         @dao
         abstract class PersonDao {
           @insert
@@ -250,7 +242,7 @@ void main() {
   });
 
   test('create DAO aware of other different entity stream query', () async {
-    final dao = await _createDao('''
+    final dao = await createDao('''
       @dao
       abstract class PersonDao {
         @insert
@@ -392,55 +384,4 @@ void main() {
         }
       '''));
   });*/
-}
-
-Future<Dao> _createDao(final String dao) async {
-  final library = await resolveSource('''
-      library test;
-      
-      import 'package:floor_annotation/floor_annotation.dart';
-      
-      $dao
-      
-      @entity
-      class Person {
-        @primaryKey
-        final int id;
-      
-        final String name;
-      
-        Person(this.id, this.name);
-      }
-
-      @DatabaseView("SELECT name FROM Person")
-      class Name {
-        final String name;
-      
-        Name(this.name);
-      }
-      ''', (resolver) async {
-    return LibraryReader(await resolver.findLibraryByName('test'));
-  });
-
-  final daoClass = library.classes.firstWhere((classElement) =>
-      classElement.hasAnnotation(annotations.dao.runtimeType));
-
-  final entities = library.classes
-      .where((classElement) => classElement.hasAnnotation(annotations.Entity))
-      .map((classElement) => EntityProcessor(classElement).process())
-      .toList();
-
-  final views = library.classes
-      .where((classElement) =>
-          classElement.hasAnnotation(annotations.DatabaseView))
-      .map((classElement) => ViewProcessor(classElement).process())
-      .toList();
-
-  final engine = AnalyzerEngine();
-  entities.forEach(engine.registerEntity);
-  views.forEach(engine.checkAndRegisterView);
-
-  return DaoProcessor(
-          daoClass, 'personDao', 'TestDatabase', entities, views, engine)
-      .process();
 }

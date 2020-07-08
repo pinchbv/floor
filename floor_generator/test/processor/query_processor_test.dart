@@ -1,17 +1,15 @@
 import 'package:analyzer/dart/element/element.dart';
 import 'package:build_test/build_test.dart';
-import 'package:floor_annotation/floor_annotation.dart' as annotations;
-import 'package:floor_generator/misc/type_utils.dart';
-import 'package:floor_generator/processor/entity_processor.dart';
 import 'package:floor_generator/processor/query_analyzer/engine.dart';
 import 'package:floor_generator/processor/query_processor.dart';
-import 'package:floor_generator/processor/view_processor.dart';
 import 'package:floor_generator/value_object/entity.dart';
 import 'package:floor_generator/value_object/query.dart';
-import 'package:floor_generator/value_object/view.dart';
+//import 'package:floor_generator/value_object/view.dart';
 import 'package:source_gen/source_gen.dart';
 import 'package:sqlparser/sqlparser.dart' hide View;
 import 'package:test/test.dart';
+
+import '../test_utils.dart';
 
 //TODO new tests:
 // Errors:
@@ -30,17 +28,15 @@ import 'package:test/test.dart';
 
 void main() {
   List<Entity> entities;
-  List<View> views;
+  //List<View> views;
   AnalyzerEngine engine;
 
   setUpAll(() async {
     engine = AnalyzerEngine();
 
-    entities = await _getEntities();
-    entities.forEach(engine.registerEntity);
+    entities = await getEntities(engine);
 
-    views = await _getViews();
-    views.forEach(engine.checkAndRegisterView);
+    /*views =*/ await getViews(engine);
   });
 
   test('create simple query object', () async {
@@ -113,8 +109,8 @@ void main() {
       )),
     );
   });
-/*
   group('query parsing', () {
+/*
     test('parse query', () async {
       final methodElement = await _createQueryMethodElement('''
       @Query('SELECT * FROM Person WHERE id = :id')
@@ -250,11 +246,26 @@ void main() {
               .sql;
 
       expect(actual, equals('SELECT ?1, ?2'));
-    });
+    });*/
   });
 
   group('errors', () {
-    test('exception when method does not return future', () async {
+    test('parser exception when query string has more than one query',
+        () async {
+      final methodElement = await _createQueryMethodElement('''
+      @Query('SELECT 1;SELECT 2')
+      Future<List<Person>> findAllPersons();
+    ''');
+
+      final actual = () =>
+          QueryProcessor(methodElement, 'SELECT 1;SELECT 2', engine).process();
+      expect(
+          actual,
+          throwsInvalidGenerationSourceErrorWithMessagePrefix(
+              InvalidGenerationSourceError('The query contained parser errors:',
+                  element: methodElement)));
+    });
+    /*test('exception when method does not return future', () async {
       final methodElement = await _createQueryMethodElement('''
       @Query('SELECT * FROM Person')
       List<Person> findAllPersons();
@@ -326,8 +337,8 @@ void main() {
               .process();
       expect(
           actual, throwsA(const TypeMatcher<InvalidGenerationSourceError>()));
-    });
-  });*/
+    });*/
+  });
 }
 
 Future<MethodElement> _createQueryMethodElement(
@@ -365,53 +376,4 @@ Future<MethodElement> _createQueryMethodElement(
   });
 
   return library.classes.first.methods.first;
-}
-
-Future<List<Entity>> _getEntities() async {
-  final library = await resolveSource('''
-      library test;
-      
-      import 'package:floor_annotation/floor_annotation.dart';
-      
-      
-      @entity
-      class Person {
-        @primaryKey
-        final int id;
-      
-        final String name;
-      
-        Person(this.id, this.name);
-      }
-    ''', (resolver) async {
-    return LibraryReader(await resolver.findLibraryByName('test'));
-  });
-
-  return library.classes
-      .where((classElement) => classElement.hasAnnotation(annotations.Entity))
-      .map((classElement) => EntityProcessor(classElement).process())
-      .toList();
-}
-
-Future<List<View>> _getViews() async {
-  final library = await resolveSource('''
-      library test;
-      
-      import 'package:floor_annotation/floor_annotation.dart';
-      
-      @DatabaseView("SELECT DISTINCT(name) AS name from person")
-      class Name {
-        final String name;
-      
-        Name(this.name);
-      }
-    ''', (resolver) async {
-    return LibraryReader(await resolver.findLibraryByName('test'));
-  });
-
-  return library.classes
-      .where((classElement) =>
-          classElement.hasAnnotation(annotations.DatabaseView))
-      .map((classElement) => ViewProcessor(classElement).process())
-      .toList();
 }

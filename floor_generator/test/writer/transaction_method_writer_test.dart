@@ -38,6 +38,6 @@ void main() {
 Future<TransactionMethod> _createTransactionMethod(
   final String methodSignature,
 ) async {
-  final dao = await createDao(methodSignature);
+  final dao = await createDaoMethod(methodSignature);
   return dao.transactionMethods.first;
 }

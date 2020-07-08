@@ -1,16 +1,14 @@
 import 'package:analyzer/dart/element/element.dart';
 import 'package:build_test/build_test.dart';
-import 'package:floor_annotation/floor_annotation.dart' as annotations;
-import 'package:floor_generator/misc/type_utils.dart';
 import 'package:floor_generator/processor/dao_processor.dart';
-import 'package:floor_generator/processor/entity_processor.dart';
 import 'package:floor_generator/processor/query_analyzer/engine.dart';
-import 'package:floor_generator/processor/view_processor.dart';
 import 'package:floor_generator/value_object/dao.dart';
 import 'package:floor_generator/value_object/entity.dart';
 import 'package:floor_generator/value_object/view.dart';
 import 'package:source_gen/source_gen.dart';
 import 'package:test/test.dart';
+
+import '../test_utils.dart';
 
 void main() {
   List<Entity> entities;
@@ -20,10 +18,10 @@ void main() {
   setUpAll(() async {
     engine = AnalyzerEngine();
 
-    entities = await _getEntities();
+    entities = await getEntities();
     entities.forEach(engine.registerEntity);
 
-    views = await _getViews();
+    views = await getViews();
     views.forEach(engine.checkAndRegisterView);
   });
 
@@ -208,52 +206,4 @@ Future<ClassElement> _createDao(final String dao) async {
   });
 
   return library.classes.first;
-}
-
-Future<List<Entity>> _getEntities() async {
-  final library = await resolveSource('''
-      library test;
-      
-      import 'package:floor_annotation/floor_annotation.dart';
-      
-      @entity
-      class Person {
-        @primaryKey
-        final int id;
-      
-        final String name;
-      
-        Person(this.id, this.name);
-      }
-    ''', (resolver) async {
-    return LibraryReader(await resolver.findLibraryByName('test'));
-  });
-
-  return library.classes
-      .where((classElement) => classElement.hasAnnotation(annotations.Entity))
-      .map((classElement) => EntityProcessor(classElement).process())
-      .toList();
-}
-
-Future<List<View>> _getViews() async {
-  final library = await resolveSource('''
-      library test;
-      
-      import 'package:floor_annotation/floor_annotation.dart';
-      
-      @DatabaseView("SELECT name FROM Person")
-      class Name {
-        final String name;
-      
-        Person(this.name);
-      }
-    ''', (resolver) async {
-    return LibraryReader(await resolver.findLibraryByName('test'));
-  });
-
-  return library.classes
-      .where((classElement) =>
-          classElement.hasAnnotation(annotations.DatabaseView))
-      .map((classElement) => ViewProcessor(classElement).process())
-      .toList();
 }

@@ -14,6 +14,7 @@ import 'package:floor_generator/processor/query_analyzer/engine.dart';
 import 'package:floor_generator/processor/view_processor.dart';
 import 'package:floor_generator/value_object/dao.dart';
 import 'package:floor_generator/value_object/entity.dart';
+import 'package:floor_generator/value_object/view.dart';
 import 'package:path/path.dart' as path;
 import 'package:source_gen/source_gen.dart';
 import 'package:test/test.dart';
@@ -122,16 +123,24 @@ Matcher throwsInvalidGenerationSourceError(
   );
 }
 
-Future<Dao> createDao(final String methodSignature) async {
+Matcher throwsInvalidGenerationSourceErrorWithMessagePrefix(
+  final InvalidGenerationSourceError error,
+) {
+  return throwsA(
+    const TypeMatcher<InvalidGenerationSourceError>()
+        .having((e) => e.message, 'message', startsWith(error.message))
+        .having((e) => e.todo, 'todo', error.todo)
+        .having((e) => e.element, 'element', error.element),
+  );
+}
+
+Future<Dao> createDao(final String dao) async {
   final library = await resolveSource('''
       library test;
       
       import 'package:floor_annotation/floor_annotation.dart';
       
-      @dao
-      abstract class PersonDao {
-        $methodSignature
-      }
+      $dao
       
       $_personEntity
       
@@ -143,23 +152,30 @@ Future<Dao> createDao(final String methodSignature) async {
   final daoClass = library.classes.firstWhere((classElement) =>
       classElement.hasAnnotation(annotations.dao.runtimeType));
 
+  final engine = AnalyzerEngine();
+
   final entities = library.classes
       .where((classElement) => classElement.hasAnnotation(annotations.Entity))
-      .map((classElement) => EntityProcessor(classElement).process())
+      .map((classElement) => EntityProcessor(classElement, engine).process())
       .toList();
   final views = library.classes
       .where((classElement) =>
           classElement.hasAnnotation(annotations.DatabaseView))
-      .map((classElement) => ViewProcessor(classElement).process())
+      .map((classElement) => ViewProcessor(classElement, engine).process())
       .toList();
-
-  final engine = AnalyzerEngine();
-  entities.forEach(engine.registerEntity);
-  views.forEach(engine.checkAndRegisterView);
 
   return DaoProcessor(
           daoClass, 'personDao', 'TestDatabase', entities, views, engine)
       .process();
+}
+
+Future<Dao> createDaoMethod(final String methodSignature) async {
+  return createDao('''
+      @dao
+      abstract class PersonDao {
+        $methodSignature
+      }
+    ''');
 }
 
 Future<ClassElement> createClassElement(final String clazz) async {
@@ -189,7 +205,8 @@ Future<Entity> getPersonEntity() async {
 
   return library.classes
       .where((classElement) => classElement.hasAnnotation(annotations.Entity))
-      .map((classElement) => EntityProcessor(classElement).process())
+      .map((classElement) =>
+          EntityProcessor(classElement, AnalyzerEngine()).process())
       .first;
 }
 
@@ -214,6 +231,51 @@ extension StringExtension on String {
   }
 }
 
+Future<AnalyzerEngine> getEngineWithPersonEntity() async {
+  final engine = AnalyzerEngine();
+  engine.registerEntity(await getPersonEntity());
+  return engine;
+}
+
+Future<List<Entity>> getEntities([AnalyzerEngine engine]) async {
+  final library = await resolveSource('''
+      library test;
+      
+      import 'package:floor_annotation/floor_annotation.dart';
+      
+      $_personEntity
+    ''', (resolver) async {
+    return LibraryReader(await resolver.findLibraryByName('test'));
+  });
+
+  engine ??= AnalyzerEngine();
+
+  return library.classes
+      .where((classElement) => classElement.hasAnnotation(annotations.Entity))
+      .map((classElement) => EntityProcessor(classElement, engine).process())
+      .toList();
+}
+
+Future<List<View>> getViews([AnalyzerEngine engine]) async {
+  final library = await resolveSource('''
+      library test;
+      
+      import 'package:floor_annotation/floor_annotation.dart';
+      
+      $_nameView
+    ''', (resolver) async {
+    return LibraryReader(await resolver.findLibraryByName('test'));
+  });
+
+  engine ??= await getEngineWithPersonEntity();
+
+  return library.classes
+      .where((classElement) =>
+          classElement.hasAnnotation(annotations.DatabaseView))
+      .map((classElement) => ViewProcessor(classElement, engine).process())
+      .toList();
+}
+
 const _personEntity = '''
   @entity
   class Person {
@@ -227,7 +289,7 @@ const _personEntity = '''
 ''';
 
 const _nameView = '''
-  @DatabaseView("SELECT name FROM Person")
+  @DatabaseView("SELECT DISTINCT name FROM Person")
   class Name {
     final String name;
   

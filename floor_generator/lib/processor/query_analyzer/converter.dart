@@ -12,6 +12,8 @@ import 'package:sqlparser/sqlparser.dart' as sqlparser show View;
 //todo test dependency graph
 //todo test visitors with example queries
 //todo add tests
+//TODO test: check converter by parallel construction: field, entity
+
 extension ToTableColumn on Field {
   static BasicType _toBasicType(String type) {
     final mapping = {
@@ -115,23 +117,26 @@ extension ToTable on Entity {
 
 extension ToSqlparserView on View {
   sqlparser.View asSqlparserView(SqlEngine engine) {
+    final _processorError = ViewProcessorError(classElement);
     // parse query
     final parserCtx = engine.parse(query);
 
     if (parserCtx.errors.isNotEmpty) {
-      throw ViewProcessorError(classElement)
-          .parseErrorFromSqlparser(parserCtx.errors.first);
+      throw _processorError.parseErrorFromSqlparser(parserCtx.errors.first);
     }
 
     // check if query is a select statement
     if (!(parserCtx.rootNode is BaseSelectStatement)) {
-      throw ViewProcessorError(classElement).missingSelectQuery;
+      throw _processorError.missingSelectQuery;
     }
 
     _assertNoVariables(parserCtx.rootNode);
 
     // analyze query (derive types)
     final ctx = engine.analyzeParsed(parserCtx);
+    if (ctx.errors.isNotEmpty) {
+      throw _processorError.analysisErrorFromSqlparser(ctx.errors.first);
+    }
 
     // create a Parser node for sqlparser
     final viewStmt = CreateViewStatement(
@@ -147,8 +152,7 @@ extension ToSqlparserView on View {
     LintingVisitor(getDefaultEngineOptions(), ctx)
         .visitCreateViewStatement(viewStmt, null);
     if (ctx.errors.isNotEmpty) {
-      throw ViewProcessorError(classElement)
-          .lintErrorFromSqlparser(ctx.errors.first);
+      throw _processorError.analysisErrorFromSqlparser(ctx.errors.first);
     }
 
     // let sqlparser convert the parser node into a sqlparser view
@@ -163,18 +167,16 @@ extension ToSqlparserView on View {
       //be strict here, but could be too strict.
       if (resolvedColumnType.type == BasicType.nullType &&
           !fields[i].isNullable) {
-        throw ViewProcessorError(classElement)
-            .nullableMismatch(fields[i].columnName, fields[i].fieldElement);
+        throw _processorError.nullableMismatch(fields[i]);
       }
 
       if (resolvedColumnType.type != BasicType.nullType) {
         if (ToTableColumn._toBasicType(fields[i].sqlType) !=
             resolvedColumnType.type) {
-          throw ViewProcessorError(classElement)
-              .typeMismatch(fields[i], resolvedColumnType);
+          throw _processorError.typeMismatch(fields[i], resolvedColumnType);
         }
         if (resolvedColumnType.nullable && !fields[i].isNullable) {
-          throw ViewProcessorError(classElement).nullableMismatch2(fields[i]);
+          throw _processorError.nullableMismatch2(fields[i]);
         }
       }
     }

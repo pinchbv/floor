@@ -2,6 +2,7 @@ import 'package:analyzer/dart/element/element.dart';
 import 'package:collection/collection.dart';
 import 'package:floor_generator/processor/error/queryable_processor_error.dart';
 import 'package:floor_generator/processor/field_processor.dart';
+import 'package:floor_generator/processor/query_analyzer/engine.dart';
 import 'package:floor_generator/processor/queryable_processor.dart';
 import 'package:floor_generator/value_object/field.dart';
 import 'package:floor_generator/value_object/queryable.dart';
@@ -449,7 +450,8 @@ class TestQueryable extends Queryable {
 }
 
 class TestProcessor extends QueryableProcessor<TestQueryable> {
-  TestProcessor(ClassElement classElement) : super(classElement);
+  TestProcessor(ClassElement classElement)
+      : super(classElement, AnalyzerEngine());
 
   @override
   TestQueryable process() {

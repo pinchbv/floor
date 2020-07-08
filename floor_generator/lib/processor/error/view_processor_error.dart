@@ -22,23 +22,22 @@ class ViewProcessorError {
   InvalidGenerationSourceError parseErrorFromSqlparser(
       ParsingError parsingError) {
     return InvalidGenerationSourceError(
-        'The following error occurred while parsing the SQL-Statement in ${_classElement.displayName}: ${parsingError.message}',
+        'The following error occurred while parsing the SQL-Statement in ${_classElement.displayName}: ${parsingError.toString()}',
         element: _classElement);
   }
 
-  InvalidGenerationSourceError lintErrorFromSqlparser(
+  InvalidGenerationSourceError analysisErrorFromSqlparser(
       AnalysisError lintingError) {
     return InvalidGenerationSourceError(
-        'The following error occurred while analyzing the SQL-Statement in ${_classElement.displayName}: ${lintingError.message}',
+        'The following error occurred while analyzing the SQL-Statement in ${_classElement.displayName}: ${lintingError.toString()}',
         element: _classElement);
   }
 
-  InvalidGenerationSourceError nullableMismatch(
-      String columnName, FieldElement el) {
+  InvalidGenerationSourceError nullableMismatch(Field field) {
     return InvalidGenerationSourceError(
-        'The query returns `null` for `$columnName` but the type of the field is not nullable',
+        'The query returns `null` for `${field.columnName}` but the type of the field is not nullable',
         todo: 'Either make the field nullable or alter your query.',
-        element: el);
+        element: field.fieldElement);
   }
 
   InvalidGenerationSourceError nullableMismatch2(Field field) {

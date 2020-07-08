@@ -6,6 +6,7 @@ import 'package:floor_generator/misc/constants.dart';
 import 'package:floor_generator/misc/foreign_key_action.dart';
 import 'package:floor_generator/misc/type_utils.dart';
 import 'package:floor_generator/processor/error/entity_processor_error.dart';
+import 'package:floor_generator/processor/query_analyzer/engine.dart';
 import 'package:floor_generator/processor/queryable_processor.dart';
 import 'package:floor_generator/value_object/entity.dart';
 import 'package:floor_generator/value_object/field.dart';
@@ -16,9 +17,10 @@ import 'package:floor_generator/value_object/primary_key.dart';
 class EntityProcessor extends QueryableProcessor<Entity> {
   final EntityProcessorError _processorError;
 
-  EntityProcessor(final ClassElement classElement)
+  EntityProcessor(
+      final ClassElement classElement, final AnalyzerEngine analyzerEngine)
       : _processorError = EntityProcessorError(classElement),
-        super(classElement);
+        super(classElement, analyzerEngine);
 
   @nonNull
   @override
@@ -26,7 +28,7 @@ class EntityProcessor extends QueryableProcessor<Entity> {
     final name = _getName();
     final fields = getFields();
 
-    return Entity(
+    final entity = Entity(
       classElement,
       name,
       fields,
@@ -35,6 +37,10 @@ class EntityProcessor extends QueryableProcessor<Entity> {
       _getIndices(fields, name),
       getConstructor(fields),
     );
+
+    analyzerEngine.registerEntity(entity);
+
+    return entity;
   }
 
   @nonNull
