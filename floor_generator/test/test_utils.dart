@@ -43,14 +43,14 @@ Future<DartType> getDartType(final dynamic value) async {
   return resolveSource(source, (item) async {
     final libraryReader = LibraryReader(await item.findLibraryByName('test'));
     return (libraryReader.allElements.elementAt(1) as VariableElement).type;
-  });
+  }, inputId: createAssetId());
 }
 
 Future<DartType> getDartTypeFromString(final String value) {
   return getDartType(value);
 }
 
-Future<DartType> getDartTypeWithPerson(String value) async {
+Future<DartType> getDartTypeWithPerson(String value, [int id]) async {
   final source = '''
   library test;
   
@@ -73,10 +73,10 @@ Future<DartType> getDartTypeWithPerson(String value) async {
     return (libraryReader.allElements.first as PropertyAccessorElement)
         .type
         .returnType;
-  });
+  }, inputId: createAssetId(id));
 }
 
-Future<DartType> getDartTypeWithName(String value) async {
+Future<DartType> getDartTypeWithName(String value, [int id]) async {
   final source = '''
   library test;
   
@@ -96,7 +96,7 @@ Future<DartType> getDartTypeWithName(String value) async {
     return (libraryReader.allElements.first as PropertyAccessorElement)
         .type
         .returnType;
-  });
+  }, inputId: createAssetId(id));
 }
 
 final _dartfmt = DartFormatter();
@@ -147,7 +147,7 @@ Future<Dao> createDao(final String dao) async {
       $_nameView
       ''', (resolver) async {
     return LibraryReader(await resolver.findLibraryByName('test'));
-  });
+  }, inputId: createAssetId());
 
   final daoClass = library.classes.firstWhere((classElement) =>
       classElement.hasAnnotation(annotations.dao.runtimeType));
@@ -187,7 +187,7 @@ Future<ClassElement> createClassElement(final String clazz) async {
       $clazz
       ''', (resolver) async {
     return LibraryReader(await resolver.findLibraryByName('test'));
-  });
+  }, inputId: createAssetId());
 
   return library.classes.first;
 }
@@ -201,7 +201,7 @@ Future<Entity> getPersonEntity() async {
       $_personEntity
     ''', (resolver) async {
     return LibraryReader(await resolver.findLibraryByName('test'));
-  });
+  }, inputId: createAssetId());
 
   return library.classes
       .where((classElement) => classElement.hasAnnotation(annotations.Entity))
@@ -225,7 +225,7 @@ extension StringExtension on String {
       $_personEntity
     ''', (resolver) async {
       return LibraryReader(await resolver.findLibraryByName('test'));
-    });
+    }, inputId: createAssetId());
 
     return library.classes.first.methods.first;
   }
@@ -246,7 +246,7 @@ Future<List<Entity>> getEntities([AnalyzerEngine engine]) async {
       $_personEntity
     ''', (resolver) async {
     return LibraryReader(await resolver.findLibraryByName('test'));
-  });
+  }, inputId: createAssetId());
 
   engine ??= AnalyzerEngine();
 
@@ -265,7 +265,7 @@ Future<List<View>> getViews([AnalyzerEngine engine]) async {
       $_nameView
     ''', (resolver) async {
     return LibraryReader(await resolver.findLibraryByName('test'));
-  });
+  }, inputId: createAssetId());
 
   engine ??= await getEngineWithPersonEntity();
 
@@ -297,3 +297,11 @@ const _nameView = '''
   }
 
 ''';
+
+/// give each created source a unique id to avoid messing up span
+/// calculation for error tests
+int _id = 0;
+AssetId createAssetId([int id]) {
+  id ??= _id++;
+  return AssetId('_resolve_source', 'lib/_resolve_source$id.dart');
+}

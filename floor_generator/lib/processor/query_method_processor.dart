@@ -7,6 +7,7 @@ import 'package:floor_generator/misc/type_utils.dart';
 import 'package:floor_generator/processor/error/query_method_processor_error.dart';
 import 'package:floor_generator/processor/processor.dart';
 import 'package:floor_generator/processor/query_analyzer/engine.dart';
+import 'package:floor_generator/processor/query_analyzer/type_checker.dart';
 import 'package:floor_generator/processor/query_processor.dart';
 import 'package:floor_generator/value_object/query.dart';
 import 'package:floor_generator/value_object/query_method.dart';
@@ -103,9 +104,14 @@ class QueryMethodProcessor extends Processor<QueryMethod> {
       if (!dartType.isVoid || !dartType.isFuture) {
         throw _processorError.doesNotReturnVoidFuture;
       }
+    } else if (dartType.isVoid) {
+      assertMatchingVoidReturn(sqliteColumns, _methodElement);
+    } else if (dartType.isPrimitive) {
+      assertMatchingSingleReturnType(
+          dartType.flattened, sqliteColumns, _methodElement);
     } else {
-      // TODO typeconverters
-      //TODO check types
+      assertMatchingReturnTypes(
+          dartType.queryable.fields, sqliteColumns, _methodElement);
     }
   }
 

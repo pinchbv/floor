@@ -77,7 +77,7 @@ class SqlResultColumn {
   final String name;
 
   @nullable
-  final BasicType sqltype;
+  final BasicType sqlType;
 
   @nullable
   final bool isNullable;
@@ -88,9 +88,16 @@ class SqlResultColumn {
 
   SqlResultColumn(this.name, ResolveResult type)
       : assert(type != null),
-        sqltype = type.type?.type,
+        sqlType = type.type?.type,
         isNullable = type.type?.nullable,
         isResolved = !type.unknown;
+
+  SqlResultColumn.fromColumnWithType(ColumnWithType col)
+      : assert(col != null),
+        name = col.name,
+        sqlType = col.type.type,
+        isNullable = col.type.nullable,
+        isResolved = true;
 
   @override
   bool operator ==(Object other) =>
@@ -98,19 +105,19 @@ class SqlResultColumn {
       other is SqlResultColumn &&
           runtimeType == other.runtimeType &&
           name == other.name &&
-          sqltype == other.sqltype &&
+          sqlType == other.sqlType &&
           isNullable == other.isNullable &&
           isResolved == other.isResolved;
 
   @override
   int get hashCode =>
       name.hashCode ^
-      sqltype.hashCode ^
+      sqlType.hashCode ^
       isNullable.hashCode ^
       isResolved.hashCode;
 
   @override
   String toString() {
-    return 'SqlResultColumn{name: $name, sqltype: $sqltype, isNullable: $isNullable, isResolved: $isResolved}';
+    return 'SqlResultColumn{name: $name, sqltype: $sqlType, isNullable: $isNullable, isResolved: $isResolved}';
   }
 }

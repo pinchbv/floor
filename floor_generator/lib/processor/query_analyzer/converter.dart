@@ -1,12 +1,7 @@
 import 'package:floor_generator/misc/constants.dart';
-import 'package:floor_generator/processor/error/view_processor_error.dart';
-import 'package:floor_generator/processor/query_analyzer/engine.dart';
-import 'package:floor_generator/processor/query_analyzer/visitors.dart';
 import 'package:floor_generator/value_object/entity.dart';
 import 'package:floor_generator/value_object/field.dart';
-import 'package:floor_generator/value_object/view.dart';
-import 'package:sqlparser/sqlparser.dart' hide View, Queryable;
-import 'package:sqlparser/sqlparser.dart' as sqlparser show View;
+import 'package:sqlparser/sqlparser.dart';
 
 //todo single test for testing engine registrations and dependencies
 //todo test dependency graph

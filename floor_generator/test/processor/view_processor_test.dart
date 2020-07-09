@@ -1,10 +1,11 @@
+import 'package:floor_generator/processor/error/type_checker_error.dart';
 import 'package:floor_generator/processor/error/view_processor_error.dart';
 import 'package:floor_generator/processor/field_processor.dart';
 import 'package:floor_generator/processor/view_processor.dart';
 import 'package:floor_generator/value_object/field.dart';
 import 'package:floor_generator/value_object/view.dart';
 import 'package:source_gen/source_gen.dart';
-import 'package:sqlparser/sqlparser.dart' show ResolvedType, BasicType;
+import 'package:sqlparser/sqlparser.dart' show BasicType;
 import 'package:test/test.dart';
 
 import '../test_utils.dart';
@@ -296,7 +297,7 @@ void main() {
 
       expect(
           actual,
-          throwsInvalidGenerationSourceError(ViewProcessorError(classElement)
+          throwsInvalidGenerationSourceError(TypeCheckerError(classElement)
               .nullableMismatch(Field(
                   classElement.fields[0], 'id', 'id', false, 'INTEGER'))));
     });
@@ -322,10 +323,10 @@ void main() {
 
       expect(
           actual,
-          throwsInvalidGenerationSourceError(ViewProcessorError(classElement)
+          throwsInvalidGenerationSourceError(TypeCheckerError(classElement)
               .typeMismatch(
                   Field(classElement.fields[0], 'id', 'id', true, 'TEXT'),
-                  const ResolvedType(type: BasicType.int))));
+                  BasicType.int)));
     });
 
     test('Column type mismatch: nullable to non-nullable', () async {
@@ -349,7 +350,7 @@ void main() {
 
       expect(
           actual,
-          throwsInvalidGenerationSourceError(ViewProcessorError(classElement)
+          throwsInvalidGenerationSourceError(TypeCheckerError(classElement)
               .nullableMismatch2(Field(
                   classElement.fields[0], 'id', 'id', false, 'INTEGER'))));
     });

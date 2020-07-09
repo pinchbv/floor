@@ -31,10 +31,13 @@ void main() {
     views = await getViews(engine);
   });
   test('create query method', () async {
+    // has to exist or DartType(Person) != DartType(Person) because
+    // they are from different sources otherwise
+    const matchingSourceId = 1234;
     final methodElement = await _createQueryMethodElement('''
       @Query('SELECT * FROM Person')
       Future<List<Person>> findAllPersons();      
-    ''');
+    ''', matchingSourceId);
 
     final actual =
         QueryMethodProcessor(methodElement, [...entities, ...views], engine)
@@ -48,8 +51,8 @@ void main() {
           'findAllPersons',
           QueryProcessor(methodElement, 'SELECT * FROM Person', engine)
               .process(),
-          QueryMethodReturnType(
-              await getDartTypeWithPerson('Future<List<Person>>'))
+          QueryMethodReturnType(await getDartTypeWithPerson(
+              'Future<List<Person>>', matchingSourceId))
             ..queryable = entities.first,
           [],
         ),
@@ -58,10 +61,13 @@ void main() {
   });
 
   test('create query method for a view', () async {
+    // has to exist or DartType(Name) != DartType(Name) because
+    // they are from different sources otherwise
+    const matchingSourceId = 1234;
     final methodElement = await _createQueryMethodElement('''
       @Query('SELECT * FROM name')
       Future<List<Name>> findAllNames();      
-    ''');
+    ''', matchingSourceId);
 
     final actual =
         QueryMethodProcessor(methodElement, [...entities, ...views], engine)
@@ -74,7 +80,8 @@ void main() {
           methodElement,
           'findAllNames',
           QueryProcessor(methodElement, 'SELECT * FROM name', engine).process(),
-          QueryMethodReturnType(await getDartTypeWithName('Future<List<Name>>'))
+          QueryMethodReturnType(
+              await getDartTypeWithName('Future<List<Name>>', matchingSourceId))
             ..queryable = views.first,
           [],
         ),
@@ -308,9 +315,8 @@ void main() {
   });
 }
 
-Future<MethodElement> _createQueryMethodElement(
-  final String method,
-) async {
+Future<MethodElement> _createQueryMethodElement(final String method,
+    [int id]) async {
   final library = await resolveSource('''
       library test;
       
@@ -339,7 +345,7 @@ Future<MethodElement> _createQueryMethodElement(
       }
     ''', (resolver) async {
     return LibraryReader(await resolver.findLibraryByName('test'));
-  });
+  }, inputId: createAssetId(id));
 
   return library.classes.first.methods.first;
 }

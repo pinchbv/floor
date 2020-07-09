@@ -1,5 +1,4 @@
 import 'package:analyzer/dart/element/element.dart';
-import 'package:floor_generator/value_object/field.dart';
 import 'package:source_gen/source_gen.dart';
 import 'package:sqlparser/sqlparser.dart';
 
@@ -38,28 +37,6 @@ class ViewProcessorError {
     return InvalidGenerationSourceError(
         'The following error occurred while comparing the DatabaseView to the SQL-Statement in ${_classElement.displayName}: ${lintingError.toString()}',
         element: _classElement);
-  }
-
-  InvalidGenerationSourceError nullableMismatch(Field field) {
-    return InvalidGenerationSourceError(
-        'The query returns `null` for `${field.columnName}` but the type of the field is not nullable',
-        todo: 'Either make the field nullable or alter your query.',
-        element: field.fieldElement);
-  }
-
-  InvalidGenerationSourceError nullableMismatch2(Field field) {
-    return InvalidGenerationSourceError(
-        'The query could return `null` for `${field.columnName}` but the type of the field is not nullable',
-        todo: 'Either make the field nullable or alter your query.',
-        element: field.fieldElement);
-  }
-
-  InvalidGenerationSourceError typeMismatch(
-      Field field, ResolvedType parsertype) {
-    return InvalidGenerationSourceError(
-        'The query returns a column of type ${parsertype.type} for `${field.columnName}` but the type of the field is derived as ${field.sqlType}',
-        todo: 'Either change the field type or alter your query.',
-        element: field.fieldElement);
   }
 
   InvalidGenerationSourceError unexpectedVariable(Variable variable) {

@@ -4,8 +4,8 @@ import 'package:floor_generator/misc/annotations.dart';
 import 'package:floor_generator/misc/constants.dart';
 import 'package:floor_generator/misc/type_utils.dart';
 import 'package:floor_generator/processor/error/view_processor_error.dart';
-import 'package:floor_generator/processor/query_analyzer/converter.dart';
 import 'package:floor_generator/processor/query_analyzer/engine.dart';
+import 'package:floor_generator/processor/query_analyzer/type_checker.dart';
 import 'package:floor_generator/processor/query_analyzer/visitors.dart';
 import 'package:floor_generator/processor/queryable_processor.dart';
 import 'package:floor_generator/value_object/field.dart';
@@ -29,7 +29,7 @@ class ViewProcessor extends QueryableProcessor<View> {
 
     final sqlparserView = _checkAndConvert(query, name, fields);
 
-    _assertMatchingTypes(fields, sqlparserView.resolvedColumns);
+    assertMatchingTypes(fields, sqlparserView.resolvedColumns, classElement);
 
     final view = View(
       classElement,
@@ -113,28 +113,6 @@ class ViewProcessor extends QueryableProcessor<View> {
     }
     if (visitor.numberedVariables.isNotEmpty) {
       throw _processorError.unexpectedVariable(visitor.numberedVariables.first);
-    }
-  }
-
-  void _assertMatchingTypes(
-      List<Field> fields, List<sqlparser.ColumnWithType> resolvedColumns) {
-    for (int i = 0; i < fields.length; ++i) {
-      final resolvedColumnType = resolvedColumns[i].type;
-
-      //be strict here, but could be too strict.
-      if (resolvedColumnType.type == sqlparser.BasicType.nullType &&
-          !fields[i].isNullable) {
-        throw _processorError.nullableMismatch(fields[i]);
-      }
-
-      if (resolvedColumnType.type != sqlparser.BasicType.nullType) {
-        if (sqlToBasicType[fields[i].sqlType] != resolvedColumnType.type) {
-          throw _processorError.typeMismatch(fields[i], resolvedColumnType);
-        }
-        if (resolvedColumnType.nullable && !fields[i].isNullable) {
-          throw _processorError.nullableMismatch2(fields[i]);
-        }
-      }
     }
   }
 }
