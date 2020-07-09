@@ -25,6 +25,12 @@ class EntityProcessor extends QueryableProcessor<Entity> {
   Entity process() {
     final name = _getName();
     final fields = getFields();
+    final primaryKey = _getPrimaryKey(fields);
+    final withoutRowid = _getWithoutRowid();
+
+    if (primaryKey.autoGenerateId && withoutRowid) {
+      throw _processorError.autoIncrementInWithoutRowid;
+    }
 
     return Entity(
       classElement,
