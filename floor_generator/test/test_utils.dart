@@ -299,7 +299,9 @@ const _nameView = '''
 ''';
 
 /// give each created source a unique id to avoid messing up span
-/// calculation for error tests
+/// calculation for error tests. This does not have to be thread-safe as tests
+/// are usually executed single-threaded and the ids only have to be different
+/// for multiple assets in the same tests.
 int _id = 0;
 AssetId createAssetId([int id]) {
   id ??= _id++;

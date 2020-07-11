@@ -4,7 +4,6 @@ import 'package:floor_generator/processor/query_analyzer/engine.dart';
 import 'package:floor_generator/processor/query_processor.dart';
 import 'package:floor_generator/value_object/entity.dart';
 import 'package:floor_generator/value_object/query.dart';
-//import 'package:floor_generator/value_object/view.dart';
 import 'package:source_gen/source_gen.dart';
 import 'package:sqlparser/sqlparser.dart' hide View;
 import 'package:test/test.dart';
@@ -16,19 +15,15 @@ import '../test_utils.dart';
 // - parsing error
 // - analyzer error (e.g. "IN (5,'3')" )
 // - numbered variables in query
-// - sql/method parameter mismatch 1 (mayb copied from qm-processor-test)
-// - sql/method parameter mismatch 2 (mayb copied from qm-processor-test)
+// - list parameter without parentheses
 // Normal behaviour:
 // - complex variable scenario (multiple lists, used many times with normal vars in between)
-// - no-dependencies scenario in select
-// - proper outputs (dependencies, affected, output) for update
 // - proper outputs (dependencies, affected, output) for delete
 // - proper outputs (dependencies, affected, output) for insert
 //
 
 void main() {
   List<Entity> entities;
-  //List<View> views;
   AnalyzerEngine engine;
 
   setUpAll(() async {
@@ -36,13 +31,13 @@ void main() {
 
     entities = await getEntities(engine);
 
-    /*views =*/ await getViews(engine);
+    await getViews(engine);
   });
 
   test('create simple query object', () async {
     final methodElement = await _createQueryMethodElement('''
       @Query('SELECT * FROM Person')
-      Future<List<Person>> findAllPersons();      
+      Future<List<Person>> findAllPersons();
     ''');
 
     final actual =
@@ -69,10 +64,34 @@ void main() {
     );
   });
 
-  test('create complex query object', () async {
+  test('create complex query object from update', () async {
+    final methodElement = await _createQueryMethodElement('''
+      @Query('UPDATE Person SET name = :newName where id in (:ids) and name in (:bar)')
+      Future<void> updateNames(List<int> ids, List<String> bar, String newName);
+    ''');
+
+    final actual = QueryProcessor(
+            methodElement,
+            'UPDATE Person SET name = :newName where id in (:ids) and name in (:bar)',
+            engine)
+        .process();
+
+    expect(
+      actual,
+      equals(Query(
+        'UPDATE Person SET name = ?1 where id in (:varlist) and name in (:varlist)',
+        [ListParameter(41, 'ids'), ListParameter(64, 'bar')],
+        [],
+        {entities.firstWhere((e) => e.name == 'Person')},
+        {'Person'},
+      )),
+    );
+  });
+
+  test('create complex query object from select', () async {
     final methodElement = await _createQueryMethodElement('''
       @Query("SELECT *, name='Jules', length(name), :arg1 as X FROM Name WHERE length(name) in (:lengths)")
-      Future<void> findAllPersons(List<int> lengths, Uint8List arg1);      
+      Future<void> findAllPersons(List<int> lengths, Uint8List arg1);
     ''');
 
     final actual = QueryProcessor(
@@ -109,153 +128,178 @@ void main() {
       )),
     );
   });
-  group('query parsing', () {
-/*
-    test('parse query', () async {
-      final methodElement = await _createQueryMethodElement('''
-      @Query('SELECT * FROM Person WHERE id = :id')
-      Future<Person> findPerson(int id);
+
+  test('create query object without dependencies', () async {
+    final methodElement = await _createQueryMethodElement('''
+      @Query('SELECT :needle IN (:haystack)')
+      Future<bool> contains(List<String> haystack, String needle);
     ''');
 
-      final actual =
-          QueryMethodProcessor(methodElement, [...entities, ...views], engine)
-              .process()
-              .query
-              .sql;
+    final actual =
+        QueryProcessor(methodElement, 'SELECT :needle IN (:haystack)', engine)
+            .process();
 
-      expect(actual, equals('SELECT * FROM Person WHERE id = ?1'));
-    });
+    expect(
+      actual,
+      equals(Query(
+        'SELECT ?1 IN (:varlist)',
+        [ListParameter(14, 'haystack')],
+        [
+          SqlResultColumn(
+              ':needle IN (:haystack)',
+              const ResolveResult(ResolvedType(
+                  type: BasicType.int, nullable: false, hint: IsBoolean()))),
+        ],
+        {},
+        {},
+      )),
+    );
+  });
 
-    test('parse multiline query', () async {
-      final methodElement = await _createQueryMethodElement("""
-        @Query('''
-          SELECT * FROM person
-          WHERE id = :id AND name = :name
-        ''')
-        Future<Person> findPersonByIdAndName(int id, String name);
-      """);
-
-      final actual =
-          QueryMethodProcessor(methodElement, [...entities, ...views], engine)
-              .process()
-              .query
-              .sql;
-
-      expect(
-        actual,
-        equals(
-            '          SELECT * FROM person\n          WHERE id = ?1 AND name = ?2\n        '),
-      );
-    });
-
-    test('parse concatenated string query', () async {
+  group('parameter parsing', () {
+    test('Parse query with IN clause', () async {
       final methodElement = await _createQueryMethodElement('''
-        @Query('SELECT * FROM person '
-            'WHERE id = :id AND name = :name')
-        Future<Person> findPersonByIdAndName(int id, String name);    
+        @Query("update Person set name = '1' where id in (:ids)")
+        Future<void> setRated(List<int> ids);
       ''');
 
-      final actual =
-          QueryMethodProcessor(methodElement, [...entities, ...views], engine)
-              .process()
-              .query
-              .sql;
+      final actual = QueryProcessor(methodElement,
+              "update Person set name = '1' where id in (:ids)", engine)
+          .process();
 
       expect(
-        actual,
-        equals('SELECT * FROM person WHERE id = ?1 AND name = ?2'),
+        actual.listParameters,
+        equals([ListParameter(42, 'ids')]),
       );
-    });
-
-    test('Parse IN clause', () async {
-      final methodElement = await _createQueryMethodElement('''
-      @Query("update Person set name = '1' where id in (:ids)")
-      Future<void> setRated(List<int> ids);
-    ''');
-
-      final actual =
-          QueryMethodProcessor(methodElement, [], engine).process().query.sql;
-
-      expect(
-        actual,
-        equals(r'''update Person set name = '1' where id in (:varlist)'''),
-      );
+      expect(actual.sql,
+          equals("update Person set name = '1' where id in (:varlist)"));
     });
 
     test('Parse query with multiple IN clauses', () async {
       final methodElement = await _createQueryMethodElement('''
-      @Query("update Person set name = '1' where id in (:ids) and name in (:bar)")
-      Future<void> setRated(List<int> ids, List<String> bar);
-    ''');
+        @Query("update Person set name = '1' where id in (:ids) and name in (:bar)")
+        Future<void> setRated(List<int> ids, List<String> bar);
+      ''');
 
-      final actual =
-          QueryMethodProcessor(methodElement, [], engine).process().query.sql;
+      final actual = QueryProcessor(
+              methodElement,
+              "update Person set name = '1' where id in (:ids) and name in (:bar)",
+              engine)
+          .process();
 
       expect(
-        actual,
+        actual.sql,
         equals(
-          r'''update Person set name = '1' where id in (:varlist) '''
-          r'and name in (:varlist)',
+          "update Person set name = '1' where id in (:varlist) "
+          'and name in (:varlist)',
         ),
+      );
+      expect(
+        actual.listParameters,
+        equals([ListParameter(42, 'ids'), ListParameter(65, 'bar')]),
       );
     });
 
     test('Parse query with IN clause and other parameter', () async {
       final methodElement = await _createQueryMethodElement('''
-      @Query("update Person set name = '1' where id in (:ids) AND name = :bar")
-      Future<void> setRated(List<int> ids, int bar);
-    ''');
+        @Query("update Person set name = '1' where id in (:ids) AND name = :bar")
+        Future<void> setRated(List<int> ids, int bar);
+      ''');
 
-      final actual =
-          QueryMethodProcessor(methodElement, [], engine).process().query.sql;
+      final actual = QueryProcessor(
+              methodElement,
+              "update Person set name = '1' where id in (:ids) AND name = :bar",
+              engine)
+          .process();
 
       expect(
-        actual,
+        actual.sql,
         equals(
-          "update Person set name = '1' where id in (:varlist) "
-          'AND name = ?1',
+          "update Person set name = '1' where id in (:varlist) AND name = ?1",
         ),
+      );
+      expect(
+        actual.listParameters,
+        equals([ListParameter(42, 'ids')]),
       );
     });
 
     test('Parse query with LIKE operator', () async {
       final methodElement = await _createQueryMethodElement('''
-      @Query('SELECT * FROM Person WHERE name LIKE :name')
-      Future<List<Person>> findPersonsWithNamesLike(String name);
-    ''');
+        @Query('SELECT * FROM Person WHERE name LIKE :name')
+        Future<List<Person>> findPersonsWithNamesLike(String name);
+      ''');
 
-      final actual =
-          QueryMethodProcessor(methodElement, [...entities, ...views], engine)
-              .process()
-              .query
-              .sql;
+      final actual = QueryProcessor(methodElement,
+              'SELECT * FROM Person WHERE name LIKE :name', engine)
+          .process()
+          .sql;
 
       expect(actual, equals('SELECT * FROM Person WHERE name LIKE ?1'));
     });
 
     test('Parse query with commas', () async {
       final methodElement = await _createQueryMethodElement('''
-      @Query('SELECT :table, :otherTable')
-      Future<void> findPersonsWithNamesLike(String table, String otherTable);
-    ''');
+        @Query('SELECT :table, :otherTable')
+        Future<void> findPersonsWithNamesLike(String table, String otherTable);
+      ''');
 
       final actual =
-          QueryMethodProcessor(methodElement, [...entities, ...views], engine)
+          QueryProcessor(methodElement, 'SELECT :table, :otherTable', engine)
               .process()
-              .query
               .sql;
 
       expect(actual, equals('SELECT ?1, ?2'));
-    });*/
+    });
+
+    test('Parse query with multiple parameters', () async {
+      final methodElement = await _createQueryMethodElement('''
+        @Query('SELECT :table, :otherTable, :otherTable, :table')
+        Future<void> findPersonsWithNamesLike(String table, String otherTable);
+      ''');
+
+      final actual = QueryProcessor(methodElement,
+              'SELECT :table, :otherTable, :otherTable, :table', engine)
+          .process();
+
+      expect(actual.sql, equals('SELECT ?1, ?2, ?2, ?1'));
+      expect(actual.listParameters, equals(<ListParameter>[]));
+    });
+
+    test('Parse complex query with multiple parameters', () async {
+      final methodElement = await _createQueryMethodElement('''
+        @Query('SELECT :otherTable, (:list2), :otherTable, (:list1), (:list2), :otherTable, :table, (:list1)')
+        Future<void> findPersonsWithNamesLike(String table, String otherTable, List<double> list1, List<bool> list2);
+      ''');
+
+      final actual = QueryProcessor(
+              methodElement,
+              'SELECT :otherTable, (:list2), :otherTable, (:list1), (:list2), :otherTable, :table, (:list1)',
+              engine)
+          .process();
+
+      expect(
+          actual.sql,
+          equals(
+              'SELECT ?2, (:varlist), ?2, (:varlist), (:varlist), ?2, ?1, (:varlist)'));
+      expect(
+          actual.listParameters,
+          equals([
+            ListParameter(12, 'list2'),
+            ListParameter(28, 'list1'),
+            ListParameter(40, 'list2'),
+            ListParameter(60, 'list1'),
+          ]));
+    });
   });
 
   group('errors', () {
     test('parser exception when query string has more than one query',
         () async {
       final methodElement = await _createQueryMethodElement('''
-      @Query('SELECT 1;SELECT 2')
-      Future<List<Person>> findAllPersons();
-    ''');
+        @Query('SELECT 1;SELECT 2')
+        Future<List<Person>> findAllPersons();
+      ''');
 
       final actual = () =>
           QueryProcessor(methodElement, 'SELECT 1;SELECT 2', engine).process();
@@ -265,62 +309,26 @@ void main() {
               InvalidGenerationSourceError('The query contained parser errors:',
                   element: methodElement)));
     });
-    /*test('exception when method does not return future', () async {
-      final methodElement = await _createQueryMethodElement('''
-      @Query('SELECT * FROM Person')
-      List<Person> findAllPersons();
-    ''');
-
-      final actual = () =>
-          QueryMethodProcessor(methodElement, [...entities, ...views], engine)
-              .process();
-
-      final error =
-          QueryMethodProcessorError(methodElement).doesNotReturnFutureNorStream;
-      expect(actual, throwsInvalidGenerationSourceError(error));
-    });
-
-    test('exception when query is empty string', () async {
-      final methodElement = await _createQueryMethodElement('''
-      @Query('')
-      Future<List<Person>> findAllPersons();
-    ''');
-
-      final actual = () =>
-          QueryMethodProcessor(methodElement, [...entities, ...views], engine)
-              .process();
-
-      final error = QueryMethodProcessorError(methodElement).noQueryDefined;
-      expect(actual, throwsInvalidGenerationSourceError(error));
-    });
-
-    test('exception when query is null', () async {
-      final methodElement = await _createQueryMethodElement('''
-      @Query()
-      Future<List<Person>> findAllPersons();
-    ''');
-
-      final actual = () =>
-          QueryMethodProcessor(methodElement, [...entities, ...views], engine)
-              .process();
-
-      final error = QueryMethodProcessorError(methodElement).noQueryDefined;
-      expect(actual, throwsInvalidGenerationSourceError(error));
-    });
-
     test('exception when query arguments do not match method parameters',
         () async {
       final methodElement = await _createQueryMethodElement('''
-      @Query('SELECT * FROM Person WHERE id = :id AND name = :name')
-      Future<Person> findPersonByIdAndName(int id);
-    ''');
+        @Query('SELECT * FROM Person WHERE id = :id AND name = :name')
+        Future<Person> findPersonByIdAndName(int id);
+      ''');
 
-      final actual = () =>
-          QueryMethodProcessor(methodElement, [...entities, ...views], engine)
-              .process();
+      final actual = () => QueryProcessor(methodElement,
+              'SELECT * FROM Person WHERE id = :id AND name = :name', engine)
+          .process();
 
-      //maybe mock ColonNamedVariable, or else the following line will not match.
-      // final error = QueryAnalyzerError(methodElement).queryParameterMissingInMethod(ColonNamedVariable(ColonVariableToken(null,':name')));
+      expect(
+          actual,
+          throwsInvalidGenerationSourceErrorWithMessagePrefix(
+              InvalidGenerationSourceError(
+                  'The named variable in the statement of the `@Query` annotation should exist in the method parameters.',
+                  todo:
+                      'Please add a method parameter for the variable `:name` with the name `name`.',
+                  element: methodElement)));
+
       expect(
           actual, throwsA(const TypeMatcher<InvalidGenerationSourceError>()));
     });
@@ -328,16 +336,16 @@ void main() {
     test('exception when query arguments do not match method parameters',
         () async {
       final methodElement = await _createQueryMethodElement('''
-      @Query('SELECT * FROM Person WHERE id = :id')
-      Future<Person> findPersonByIdAndName(int id, String name);
-    ''');
+        @Query('SELECT * FROM Person WHERE id = :id')
+        Future<Person> findPersonByIdAndName(int id, String name);
+      ''');
 
-      final actual = () =>
-          QueryMethodProcessor(methodElement, [...entities, ...views], engine)
-              .process();
+      final actual = () => QueryProcessor(
+              methodElement, 'SELECT * FROM Person WHERE id = :id', engine)
+          .process();
       expect(
           actual, throwsA(const TypeMatcher<InvalidGenerationSourceError>()));
-    });*/
+    });
   });
 }
 

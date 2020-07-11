@@ -29,6 +29,7 @@ class QueryMethodReturnType {
       flattened.isVoid ||
       flattened.isDartCoreDouble ||
       flattened.isDartCoreInt ||
+      flattened.isDartCoreBool ||
       flattened.isDartCoreString ||
       flattened.isUint8List;
 

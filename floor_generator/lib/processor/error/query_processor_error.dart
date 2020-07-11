@@ -26,7 +26,8 @@ class QueryProcessorError {
   InvalidGenerationSourceError queryParameterMissingInMethod(
       ColonNamedVariable variable) {
     return InvalidGenerationSourceError(
-        'Named variable in statement of `@Query` annotation should exist in the method parameters.\n${variable.span.highlight()}',
+        'The named variable in the statement of the `@Query` annotation should exist in the method parameters.\n'
+        '${variable.span.highlight()}',
         todo:
             'Please add a method parameter for the variable `${variable.name}` with the name `${variable.name.substring(1)}`.',
         element: _methodElement);
@@ -35,7 +36,7 @@ class QueryProcessorError {
   InvalidGenerationSourceError methodParameterMissingInQuery(
       ParameterElement parameter) {
     return InvalidGenerationSourceError(
-        'Method parameter should be referenced in statement of `@Query` annotation',
+        'The method parameter should be referenced in statement of `@Query` annotation',
         todo:
             'Please reference this parameter with `:${parameter.displayName}` or remove it from the parameters.',
         element: parameter);
@@ -43,7 +44,6 @@ class QueryProcessorError {
 
   InvalidGenerationSourceError shouldNotHaveNumberedVars(NumberedVariable e) {
     return InvalidGenerationSourceError(
-        'Invalid numbered variable in statement of `@Query` annotation. '
         'Statements used in floor should only have named parameters with colons.\n${e.span.highlight()}',
         todo:
             'Please use a named variable (`:name`) instead of numbered variables (`?` or `?3`).',
@@ -58,6 +58,15 @@ class QueryProcessorError {
       ..writeln(v.span.highlight());
     return InvalidGenerationSourceError(builder.toString(),
         todo: 'Please report the bug and include some context.',
+        element: _methodElement);
+  }
+
+  InvalidGenerationSourceError listParameterMissingParentheses(
+      ColonNamedVariable v) {
+    return InvalidGenerationSourceError(
+        'The named variable ${v.name} referencing a list parameter should be enclosed by parentheses.\n'
+        '${v.span.highlight()}',
+        todo: 'Please replace `${v.name}` with `(${v.name})`',
         element: _methodElement);
   }
 }

@@ -67,7 +67,7 @@ abstract class QueryableProcessor<T extends Queryable> extends Processor<T> {
     );
     if (field != null) {
       final parameterValue = "row['${field.columnName}']";
-      final castedParameterValue = _castParameterValue(
+      final castedParameterValue = castParameterValue(
           parameterElement.type, parameterValue, field.isNullable);
       if (parameterElement.isNamed) {
         return '$parameterName: $castedParameterValue';
@@ -79,7 +79,7 @@ abstract class QueryableProcessor<T extends Queryable> extends Processor<T> {
   }
 
   @nonNull
-  String _castParameterValue(
+  static String castParameterValue(
     final DartType parameterType,
     final String parameterValue,
     final bool isNullable,

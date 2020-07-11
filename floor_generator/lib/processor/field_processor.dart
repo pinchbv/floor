@@ -70,7 +70,7 @@ class FieldProcessor extends Processor<Field> {
       return SqlType.blob;
     }
     throw InvalidGenerationSourceError(
-      'Column type is not supported for $type.',
+      'Column type is not supported for `$type.`',
       element: _fieldElement,
     );
   }

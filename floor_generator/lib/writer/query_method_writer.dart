@@ -4,6 +4,7 @@ import 'package:floor_generator/misc/annotations.dart';
 import 'package:floor_generator/misc/string_utils.dart';
 import 'package:floor_generator/misc/type_utils.dart';
 import 'package:floor_generator/processor/query_analyzer/engine.dart';
+import 'package:floor_generator/processor/queryable_processor.dart';
 import 'package:floor_generator/value_object/query_method.dart';
 import 'package:floor_generator/writer/writer.dart';
 import 'package:source_gen/source_gen.dart';
@@ -187,9 +188,10 @@ class QueryMethodWriter implements Writer {
   @nonNull
   String _generateMapper() {
     if (_queryMethod.returnType.queryable == null) {
-      //TODO Typeconverters, use QueryableProcessor._castParameterValue
-      const type = 'int';
-      return '(Map<String, dynamic> row) => row.values.first as $type';
+      //TODO Typeconverters
+      final cast = QueryableProcessor.castParameterValue(
+          _queryMethod.returnType.flattened, 'row.values.first', true);
+      return '(Map<String, dynamic> row) => $cast';
     } else {
       return '_${_queryMethod.returnType.queryable.classElement.displayName.decapitalize()}Mapper';
     }

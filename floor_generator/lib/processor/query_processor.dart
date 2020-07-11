@@ -90,7 +90,7 @@ class QueryProcessor extends Processor<Query> {
     final visitor = VariableVisitor(_processorError, numberedVarsAllowed: false)
       ..visitStatement(ctx.root, null);
 
-    // reverse List and (1-x)replace var name with parameter or(0) map span to name
+    // replace(1-x) var names with parameters or(0) map span to name
     final newQuery = StringBuffer();
     int currentLast = 0;
     for (final v in visitor.variables) {
@@ -100,6 +100,9 @@ class QueryProcessor extends Processor<Query> {
         newQuery.write('?');
         newQuery.write(varIndexInMethod);
       } else {
+        if (!(v.parent is Parentheses || v.parent is Tuple)) {
+          throw _processorError.listParameterMissingParentheses(v);
+        }
         listParameters.add(ListParameter(newQuery.length, v.name.substring(1)));
         newQuery.write(varlistPlaceholder);
       }
@@ -187,7 +190,7 @@ ResolvedType _getSqlparserType(VariableElement parameter,
     return const ResolvedType(type: BasicType.blob, nullable: true);
   }
   throw InvalidGenerationSourceError(
-    'Column type is not supported for $type.',
+    'Column type is not supported for `$type`.',
     element: parameter,
   );
 }
