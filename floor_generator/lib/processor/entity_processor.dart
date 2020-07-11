@@ -6,7 +6,6 @@ import 'package:floor_generator/misc/constants.dart';
 import 'package:floor_generator/misc/foreign_key_action.dart';
 import 'package:floor_generator/misc/type_utils.dart';
 import 'package:floor_generator/processor/error/entity_processor_error.dart';
-import 'package:floor_generator/processor/query_analyzer/engine.dart';
 import 'package:floor_generator/processor/queryable_processor.dart';
 import 'package:floor_generator/value_object/entity.dart';
 import 'package:floor_generator/value_object/field.dart';
@@ -17,10 +16,9 @@ import 'package:floor_generator/value_object/primary_key.dart';
 class EntityProcessor extends QueryableProcessor<Entity> {
   final EntityProcessorError _processorError;
 
-  EntityProcessor(
-      final ClassElement classElement, final AnalyzerEngine analyzerEngine)
+  EntityProcessor(final ClassElement classElement)
       : _processorError = EntityProcessorError(classElement),
-        super(classElement, analyzerEngine);
+        super(classElement);
 
   @nonNull
   @override
@@ -28,8 +26,8 @@ class EntityProcessor extends QueryableProcessor<Entity> {
     final name = _getName();
     final fields = getFields();
 
-    final entity = Entity(
-      classElement,
+    return Entity(
+      classElement.displayName,
       name,
       fields,
       _getPrimaryKey(fields),
@@ -37,10 +35,6 @@ class EntityProcessor extends QueryableProcessor<Entity> {
       _getIndices(fields, name),
       getConstructor(fields),
     );
-
-    analyzerEngine.registerEntity(entity);
-
-    return entity;
   }
 
   @nonNull

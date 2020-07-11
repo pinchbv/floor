@@ -1,4 +1,3 @@
-import 'package:analyzer/dart/element/element.dart';
 import 'package:collection/collection.dart';
 import 'package:floor_generator/misc/annotations.dart';
 import 'package:floor_generator/value_object/field.dart';
@@ -13,14 +12,14 @@ class Entity extends Queryable {
   final List<Index> indices;
 
   Entity(
-    ClassElement classElement,
+    String className,
     String name,
     List<Field> fields,
     this.primaryKey,
     this.foreignKeys,
     this.indices,
     String constructor,
-  ) : super(classElement, name, fields, constructor);
+  ) : super(className, name, fields, constructor);
 
   @nonNull
   String getCreateTableStatement() {
@@ -83,7 +82,7 @@ class Entity extends Queryable {
       identical(this, other) ||
       other is Entity &&
           runtimeType == other.runtimeType &&
-          classElement == other.classElement &&
+          className == other.className &&
           name == other.name &&
           const ListEquality<Field>().equals(fields, other.fields) &&
           primaryKey == other.primaryKey &&
@@ -94,7 +93,7 @@ class Entity extends Queryable {
 
   @override
   int get hashCode =>
-      classElement.hashCode ^
+      className.hashCode ^
       name.hashCode ^
       fields.hashCode ^
       primaryKey.hashCode ^
@@ -104,6 +103,6 @@ class Entity extends Queryable {
 
   @override
   String toString() {
-    return 'Entity{classElement: $classElement, name: $name, fields: $fields, primaryKey: $primaryKey, foreignKeys: $foreignKeys, indices: $indices, constructor: $constructor}';
+    return 'Entity{className: $className, name: $name, fields: $fields, primaryKey: $primaryKey, foreignKeys: $foreignKeys, indices: $indices, constructor: $constructor}';
   }
 }

@@ -26,8 +26,7 @@ class InsertionMethodWriter implements Writer {
 
   @nonNull
   String _generateMethodBody() {
-    final entityClassName =
-        _method.entity.classElement.displayName.decapitalize();
+    final entityClassName = _method.entity.className.decapitalize();
     final methodSignatureParameterName = _method.parameterElement.displayName;
 
     if (_method.flattenedReturnType.isVoid) {

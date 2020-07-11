@@ -15,10 +15,11 @@ import 'package:sqlparser/sqlparser.dart' as sqlparser;
 class ViewProcessor extends QueryableProcessor<View> {
   final ViewProcessorError _processorError;
 
-  ViewProcessor(
-      final ClassElement classElement, final AnalyzerEngine analyzerEngine)
+  final AnalyzerEngine _analyzerEngine;
+
+  ViewProcessor(final ClassElement classElement, this._analyzerEngine)
       : _processorError = ViewProcessorError(classElement),
-        super(classElement, analyzerEngine);
+        super(classElement);
 
   @nonNull
   @override
@@ -32,14 +33,14 @@ class ViewProcessor extends QueryableProcessor<View> {
     assertMatchingTypes(fields, sqlparserView.resolvedColumns, classElement);
 
     final view = View(
-      classElement,
+      classElement.displayName,
       name,
       fields,
       query,
       getConstructor(fields),
     );
 
-    analyzerEngine.registerView(view, sqlparserView);
+    _analyzerEngine.registerView(view, sqlparserView);
 
     return view;
   }
@@ -64,7 +65,7 @@ class ViewProcessor extends QueryableProcessor<View> {
   sqlparser.View _checkAndConvert(
       String query, String name, List<Field> fields) {
     // parse query
-    final parserCtx = analyzerEngine.inner.parse(query);
+    final parserCtx = _analyzerEngine.inner.parse(query);
 
     if (parserCtx.errors.isNotEmpty) {
       throw _processorError.parseErrorFromSqlparser(parserCtx.errors.first);
@@ -78,7 +79,7 @@ class ViewProcessor extends QueryableProcessor<View> {
     _assertNoVariables(parserCtx.rootNode);
 
     // analyze query (derive types)
-    final ctx = analyzerEngine.inner.analyzeParsed(parserCtx);
+    final ctx = _analyzerEngine.inner.analyzeParsed(parserCtx);
     if (ctx.errors.isNotEmpty) {
       throw _processorError.analysisErrorFromSqlparser(ctx.errors.first);
     }

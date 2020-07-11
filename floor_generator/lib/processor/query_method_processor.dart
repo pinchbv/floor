@@ -75,8 +75,7 @@ class QueryMethodProcessor extends Processor<QueryMethod> {
     // find a matching queryable (view or entity) for the return type
     returnType.queryable = _queryables.firstWhere(
         (queryable) =>
-            queryable.classElement.displayName ==
-            returnType.flattened.getDisplayString(),
+            queryable.className == returnType.flattened.getDisplayString(),
         orElse: () => null);
 
     _assertReturnsPrimitiveOrQueryable(returnType);

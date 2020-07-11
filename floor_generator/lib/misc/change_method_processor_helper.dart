@@ -50,8 +50,7 @@ class ChangeMethodProcessorHelper {
   Entity getEntity(@nonNull final DartType flattenedParameterType) {
     return _entities.firstWhere(
         (entity) =>
-            entity.classElement.displayName ==
-            flattenedParameterType.getDisplayString(),
+            entity.className == flattenedParameterType.getDisplayString(),
         orElse: () => throw InvalidGenerationSourceError(
             'You are trying to change an object which is not an entity.',
             element: _methodElement));

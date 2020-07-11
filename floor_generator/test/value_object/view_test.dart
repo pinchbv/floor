@@ -7,7 +7,7 @@ import 'package:test/test.dart';
 import '../mocks.dart';
 
 void main() {
-  final mockClassElement = MockClassElement();
+  const mockClassName = 'SomeClassName';
   final mockFieldElement = MockFieldElement();
   final mockDartType = MockDartType();
 
@@ -28,17 +28,15 @@ void main() {
   final allFields = [field, nullableField];
 
   tearDown(() {
-    clearInteractions(mockClassElement);
     clearInteractions(mockFieldElement);
     clearInteractions(mockDartType);
-    reset(mockClassElement);
     reset(mockFieldElement);
     reset(mockDartType);
   });
 
   test('Create view statement with simple query', () {
     final view = View(
-      mockClassElement,
+      mockClassName,
       'entityName',
       allFields,
       'SELECT * FROM x',

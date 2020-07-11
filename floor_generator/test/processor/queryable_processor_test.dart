@@ -2,7 +2,6 @@ import 'package:analyzer/dart/element/element.dart';
 import 'package:collection/collection.dart';
 import 'package:floor_generator/processor/error/queryable_processor_error.dart';
 import 'package:floor_generator/processor/field_processor.dart';
-import 'package:floor_generator/processor/query_analyzer/engine.dart';
 import 'package:floor_generator/processor/queryable_processor.dart';
 import 'package:floor_generator/value_object/field.dart';
 import 'package:floor_generator/value_object/queryable.dart';
@@ -29,7 +28,7 @@ void main() {
         .toList();
     const constructor = "Person(row['id'] as int, row['name'] as String)";
     final expected = TestQueryable(
-      classElement,
+      classElement.displayName,
       fields,
       constructor,
     );
@@ -425,39 +424,38 @@ void main() {
 
 class TestQueryable extends Queryable {
   TestQueryable(
-    ClassElement classElement,
+    String className,
     List<Field> fields,
     String constructor,
-  ) : super(classElement, '', fields, constructor);
+  ) : super(className, '', fields, constructor);
 
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
       other is TestQueryable &&
           runtimeType == other.runtimeType &&
-          classElement == other.classElement &&
+          className == other.className &&
           const ListEquality<Field>().equals(fields, other.fields) &&
           constructor == other.constructor;
 
   @override
   int get hashCode =>
-      classElement.hashCode ^ fields.hashCode ^ constructor.hashCode;
+      className.hashCode ^ fields.hashCode ^ constructor.hashCode;
 
   @override
   String toString() {
-    return 'TestQueryable{classElement: $classElement, name: $name, fields: $fields, constructor: $constructor}';
+    return 'TestQueryable{className: $className, name: $name, fields: $fields, constructor: $constructor}';
   }
 }
 
 class TestProcessor extends QueryableProcessor<TestQueryable> {
-  TestProcessor(ClassElement classElement)
-      : super(classElement, AnalyzerEngine());
+  TestProcessor(ClassElement classElement) : super(classElement);
 
   @override
   TestQueryable process() {
     final fields = getFields();
     return TestQueryable(
-      classElement,
+      classElement.displayName,
       fields,
       getConstructor(fields),
     );

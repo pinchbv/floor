@@ -62,7 +62,7 @@ class QueryMethodWriter implements Writer {
     // If no List parameters are present, Nothing will be written.
     _methodBody.write(_generateListConvertersForQuery());
 
-    //generate the common inputs for all queries
+    // generate the common inputs for all queries
     final arguments = _generateArguments();
     final query = _generateQueryString();
 
@@ -193,7 +193,7 @@ class QueryMethodWriter implements Writer {
           _queryMethod.returnType.flattened, 'row.values.first', true);
       return '(Map<String, dynamic> row) => $cast';
     } else {
-      return '_${_queryMethod.returnType.queryable.classElement.displayName.decapitalize()}Mapper';
+      return '_${_queryMethod.returnType.queryable.className.decapitalize()}Mapper';
     }
   }
 }

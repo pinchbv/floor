@@ -34,7 +34,7 @@ void main() {
     const query = 'SELECT * from Person';
     const constructor = "PersonView(row['id'] as int, row['name'] as String)";
     final expected = View(
-      classElement,
+      classElement.displayName,
       name,
       fields,
       query,
@@ -115,7 +115,7 @@ void main() {
     const query = 'SELECT * from Person';
     const constructor = "Person(row['id'] as int, row['name'] as String)";
     final expected = View(
-      classElement,
+      classElement.displayName,
       name,
       fields,
       query,

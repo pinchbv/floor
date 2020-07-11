@@ -29,13 +29,10 @@ class DatabaseProcessor extends Processor<Database> {
   @override
   Database process() {
     final analyzerEngine = AnalyzerEngine();
-
     final databaseName = _classElement.displayName;
-
-    final entities = _getEntities(_classElement, analyzerEngine);
-
+    final entities = _getEntities(_classElement);
+    entities.forEach(analyzerEngine.registerEntity);
     final views = _getViews(_classElement, analyzerEngine);
-
     final daoGetters =
         _getDaoGetters(databaseName, entities, views, analyzerEngine);
     final version = _getDatabaseVersion();
@@ -100,8 +97,7 @@ class DatabaseProcessor extends Processor<Database> {
   }
 
   @nonNull
-  List<Entity> _getEntities(final ClassElement databaseClassElement,
-      final AnalyzerEngine analyzerEngine) {
+  List<Entity> _getEntities(final ClassElement databaseClassElement) {
     final entities = _classElement
         .getAnnotation(annotations.Database)
         .getField(AnnotationField.databaseEntities)
@@ -109,8 +105,7 @@ class DatabaseProcessor extends Processor<Database> {
         ?.map((object) => object.toTypeValue().element)
         ?.whereType<ClassElement>()
         ?.where(_isEntity)
-        ?.map((classElement) =>
-            EntityProcessor(classElement, analyzerEngine).process())
+        ?.map((classElement) => EntityProcessor(classElement).process())
         ?.toList();
 
     if (entities == null || entities.isEmpty) {

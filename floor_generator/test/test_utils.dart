@@ -156,8 +156,9 @@ Future<Dao> createDao(final String dao) async {
 
   final entities = library.classes
       .where((classElement) => classElement.hasAnnotation(annotations.Entity))
-      .map((classElement) => EntityProcessor(classElement, engine).process())
+      .map((classElement) => EntityProcessor(classElement).process())
       .toList();
+  entities.forEach(engine.registerEntity);
   final views = library.classes
       .where((classElement) =>
           classElement.hasAnnotation(annotations.DatabaseView))
@@ -205,8 +206,7 @@ Future<Entity> getPersonEntity() async {
 
   return library.classes
       .where((classElement) => classElement.hasAnnotation(annotations.Entity))
-      .map((classElement) =>
-          EntityProcessor(classElement, AnalyzerEngine()).process())
+      .map((classElement) => EntityProcessor(classElement).process())
       .first;
 }
 
@@ -248,12 +248,14 @@ Future<List<Entity>> getEntities([AnalyzerEngine engine]) async {
     return LibraryReader(await resolver.findLibraryByName('test'));
   }, inputId: createAssetId());
 
-  engine ??= AnalyzerEngine();
-
-  return library.classes
+  final entities = library.classes
       .where((classElement) => classElement.hasAnnotation(annotations.Entity))
-      .map((classElement) => EntityProcessor(classElement, engine).process())
+      .map((classElement) => EntityProcessor(classElement).process())
       .toList();
+  if (engine != null) {
+    entities.forEach(engine.registerEntity);
+  }
+  return entities;
 }
 
 Future<List<View>> getViews([AnalyzerEngine engine]) async {
