@@ -54,7 +54,7 @@ class QueryProcessorError {
       ColonNamedVariable v) {
     final builder = StringBuffer()
       ..writeln(
-          'The named variable ${v.name} should not be in the transformed query string! This is a bug in floor.')
+          'The named variable `${v.name}` should not be in the transformed query string! This is a bug in floor.')
       ..writeln(v.span.highlight());
     return InvalidGenerationSourceError(builder.toString(),
         todo: 'Please report the bug and include some context.',
@@ -64,7 +64,7 @@ class QueryProcessorError {
   InvalidGenerationSourceError listParameterMissingParentheses(
       ColonNamedVariable v) {
     return InvalidGenerationSourceError(
-        'The named variable ${v.name} referencing a list parameter should be enclosed by parentheses.\n'
+        'The named variable `${v.name}` referencing a list parameter should be enclosed by parentheses.\n'
         '${v.span.highlight()}',
         todo: 'Please replace `${v.name}` with `(${v.name})`',
         element: _methodElement);

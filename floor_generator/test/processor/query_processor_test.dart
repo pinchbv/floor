@@ -1,5 +1,6 @@
 import 'package:analyzer/dart/element/element.dart';
 import 'package:build_test/build_test.dart';
+import 'package:floor_generator/processor/error/query_processor_error.dart';
 import 'package:floor_generator/processor/query_analyzer/engine.dart';
 import 'package:floor_generator/processor/query_processor.dart';
 import 'package:floor_generator/value_object/entity.dart';
@@ -9,18 +10,6 @@ import 'package:sqlparser/sqlparser.dart' hide View;
 import 'package:test/test.dart';
 
 import '../test_utils.dart';
-
-//TODO new tests:
-// Errors:
-// - parsing error
-// - analyzer error (e.g. "IN (5,'3')" )
-// - numbered variables in query
-// - list parameter without parentheses
-// Normal behaviour:
-// - complex variable scenario (multiple lists, used many times with normal vars in between)
-// - proper outputs (dependencies, affected, output) for delete
-// - proper outputs (dependencies, affected, output) for insert
-//
 
 void main() {
   List<Entity> entities;
@@ -60,6 +49,50 @@ void main() {
         ],
         {entities.firstWhere((e) => e.name == 'Person')},
         {},
+      )),
+    );
+  });
+
+  test('create query object from insert', () async {
+    final methodElement = await _createQueryMethodElement('''
+      @Query('REPLACE INTO Person DEFAULT VALUES')
+      Future<void> insertOrReplaceDefaultPerson();
+    ''');
+
+    final actual = QueryProcessor(
+            methodElement, 'REPLACE INTO Person DEFAULT VALUES', engine)
+        .process();
+
+    expect(
+      actual,
+      equals(Query(
+        'REPLACE INTO Person DEFAULT VALUES',
+        [],
+        [],
+        {entities.firstWhere((e) => e.name == 'Person')},
+        {'Person'},
+      )),
+    );
+  });
+
+  test('create query object from delete', () async {
+    final methodElement = await _createQueryMethodElement('''
+      @Query('DELETE FROM Person WHERE id in (:ids)')
+      Future<void> deletePersonWithIds(List<int> ids);
+    ''');
+
+    final actual = QueryProcessor(
+            methodElement, 'DELETE FROM Person WHERE id in (:ids)', engine)
+        .process();
+
+    expect(
+      actual,
+      equals(Query(
+        'DELETE FROM Person WHERE id in (:varlist)',
+        [ListParameter(32, 'ids')],
+        [],
+        {entities.firstWhere((e) => e.name == 'Person')},
+        {'Person'},
       )),
     );
   });
@@ -252,6 +285,20 @@ void main() {
       expect(actual, equals('SELECT ?1, ?2'));
     });
 
+    test('Do not parse parameters in string literals', () async {
+      final methodElement = await _createQueryMethodElement('''
+        @Query('SELECT :table, :otherTable, \':variable and ?4 \'')
+        Future<void> findPersonsWithNamesLike(String table, String otherTable);
+      ''');
+
+      final actual = QueryProcessor(methodElement,
+              'SELECT :table, :otherTable, \':variable and ?4 \'', engine)
+          .process()
+          .sql;
+
+      expect(actual, equals('SELECT ?1, ?2, \':variable and ?4 \''));
+    });
+
     test('Parse query with multiple parameters', () async {
       final methodElement = await _createQueryMethodElement('''
         @Query('SELECT :table, :otherTable, :otherTable, :table')
@@ -294,6 +341,22 @@ void main() {
   });
 
   group('errors', () {
+    test('normal parser exception when query string is malformed', () async {
+      final methodElement = await _createQueryMethodElement('''
+        @Query('FROM Person SELECT 1')
+        Future<List<Person>> findAllPersons();
+      ''');
+
+      final actual = () =>
+          QueryProcessor(methodElement, 'FROM Person SELECT 1', engine)
+              .process();
+      expect(
+          actual,
+          throwsInvalidGenerationSourceErrorWithMessagePrefix(
+              InvalidGenerationSourceError('The query contained parser errors:',
+                  element: methodElement)));
+    });
+
     test('parser exception when query string has more than one query',
         () async {
       final methodElement = await _createQueryMethodElement('''
@@ -309,42 +372,144 @@ void main() {
               InvalidGenerationSourceError('The query contained parser errors:',
                   element: methodElement)));
     });
-    test('exception when query arguments do not match method parameters',
+
+    test('analyzer exception when query string contains unknown entity',
         () async {
       final methodElement = await _createQueryMethodElement('''
-        @Query('SELECT * FROM Person WHERE id = :id AND name = :name')
-        Future<Person> findPersonByIdAndName(int id);
+        @Query('SELECT 1 FROM UnknownTable')
+        Future<List<Person>> findAllPersons();
       ''');
 
-      final actual = () => QueryProcessor(methodElement,
-              'SELECT * FROM Person WHERE id = :id AND name = :name', engine)
-          .process();
-
+      final actual = () =>
+          QueryProcessor(methodElement, 'SELECT 1 FROM UnknownTable', engine)
+              .process();
       expect(
           actual,
           throwsInvalidGenerationSourceErrorWithMessagePrefix(
               InvalidGenerationSourceError(
-                  'The named variable in the statement of the `@Query` annotation should exist in the method parameters.',
-                  todo:
-                      'Please add a method parameter for the variable `:name` with the name `name`.',
+                  'The query contained analyzer errors:',
                   element: methodElement)));
-
-      expect(
-          actual, throwsA(const TypeMatcher<InvalidGenerationSourceError>()));
     });
 
-    test('exception when query arguments do not match method parameters',
+    test('analyzer exception when query string contains unknown column',
         () async {
       final methodElement = await _createQueryMethodElement('''
+        @Query('SELECT unknownColumn FROM Person')
+        Future<List<int>> findAllPersons();
+      ''');
+
+      final actual = () => QueryProcessor(
+              methodElement, 'SELECT unknownColumn FROM Person', engine)
+          .process();
+      expect(
+          actual,
+          throwsInvalidGenerationSourceErrorWithMessagePrefix(
+              InvalidGenerationSourceError(
+                  'The query contained analyzer errors:',
+                  element: methodElement)));
+    });
+
+    group('parameters', () {
+      test('exception when query arguments do not match method parameters',
+          () async {
+        final methodElement = await _createQueryMethodElement('''
+        @Query('SELECT * FROM Person WHERE id = :id AND name = :name')
+        Future<Person> findPersonByIdAndName(int id);
+      ''');
+
+        final actual = () => QueryProcessor(methodElement,
+                'SELECT * FROM Person WHERE id = :id AND name = :name', engine)
+            .process();
+
+        expect(
+            actual,
+            throwsInvalidGenerationSourceErrorWithMessagePrefix(
+                InvalidGenerationSourceError(
+                    'The named variable in the statement of the `@Query` annotation should exist in the method parameters.',
+                    todo:
+                        'Please add a method parameter for the variable `:name` with the name `name`.',
+                    element: methodElement)));
+      });
+
+      test('exception when query arguments do not match method parameters',
+          () async {
+        final methodElement = await _createQueryMethodElement('''
         @Query('SELECT * FROM Person WHERE id = :id')
         Future<Person> findPersonByIdAndName(int id, String name);
       ''');
 
-      final actual = () => QueryProcessor(
-              methodElement, 'SELECT * FROM Person WHERE id = :id', engine)
-          .process();
-      expect(
-          actual, throwsA(const TypeMatcher<InvalidGenerationSourceError>()));
+        final actual = () => QueryProcessor(
+                methodElement, 'SELECT * FROM Person WHERE id = :id', engine)
+            .process();
+        expect(
+            actual,
+            throwsInvalidGenerationSourceError(
+                QueryProcessorError(methodElement)
+                    .methodParameterMissingInQuery(
+                        methodElement.parameters.skip(1).first)));
+      });
+
+      test('exception when query has numbered variables', () async {
+        final methodElement = await _createQueryMethodElement('''
+        @Query('SELECT * FROM Person WHERE id = ?1')
+        Future<Person> findPersonByIdAndName(int id, String name);
+      ''');
+
+        final actual = () => QueryProcessor(
+                methodElement, 'SELECT * FROM Person WHERE id = ?1', engine)
+            .process();
+
+        expect(
+            actual,
+            throwsInvalidGenerationSourceErrorWithMessagePrefix(
+                InvalidGenerationSourceError(
+                    'Statements used in floor should only have named parameters with colons.',
+                    todo:
+                        'Please use a named variable (`:name`) instead of numbered variables (`?` or `?3`).',
+                    element: methodElement)));
+      });
+
+      test('exception when query has list parameters without parentheses',
+          () async {
+        final methodElement = await _createQueryMethodElement('''
+        @Query('SELECT * FROM Person WHERE id = :id AND name IN :names')
+        Future<Person> findPersonByIdAndName(int id, List<String> names);
+      ''');
+
+        final actual = () => QueryProcessor(
+                methodElement,
+                'SELECT * FROM Person WHERE id = :id AND name IN :names',
+                engine)
+            .process();
+
+        expect(
+            actual,
+            throwsInvalidGenerationSourceErrorWithMessagePrefix(
+                InvalidGenerationSourceError(
+                    'The named variable `:names` referencing a list parameter should be enclosed by parentheses.',
+                    todo: 'Please replace `:names` with `(:names)`',
+                    element: methodElement)));
+      });
+
+      test('Do not parse parameters if it is not an expression', () async {
+        final methodElement = await _createQueryMethodElement('''
+        @Query('SELECT :table, :otherTable, `:variable`.id FROM Person AS :variable')
+        Future<void> findPersonsWithNamesLike(String table, String otherTable);
+      ''');
+
+        final actual = () => QueryProcessor(
+                methodElement,
+                'SELECT :table, :otherTable, `:variable`.id FROM Person AS :variable',
+                engine)
+            .process();
+
+        expect(
+            actual,
+            throwsInvalidGenerationSourceErrorWithMessagePrefix(
+                InvalidGenerationSourceError(
+                    'The query contained parser errors: line 1, column 59: Error: Expected an identifier',
+                    element: methodElement)));
+      });
     });
   });
 }
