@@ -80,7 +80,7 @@ class QueryMethodWriter implements Writer {
     //TODO Typeconverters
     return [
       ..._queryMethod.parameters
-          .where((param) => !param.type.isDartCoreList)
+          .where((parameter) => !parameter.type.isDartCoreList)
           .map((parameter) {
         if (parameter.type.isDartCoreBool) {
           return '${parameter.displayName} == null ? null : (${parameter.displayName} ? 1 : 0)';
@@ -89,7 +89,7 @@ class QueryMethodWriter implements Writer {
         }
       }),
       ..._queryMethod.parameters
-          .where((param) => param.type.isDartCoreList)
+          .where((parameter) => parameter.type.isDartCoreList)
           .map((parameter) => '...${parameter.displayName}')
     ];
   }
@@ -124,7 +124,7 @@ class QueryMethodWriter implements Writer {
             _queryMethod.query.dependencies.map((e) => e.name))
         : null;
 
-    final parameters = StringBuffer()..write(query)..write(', mapper: $mapper');
+    final parameters = StringBuffer(query)..write(', mapper: $mapper');
     if (arguments != null) parameters.write(', arguments: $arguments');
     if (deps != null) parameters.write(', dependencies: $deps');
 

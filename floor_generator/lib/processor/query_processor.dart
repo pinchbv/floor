@@ -127,6 +127,8 @@ class QueryProcessor extends Processor<Query> {
     return findWrittenTables(root).map((e) => e.table.name).toSet();
   }
 
+  /// This assertion should always be successful, even with wrong input. If it
+  /// isn't, then there is a bug within floors mechanism to handle `:var`s.
   void _assertNoNamedVarsLeft(String newQuery) {
     final parsed = _engine.inner.parse(newQuery);
     final visitor = VariableVisitor(_processorError, numberedVarsAllowed: true)

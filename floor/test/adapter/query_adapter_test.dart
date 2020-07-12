@@ -134,6 +134,33 @@ void main() {
 
         verify(mockDatabaseExecutor.rawQuery(sql, arguments));
       });
+
+      test('executes query with update', () async {
+        final streamController = StreamController<String>();
+        const entityName = 'person';
+
+        final underTest = QueryAdapter(mockDatabaseExecutor, streamController);
+
+        final arguments = [123];
+        await underTest.queryNoReturn(sql,
+            arguments: arguments, changedEntities: {entityName});
+
+        expect(streamController.stream, emits(entityName));
+        verify(mockDatabaseExecutor.rawQuery(sql, arguments));
+
+        await streamController.close();
+      });
+
+      test('executes query with update with no _changeListener present',
+          () async {
+        const entityName = 'person';
+
+        final arguments = [123];
+        await underTest.queryNoReturn(sql,
+            arguments: arguments, changedEntities: {entityName});
+
+        verify(mockDatabaseExecutor.rawQuery(sql, arguments));
+      });
     });
   });
 
@@ -282,6 +309,35 @@ void main() {
 
       streamController.add(entityName);
       streamController.add(otherEntity);
+    });
+
+    test('unrelated update should not update stream', () async {
+      const otherEntity = 'otherEntity';
+      final person = Person(1, 'Frank');
+      final person2 = Person(2, 'Peter');
+      final queryResult = Future(() => [
+            <String, dynamic>{'id': person.id, 'name': person.name},
+            <String, dynamic>{'id': person2.id, 'name': person2.name},
+          ]);
+      when(mockDatabaseExecutor.rawQuery(sql)).thenAnswer((_) => queryResult);
+
+      final actual = underTest.queryListStream(sql,
+          dependencies: {entityName}, mapper: mapper);
+      //first, emit the result
+      expect(
+          actual,
+          emitsInOrder(<List<Person>>[
+            [person, person2],
+          ]));
+
+      //after emitting the first result, no other updates were made
+      expect(actual.skip(1), emitsDone);
+
+      streamController.add(otherEntity);
+      streamController.add(otherEntity);
+
+      await Future<void>.delayed(const Duration(milliseconds: 100));
+      await streamController.close();
     });
   });
 }

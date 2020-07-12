@@ -40,7 +40,7 @@ class QueryAdapter {
   }) async {
     final rows = await _database.rawQuery(sql, arguments);
 
-    return rows.map((row) => mapper(row)).toList();
+    return rows.map(mapper).toList();
   }
 
   Future<void> queryNoReturn(
@@ -77,11 +77,10 @@ class QueryAdapter {
 
     // listen on all updates where the updated table
     // is one of the dependencies of this query.
-    final subscription =
-        _changeListener.stream.where(dependencies.contains).listen(
-              (_) async => executeQueryAndNotifyController(),
-              onDone: () => controller.close(),
-            );
+    final subscription = _changeListener.stream
+        .where(dependencies.contains)
+        .listen((_) async => executeQueryAndNotifyController(),
+            onDone: () => controller.close());
 
     controller.onCancel = () => subscription.cancel();
 
@@ -108,11 +107,10 @@ class QueryAdapter {
 
     // listen on all updates where the updated table
     // is one of the dependencies of this query.
-    final subscription =
-        _changeListener.stream.where(dependencies.contains).listen(
-              (_) async => executeQueryAndNotifyController(),
-              onDone: () => controller.close(),
-            );
+    final subscription = _changeListener.stream
+        .where(dependencies.contains)
+        .listen((_) async => executeQueryAndNotifyController(),
+            onDone: () => controller.close());
 
     controller.onCancel = () => subscription.cancel();
 
