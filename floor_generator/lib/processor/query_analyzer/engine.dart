@@ -1,4 +1,4 @@
-import 'package:floor_generator/processor/query_analyzer/converter.dart';
+import 'package:floor_generator/misc/type_utils.dart';
 import 'package:floor_generator/processor/query_analyzer/dependency_graph.dart';
 import 'package:floor_generator/processor/query_analyzer/visitors.dart';
 import 'package:floor_generator/value_object/entity.dart';
@@ -7,6 +7,12 @@ import 'package:floor_generator/value_object/view.dart' as floor;
 import 'package:sqlparser/sqlparser.dart' hide Queryable;
 
 const String varlistPlaceholder = ':varlist';
+
+//todo single test for testing engine registrations and dependencies
+//todo test dependency graph
+//todo test visitors with example queries
+//todo add tests
+//TODO test: check converter by parallel construction: field, entity
 
 EngineOptions getDefaultEngineOptions() {
   return EngineOptions(
@@ -26,7 +32,7 @@ class AnalyzerEngine {
   AnalyzerEngine();
 
   void registerEntity(Entity entity) {
-    inner.registerTable(entity.asTable());
+    inner.registerTable(convertEntityToTable(entity));
 
     registry[entity.name] = entity;
 
@@ -46,4 +52,22 @@ class AnalyzerEngine {
     final references = findReferencedTablesOrViews(convertedView.definition);
     dependencies.add(floorView.name, references.map((e) => e.name));
   }
+
+  static Table convertEntityToTable(Entity e) => Table(
+        // table constraints like foreign keys or indices are omitted here
+        // because they will not be needed for static analysis.
+        name: e.name,
+        resolvedColumns: e.fields
+            .map((field) => TableColumn(
+                  field.columnName,
+                  ResolvedType(
+                      type: sqlToBasicType[field.sqlType],
+                      nullable: field.isNullable,
+                      isArray: false,
+                      hint: field.fieldElement.type.isDartCoreBool
+                          ? const IsBoolean()
+                          : null),
+                ))
+            .toList(growable: false),
+      );
 }

@@ -1,6 +1,8 @@
 import 'dart:typed_data';
 
+import 'package:floor_generator/misc/constants.dart';
 import 'package:floor_generator/misc/type_utils.dart';
+import 'package:sqlparser/sqlparser.dart';
 import 'package:test/test.dart';
 
 import '../test_utils.dart';
@@ -79,6 +81,14 @@ void main() {
       final actual = type.flatten();
 
       expect(actual.isDartCoreInt, isTrue);
+    });
+  });
+  group('sql type conversions', () {
+    test('floor into sqlparser', () async {
+      expect(sqlToBasicType[SqlType.integer], equals(BasicType.int));
+      expect(sqlToBasicType[SqlType.blob], equals(BasicType.blob));
+      expect(sqlToBasicType[SqlType.real], equals(BasicType.real));
+      expect(sqlToBasicType[SqlType.text], equals(BasicType.text));
     });
   });
 }

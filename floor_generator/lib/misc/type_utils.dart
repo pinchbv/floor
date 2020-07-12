@@ -4,7 +4,9 @@ import 'package:analyzer/dart/constant/value.dart';
 import 'package:analyzer/dart/element/element.dart';
 import 'package:analyzer/dart/element/type.dart';
 import 'package:floor_generator/misc/annotations.dart';
+import 'package:floor_generator/misc/constants.dart';
 import 'package:source_gen/source_gen.dart';
+import 'package:sqlparser/sqlparser.dart' show BasicType;
 
 extension SupportedTypeChecker on DartType {
   @nonNull
@@ -63,3 +65,10 @@ final _doubleTypeChecker = _typeChecker(double);
 final _uint8ListTypeChecker = _typeChecker(Uint8List);
 
 final _streamTypeChecker = _typeChecker(Stream);
+
+const sqlToBasicType = {
+  SqlType.blob: BasicType.blob,
+  SqlType.integer: BasicType.int,
+  SqlType.real: BasicType.real,
+  SqlType.text: BasicType.text,
+};
