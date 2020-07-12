@@ -5,6 +5,7 @@ import 'package:floor_generator/processor/query_analyzer/engine.dart';
 import 'package:floor_generator/processor/query_processor.dart';
 import 'package:floor_generator/value_object/entity.dart';
 import 'package:floor_generator/value_object/query.dart';
+import 'package:floor_generator/misc/type_utils.dart';
 import 'package:source_gen/source_gen.dart';
 import 'package:sqlparser/sqlparser.dart' hide View;
 import 'package:test/test.dart';
@@ -391,7 +392,7 @@ void main() {
                   element: methodElement)));
     });
 
-    test('analyzer exception when query string contains unknown column',
+    test('analyzer exception when query string references unknown column',
         () async {
       final methodElement = await _createQueryMethodElement('''
         @Query('SELECT unknownColumn FROM Person')
@@ -410,6 +411,43 @@ void main() {
     });
 
     group('parameters', () {
+      test('exception when method parameters have an unsupported type',
+          () async {
+        final methodElement = await _createQueryMethodElement('''
+      @Query('SELECT * FROM Person WHERE id = :person')
+      Future<Person> findById(Person person);
+    ''');
+
+        final actual = () => QueryProcessor(methodElement,
+                'SELECT * FROM Person WHERE id = :person', engine)
+            .process();
+        final parameterElement = methodElement.parameters.first;
+        expect(
+            actual,
+            throwsInvalidGenerationSourceError(
+                QueryProcessorError(methodElement).unsupportedParameterType(
+                    parameterElement, parameterElement.type)));
+      });
+
+      test(
+          'exception when method parameters have an unsupported type wrapped in a List',
+          () async {
+        final methodElement = await _createQueryMethodElement('''
+      @Query('SELECT * FROM Person WHERE id = :person')
+      Future<Person> findById(List<Person> person);
+    ''');
+
+        final actual = () => QueryProcessor(methodElement,
+                'SELECT * FROM Person WHERE id = :person', engine)
+            .process();
+        final parameterElement = methodElement.parameters.first;
+        expect(
+            actual,
+            throwsInvalidGenerationSourceError(
+                QueryProcessorError(methodElement).unsupportedParameterType(
+                    parameterElement, parameterElement.type.flatten())));
+      });
+
       test('exception when query arguments do not match method parameters',
           () async {
         final methodElement = await _createQueryMethodElement('''

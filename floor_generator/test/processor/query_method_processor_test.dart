@@ -1,6 +1,7 @@
 import 'package:analyzer/dart/element/element.dart';
 import 'package:build_test/build_test.dart';
 import 'package:floor_generator/processor/error/query_method_processor_error.dart';
+import 'package:floor_generator/processor/error/type_checker_error.dart';
 import 'package:floor_generator/processor/query_analyzer/engine.dart';
 import 'package:floor_generator/processor/query_method_processor.dart';
 import 'package:floor_generator/processor/query_processor.dart';
@@ -16,6 +17,7 @@ import '../test_utils.dart';
 // TODO update tests (list incomplete)
 // todo put parsing into query processor test
 // todo add return type checking test, e.g. delete query with wrong return types
+// already done: columnCountMismatch Error
 
 void main() {
   List<Entity> entities;
@@ -148,8 +150,8 @@ void main() {
   group('return type checking', () {
     test('parse contains function', () async {
       final methodElement = await _createQueryMethodElement('''
-      @Query('SELECT :needle IN (:haystack)')
-      Future<bool> contains(List<String> haystack, String needle);''');
+        @Query('SELECT :needle IN (:haystack)')
+        Future<bool> contains(List<String> haystack, String needle);''');
 
       //should not throw errors
       QueryMethodProcessor(methodElement, [], engine).process();
@@ -158,26 +160,11 @@ void main() {
   });
 
   group('errors', () {
-    test('exception when method does not return future', () async {
-      final methodElement = await _createQueryMethodElement('''
-      @Query('SELECT * FROM Person')
-      List<Person> findAllPersons();
-    ''');
-
-      final actual = () =>
-          QueryMethodProcessor(methodElement, [...entities, ...views], engine)
-              .process();
-
-      final error =
-          QueryMethodProcessorError(methodElement).doesNotReturnFutureNorStream;
-      expect(actual, throwsInvalidGenerationSourceError(error));
-    });
-
     test('exception when query is empty string', () async {
       final methodElement = await _createQueryMethodElement('''
-      @Query('')
-      Future<List<Person>> findAllPersons();
-    ''');
+        @Query('')
+        Future<List<Person>> findAllPersons();
+      ''');
 
       final actual = () =>
           QueryMethodProcessor(methodElement, [...entities, ...views], engine)
@@ -189,9 +176,9 @@ void main() {
 
     test('exception when query is null', () async {
       final methodElement = await _createQueryMethodElement('''
-      @Query()
-      Future<List<Person>> findAllPersons();
-    ''');
+        @Query()
+        Future<List<Person>> findAllPersons();
+      ''');
 
       final actual = () =>
           QueryMethodProcessor(methodElement, [...entities, ...views], engine)
@@ -200,22 +187,135 @@ void main() {
       final error = QueryMethodProcessorError(methodElement).noQueryDefined;
       expect(actual, throwsInvalidGenerationSourceError(error));
     });
+    group('return type', () {
+      test('exception when method does not return future', () async {
+        final methodElement = await _createQueryMethodElement('''
+          @Query('SELECT * FROM Person')
+          List<Person> findAllPersons();
+        ''');
 
-    test('exception when query arguments have an unsupported type', () async {
-      final methodElement = await _createQueryMethodElement('''
-      @Query('SELECT * FROM Person WHERE id = :person')
-      Future<Person> findById(Person person);
-    ''');
+        final actual = () =>
+            QueryMethodProcessor(methodElement, [...entities, ...views], engine)
+                .process();
 
-      final actual = () =>
-          QueryMethodProcessor(methodElement, [...entities, ...views], engine)
-              .process();
-      expect(
-          actual,
-          throwsInvalidGenerationSourceError(InvalidGenerationSourceError(
-              'Column type is not supported for `Person`.',
-              todo: '',
-              element: methodElement.parameters.first)));
+        final error = QueryMethodProcessorError(methodElement)
+            .doesNotReturnFutureNorStream;
+        expect(actual, throwsInvalidGenerationSourceError(error));
+      });
+
+      test(
+          'exception when method does not return primitive or Queryable or List',
+          () async {
+        final methodElement = await _createQueryMethodElement('''
+          @Query('SELECT * FROM Person')
+          Future<Set<Person>> findAllPersons();
+        ''');
+
+        final actual = () =>
+            QueryMethodProcessor(methodElement, [...entities, ...views], engine)
+                .process();
+
+        final error = QueryMethodProcessorError(methodElement)
+            .doesNotReturnQueryableOrPrimitive;
+        expect(actual, throwsInvalidGenerationSourceError(error));
+      });
+
+      test(
+          'exception when method does not return Future<void> when returning void - Stream',
+          () async {
+        final methodElement = await _createQueryMethodElement('''
+          @Query('SELECT * FROM Person')
+          Stream<void> findAllPersons();
+        ''');
+
+        final actual = () =>
+            QueryMethodProcessor(methodElement, [...entities, ...views], engine)
+                .process();
+
+        final error =
+            QueryMethodProcessorError(methodElement).voidReturnCannotBeStream;
+        expect(actual, throwsInvalidGenerationSourceError(error));
+      });
+      test(
+          'exception when method does not return Future<void> when returning void - Stream<List>',
+          () async {
+        final methodElement = await _createQueryMethodElement('''
+          @Query('SELECT * FROM Person')
+          Stream<List<void>> findAllPersons();
+        ''');
+
+        final actual = () =>
+            QueryMethodProcessor(methodElement, [...entities, ...views], engine)
+                .process();
+
+        final error =
+            QueryMethodProcessorError(methodElement).voidReturnCannotBeList;
+        expect(actual, throwsInvalidGenerationSourceError(error));
+      });
+      test(
+          'exception when method does not return Future<void> when returning void - Future<List>',
+          () async {
+        final methodElement = await _createQueryMethodElement('''
+          @Query('SELECT * FROM Person')
+          Future<List<void>> findAllPersons();
+        ''');
+
+        final actual = () =>
+            QueryMethodProcessor(methodElement, [...entities, ...views], engine)
+                .process();
+
+        final error =
+            QueryMethodProcessorError(methodElement).voidReturnCannotBeList;
+        expect(actual, throwsInvalidGenerationSourceError(error));
+      });
+
+      test(
+          'exception when method does not return void on empty result - Queryable',
+          () async {
+        final methodElement = await _createQueryMethodElement('''
+          @Query('DELETE FROM Person')
+          Future<List<Person>> findAllPersons();
+        ''');
+
+        final actual = () =>
+            QueryMethodProcessor(methodElement, [...entities, ...views], engine)
+                .process();
+
+        final error = TypeCheckerError(methodElement).columnCountMismatch(2, 0);
+        expect(actual, throwsInvalidGenerationSourceError(error));
+      });
+
+      test(
+          'exception when method does not return void on empty result - primitive return type',
+          () async {
+        final methodElement = await _createQueryMethodElement('''
+          @Query('DELETE FROM Person')
+          Future<List<int>> findAllPersons();
+        ''');
+
+        final actual = () =>
+            QueryMethodProcessor(methodElement, [...entities, ...views], engine)
+                .process();
+
+        final error = TypeCheckerError(methodElement).columnCountShouldBeOne(0);
+        expect(actual, throwsInvalidGenerationSourceError(error));
+      });
+
+      test(
+          'exception when method does not return void on empty result - primitive return type',
+          () async {
+        final methodElement = await _createQueryMethodElement('''
+          @Query('DELETE FROM Person')
+          Future<List<int>> findAllPersons();
+        ''');
+
+        final actual = () =>
+            QueryMethodProcessor(methodElement, [...entities, ...views], engine)
+                .process();
+
+        final error = TypeCheckerError(methodElement).columnCountShouldBeOne(0);
+        expect(actual, throwsInvalidGenerationSourceError(error));
+      });
     });
   });
 }

@@ -1,4 +1,5 @@
 import 'package:analyzer/dart/element/element.dart';
+import 'package:analyzer/dart/element/type.dart';
 import 'package:source_gen/source_gen.dart';
 import 'package:sqlparser/sqlparser.dart';
 
@@ -68,5 +69,13 @@ class QueryProcessorError {
         '${v.span.highlight()}',
         todo: 'Please replace `${v.name}` with `(${v.name})`',
         element: _methodElement);
+  }
+
+  InvalidGenerationSourceError unsupportedParameterType(
+      VariableElement parameter, DartType type) {
+    return InvalidGenerationSourceError(
+      'Parameter type `$type` is not supported.',
+      element: parameter,
+    );
   }
 }

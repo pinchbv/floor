@@ -97,23 +97,6 @@ class QueryMethodProcessor extends Processor<QueryMethod> {
     }
   }
 
-  void _assertMatchingReturnType(
-      QueryMethodReturnType dartType, List<SqlResultColumn> sqliteColumns) {
-    if (sqliteColumns.isEmpty) {
-      if (!dartType.isVoid || !dartType.isFuture) {
-        throw _processorError.doesNotReturnVoidFuture;
-      }
-    } else if (dartType.isVoid) {
-      assertMatchingVoidReturn(sqliteColumns, _methodElement);
-    } else if (dartType.isPrimitive) {
-      assertMatchingSingleReturnType(
-          dartType.flattened, sqliteColumns, _methodElement);
-    } else {
-      assertMatchingReturnTypes(
-          dartType.queryable.fields, sqliteColumns, _methodElement);
-    }
-  }
-
   void _assertVoidReturnIsFuture(QueryMethodReturnType returnType) {
     if (returnType.isVoid && returnType.isList) {
       throw _processorError.voidReturnCannotBeList;
@@ -121,6 +104,19 @@ class QueryMethodProcessor extends Processor<QueryMethod> {
 
     if (returnType.isVoid && returnType.isStream) {
       throw _processorError.voidReturnCannotBeStream;
+    }
+  }
+
+  void _assertMatchingReturnType(
+      QueryMethodReturnType dartType, List<SqlResultColumn> sqliteColumns) {
+    if (dartType.isVoid) {
+      assertMatchingVoidReturn(sqliteColumns, _methodElement);
+    } else if (dartType.isPrimitive) {
+      assertMatchingSingleReturnType(
+          dartType.flattened, sqliteColumns, _methodElement);
+    } else {
+      assertMatchingReturnTypes(
+          dartType.queryable.fields, sqliteColumns, _methodElement);
     }
   }
 }

@@ -2,12 +2,10 @@ import 'package:code_builder/code_builder.dart';
 import 'package:floor_generator/misc/annotation_expression.dart';
 import 'package:floor_generator/misc/annotations.dart';
 import 'package:floor_generator/misc/string_utils.dart';
-import 'package:floor_generator/misc/type_utils.dart';
 import 'package:floor_generator/processor/query_analyzer/engine.dart';
 import 'package:floor_generator/processor/queryable_processor.dart';
 import 'package:floor_generator/value_object/query_method.dart';
 import 'package:floor_generator/writer/writer.dart';
-import 'package:source_gen/source_gen.dart';
 
 class QueryMethodWriter implements Writer {
   final QueryMethod _queryMethod;
@@ -37,18 +35,11 @@ class QueryMethodWriter implements Writer {
   }
 
   List<Parameter> _generateMethodParameters() {
-    return _queryMethod.parameters.map((parameter) {
-      if (!parameter.type.isSupported) {
-        throw InvalidGenerationSourceError(
-          'The type of this parameter is not supported.',
-          element: parameter,
-        );
-      }
-
-      return Parameter((builder) => builder
-        ..name = parameter.name
-        ..type = refer(parameter.type.getDisplayString()));
-    }).toList();
+    return _queryMethod.parameters
+        .map((parameter) => Parameter((builder) => builder
+          ..name = parameter.name
+          ..type = refer(parameter.type.getDisplayString())))
+        .toList();
   }
 
   String _generateMethodBody() {

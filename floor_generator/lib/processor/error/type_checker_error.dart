@@ -22,7 +22,7 @@ class TypeCheckerError {
 
   InvalidGenerationSourceError columnCountShouldBeOne(int columnCount) {
     return InvalidGenerationSourceError(
-      'The query should return a single column instead of $columnCount.',
+      'The query should return a single column instead of $columnCount column${columnCount == 1 ? 's' : ''}.',
       todo: 'Either change the target type or alter your query.',
       element: _queryElement,
     );

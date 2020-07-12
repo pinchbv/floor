@@ -36,14 +36,6 @@ class QueryMethodProcessorError {
     );
   }
 
-  InvalidGenerationSourceError get doesNotReturnVoidFuture {
-    return InvalidGenerationSourceError(
-      'The given query does not return anything but the method does not return a Future<void>.',
-      todo: 'Set the return type to Future<void>.',
-      element: _methodElement,
-    );
-  }
-
   InvalidGenerationSourceError get voidReturnCannotBeList {
     return InvalidGenerationSourceError(
       'The given query cannot return a List<void>.',

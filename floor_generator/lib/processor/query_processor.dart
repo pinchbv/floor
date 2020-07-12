@@ -7,7 +7,6 @@ import 'package:floor_generator/processor/query_analyzer/visitors.dart';
 import 'package:floor_generator/value_object/entity.dart';
 import 'package:floor_generator/value_object/query.dart';
 import 'package:floor_generator/misc/type_utils.dart';
-import 'package:source_gen/source_gen.dart';
 import 'package:sqlparser/sqlparser.dart';
 
 class QueryProcessor extends Processor<Query> {
@@ -167,32 +166,29 @@ class QueryProcessor extends Processor<Query> {
       }
     }
   }
-}
 
-/// converts a dart element type description to a nullable type
-/// compatible with sqlparser.
-@nonNull
-ResolvedType _getSqlparserType(VariableElement parameter,
-    {bool flattenLists = false}) {
+  /// converts a dart element type description to a nullable type
+  /// compatible with sqlparser.
+  @nonNull
+  ResolvedType _getSqlparserType(VariableElement parameter,
+      {bool flattenLists = false}) {
 //TODO typeconverters
-  var type = parameter.type;
-  if (flattenLists && type.isDartCoreList) {
-    type = type.flatten();
+    var type = parameter.type;
+    if (flattenLists && type.isDartCoreList) {
+      type = type.flatten();
+    }
+    if (type.isDartCoreInt) {
+      return const ResolvedType(type: BasicType.int, nullable: true);
+    } else if (type.isDartCoreString) {
+      return const ResolvedType(type: BasicType.text, nullable: true);
+    } else if (type.isDartCoreBool) {
+      return const ResolvedType(
+          type: BasicType.int, nullable: true, hint: IsBoolean());
+    } else if (type.isDartCoreDouble) {
+      return const ResolvedType(type: BasicType.real, nullable: true);
+    } else if (type.isUint8List) {
+      return const ResolvedType(type: BasicType.blob, nullable: true);
+    }
+    throw _processorError.unsupportedParameterType(parameter, type);
   }
-  if (type.isDartCoreInt) {
-    return const ResolvedType(type: BasicType.int, nullable: true);
-  } else if (type.isDartCoreString) {
-    return const ResolvedType(type: BasicType.text, nullable: true);
-  } else if (type.isDartCoreBool) {
-    return const ResolvedType(
-        type: BasicType.int, nullable: true, hint: IsBoolean());
-  } else if (type.isDartCoreDouble) {
-    return const ResolvedType(type: BasicType.real, nullable: true);
-  } else if (type.isUint8List) {
-    return const ResolvedType(type: BasicType.blob, nullable: true);
-  }
-  throw InvalidGenerationSourceError(
-    'Column type is not supported for `$type`.',
-    element: parameter,
-  );
 }

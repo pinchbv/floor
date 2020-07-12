@@ -58,13 +58,8 @@ void assertMatchingReturnTypes(List<Field> fields,
 void assertMatchingSingleReturnType(DartType primitiveType,
     List<SqlResultColumn> resolvedColumns, Element queryElement) {
   if (resolvedColumns.length != 1) {
-    if (primitiveType.isVoid) {
-      assertMatchingVoidReturn(resolvedColumns, queryElement);
-      return;
-    } else {
-      throw TypeCheckerError(queryElement)
-          .columnCountShouldBeOne(resolvedColumns.length);
-    }
+    throw TypeCheckerError(queryElement)
+        .columnCountShouldBeOne(resolvedColumns.length);
   }
 
   final column = resolvedColumns.first;
@@ -77,6 +72,11 @@ void assertMatchingSingleReturnType(DartType primitiveType,
 
   // We can assume all primitive return types to be nullable,
   // so omit those checks and directly check the type.
+
+  if (column.sqlType == BasicType.nullType) {
+    return; // if the column returns null, it will match all types.
+  }
+
   if (_getSqlParserType(primitiveType) != column.sqlType) {
     throw TypeCheckerError(queryElement)
         .returnTypeMismatch(primitiveType, column.sqlType);
