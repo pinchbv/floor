@@ -61,10 +61,10 @@ After integrating type converters and embeddable objects, the API surface won't 
     dependencies:
       flutter:
         sdk: flutter
-      floor: ^0.13.0
+      floor: ^0.14.0
 
     dev_dependencies:
-      floor_generator: ^0.13.0
+      floor_generator: ^0.14.0
       build_runner: ^1.7.3
     ````
 
