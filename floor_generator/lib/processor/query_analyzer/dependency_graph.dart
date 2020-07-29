@@ -1,3 +1,5 @@
+import 'package:floor_generator/misc/annotations.dart';
+
 class DependencyGraph {
   final Map<String, Set<String>> _directDependencies = {};
 
@@ -10,6 +12,7 @@ class DependencyGraph {
     _dependencyCache.clear();
   }
 
+  @nonNull
   Set<String> indirectDependencies(String name) {
     if (!_directDependencies.containsKey(name)) {
       return {name};

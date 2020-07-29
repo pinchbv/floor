@@ -20,7 +20,11 @@ dependencies:
   strings: ^0.1.2
   floor_annotation:
     path: ../floor_annotation/
-  sqlparser: ^0.10.0
+  sqlparser: # should be ^0.11.0
+    git:
+      url: https://github.com/simolus3/moor.git
+      ref: c2ce934
+      path: sqlparser
 
 
 dev_dependencies:

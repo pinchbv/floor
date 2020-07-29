@@ -1,5 +1,6 @@
 import 'package:analyzer/dart/element/element.dart';
 import 'package:analyzer/dart/element/type.dart';
+import 'package:floor_generator/misc/annotations.dart';
 import 'package:floor_generator/value_object/field.dart';
 import 'package:source_gen/source_gen.dart';
 import 'package:sqlparser/sqlparser.dart';
@@ -29,15 +30,15 @@ class TypeCheckerError {
   }
 
   InvalidGenerationSourceError columnNotFound(Field field) {
-    return _newError(
+    return _newFieldTypeMismatchError(
       'The query should return a column named `${field.columnName}`',
-      'remove the field',
+      'rename the field',
       field.fieldElement,
     );
   }
 
   InvalidGenerationSourceError nullableMismatch(Field field) {
-    return _newError(
+    return _newFieldTypeMismatchError(
       'The query returns `null` for `${field.columnName}` but the type of the field is not nullable',
       'make the field nullable',
       field.fieldElement,
@@ -45,7 +46,7 @@ class TypeCheckerError {
   }
 
   InvalidGenerationSourceError nullableMismatch2(Field field) {
-    return _newError(
+    return _newFieldTypeMismatchError(
       'The query could return `null` for `${field.columnName}` but the type of the field is not nullable',
       'make the field nullable',
       field.fieldElement,
@@ -53,7 +54,7 @@ class TypeCheckerError {
   }
 
   InvalidGenerationSourceError typeMismatch(Field field, BasicType parserType) {
-    return _newError(
+    return _newFieldTypeMismatchError(
       'The query returns a column of type ${_getSqlType(parserType)} '
           'for `${field.columnName}` but the type of the field is ${field.sqlType}',
       'change the field type',
@@ -71,7 +72,7 @@ class TypeCheckerError {
     );
   }
 
-  InvalidGenerationSourceError _newError(
+  InvalidGenerationSourceError _newFieldTypeMismatchError(
       String message, String fieldAlteration, FieldElement field) {
     final buffer = StringBuffer(message);
     try {
@@ -91,6 +92,7 @@ class TypeCheckerError {
         element: _queryElement);
   }
 
+  @nonNull
   static String _getSqlType(BasicType parserType) {
     switch (parserType) {
       case BasicType.nullType:

@@ -62,6 +62,7 @@ class ViewProcessor extends QueryableProcessor<View> {
         ?.toStringValue();
   }
 
+  @nonNull
   sqlparser.View _checkAndConvert(
       String query, String name, List<Field> fields) {
     // parse query

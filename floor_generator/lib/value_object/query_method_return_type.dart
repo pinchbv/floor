@@ -1,4 +1,5 @@
 import 'package:analyzer/dart/element/type.dart';
+import 'package:floor_generator/misc/annotations.dart';
 import 'package:floor_generator/misc/type_utils.dart';
 import 'package:floor_generator/value_object/queryable.dart';
 
@@ -7,7 +8,7 @@ import 'package:floor_generator/value_object/queryable.dart';
 class QueryMethodReturnType {
   final DartType raw;
 
-  Queryable queryable;
+  /*late*/ Queryable queryable;
   // The following values are derived once (in the constructor) and stored.
   final bool isStream;
   final bool isFuture;
@@ -21,10 +22,13 @@ class QueryMethodReturnType {
   ///
   /// Stream<T> -> T
   /// Stream<List<T>> -> T
+  @nonNull
   final DartType flattened;
 
+  @nonNull
   bool get isVoid => flattened.isVoid;
 
+  @nonNull
   bool get isPrimitive =>
       flattened.isVoid ||
       flattened.isDartCoreDouble ||
@@ -38,7 +42,7 @@ class QueryMethodReturnType {
         isStream = raw.isStream,
         isFuture = raw.isDartAsyncFuture,
         isList = raw.flatten().isDartCoreList,
-        flattened = _flatten(raw);
+        flattened = _flattenWithList(raw);
 
   @override
   bool operator ==(Object other) =>
@@ -56,7 +60,8 @@ class QueryMethodReturnType {
     return 'QueryMethod{raw: $raw, queryable: $queryable, flattened: $flattened}';
   }
 
-  static DartType _flatten(DartType rawReturnType) {
+  @nonNull
+  static DartType _flattenWithList(DartType rawReturnType) {
     final flattenedOnce = rawReturnType.flatten();
     if (flattenedOnce.isDartCoreList) {
       return flattenedOnce.flatten();

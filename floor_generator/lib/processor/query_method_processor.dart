@@ -66,6 +66,9 @@ class QueryMethodProcessor extends Processor<QueryMethod> {
     return query;
   }
 
+  /// Derive the method return type and check if it matches the conditions (has
+  /// to be Future<> or Stream<>, inner type must be a Queryable or a primitive
+  /// type, if the inner type is void, don't allow Stream<> or List<>)
   @nonNull
   QueryMethodReturnType _getAndCheckReturnType() {
     final returnType = QueryMethodReturnType(_methodElement.returnType);
@@ -107,6 +110,9 @@ class QueryMethodProcessor extends Processor<QueryMethod> {
     }
   }
 
+  /// Checks if the method return type and the query result have matching types
+  /// or throws an error if they don't. Delegates to type_checker depending on
+  /// how many columns are expected to be returned(0, 1 or more than one)
   void _assertMatchingReturnType(
       QueryMethodReturnType dartType, List<SqlResultColumn> sqliteColumns) {
     if (dartType.isVoid) {

@@ -1,3 +1,4 @@
+import 'package:floor_generator/misc/annotations.dart';
 import 'package:floor_generator/processor/error/query_processor_error.dart';
 import 'package:sqlparser/sqlparser.dart';
 import 'package:sqlparser/utils/find_referenced_tables.dart';
@@ -16,6 +17,20 @@ class VariableVisitor extends RecursiveVisitor<void, void> {
 
   final Set<String> checkIfVariableExists;
 
+  /// creates a visitor which walks a parsed SQLite statement and accumulates
+  /// all variable references into a list. It can throw an error if it
+  /// encounters a numbered variable (instead of a named one) and if it
+  /// encounters a variable which is not in the Set of variable names to check.
+  ///
+  /// If both are not checked, the [_processorError] can be null as it won't be used.
+  ///
+  /// It can be used in the following way:
+  ///
+  /// ```dart
+  ///     final visitor = VariableVisitor(null, numberedVarsAllowed: true)
+  ///          ..visitStatement(query, null);
+  ///     print(visitor.variables)
+  /// ```
   VariableVisitor(this._processorError,
       {this.numberedVarsAllowed = false, this.checkIfVariableExists});
 
@@ -49,6 +64,7 @@ class VariableVisitor extends RecursiveVisitor<void, void> {
 ///
 /// If you want to use both [findWrittenTables] and this on the same ast node,
 /// follow the advice on [findWrittenTables] to only walk the ast once.
+@nonNull
 Set<NamedResultSet> findReferencedTablesOrViews(AstNode root) {
   final visitor = ReferencedTablesVisitor()..visit(root, null);
   return {...visitor.foundTables, ...visitor.foundViews};

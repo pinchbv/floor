@@ -1,3 +1,4 @@
+import 'package:floor_generator/misc/annotations.dart';
 import 'package:floor_generator/misc/type_utils.dart';
 import 'package:floor_generator/processor/query_analyzer/dependency_graph.dart';
 import 'package:floor_generator/processor/query_analyzer/visitors.dart';
@@ -14,6 +15,7 @@ const String varlistPlaceholder = ':varlist';
 //todo add tests
 //TODO test: check converter by parallel construction: field, entity
 
+@nonNull
 EngineOptions getDefaultEngineOptions() {
   return EngineOptions(
     useMoorExtensions: false,
@@ -32,7 +34,7 @@ class AnalyzerEngine {
   AnalyzerEngine();
 
   void registerEntity(Entity entity) {
-    inner.registerTable(convertEntityToTable(entity));
+    inner.registerTable(_convertEntityToTable(entity));
 
     registry[entity.name] = entity;
 
@@ -53,7 +55,9 @@ class AnalyzerEngine {
     dependencies.add(floorView.name, references.map((e) => e.name));
   }
 
-  static Table convertEntityToTable(Entity e) => Table(
+  /// Converts a floor [Entity] into a sqlparser [Table]
+  @nonNull
+  static Table _convertEntityToTable(Entity e) => Table(
         // table constraints like foreign keys or indices are omitted here
         // because they will not be needed for static analysis.
         name: e.name,

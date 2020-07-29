@@ -42,15 +42,16 @@ class QueryMethodWriter implements Writer {
         .toList();
   }
 
+  @nonNull
   String _generateMethodBody() {
     final _methodBody = StringBuffer();
 
     // generate the variable definitions which will store the sqlite argument
     // lists, e.g. '?5,?6,?7,?8'. These have to be generated for each call to
-    // the querymethod to accomodate for different list sizes. This is
+    // the querymethod to accommodate for different list sizes. This is
     // necessary to guarantee that each single value is inserted at the right
-    // place and only via sqlites escape-mechanism.
-    // If no List parameters are present, Nothing will be written.
+    // place and only via SQLite's escape-mechanism.
+    // If no [List] parameters are present, Nothing will be written.
     _methodBody.write(_generateListConvertersForQuery());
 
     // generate the common inputs for all queries
@@ -64,6 +65,38 @@ class QueryMethodWriter implements Writer {
     }
 
     return _methodBody.toString();
+  }
+
+  @nonNull
+  String _generateListConvertersForQuery() {
+    final start = _queryMethod.parameters
+            .where((param) => !param.type.isDartCoreList)
+            .length +
+        1;
+    final code = StringBuffer();
+    String lastParam;
+    for (final listParam in _queryMethod.parameters
+        .where((param) => param.type.isDartCoreList)) {
+      if (lastParam == null) {
+        code.write('int _start=$start;');
+      } else {
+        code.write('_start+=$lastParam.length;');
+      }
+      code.write(
+          'final _sqliteVariablesFor${listParam.displayName.capitalize()}=');
+      code.write('Iterable<String>.generate(');
+      code.write("${listParam.displayName}.length,(i)=>'?\${i+_start}'");
+      code.write(").join(',');");
+
+      lastParam = listParam.displayName;
+    }
+    return code.toString();
+  }
+
+  @nullable
+  String _generateArguments() {
+    final parameters = _generateParameters();
+    return parameters.isNotEmpty ? '<dynamic>[${parameters.join(', ')}]' : null;
   }
 
   @nonNull
@@ -85,10 +118,23 @@ class QueryMethodWriter implements Writer {
     ];
   }
 
-  @nullable
-  String _generateArguments() {
-    final parameters = _generateParameters();
-    return parameters.isNotEmpty ? '<dynamic>[${parameters.join(', ')}]' : null;
+  /// Generates the Query string while accounting for the dynamically-inserted
+  /// list parameters (created as `_sqliteVariablesForX`).
+  @nonNull
+  String _generateQueryString() {
+    final code = StringBuffer();
+    int start = 0;
+    final originalQuery = _queryMethod.query.sql;
+    for (final listParameter in _queryMethod.query.listParameters) {
+      code.write(
+          originalQuery.substring(start, listParameter.position).toLiteral());
+
+      code.write('+ _sqliteVariablesFor${listParameter.name.capitalize()} +');
+      start = listParameter.position + varlistPlaceholder.length;
+    }
+    code.write(originalQuery.substring(start).toLiteral());
+
+    return code.toString();
   }
 
   @nonNull
@@ -123,51 +169,6 @@ class QueryMethodWriter implements Writer {
     final stream = _queryMethod.returnType.isStream ? 'Stream' : '';
 
     return 'return _queryAdapter.query$list$stream($parameters);';
-  }
-
-  @nonNull
-  String _generateListConvertersForQuery() {
-    final start = _queryMethod.parameters
-            .where((param) => !param.type.isDartCoreList)
-            .length +
-        1;
-    final code = StringBuffer();
-    String lastParam;
-    for (final listParam in _queryMethod.parameters
-        .where((param) => param.type.isDartCoreList)) {
-      if (lastParam == null) {
-        code.write('int _start=$start;');
-      } else {
-        code.write('_start+=$lastParam.length;');
-      }
-      code.write(
-          'final _sqliteVariablesFor${listParam.displayName.capitalize()}=');
-      code.write('Iterable<String>.generate(');
-      code.write("${listParam.displayName}.length,(i)=>'?\${i+_start}'");
-      code.write(").join(',');");
-
-      lastParam = listParam.displayName;
-    }
-    return code.toString();
-  }
-
-  /// Generates the Query string while accounting for the dynamically-inserted
-  /// list parameters (created as `_sqliteVariablesForX`).
-  @nonNull
-  String _generateQueryString() {
-    final code = StringBuffer();
-    int start = 0;
-    final originalQuery = _queryMethod.query.sql;
-    for (final listParameter in _queryMethod.query.listParameters) {
-      code.write(
-          originalQuery.substring(start, listParameter.position).toLiteral());
-
-      code.write('+ _sqliteVariablesFor${listParameter.name.capitalize()} +');
-      start = listParameter.position + varlistPlaceholder.length;
-    }
-    code.write(originalQuery.substring(start).toLiteral());
-
-    return code.toString();
   }
 
   @nullable
