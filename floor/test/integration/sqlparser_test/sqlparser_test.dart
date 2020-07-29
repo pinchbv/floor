@@ -10,7 +10,8 @@ import '../model/person.dart';
 part 'sqlparser_test.g.dart';
 
 void main() {
-  group('BLOB tests', () {
+  //TODO test case sensitivity for processor (entityname vs query reference), changelistener (affected and @update vs dependencies)
+  group('Function type derivation tests', () {
     TestDatabase database;
     DeepDao deepDao;
 

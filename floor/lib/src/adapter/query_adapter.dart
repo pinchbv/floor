@@ -43,6 +43,9 @@ class QueryAdapter {
     return rows.map(mapper).toList();
   }
 
+  /// Executes a SQLite query that does not return any values.
+  /// It will also trigger the [_changeListener] of affected entities if this
+  /// query is expected to change something.
   Future<void> queryNoReturn(
     final String sql, {
     final List<dynamic> arguments,
