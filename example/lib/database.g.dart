@@ -135,19 +135,18 @@ class _$TaskDao extends TaskDao {
 
   @override
   Future<Task> findTaskById(int id) async {
-    return _queryAdapter.query(r""" SELECT * FROM task WHERE id = ?1 """,
+    return _queryAdapter.query('SELECT * FROM task WHERE id = ?1',
         mapper: _taskMapper, arguments: <dynamic>[id]);
   }
 
   @override
   Future<List<Task>> findAllTasks() async {
-    return _queryAdapter
-        .queryList(r""" SELECT * FROM task """, mapper: _taskMapper);
+    return _queryAdapter.queryList('SELECT * FROM task', mapper: _taskMapper);
   }
 
   @override
   Stream<List<Task>> findAllTasksAsStream() {
-    return _queryAdapter.queryListStream(r""" SELECT * FROM task """,
+    return _queryAdapter.queryListStream('SELECT * FROM task',
         mapper: _taskMapper, dependencies: {'Task'});
   }
 
