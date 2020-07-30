@@ -15,8 +15,6 @@ import 'package:test/test.dart';
 import '../test_utils.dart';
 
 // TODO update tests (list incomplete)
-// todo put parsing into query processor test
-// todo add return type checking test, e.g. delete query with wrong return types
 // already done: columnCountMismatch Error
 
 void main() {
@@ -187,6 +185,7 @@ void main() {
       final error = QueryMethodProcessorError(methodElement).noQueryDefined;
       expect(actual, throwsInvalidGenerationSourceError(error));
     });
+
     group('return type', () {
       test('exception when method does not return future', () async {
         final methodElement = await _createQueryMethodElement('''

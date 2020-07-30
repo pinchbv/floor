@@ -11,7 +11,6 @@ extension StringUtils on String {
   /// Makes the first letter of the supplied string [value] lowercase.
   @nonNull
   String capitalize() {
-    //TODO test
     return '${this[0].toUpperCase()}${substring(1)}';
   }
 
@@ -19,7 +18,6 @@ extension StringUtils on String {
   /// embedding it into source code strings.
   @nonNull
   String toLiteral() {
-    //TODO test
     if (this == null) {
       return 'null';
     } else {

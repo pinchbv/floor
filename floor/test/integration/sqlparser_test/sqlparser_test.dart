@@ -10,20 +10,52 @@ import '../model/person.dart';
 part 'sqlparser_test.g.dart';
 
 void main() {
-  //TODO test case sensitivity for processor (entityname vs query reference), changelistener (affected and @update vs dependencies)
+  TestDatabase database;
+  DeepDao deepDao;
+  CaseDao caseDao;
+
+  setUp(() async {
+    database = await $FloorTestDatabase.inMemoryDatabaseBuilder().build();
+    deepDao = database.deepDao;
+    caseDao = database.caseDao;
+  });
+
+  tearDown(() async {
+    await database.close();
+  });
+
+  test('Stream works with wrong case', () async {
+    final person1 = Person(1, 'Baba');
+    final person2 = Person(2, 'Me');
+
+    final actual = caseDao.allPersons();
+    expect(
+        actual,
+        emitsInOrder(<List<Person>>[
+          [],
+          [],
+          [person1],
+          [person1],
+          [person1, person2],
+          [person1, person2],
+        ]));
+    await Future<void>.delayed(const Duration(milliseconds: 100));
+    await caseDao.updateName();
+
+    await Future<void>.delayed(const Duration(milliseconds: 100));
+    await caseDao.insertPerson(person1);
+
+    await Future<void>.delayed(const Duration(milliseconds: 100));
+    await caseDao.updateName();
+
+    await Future<void>.delayed(const Duration(milliseconds: 100));
+    await caseDao.insertPerson(person2);
+
+    await Future<void>.delayed(const Duration(milliseconds: 100));
+    await caseDao.updateName();
+  });
+
   group('Function type derivation tests', () {
-    TestDatabase database;
-    DeepDao deepDao;
-
-    setUp(() async {
-      database = await $FloorTestDatabase.inMemoryDatabaseBuilder().build();
-      deepDao = database.deepDao;
-    });
-
-    tearDown(() async {
-      await database.close();
-    });
-
     test('try IN with null list', () async {
       final list = ['a', 'b', 'c', 'd', 'e', 'f', null];
 
@@ -79,6 +111,7 @@ void main() {
 @Database(version: 1, entities: [Person])
 abstract class TestDatabase extends FloorDatabase {
   DeepDao get deepDao;
+  CaseDao get caseDao;
 }
 
 @dao
@@ -91,4 +124,16 @@ abstract class DeepDao {
 
   @insert
   Future<void> insertPerson(Person person);
+}
+
+@dao
+abstract class CaseDao {
+  @Query('SELECT * FROM pErson')
+  Stream<List<Person>> allPersons();
+
+  @Query('UPDATE peRson SET custom_name=\'what\' WHERE id=-3')
+  Future<void> updateName();
+
+  @insert
+  Future<void> insertPerson(Person p);
 }

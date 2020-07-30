@@ -16,13 +16,11 @@ const String varlistPlaceholder = ':varlist';
 //TODO test: check converter by parallel construction: field, entity
 
 @nonNull
-EngineOptions getDefaultEngineOptions() {
-  return EngineOptions(
-    useMoorExtensions: false,
-    useLegacyTypeInference: false,
-    enabledExtensions: const [],
-  );
-}
+EngineOptions getDefaultEngineOptions() => EngineOptions(
+      useMoorExtensions: false,
+      useLegacyTypeInference: false,
+      enabledExtensions: const [],
+    );
 
 class AnalyzerEngine {
   final Map<String, Queryable> registry = {};

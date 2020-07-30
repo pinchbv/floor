@@ -83,7 +83,6 @@ class SqlResultColumn {
   final bool isNullable;
 
   @nonNull
-  //TODO reminder:check for all accesses
   final bool isResolved;
 
   SqlResultColumn(this.name, ResolveResult type)

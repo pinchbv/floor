@@ -37,8 +37,6 @@ void assertMatchingReturnTypes(List<Field> fields,
       continue;
     }
 
-    //final resolvedColumnType = column.sqltype;
-
     //be strict here, but could be too strict.
     if (column.sqlType == BasicType.nullType && !fields[i].isNullable) {
       throw error.nullableMismatch(fields[i]);
