@@ -1,6 +1,7 @@
 import 'package:analyzer/dart/element/element.dart';
 import 'package:collection/collection.dart';
 import 'package:floor_generator/misc/annotations.dart';
+import 'package:floor_generator/value_object/embedded.dart';
 import 'package:floor_generator/value_object/field.dart';
 import 'package:floor_generator/value_object/queryable.dart';
 
@@ -11,9 +12,10 @@ class View extends Queryable {
     ClassElement classElement,
     String name,
     List<Field> fields,
+    List<Embedded> embeddeds,
     this.query,
     String constructor,
-  ) : super(classElement, name, fields, constructor);
+  ) : super(classElement, name, fields, embeddeds, constructor);
 
   @nonNull
   String getCreateViewStatement() {

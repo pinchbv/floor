@@ -2,6 +2,7 @@ import 'package:analyzer/dart/element/element.dart';
 import 'package:build_test/build_test.dart';
 import 'package:floor_generator/processor/entity_processor.dart';
 import 'package:floor_generator/processor/field_processor.dart';
+import 'package:floor_generator/value_object/embedded.dart';
 import 'package:floor_generator/value_object/entity.dart';
 import 'package:floor_generator/value_object/foreign_key.dart';
 import 'package:floor_generator/value_object/index.dart';
@@ -31,6 +32,7 @@ void main() {
     final fields = classElement.fields
         .map((fieldElement) => FieldProcessor(fieldElement).process())
         .toList();
+    final embeddeds = <Embedded>[];
     final primaryKey = PrimaryKey([fields[0]], false);
     const foreignKeys = <ForeignKey>[];
     const indices = <Index>[];
@@ -39,6 +41,7 @@ void main() {
       classElement,
       name,
       fields,
+      embeddeds,
       primaryKey,
       foreignKeys,
       indices,
@@ -65,6 +68,7 @@ void main() {
     final fields = classElement.fields
         .map((fieldElement) => FieldProcessor(fieldElement).process())
         .toList();
+    const embeddeds = <Embedded>[];
     final primaryKey = PrimaryKey(fields, false);
     const foreignKeys = <ForeignKey>[];
     const indices = <Index>[];
@@ -73,6 +77,7 @@ void main() {
       classElement,
       name,
       fields,
+      embeddeds,
       primaryKey,
       foreignKeys,
       indices,

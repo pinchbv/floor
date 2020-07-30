@@ -45,6 +45,7 @@ void main() {
         mockClassElement,
         'entityName',
         allFields,
+        [],
         primaryKey,
         [],
         [],
@@ -66,6 +67,7 @@ void main() {
         mockClassElement,
         'entityName',
         allFields,
+        [],
         primaryKey,
         [],
         [],
@@ -88,6 +90,7 @@ void main() {
         mockClassElement,
         'entityName',
         allFields,
+        [],
         primaryKey,
         [],
         [],
@@ -119,6 +122,7 @@ void main() {
         mockClassElement,
         'entityName',
         [nullableField],
+        [],
         primaryKey,
         [foreignKey],
         [],
@@ -145,6 +149,7 @@ void main() {
       mockClassElement,
       'entityName',
       [nullableField],
+      [],
       primaryKey,
       [],
       [],
@@ -174,7 +179,7 @@ void main() {
       final actual = entity.getValueMapping();
 
       final expected = '<String, dynamic>{'
-          "'${nullableField.columnName}': item.$fieldElementDisplayName == null ? null : (item.$fieldElementDisplayName ? 1 : 0)"
+          "'${nullableField.columnName}': item.$fieldElementDisplayName?.toInt()"
           '}';
       expect(actual, equals(expected));
     });
@@ -184,6 +189,7 @@ void main() {
         mockClassElement,
         'entityName',
         [nullableField, field],
+        [],
         primaryKey,
         [],
         [],
@@ -194,8 +200,8 @@ void main() {
       final actual = entity.getValueMapping();
 
       final expected = '<String, dynamic>{'
-          "'${nullableField.columnName}': item.$fieldElementDisplayName == null ? null : (item.$fieldElementDisplayName ? 1 : 0),"
-          " '${field.columnName}': item.$fieldElementDisplayName ? 1 : 0"
+          "'${nullableField.columnName}': item.$fieldElementDisplayName?.toInt(),"
+          " '${field.columnName}': item.$fieldElementDisplayName?.toInt()"
           '}';
       expect(actual, equals(expected));
     });

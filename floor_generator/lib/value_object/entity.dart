@@ -1,6 +1,7 @@
 import 'package:analyzer/dart/element/element.dart';
 import 'package:collection/collection.dart';
 import 'package:floor_generator/misc/annotations.dart';
+import 'package:floor_generator/value_object/embedded.dart';
 import 'package:floor_generator/value_object/field.dart';
 import 'package:floor_generator/value_object/foreign_key.dart';
 import 'package:floor_generator/value_object/index.dart';
@@ -16,11 +17,12 @@ class Entity extends Queryable {
     ClassElement classElement,
     String name,
     List<Field> fields,
+    List<Embedded> embeddeds,
     this.primaryKey,
     this.foreignKeys,
     this.indices,
     String constructor,
-  ) : super(classElement, name, fields, constructor);
+  ) : super(classElement, name, fields, embeddeds, constructor);
 
   @nonNull
   String getCreateTableStatement() {
@@ -29,6 +31,25 @@ class Entity extends Queryable {
           primaryKey.fields.contains(field) && primaryKey.autoGenerateId;
       return field.getDatabaseDefinition(autoIncrement);
     }).toList();
+
+    final embeddedDefinitions = embeddeds
+
+        // dig into children to expand fields
+        .expand((embedded) {
+          final fields = <Field>[];
+
+          void dig(final Embedded child) {
+            fields.addAll(child.fields);
+            child.children.forEach(dig);
+          }
+
+          dig(embedded);
+
+          return fields;
+        })
+        .map((field) => field.getDatabaseDefinition(false))
+        .toList();
+    databaseDefinition.addAll(embeddedDefinitions);
 
     final foreignKeyDefinitions =
         foreignKeys.map((foreignKey) => foreignKey.getDefinition()).toList();
@@ -55,11 +76,36 @@ class Entity extends Queryable {
 
   @nonNull
   String getValueMapping() {
-    final keyValueList = fields.map((field) {
+    final keyValueList = <String>[];
+
+    final fieldKeyValue = fields.map((field) {
       final columnName = field.columnName;
       final attributeValue = _getAttributeValue(field);
-      return "'$columnName': $attributeValue";
+      return "'$columnName': item.$attributeValue";
     }).toList();
+    keyValueList.addAll(fieldKeyValue);
+
+    final embeddedKeyValue = embeddeds.expand((embedded) {
+      final keyValue = <String>[];
+      final className = <String>[];
+
+      void dig(final Embedded child) {
+        className.add(child.fieldElement.displayName);
+        for (final field in child.fields) {
+          final columnName = field.columnName;
+          final attributeValue =
+              [...className, _getAttributeValue(field)].join('?.');
+          keyValue.add("'$columnName': item.$attributeValue");
+        }
+
+        child.children.forEach(dig);
+      }
+
+      dig(embedded);
+
+      return keyValue;
+    }).toList();
+    keyValueList.addAll(embeddedKeyValue);
 
     return '<String, dynamic>{${keyValueList.join(', ')}}';
   }
@@ -68,13 +114,9 @@ class Entity extends Queryable {
   String _getAttributeValue(final Field field) {
     final parameterName = field.fieldElement.displayName;
     if (field.fieldElement.type.isDartCoreBool) {
-      if (field.isNullable) {
-        return 'item.$parameterName == null ? null : (item.$parameterName ? 1 : 0)';
-      } else {
-        return 'item.$parameterName ? 1 : 0';
-      }
+      return '$parameterName?.toInt()';
     } else {
-      return 'item.$parameterName';
+      return '$parameterName';
     }
   }
 
@@ -86,6 +128,7 @@ class Entity extends Queryable {
           classElement == other.classElement &&
           name == other.name &&
           const ListEquality<Field>().equals(fields, other.fields) &&
+          const ListEquality<Embedded>().equals(embeddeds, other.embeddeds) &&
           primaryKey == other.primaryKey &&
           const ListEquality<ForeignKey>()
               .equals(foreignKeys, other.foreignKeys) &&
@@ -97,6 +140,7 @@ class Entity extends Queryable {
       classElement.hashCode ^
       name.hashCode ^
       fields.hashCode ^
+      embeddeds.hashCode ^
       primaryKey.hashCode ^
       foreignKeys.hashCode ^
       indices.hashCode ^
@@ -104,6 +148,6 @@ class Entity extends Queryable {
 
   @override
   String toString() {
-    return 'Entity{classElement: $classElement, name: $name, fields: $fields, primaryKey: $primaryKey, foreignKeys: $foreignKeys, indices: $indices, constructor: $constructor}';
+    return 'Entity{classElement: $classElement, name: $name, fields: $fields, embeddeds: $embeddeds, primaryKey: $primaryKey, foreignKeys: $foreignKeys, indices: $indices, constructor: $constructor}';
   }
 }

@@ -1,6 +1,7 @@
 import 'package:example/database.dart';
 import 'package:example/task.dart';
 import 'package:example/task_dao.dart';
+import 'package:example/timestamp.dart';
 import 'package:flutter/material.dart';
 
 Future<void> main() async {
@@ -177,7 +178,15 @@ class TasksTextField extends StatelessWidget {
     if (message.trim().isEmpty) {
       _textEditingController.clear();
     } else {
-      final task = Task(null, message);
+      final task = Task(
+        null,
+        message,
+        Timestamp(
+          createdAt: DateTime.now().toString(),
+          updatedAt: DateTime.now().toString(),
+        ),
+      );
+
       await dao.insertTask(task);
       _textEditingController.clear();
     }

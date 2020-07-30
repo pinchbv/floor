@@ -3,6 +3,7 @@ import 'package:collection/collection.dart';
 import 'package:floor_generator/processor/error/queryable_processor_error.dart';
 import 'package:floor_generator/processor/field_processor.dart';
 import 'package:floor_generator/processor/queryable_processor.dart';
+import 'package:floor_generator/value_object/embedded.dart';
 import 'package:floor_generator/value_object/field.dart';
 import 'package:floor_generator/value_object/queryable.dart';
 import 'package:test/test.dart';
@@ -26,10 +27,12 @@ void main() {
     final fields = classElement.fields
         .map((fieldElement) => FieldProcessor(fieldElement).process())
         .toList();
+    final embeddeds = <Embedded>[];
     const constructor = "Person(row['id'] as int, row['name'] as String)";
     final expected = TestQueryable(
       classElement,
       fields,
+      embeddeds,
       constructor,
     );
     expect(actual, equals(expected));
@@ -416,7 +419,7 @@ void main() {
 
       final actual = TestProcessor(classElement).process().constructor;
 
-      const expected = "Person(row['id'] as int, row['name'] as String)";
+      const expected = "Person(row['id'] as int, row['name'] as String, null)";
       expect(actual, equals(expected));
     });
   });
@@ -426,8 +429,9 @@ class TestQueryable extends Queryable {
   TestQueryable(
     ClassElement classElement,
     List<Field> fields,
+    List<Embedded> embeddeds,
     String constructor,
-  ) : super(classElement, '', fields, constructor);
+  ) : super(classElement, '', fields, embeddeds, constructor);
 
   @override
   bool operator ==(Object other) =>
@@ -454,10 +458,13 @@ class TestProcessor extends QueryableProcessor<TestQueryable> {
   @override
   TestQueryable process() {
     final fields = getFields();
+    final embeddeds = getEmbeddeds();
+
     return TestQueryable(
       classElement,
       fields,
-      getConstructor(fields),
+      embeddeds,
+      getConstructor([...fields, ...embeddeds]),
     );
   }
 }

@@ -272,6 +272,7 @@ void main() {
       null, // classElement,
       'Dog', // name,
       [], // fields,
+      [], // embeddeds,
       null, // primaryKey,
       [], // foreignKeys,
       [], // indices,

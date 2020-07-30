@@ -1,3 +1,4 @@
+import 'package:example/timestamp.dart';
 import 'package:floor/floor.dart';
 
 @entity
@@ -7,7 +8,10 @@ class Task {
 
   final String message;
 
-  Task(this.id, this.message);
+  @Embedded(prefix: 'time_')
+  final Timestamp timestamp;
+
+  Task(this.id, this.message, this.timestamp);
 
   @override
   bool operator ==(Object other) =>
@@ -18,10 +22,10 @@ class Task {
           message == other.message;
 
   @override
-  int get hashCode => id.hashCode ^ message.hashCode;
+  int get hashCode => id.hashCode ^ message.hashCode ^ timestamp.hashCode;
 
   @override
   String toString() {
-    return 'Task{id: $id, message: $message}';
+    return 'Task{id: $id, message: $message, timestamp: $timestamp}';
   }
 }

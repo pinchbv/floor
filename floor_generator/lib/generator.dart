@@ -10,6 +10,7 @@ import 'package:floor_generator/value_object/database.dart';
 import 'package:floor_generator/writer/dao_writer.dart';
 import 'package:floor_generator/writer/database_builder_writer.dart';
 import 'package:floor_generator/writer/database_writer.dart';
+import 'package:floor_generator/writer/extension_writer.dart';
 import 'package:floor_generator/writer/floor_writer.dart';
 import 'package:source_gen/source_gen.dart';
 
@@ -34,7 +35,8 @@ class FloorGenerator extends GeneratorForAnnotation<annotations.Database> {
       ..body.add(FloorWriter(database.name).write())
       ..body.add(DatabaseBuilderWriter(database.name).write())
       ..body.add(databaseClass)
-      ..body.addAll(daoClasses));
+      ..body.addAll(daoClasses)
+      ..body.add(ExtensionWriter().write()));
 
     return library.accept(DartEmitter()).toString();
   }
