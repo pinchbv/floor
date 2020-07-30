@@ -48,6 +48,7 @@ void main() {
         primaryKey,
         [],
         [],
+        false,
         '',
       );
 
@@ -69,6 +70,7 @@ void main() {
         primaryKey,
         [],
         [],
+        false,
         '',
       );
 
@@ -91,6 +93,7 @@ void main() {
         primaryKey,
         [],
         [],
+        false,
         '',
       );
 
@@ -122,6 +125,7 @@ void main() {
         primaryKey,
         [foreignKey],
         [],
+        false,
         '',
       );
 
@@ -139,6 +143,29 @@ void main() {
     });
   });
 
+  test('Create table statement with "WITHOUT ROWID"', () {
+    final primaryKey = PrimaryKey([field], false);
+    final entity = Entity(
+      mockClassElement,
+      'entityName',
+      allFields,
+      primaryKey,
+      [],
+      [],
+      true,
+      '',
+    );
+
+    final actual = entity.getCreateTableStatement();
+
+    final expected = 'CREATE TABLE IF NOT EXISTS `${entity.name}` '
+        '(`${field.columnName}` ${field.sqlType} NOT NULL, '
+        '`${nullableField.columnName}` ${nullableField.sqlType}, '
+        'PRIMARY KEY (`${field.columnName}`)'
+        ') WITHOUT ROWID';
+    expect(actual, equals(expected));
+  });
+
   group('Value mapping', () {
     final primaryKey = PrimaryKey([nullableField], true);
     final entity = Entity(
@@ -148,6 +175,7 @@ void main() {
       primaryKey,
       [],
       [],
+      false,
       '',
     );
     const fieldElementDisplayName = 'foo';
@@ -187,6 +215,7 @@ void main() {
         primaryKey,
         [],
         [],
+        false,
         '',
       );
       when(mockDartType.isDartCoreBool).thenReturn(true);
