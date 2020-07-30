@@ -64,6 +64,23 @@ void main() {
       final actual = await boolDao.findWithNullable(false);
       expect(actual, equals(obj));
     });
+
+    test('return nullables', () async {
+      await boolDao
+          .insertBoolC(BooleanClass(false, nullable: null, nonnullable: true));
+      await boolDao
+          .insertBoolC(BooleanClass(true, nullable: false, nonnullable: true));
+
+      expect(await boolDao.getNullables(), equals([null, false]));
+    });
+    test('return nullables', () async {
+      await boolDao
+          .insertBoolC(BooleanClass(false, nullable: null, nonnullable: true));
+      await boolDao
+          .insertBoolC(BooleanClass(true, nullable: false, nonnullable: false));
+
+      expect(await boolDao.getNonNullables(), equals([true, false]));
+    });
   });
 }
 
@@ -107,6 +124,12 @@ abstract class TestDatabase extends FloorDatabase {
 abstract class BoolDao {
   @Query('SELECT * FROM BooleanClass where nonnullable = :val')
   Future<BooleanClass> findWithNonNullable(bool val);
+
+  @Query('SELECT nonnullable FROM BooleanClass')
+  Future<List<bool>> getNonNullables();
+
+  @Query('SELECT nullable FROM BooleanClass')
+  Future<List<bool>> getNullables();
 
   @Query('SELECT * FROM BooleanClass where nullable = :val')
   Future<BooleanClass> findWithNullable(bool val);

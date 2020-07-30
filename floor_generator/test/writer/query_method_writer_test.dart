@@ -42,6 +42,40 @@ void main() {
     '''));
   });
 
+  test('query with primitive return type', () async {
+    final queryMethod = await _createQueryMethod('''
+      @Query('SELECT COUNT(*) FROM Person WHERE name = :name')
+      Future<int> count(String name);
+    ''');
+
+    final actual = QueryMethodWriter(queryMethod).write();
+
+    expect(actual, equalsDart(r'''
+      @override
+      Future<int> count(String name) async {
+        return _queryAdapter.query('SELECT COUNT(*) FROM Person WHERE name = ?1',
+            mapper: (Map<String, dynamic> row) => row.values.first as int, arguments: <dynamic>[name]);
+      }
+    '''));
+  });
+
+  test('query with bool return type', () async {
+    final queryMethod = await _createQueryMethod('''
+      @Query('SELECT COUNT(*)>0 FROM Person WHERE name = :name')
+      Future<bool> personWithNameExists(String name);
+    ''');
+
+    final actual = QueryMethodWriter(queryMethod).write();
+
+    expect(actual, equalsDart(r'''
+      @override
+      Future<bool> personWithNameExists(String name) async {
+        return _queryAdapter.query('SELECT COUNT(*)>0 FROM Person WHERE name = ?1',
+            mapper: (Map<String, dynamic> row) => row.values.first == null ? null : (row.values.first as int) != 0, arguments: <dynamic>[name]);
+      }
+    '''));
+  });
+
   test('query item', () async {
     final queryMethod = await _createQueryMethod('''
       @Query('SELECT * FROM Person WHERE id = :id')
