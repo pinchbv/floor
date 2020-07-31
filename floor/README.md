@@ -525,7 +525,7 @@ StreamBuilder<List<Person>>(
 
 ### Transactions
 Whenever you want to perform some operations in a transaction you have to add the `@transaction` annotation to the method.
-It's also required to add the `async` modifier. These methods can only return `Future<void>`.
+It's also required to add the `async` modifier. These methods have to return a `Future`.
 
 ```dart
 @transaction
