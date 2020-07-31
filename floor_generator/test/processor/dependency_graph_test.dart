@@ -1,4 +1,3 @@
-import 'package:floor_generator/misc/string_utils.dart';
 import 'package:floor_generator/processor/query_analyzer/dependency_graph.dart';
 import 'package:test/test.dart';
 

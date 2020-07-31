@@ -144,7 +144,7 @@ void main() {
   test('Create table statement with "WITHOUT ROWID"', () {
     final primaryKey = PrimaryKey([field], false);
     final entity = Entity(
-      mockClassElement,
+      mockClassName,
       'entityName',
       allFields,
       primaryKey,

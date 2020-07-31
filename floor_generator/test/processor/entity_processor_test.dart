@@ -157,7 +157,7 @@ void main() {
     const indices = <Index>[];
     const constructor = "Person(row['id'] as int, row['name'] as String)";
     final expected = Entity(
-      classElement,
+      classElement.displayName,
       name,
       fields,
       primaryKey,

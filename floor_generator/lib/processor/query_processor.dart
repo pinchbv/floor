@@ -67,8 +67,7 @@ class QueryProcessor extends Processor<Query> {
     final analyzed = _engine.inner.analyzeParsed(parsed,
         stmtOptions: AnalyzeStatementOptions(
             namedVariableTypes: Map.fromEntries(_parameters.map((param) =>
-                MapEntry(':${param.name}',
-                    _getSqlparserType(param, flattenLists: true))))));
+                MapEntry(':${param.name}', _getSqlparserType(param))))));
     // throw errors
     if (analyzed.errors.isNotEmpty) {
       throw _processorError.fromAnalysisError(analyzed.errors.first);
@@ -227,11 +226,10 @@ class QueryProcessor extends Processor<Query> {
   /// converts a dart element type description to a nullable type
   /// compatible with sqlparser.
   @nonNull
-  ResolvedType _getSqlparserType(VariableElement parameter,
-      {bool flattenLists = false}) {
-//TODO typeconverters
+  ResolvedType _getSqlparserType(VariableElement parameter) {
+    //TODO typeconverters
     var type = parameter.type;
-    if (flattenLists && type.isDartCoreList) {
+    if (type.isDartCoreList) {
       type = type.flatten();
     }
     if (type.isDartCoreInt) {

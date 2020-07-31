@@ -71,5 +71,6 @@ class AnalyzerEngine {
                           : null),
                 ))
             .toList(growable: false),
+        withoutRowId: e.withoutRowid,
       );
 }
