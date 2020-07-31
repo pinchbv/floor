@@ -33,6 +33,60 @@ void main() {
       }
     '''));
   });
+
+  test('Generate transaction method with integer return', () async {
+    final transactionMethod = await _createTransactionMethod('''
+      @transaction
+      Future<int> replacePersons(List<Person> persons) async {
+        return 4;
+      }
+    ''');
+
+    final actual = TransactionMethodWriter(transactionMethod).write();
+
+    expect(actual, equalsDart(r'''
+      @override
+      Future<int> replacePersons(List<Person> persons) async {
+        if (database is sqflite.Transaction) {
+          return await super.replacePersons(persons);
+        } else {
+          return await (database as sqflite.Database)
+              .transaction<int>((transaction) async {
+            final transactionDatabase = _$TestDatabase(changeListener)
+              ..database = transaction;
+            return await transactionDatabase.personDao.replacePersons(persons);
+          });
+        }
+      }
+    '''));
+  });
+
+  test('Generate transaction method with object return', () async {
+    final transactionMethod = await _createTransactionMethod('''
+      @transaction
+      Future<Person> replacePersons(List<Person> persons) async {
+        return null;
+      }
+    ''');
+
+    final actual = TransactionMethodWriter(transactionMethod).write();
+
+    expect(actual, equalsDart(r'''
+      @override
+      Future<Person> replacePersons(List<Person> persons) async {
+        if (database is sqflite.Transaction) {
+          return await super.replacePersons(persons);
+        } else {
+          return await (database as sqflite.Database)
+              .transaction<Person>((transaction) async {
+            final transactionDatabase = _$TestDatabase(changeListener)
+              ..database = transaction;
+            return await transactionDatabase.personDao.replacePersons(persons);
+          });
+        }
+      }
+    '''));
+  });
 }
 
 Future<TransactionMethod> _createTransactionMethod(

@@ -2,6 +2,7 @@ import 'package:code_builder/code_builder.dart';
 import 'package:floor_generator/misc/annotation_expression.dart';
 import 'package:floor_generator/value_object/transaction_method.dart';
 import 'package:floor_generator/writer/writer.dart';
+import 'package:floor_generator/misc/type_utils.dart';
 
 class TransactionMethodWriter implements Writer {
   final TransactionMethod method;
@@ -23,14 +24,16 @@ class TransactionMethodWriter implements Writer {
     final parameters =
         method.parameterElements.map((parameter) => parameter.name).join(', ');
     final methodCall = '${method.name}($parameters)';
+    final innerType = method.returnType.flatten();
+    final ret = innerType.isVoid ? '' : 'return ';
 
     return '''
     if (database is sqflite.Transaction) {
-      await super.$methodCall;
+      ${ret}await super.$methodCall;
     } else {
-      await (database as sqflite.Database).transaction<void>((transaction) async {
+      ${ret}await (database as sqflite.Database).transaction<${innerType.toString()}>((transaction) async {
         final transactionDatabase = _\$${method.databaseName}(changeListener)..database = transaction;
-        await transactionDatabase.${method.daoFieldName}.$methodCall;
+        ${ret}await transactionDatabase.${method.daoFieldName}.$methodCall;
       });
     }
     ''';
