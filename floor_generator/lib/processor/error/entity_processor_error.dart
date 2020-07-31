@@ -69,4 +69,13 @@ class EntityProcessorError {
       element: _classElement,
     );
   }
+
+  InvalidGenerationSourceError get autoIncrementInWithoutRowid {
+    return InvalidGenerationSourceError(
+      'autoGenerate is not allowed in WITHOUT ROWID tables',
+      todo:
+          'Remove autoGenerate in @PrimaryKey() or withoutRowid in @Entity().',
+      element: _classElement,
+    );
+  }
 }

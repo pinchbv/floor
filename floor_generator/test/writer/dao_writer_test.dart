@@ -263,6 +263,7 @@ void main() {
       null, // primaryKey,
       [], // foreignKeys,
       [], // indices,
+      false, // withoutRowid,
       '', // constructor
     );
     final actual = DaoWriter(dao, {otherEntity}).write();
