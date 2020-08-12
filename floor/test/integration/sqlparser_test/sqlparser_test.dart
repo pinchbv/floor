@@ -39,6 +39,8 @@ void main() {
           [person1, person2],
           [person1, person2],
         ]));
+    // delay execution to make sure that the stream is updated in between
+    // (and not multiple times afterwards)
     await Future<void>.delayed(const Duration(milliseconds: 100));
     await caseDao.updateName();
 

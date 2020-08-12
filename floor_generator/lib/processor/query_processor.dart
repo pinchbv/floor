@@ -52,7 +52,7 @@ class QueryProcessor extends Processor<Query> {
   @nonNull
   AnalysisContext _validate() {
     // parse query,
-    final parsed = _engine.inner.parse(_query);
+    final parsed = _engine.sqlEngine.parse(_query);
 
     // throw errors
     if (parsed.errors.isNotEmpty) {
@@ -64,7 +64,7 @@ class QueryProcessor extends Processor<Query> {
     _assertMatchingParameters(parsed.rootNode);
 
     // analyze query with named parameters only
-    final analyzed = _engine.inner.analyzeParsed(parsed,
+    final analyzed = _engine.sqlEngine.analyzeParsed(parsed,
         stmtOptions: AnalyzeStatementOptions(
             namedVariableTypes: Map.fromEntries(_parameters.map((param) =>
                 MapEntry(':${param.name}', _getSqlparserType(param))))));
@@ -153,7 +153,7 @@ class QueryProcessor extends Processor<Query> {
   Set<Entity> _getDependencies(AstNode root) {
     return findReferencedTablesOrViews(root)
         // Find indirect dependencies for referenced Queryables
-        .expand((e) => _engine.dependencies.indirectDependencies(e.name))
+        .expand((e) => _engine.dependencyGraph.indirectDependencies(e.name))
         // Find the according Queryables to their name
         .map((name) => _engine.registry[name])
         // Views cannot be updated via insert/delete/update, so we will ignore them.
@@ -173,7 +173,7 @@ class QueryProcessor extends Processor<Query> {
   /// This assertion should always be successful, even with wrong input. If it
   /// isn't, then there is a bug within floors mechanism to handle `:var`s.
   void _assertNoNamedVarsLeft(String newQuery) {
-    final parsed = _engine.inner.parse(newQuery);
+    final parsed = _engine.sqlEngine.parse(newQuery);
     final visitor = VariableVisitor(_processorError, numberedVarsAllowed: true)
       ..visitStatement(parsed.rootNode, null);
     for (final v in visitor.variables) {

@@ -7,7 +7,7 @@ import 'package:floor_generator/value_object/queryable.dart';
 import 'package:floor_generator/value_object/view.dart' as floor;
 import 'package:sqlparser/sqlparser.dart' hide Queryable;
 
-const String varlistPlaceholder = ':varlist';
+const varlistPlaceholder = ':varlist';
 
 //todo single test for testing engine registrations and dependencies
 //todo test dependency graph
@@ -25,14 +25,12 @@ EngineOptions getDefaultEngineOptions() => EngineOptions(
 class AnalyzerEngine {
   final Map<String, Queryable> registry = {};
 
-  final SqlEngine inner = SqlEngine(getDefaultEngineOptions());
+  final sqlEngine = SqlEngine(getDefaultEngineOptions());
 
-  final DependencyGraph dependencies = DependencyGraph();
-
-  AnalyzerEngine();
+  final dependencyGraph = DependencyGraph();
 
   void registerEntity(Entity entity) {
-    inner.registerTable(_convertEntityToTable(entity));
+    sqlEngine.registerTable(_convertEntityToTable(entity));
 
     registry[entity.name] = entity;
 
@@ -40,17 +38,17 @@ class AnalyzerEngine {
     final directDependencies = entity.foreignKeys
         .where((e) => e.canChangeChild)
         .map((e) => e.parentName);
-    dependencies.add(entity.name, directDependencies);
+    dependencyGraph.add(entity.name, directDependencies);
   }
 
   void registerView(floor.View floorView, View convertedView) {
-    inner.registerView(convertedView);
+    sqlEngine.registerView(convertedView);
 
     registry[floorView.name] = floorView;
 
     //register dependencies
     final references = findReferencedTablesOrViews(convertedView.definition);
-    dependencies.add(floorView.name, references.map((e) => e.name));
+    dependencyGraph.add(floorView.name, references.map((e) => e.name));
   }
 
   /// Converts a floor [Entity] into a sqlparser [Table]

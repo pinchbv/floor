@@ -8,7 +8,7 @@ extension StringUtils on String {
     return '${this[0].toLowerCase()}${substring(1)}';
   }
 
-  /// Makes the first letter of the supplied string [value] lowercase.
+  /// Makes the first letter of the supplied string [value] uppercase.
   @nonNull
   String capitalize() {
     return '${this[0].toUpperCase()}${substring(1)}';

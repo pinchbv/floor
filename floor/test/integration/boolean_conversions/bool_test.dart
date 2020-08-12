@@ -73,7 +73,8 @@ void main() {
 
       expect(await boolDao.getNullables(), equals([null, false]));
     });
-    test('return nullables', () async {
+
+    test('return nonNullables', () async {
       await boolDao
           .insertBoolC(BooleanClass(false, nullable: null, nonnullable: true));
       await boolDao

@@ -66,7 +66,7 @@ class ViewProcessor extends QueryableProcessor<View> {
   sqlparser.View _checkAndConvert(
       String query, String name, List<Field> fields) {
     // parse query
-    final parserCtx = _analyzerEngine.inner.parse(query);
+    final parserCtx = _analyzerEngine.sqlEngine.parse(query);
 
     if (parserCtx.errors.isNotEmpty) {
       throw _processorError.parseErrorFromSqlparser(parserCtx.errors.first);
@@ -80,7 +80,7 @@ class ViewProcessor extends QueryableProcessor<View> {
     _assertNoVariables(parserCtx.rootNode);
 
     // analyze query (derive types)
-    final ctx = _analyzerEngine.inner.analyzeParsed(parserCtx);
+    final ctx = _analyzerEngine.sqlEngine.analyzeParsed(parserCtx);
     if (ctx.errors.isNotEmpty) {
       throw _processorError.analysisErrorFromSqlparser(ctx.errors.first);
     }
