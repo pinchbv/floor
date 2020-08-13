@@ -1,7 +1,6 @@
 import 'package:analyzer/dart/element/element.dart';
 import 'package:collection/collection.dart';
 import 'package:floor_generator/value_object/deletion_method.dart';
-import 'package:floor_generator/value_object/entity.dart';
 import 'package:floor_generator/value_object/insertion_method.dart';
 import 'package:floor_generator/value_object/query_method.dart';
 import 'package:floor_generator/value_object/transaction_method.dart';
@@ -15,7 +14,6 @@ class Dao {
   final List<UpdateMethod> updateMethods;
   final List<DeletionMethod> deletionMethods;
   final List<TransactionMethod> transactionMethods;
-  final Set<Entity> streamEntities;
 
   Dao(
     this.classElement,
@@ -25,7 +23,6 @@ class Dao {
     this.updateMethods,
     this.deletionMethods,
     this.transactionMethods,
-    this.streamEntities,
   );
 
   @override
@@ -44,9 +41,7 @@ class Dao {
           const ListEquality<DeletionMethod>()
               .equals(deletionMethods, other.deletionMethods) &&
           const ListEquality<TransactionMethod>()
-              .equals(transactionMethods, other.transactionMethods) &&
-          const SetEquality<Entity>()
-              .equals(streamEntities, other.streamEntities);
+              .equals(transactionMethods, other.transactionMethods);
 
   @override
   int get hashCode =>
@@ -56,11 +51,10 @@ class Dao {
       insertionMethods.hashCode ^
       updateMethods.hashCode ^
       deletionMethods.hashCode ^
-      transactionMethods.hashCode ^
-      streamEntities.hashCode;
+      transactionMethods.hashCode;
 
   @override
   String toString() {
-    return 'Dao{classElement: $classElement, name: $name, queryMethods: $queryMethods, insertionMethods: $insertionMethods, updateMethods: $updateMethods, deletionMethods: $deletionMethods, transactionMethods: $transactionMethods, streamEntities: $streamEntities}';
+    return 'Dao{classElement: $classElement, name: $name, queryMethods: $queryMethods, insertionMethods: $insertionMethods, updateMethods: $updateMethods, deletionMethods: $deletionMethods, transactionMethods: $transactionMethods}';
   }
 }

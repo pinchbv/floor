@@ -148,16 +148,15 @@ class QueryProcessor extends Processor<Query> {
     return newQuery.toString();
   }
 
-  /// Determine all [Entity]s this query (indirectly) relies on.
+  /// Determine all [Entity]s this query (indirectly) relies on and return
+  /// their sql names.
   @nonNull
-  Set<Entity> _getDependencies(AstNode root) {
+  Set<String> _getDependencies(AstNode root) {
     return findReferencedTablesOrViews(root)
         // Find indirect dependencies for referenced Queryables
         .expand((e) => _engine.dependencyGraph.indirectDependencies(e.name))
-        // Find the according Queryables to their name
-        .map((name) => _engine.registry[name])
-        // Views cannot be updated via insert/delete/update, so we will ignore them.
-        .whereType<Entity>()
+        //only accept entities
+        .where((element) => _engine.isEntity(element))
         .toSet();
   }
 

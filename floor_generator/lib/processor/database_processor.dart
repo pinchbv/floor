@@ -37,6 +37,12 @@ class DatabaseProcessor extends Processor<Database> {
         _getDaoGetters(databaseName, entities, views, analyzerEngine);
     final version = _getDatabaseVersion();
 
+    final streamEntities = daoGetters
+        .expand((dg) => dg.dao.queryMethods)
+        .where((method) => method.returnType.isStream)
+        .expand((queryMethod) => queryMethod.query.dependencies)
+        .toSet();
+
     return Database(
       _classElement,
       databaseName,
@@ -44,6 +50,7 @@ class DatabaseProcessor extends Processor<Database> {
       views,
       daoGetters,
       version,
+      streamEntities,
     );
   }
 

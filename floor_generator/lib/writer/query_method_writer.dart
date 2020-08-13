@@ -157,8 +157,7 @@ class QueryMethodWriter implements Writer {
   ) {
     final mapper = _generateMapper();
     final deps = _queryMethod.returnType.isStream
-        ? _generateSetStringOrNull(
-            _queryMethod.query.dependencies.map((e) => e.name))
+        ? _generateSetStringOrNull(_queryMethod.query.dependencies)
         : null;
 
     final parameters = StringBuffer(query)..write(', mapper: $mapper');

@@ -2,7 +2,6 @@ import 'package:code_builder/code_builder.dart';
 import 'package:floor_generator/misc/string_utils.dart';
 import 'package:floor_generator/value_object/dao.dart';
 import 'package:floor_generator/value_object/deletion_method.dart';
-import 'package:floor_generator/value_object/entity.dart';
 import 'package:floor_generator/value_object/insertion_method.dart';
 import 'package:floor_generator/value_object/query_method.dart';
 import 'package:floor_generator/value_object/transaction_method.dart';
@@ -17,7 +16,7 @@ import 'package:floor_generator/writer/writer.dart';
 /// Creates the implementation of a DAO.
 class DaoWriter extends Writer {
   final Dao dao;
-  final Set<Entity> streamEntities;
+  final Set<String> streamEntities;
 
   DaoWriter(this.dao, this.streamEntities);
 
@@ -52,7 +51,13 @@ class DaoWriter extends Writer {
           ..name = '_queryAdapter'
           ..type = refer('QueryAdapter')));
 
-      final queriesRequireChangeListener = dao.streamEntities.isNotEmpty;
+      // The QueryAdapter needs a changeListener if any Query returns a Stream or
+      // if any Query of this dao updates an entity a stream depends upon.
+      final queriesRequireChangeListener = dao.queryMethods.any((queryMethod) =>
+          queryMethod.returnType.isStream ||
+          queryMethod.query.affectedEntities
+              .intersection(streamEntities)
+              .isNotEmpty);
 
       constructorBuilder
         ..initializers.add(Code(
@@ -95,7 +100,7 @@ class DaoWriter extends Writer {
         final valueMapper =
             '(${entity.className} item) => ${entity.getValueMapping()}';
 
-        final requiresChangeListener = streamEntities.contains(entity);
+        final requiresChangeListener = streamEntities.contains(entity.name);
 
         constructorBuilder
           ..initializers.add(Code(
@@ -122,7 +127,7 @@ class DaoWriter extends Writer {
         final valueMapper =
             '(${entity.className} item) => ${entity.getValueMapping()}';
 
-        final requiresChangeListener = streamEntities.contains(entity);
+        final requiresChangeListener = streamEntities.contains(entity.name);
 
         constructorBuilder
           ..initializers.add(Code(
@@ -149,7 +154,7 @@ class DaoWriter extends Writer {
         final valueMapper =
             '(${entity.className} item) => ${entity.getValueMapping()}';
 
-        final requiresChangeListener = streamEntities.contains(entity);
+        final requiresChangeListener = streamEntities.contains(entity.name);
 
         constructorBuilder
           ..initializers.add(Code(

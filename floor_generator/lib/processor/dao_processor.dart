@@ -54,26 +54,14 @@ class DaoProcessor extends Processor<Dao> {
       ..._classElement.allSupertypes.expand((type) => type.methods)
     ];
 
-    final queryMethods = _getQueryMethods(methods);
-    final insertionMethods = _getInsertionMethods(methods);
-    final updateMethods = _getUpdateMethods(methods);
-    final deletionMethods = _getDeletionMethods(methods);
-    final transactionMethods = _getTransactionMethods(methods);
-
-    final streamEntities = queryMethods
-        .where((method) => method.returnType.isStream)
-        .expand((method) => method.query.dependencies)
-        .toSet();
-
     return Dao(
       _classElement,
       name,
-      queryMethods,
-      insertionMethods,
-      updateMethods,
-      deletionMethods,
-      transactionMethods,
-      streamEntities,
+      _getQueryMethods(methods),
+      _getInsertionMethods(methods),
+      _getUpdateMethods(methods),
+      _getDeletionMethods(methods),
+      _getTransactionMethods(methods),
     );
   }
 

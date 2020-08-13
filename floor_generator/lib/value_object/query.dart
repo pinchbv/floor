@@ -1,6 +1,5 @@
 import 'package:collection/collection.dart';
 import 'package:floor_generator/misc/annotations.dart';
-import 'package:floor_generator/value_object/entity.dart';
 import 'package:sqlparser/sqlparser.dart';
 
 class Query {
@@ -10,10 +9,10 @@ class Query {
 
   final List<SqlResultColumn> resultColumnTypes;
 
-  /// The entities this query directly and indirectly depends on.
+  /// The names of the entities this query directly and indirectly depends on.
   /// If an entity of this set changes, it is possible that the output of
   /// this query also changes.
-  final Set<Entity> dependencies;
+  final Set<String> dependencies;
 
   /// The names of the entities this query will change directly
   final Set<String> affectedEntities;
@@ -31,7 +30,7 @@ class Query {
               .equals(listParameters, other.listParameters) &&
           const ListEquality<SqlResultColumn>()
               .equals(resultColumnTypes, other.resultColumnTypes) &&
-          const SetEquality<Entity>()
+          const SetEquality<String>()
               .equals(dependencies, other.dependencies) &&
           const SetEquality<String>()
               .equals(affectedEntities, other.affectedEntities);

@@ -157,7 +157,6 @@ void main() {
         DaoProcessor(classElement, '', '', entities, views, engine).process();
 
     expect(processedDao.methodsLength, equals(4));
-    expect(processedDao.streamEntities, equals(<Entity>[entities.first]));
   });
 }
 

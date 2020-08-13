@@ -12,7 +12,7 @@ class Database {
   final List<View> views;
   final List<DaoGetter> daoGetters;
   final int version;
-  final Set<Entity> streamEntities;
+  final Set<String> streamEntities;
 
   Database(
     this.classElement,
@@ -21,7 +21,8 @@ class Database {
     this.views,
     this.daoGetters,
     this.version,
-  ) : streamEntities = daoGetters.expand((dg) => dg.dao.streamEntities).toSet();
+    this.streamEntities,
+  );
 
   @override
   bool operator ==(Object other) =>
@@ -35,7 +36,7 @@ class Database {
           const ListEquality<DaoGetter>()
               .equals(daoGetters, other.daoGetters) &&
           version == other.version &&
-          const SetEquality<Entity>()
+          const SetEquality<String>()
               .equals(streamEntities, other.streamEntities);
 
   @override

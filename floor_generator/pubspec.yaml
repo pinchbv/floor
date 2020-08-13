@@ -10,7 +10,7 @@ environment:
   sdk: '>=2.6.0 <3.0.0'
 
 dependencies:
-  analyzer: ^0.39.4
+  analyzer: 0.39.14
   build: ^1.2.2
   code_builder: ^3.2.1
   meta: ^1.1.8
@@ -20,12 +20,7 @@ dependencies:
   strings: ^0.1.2
   floor_annotation:
     path: ../floor_annotation/
-  sqlparser: ^0.10.1 # should be ^0.11.0
-#    git:
-#      url: https://github.com/simolus3/moor.git
-#      ref: c2ce934
-#      path: sqlparser
-
+  sqlparser: ^0.10.1
 
 dev_dependencies:
   test: ^1.11.0

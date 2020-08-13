@@ -3,7 +3,6 @@ import 'package:floor_generator/misc/type_utils.dart';
 import 'package:floor_generator/processor/query_analyzer/dependency_graph.dart';
 import 'package:floor_generator/processor/query_analyzer/visitors.dart';
 import 'package:floor_generator/value_object/entity.dart';
-import 'package:floor_generator/value_object/queryable.dart';
 import 'package:floor_generator/value_object/view.dart' as floor;
 import 'package:sqlparser/sqlparser.dart' hide Queryable;
 
@@ -23,16 +22,12 @@ EngineOptions getDefaultEngineOptions() => EngineOptions(
     );
 
 class AnalyzerEngine {
-  final Map<String, Queryable> registry = {};
-
   final sqlEngine = SqlEngine(getDefaultEngineOptions());
 
   final dependencyGraph = DependencyGraph();
 
   void registerEntity(Entity entity) {
     sqlEngine.registerTable(_convertEntityToTable(entity));
-
-    registry[entity.name] = entity;
 
     //register dependencies
     final directDependencies = entity.foreignKeys
@@ -44,11 +39,15 @@ class AnalyzerEngine {
   void registerView(floor.View floorView, View convertedView) {
     sqlEngine.registerView(convertedView);
 
-    registry[floorView.name] = floorView;
-
     //register dependencies
     final references = findReferencedTablesOrViews(convertedView.definition);
     dependencyGraph.add(floorView.name, references.map((e) => e.name));
+  }
+
+  bool isEntity(String name) {
+    return sqlEngine.knownResultSets
+        .whereType<Table>()
+        .any((element) => element.name == name);
   }
 
   /// Converts a floor [Entity] into a sqlparser [Table]

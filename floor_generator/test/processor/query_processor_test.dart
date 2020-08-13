@@ -3,7 +3,6 @@ import 'package:build_test/build_test.dart';
 import 'package:floor_generator/processor/error/query_processor_error.dart';
 import 'package:floor_generator/processor/query_analyzer/engine.dart';
 import 'package:floor_generator/processor/query_processor.dart';
-import 'package:floor_generator/value_object/entity.dart';
 import 'package:floor_generator/value_object/query.dart';
 import 'package:floor_generator/misc/type_utils.dart';
 import 'package:source_gen/source_gen.dart';
@@ -13,13 +12,12 @@ import 'package:test/test.dart';
 import '../test_utils.dart';
 
 void main() {
-  List<Entity> entities;
   AnalyzerEngine engine;
 
   setUpAll(() async {
     engine = AnalyzerEngine();
 
-    entities = await getEntities(engine);
+    await getEntities(engine);
 
     await getViews(engine);
   });
@@ -48,7 +46,7 @@ void main() {
               const ResolveResult(
                   ResolvedType(type: BasicType.text, nullable: true))),
         ],
-        {entities.firstWhere((e) => e.name == 'Person')},
+        {'Person'},
         {},
       )),
     );
@@ -70,7 +68,7 @@ void main() {
         'REPLACE INTO Person DEFAULT VALUES',
         [],
         [],
-        {entities.firstWhere((e) => e.name == 'Person')},
+        {'Person'},
         {'Person'},
       )),
     );
@@ -92,7 +90,7 @@ void main() {
         'DELETE FROM Person WHERE id in (:varlist)',
         [ListParameter(32, 'ids')],
         [],
-        {entities.firstWhere((e) => e.name == 'Person')},
+        {'Person'},
         {'Person'},
       )),
     );
@@ -116,7 +114,7 @@ void main() {
         'UPDATE Person SET name = ?1 where id in (:varlist) and name in (:varlist)',
         [ListParameter(41, 'ids'), ListParameter(64, 'bar')],
         [],
-        {entities.firstWhere((e) => e.name == 'Person')},
+        {'Person'},
         {'Person'},
       )),
     );
@@ -157,7 +155,7 @@ void main() {
               const ResolveResult(
                   ResolvedType(type: BasicType.blob, nullable: true))),
         ],
-        {entities.firstWhere((e) => e.name == 'Person')},
+        {'Person'},
         {},
       )),
     );
