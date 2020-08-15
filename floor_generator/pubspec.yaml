@@ -10,7 +10,7 @@ environment:
   sdk: '>=2.6.0 <3.0.0'
 
 dependencies:
-  analyzer: 0.39.14
+  analyzer: 0.39.14 # pinned because of https://github.com/dart-lang/build/issues/2763
   build: ^1.2.2
   code_builder: ^3.2.1
   meta: ^1.1.8
