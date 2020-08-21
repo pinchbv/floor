@@ -5,22 +5,31 @@ import 'package:meta/meta.dart';
 
 extension DartObjectExtension on DartObject {
   /// get the String representation of the enum value, or the result of
-  /// [orElse] if the enum was not valid. [orElse]
+  /// [orElse] if the enum was not valid.
   String toEnumValueString({@required String orElse()}) {
     final interfaceType = type as InterfaceType;
     final enumValue = interfaceType.element.fields
         .where((element) => element.isEnumConstant)
         .map((fieldElement) => fieldElement.name)
         .singleWhere((valueName) => getField(valueName) != null,
-            orElse: orElse);
-
-    return '$interfaceType.$enumValue';
+            orElse: () => null);
+    if (enumValue == null) {
+      return orElse();
+    } else {
+      return '$interfaceType.$enumValue';
+    }
   }
 
+  /// get the ForeignKeyAction this enum represents, or the result of
+  /// [orElse] if the enum did not contain a valid value.
   ForeignKeyAction toForeignKeyAction({@required ForeignKeyAction orElse()}) {
     final enumValueString = toEnumValueString(orElse: () => null);
-    return ForeignKeyAction.values.singleWhere(
-        (foreignKeyAction) => foreignKeyAction.toString() == enumValueString,
-        orElse: orElse);
+    if (enumValueString == null) {
+      return orElse();
+    } else {
+      return ForeignKeyAction.values.singleWhere(
+          (foreignKeyAction) => foreignKeyAction.toString() == enumValueString,
+          orElse: orElse);
+    }
   }
 }
