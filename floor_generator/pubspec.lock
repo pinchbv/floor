@@ -225,13 +225,6 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "3.1.0"
-  lcov:
-    dependency: transitive
-    description:
-      name: lcov
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "5.7.0"
   logging:
     dependency: transitive
     description:
@@ -456,13 +449,6 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "0.3.12-nullsafety.5"
-  test_cov:
-    dependency: "direct dev"
-    description:
-      name: test_cov
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "0.2.1"
   typed_data:
     dependency: transitive
     description:

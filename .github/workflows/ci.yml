@@ -20,7 +20,7 @@ jobs:
 
       - name: Install dependencies
         working-directory: floor_annotation
-        run: pub get
+        run: dart pub get
 
       - name: Analyze
         working-directory: floor_annotation
@@ -43,7 +43,7 @@ jobs:
 
       - name: Install dependencies
         working-directory: floor_generator
-        run: pub get
+        run: dart pub get
 
       - name: Analyze
         working-directory: floor_generator
@@ -56,7 +56,7 @@ jobs:
       - name: Run tests
         if:
         working-directory: floor_generator
-        run: dart test --coverage coverage/lcov.info
+        run: dart test test/all_tests.dart --coverage coverage/lcov.info
 
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v1
