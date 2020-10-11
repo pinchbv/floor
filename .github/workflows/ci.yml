@@ -56,7 +56,7 @@ jobs:
       - name: Run tests
         if:
         working-directory: floor_generator
-        run: pub run test_cov
+        run: pub run test_coverage
 
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v1
