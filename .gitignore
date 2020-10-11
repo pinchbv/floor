@@ -1,6 +1,7 @@
 # Miscellaneous
 floor/test/integration/**/*.g.dart
 *.class
+*.lock
 *.log
 *.pyc
 *.swp
@@ -28,6 +29,7 @@ floor/test/integration/**/*.g.dart
 .pub-cache/
 .pub/
 build/
+pubspec.lock
 .flutter-plugins-dependencies
 
 # Android related
