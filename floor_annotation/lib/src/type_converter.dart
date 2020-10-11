@@ -1,3 +1,5 @@
+import 'package:meta/meta.dart';
+
 /// Base class for type converters which can be applied to:
 ///
 /// 1. databases
@@ -45,6 +47,7 @@
 ///   Order(this.id, this.date);
 /// }
 /// ```
+@experimental
 abstract class TypeConverter<T, S> {
   /// Converts the [databaseValue] of type [S] into [T]
   T decode(S databaseValue);
