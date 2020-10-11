@@ -43,6 +43,7 @@ void main() {
       primaryKey,
       foreignKeys,
       indices,
+      false,
       constructor,
       valueMapping,
     );
@@ -79,6 +80,7 @@ void main() {
       primaryKey,
       foreignKeys,
       indices,
+      false,
       constructor,
       valueMapping,
     );
@@ -134,6 +136,42 @@ void main() {
       );
       expect(actual, equals(expected));
     });
+  });
+
+  test('Process entity with "WITHOUT ROWID"', () async {
+    final classElement = await createClassElement('''
+      @Entity(withoutRowid: true)
+      class Person {
+        @primaryKey
+        final int id;
+      
+        final String name;
+      
+        Person(this.id, this.name);
+      }
+    ''');
+
+    final actual = EntityProcessor(classElement).process();
+
+    const name = 'Person';
+    final fields = classElement.fields
+        .map((fieldElement) => FieldProcessor(fieldElement).process())
+        .toList();
+    final primaryKey = PrimaryKey([fields[0]], false);
+    const foreignKeys = <ForeignKey>[];
+    const indices = <Index>[];
+    const constructor = "Person(row['id'] as int, row['name'] as String)";
+    final expected = Entity(
+      classElement,
+      name,
+      fields,
+      primaryKey,
+      foreignKeys,
+      indices,
+      true,
+      constructor,
+    );
+    expect(actual, equals(expected));
   });
 
   group('Value mapping', () {

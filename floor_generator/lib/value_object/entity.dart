@@ -11,6 +11,7 @@ class Entity extends Queryable {
   final PrimaryKey primaryKey;
   final List<ForeignKey> foreignKeys;
   final List<Index> indices;
+  final bool withoutRowid;
   final String valueMapping;
 
   Entity(
@@ -20,6 +21,7 @@ class Entity extends Queryable {
     this.primaryKey,
     this.foreignKeys,
     this.indices,
+    this.withoutRowid,
     String constructor,
     this.valueMapping,
   ) : super(classElement, name, fields, constructor);
@@ -41,7 +43,9 @@ class Entity extends Queryable {
       databaseDefinition.add(primaryKeyDefinition);
     }
 
-    return 'CREATE TABLE IF NOT EXISTS `$name` (${databaseDefinition.join(', ')})';
+    final withoutRowidClause = withoutRowid ? ' WITHOUT ROWID' : '';
+
+    return 'CREATE TABLE IF NOT EXISTS `$name` (${databaseDefinition.join(', ')})$withoutRowidClause';
   }
 
   @nullable
@@ -66,6 +70,7 @@ class Entity extends Queryable {
           primaryKey == other.primaryKey &&
           foreignKeys.equals(other.foreignKeys) &&
           indices.equals(other.indices) &&
+          withoutRowid == other.withoutRowid &&
           constructor == other.constructor &&
           valueMapping == other.valueMapping;
 
@@ -78,10 +83,11 @@ class Entity extends Queryable {
       foreignKeys.hashCode ^
       indices.hashCode ^
       constructor.hashCode ^
+      withoutRowid.hashCode ^
       valueMapping.hashCode;
 
   @override
   String toString() {
-    return 'Entity{classElement: $classElement, name: $name, fields: $fields, primaryKey: $primaryKey, foreignKeys: $foreignKeys, indices: $indices, constructor: $constructor, valueMapping: $valueMapping}';
+    return 'Entity{classElement: $classElement, name: $name, fields: $fields, primaryKey: $primaryKey, foreignKeys: $foreignKeys, indices: $indices, constructor: $constructor, withoutRowid: $withoutRowid, valueMapping: $valueMapping}';
   }
 }

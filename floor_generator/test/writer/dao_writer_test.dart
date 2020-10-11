@@ -269,6 +269,7 @@ void main() {
       null, // primaryKey,
       [], // foreignKeys,
       [], // indices,
+      false, // withoutRowid,
       '', // constructor
       '', // valueMapping
     );

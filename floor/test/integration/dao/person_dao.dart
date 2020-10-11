@@ -71,6 +71,12 @@ abstract class PersonDao {
     await insertPersons(persons);
   }
 
+  @transaction
+  Future<List<Person>> replacePersonsAndReturn(List<Person> persons) async {
+    await replacePersons(persons);
+    return findAllPersons();
+  }
+
   @Query('DELETE FROM person')
   Future<void> deleteAllPersons();
 

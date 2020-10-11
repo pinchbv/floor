@@ -62,10 +62,10 @@ After integrating type converters and embeddable objects, the API surface won't 
     dependencies:
       flutter:
         sdk: flutter
-      floor: ^0.13.0
+      floor: ^0.14.0
 
     dev_dependencies:
-      floor_generator: ^0.13.0
+      floor_generator: ^0.14.0
       build_runner: ^1.7.3
     ````
 
@@ -532,7 +532,7 @@ StreamBuilder<List<Person>>(
 
 ### Transactions
 Whenever you want to perform some operations in a transaction you have to add the `@transaction` annotation to the method.
-It's also required to add the `async` modifier. These methods can only return `Future<void>`.
+It's also required to add the `async` modifier. These methods have to return a `Future`.
 
 ```dart
 @transaction
