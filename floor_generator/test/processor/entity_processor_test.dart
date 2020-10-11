@@ -151,11 +151,11 @@ void main() {
       }
     ''');
 
-    final actual = EntityProcessor(classElement).process();
+    final actual = EntityProcessor(classElement, {}).process();
 
     const name = 'Person';
     final fields = classElement.fields
-        .map((fieldElement) => FieldProcessor(fieldElement).process())
+        .map((fieldElement) => FieldProcessor(fieldElement, null).process())
         .toList();
     final primaryKey = PrimaryKey([fields[0]], false);
     const foreignKeys = <ForeignKey>[];
@@ -170,6 +170,7 @@ void main() {
       indices,
       true,
       constructor,
+      "<String, dynamic>{'id': item.id, 'name': item.name}",
     );
     expect(actual, equals(expected));
   });
