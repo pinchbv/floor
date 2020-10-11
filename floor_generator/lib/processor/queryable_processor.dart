@@ -14,6 +14,7 @@ import 'package:floor_generator/value_object/field.dart';
 import 'package:floor_generator/value_object/queryable.dart';
 import 'package:floor_generator/value_object/type_converter.dart';
 import 'package:meta/meta.dart';
+import 'package:source_gen/source_gen.dart';
 
 abstract class QueryableProcessor<T extends Queryable> extends Processor<T> {
   final QueryableProcessorError _queryableProcessorError;
@@ -81,18 +82,24 @@ abstract class QueryableProcessor<T extends Queryable> extends Processor<T> {
 
       String parameterValue;
 
-      if (!parameterElement.type.isDefaultSqlType) {
+      if (parameterElement.type.isDefaultSqlType) {
+        parameterValue = databaseValue.cast(
+          parameterElement.type,
+          field.isNullable,
+          parameterElement,
+        );
+      } else {
         final typeConverter = [...queryableTypeConverters, field.typeConverter]
             .filterNotNull()
             .getClosest(parameterElement.type);
-        final castedDatabaseValue =
-            databaseValue.asType(typeConverter.databaseType, field.isNullable);
+        final castedDatabaseValue = databaseValue.cast(
+          typeConverter.databaseType,
+          field.isNullable,
+          parameterElement,
+        );
 
         parameterValue =
             '_${typeConverter.name.decapitalize()}.decode($castedDatabaseValue)';
-      } else {
-        parameterValue =
-            databaseValue.asType(parameterElement.type, field.isNullable);
       }
 
       if (parameterElement.isNamed) {
@@ -106,7 +113,11 @@ abstract class QueryableProcessor<T extends Queryable> extends Processor<T> {
 }
 
 extension on String {
-  String asType(DartType dartType, bool isNullable) {
+  String cast(
+    DartType dartType,
+    bool isNullable,
+    ParameterElement parameterElement,
+  ) {
     if (dartType.isDartCoreBool) {
       if (isNullable) {
         // if the value is null, return null
@@ -121,8 +132,14 @@ extension on String {
       return '$this as int';
     } else if (dartType.isUint8List) {
       return '$this as Uint8List';
-    } else {
+    } else if (dartType.isDartCoreDouble) {
       return '$this as double'; // must be double
+    } else {
+      throw InvalidGenerationSourceError(
+        'Trying to convert unsupported type $dartType.',
+        todo: 'Consider adding a type converter.',
+        element: parameterElement,
+      );
     }
   }
 }
