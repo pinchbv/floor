@@ -71,7 +71,7 @@ class QueryMethodWriter implements Writer {
     return _queryMethod.parameters
         .where((parameter) => parameter.type.isDartCoreList)
         .mapIndexed((index, parameter) {
-      // TODO #165 what about type converters that map between e.g. string and list?
+      // TODO #403 what about type converters that map between e.g. string and list?
       final flattenedParameterType = parameter.type.flatten();
       String value;
       if (flattenedParameterType.isDefaultSqlType) {
