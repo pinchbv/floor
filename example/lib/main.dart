@@ -145,10 +145,10 @@ class TasksTextField extends StatelessWidget {
           Expanded(
             child: TextField(
               controller: _textEditingController,
-              decoration: InputDecoration(
+              decoration: const InputDecoration(
                 fillColor: Colors.transparent,
                 filled: true,
-                contentPadding: const EdgeInsets.all(16),
+                contentPadding: EdgeInsets.all(16),
                 border: InputBorder.none,
                 hintText: 'Type task here',
               ),
