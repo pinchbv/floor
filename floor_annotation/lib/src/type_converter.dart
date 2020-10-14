@@ -13,6 +13,13 @@ import 'package:meta/meta.dart';
 /// on a class, all methods/fields in that class will be able to use the
 /// converters.
 ///
+/// **The closest type converter wins!**
+/// If you, for example, add a converter on the database level and another one
+/// on a DAO method parameter, which takes care of converting the same types,
+/// the one declared next to the DAO method parameter will be used.
+/// Please refer to the above list to get more information about the
+/// precedence of converters.
+///
 /// A type converter that converts between [DateTime] and the database
 /// compatible [int] type can be seen in the following example.
 ///

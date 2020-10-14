@@ -12,8 +12,7 @@ As a consequence, it's necessary to have an understanding of SQL and SQLite in o
 - no hidden costs
 - iOS, Android, Linux, macOS, Windows
 
-⚠️ The library is on its way to its first stable release!
-After integrating type converters and embeddable objects, the API surface won't change until after 1.0.
+⚠️ The library is on its way to its first stable release and is open to contributions!
 
 [![pub package](https://img.shields.io/pub/v/floor.svg)](https://pub.dartlang.org/packages/floor)
 [![build status](https://github.com/vitusortner/floor/workflows/Continuous%20integration/badge.svg)](https://github.com/vitusortner/floor/actions)
@@ -567,6 +566,9 @@ final result = await personDao.findPersonById(1);
 ```
 
 ## Type Converters
+⚠️ **This feature is still in an experimental state.
+Please use it with caution and file issues for problems you're encountering.**
+
 SQLite allows storing values of only a handful types.
 Whenever more complex Dart in-memory objects should be stored, there sometimes is the need for converting between Dart and SQLite compatible types.
 Dart's `DateTime`, for instance, provides an object-oriented API for handling time.
@@ -614,7 +616,7 @@ class Order {
 }
 ```
 
-#### Be aware that type converters can be applied to:
+### Type converters can be applied to
 1. databases
 1. DAOs
 1. entities/views
@@ -623,6 +625,10 @@ class Order {
 1. DAO method parameters
 
 The type converter is added to the scope of the element so if you put it on a class, all methods/fields in that class will be able to use the converters.
+
+**The closest type converter wins!**
+If you, for example, add a converter on the database level and another one on a DAO method parameter, which takes care of converting the same types, the one declared next to the DAO method parameter will be used.
+Please refer to the above list to get more information about the precedence of converters.
 
 ## Migrations
 Whenever you are doing changes to your entities, you're required to also migrate the old data.

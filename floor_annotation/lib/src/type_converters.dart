@@ -5,6 +5,13 @@ import 'package:meta/meta.dart';
 /// a class, all methods/fields in that class will be able to use the
 /// converters.
 ///
+/// **The closest type converter wins!**
+/// If you, for example, add a converter on the database level and another one
+/// on a DAO method parameter, which takes care of converting the same types,
+/// the one declared next to the DAO method parameter will be used.
+/// Please refer to the below list to get more information about the
+/// precedence of converters.
+///
 /// Type converters can be applied to:
 /// 1. databases
 /// 1. DAOs
