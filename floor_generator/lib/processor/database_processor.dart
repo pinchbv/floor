@@ -11,8 +11,8 @@ import 'package:floor_generator/processor/processor.dart';
 import 'package:floor_generator/processor/view_processor.dart';
 import 'package:floor_generator/value_object/dao_getter.dart';
 import 'package:floor_generator/value_object/database.dart';
-import 'package:floor_generator/value_object/view.dart';
 import 'package:floor_generator/value_object/entity.dart';
+import 'package:floor_generator/value_object/view.dart';
 
 class DatabaseProcessor extends Processor<Database> {
   final DatabaseProcessorError _processorError;
