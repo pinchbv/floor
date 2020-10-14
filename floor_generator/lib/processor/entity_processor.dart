@@ -71,7 +71,7 @@ class EntityProcessor extends QueryableProcessor<Entity> {
                       .getAnnotation(annotations.Entity)
                       .getField(AnnotationField.entityTableName)
                       ?.toStringValue() ??
-                  parentType.getDisplayString()
+                  parentType.getDisplayString(withNullability: false)
               : throw _processorError.foreignKeyDoesNotReferenceEntity;
 
           final childColumns =
