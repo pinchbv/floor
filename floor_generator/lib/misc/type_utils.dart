@@ -21,7 +21,8 @@ extension SupportedTypeChecker on DartType {
 
 extension Uint8ListTypeChecker on DartType {
   @nonNull
-  bool get isUint8List => getDisplayString() == 'Uint8List';
+  bool get isUint8List =>
+      getDisplayString(withNullability: false) == 'Uint8List';
 }
 
 extension StreamTypeChecker on DartType {

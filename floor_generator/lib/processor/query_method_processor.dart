@@ -52,7 +52,7 @@ class QueryMethodProcessor extends Processor<QueryMethod> {
     final queryable = _queryables.firstWhere(
         (queryable) =>
             queryable.classElement.displayName ==
-            flattenedReturnType.getDisplayString(),
+            flattenedReturnType.getDisplayString(withNullability: false),
         orElse: () => null);
 
     final parameterTypeConverters = parameters
