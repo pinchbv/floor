@@ -161,7 +161,7 @@ packages:
       path: "../floor_annotation"
       relative: true
     source: path
-    version: "0.8.0"
+    version: "0.9.0"
   glob:
     dependency: transitive
     description:
