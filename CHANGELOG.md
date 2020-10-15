@@ -1,5 +1,16 @@
 # Changelog
 
+# 0.15.0
+
+### Changes
+
+* Update dependencies
+
+### 🚀 Features
+
+* Add support for WITHOUT ROWID tables
+* Check transaction method return types and allow non-void returns
+
 # 0.14.0
 
 ### Changes
