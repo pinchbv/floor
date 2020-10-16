@@ -19,4 +19,9 @@ class DeletionMethod extends ChangeMethod {
           parameterElement,
           entity,
         );
+
+  @override
+  String toString() {
+    return 'DeletionMethod{methodElement: $methodElement, name: $name, returnType: $returnType, flattenedReturnType: $flattenedReturnType, parameterElement: $parameterElement, entity: $entity}';
+  }
 }

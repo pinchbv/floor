@@ -1,8 +1,10 @@
 import 'package:analyzer/dart/element/element.dart';
 import 'package:analyzer/dart/element/type.dart';
-import 'package:collection/collection.dart';
+import 'package:floor_generator/misc/extension/list_equality_extension.dart';
+import 'package:floor_generator/misc/extension/set_equality_extension.dart';
 import 'package:floor_generator/misc/type_utils.dart';
 import 'package:floor_generator/value_object/queryable.dart';
+import 'package:floor_generator/value_object/type_converter.dart';
 
 /// Wraps a method annotated with Query
 /// to enable easy access to code generation relevant data.
@@ -30,6 +32,8 @@ class QueryMethod {
 
   final Queryable queryable;
 
+  final Set<TypeConverter> typeConverters;
+
   QueryMethod(
     this.methodElement,
     this.name,
@@ -38,6 +42,7 @@ class QueryMethod {
     this.flattenedReturnType,
     this.parameters,
     this.queryable,
+    this.typeConverters,
   );
 
   bool get returnsList {
@@ -62,9 +67,9 @@ class QueryMethod {
           query == other.query &&
           rawReturnType == other.rawReturnType &&
           flattenedReturnType == other.flattenedReturnType &&
-          const ListEquality<ParameterElement>()
-              .equals(parameters, other.parameters) &&
-          queryable == other.queryable;
+          parameters.equals(other.parameters) &&
+          queryable == other.queryable &&
+          typeConverters.equals(other.typeConverters);
 
   @override
   int get hashCode =>
@@ -74,10 +79,11 @@ class QueryMethod {
       rawReturnType.hashCode ^
       flattenedReturnType.hashCode ^
       parameters.hashCode ^
-      queryable.hashCode;
+      queryable.hashCode ^
+      typeConverters.hashCode;
 
   @override
   String toString() {
-    return 'QueryMethod{methodElement: $methodElement, name: $name, query: $query, rawReturnType: $rawReturnType, flattenedReturnType: $flattenedReturnType, parameters: $parameters, entity: $queryable}';
+    return 'QueryMethod{methodElement: $methodElement, name: $name, query: $query, rawReturnType: $rawReturnType, flattenedReturnType: $flattenedReturnType, parameters: $parameters, queryable: $queryable, typeConverters: $typeConverters}';
   }
 }

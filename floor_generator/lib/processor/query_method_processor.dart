@@ -1,28 +1,35 @@
 import 'package:analyzer/dart/element/element.dart';
 import 'package:analyzer/dart/element/type.dart';
-import 'package:floor_annotation/floor_annotation.dart' as annotations
-    show Query;
+import 'package:dartx/dartx.dart';
+import 'package:floor_annotation/floor_annotation.dart' as annotations;
 import 'package:floor_generator/misc/annotations.dart';
 import 'package:floor_generator/misc/constants.dart';
+import 'package:floor_generator/misc/extension/set_extension.dart';
+import 'package:floor_generator/misc/extension/type_converter_element_extension.dart';
 import 'package:floor_generator/misc/type_utils.dart';
 import 'package:floor_generator/processor/error/query_method_processor_error.dart';
 import 'package:floor_generator/processor/processor.dart';
 import 'package:floor_generator/value_object/query_method.dart';
 import 'package:floor_generator/value_object/queryable.dart';
+import 'package:floor_generator/value_object/type_converter.dart';
 
 class QueryMethodProcessor extends Processor<QueryMethod> {
   final QueryMethodProcessorError _processorError;
 
   final MethodElement _methodElement;
   final List<Queryable> _queryables;
+  final Set<TypeConverter> _typeConverters;
 
   QueryMethodProcessor(
     final MethodElement methodElement,
     final List<Queryable> queryables,
+    final Set<TypeConverter> typeConverters,
   )   : assert(methodElement != null),
         assert(queryables != null),
+        assert(typeConverters != null),
         _methodElement = methodElement,
         _queryables = queryables,
+        _typeConverters = typeConverters,
         _processorError = QueryMethodProcessorError(methodElement);
 
   @nonNull
@@ -48,6 +55,21 @@ class QueryMethodProcessor extends Processor<QueryMethod> {
             flattenedReturnType.getDisplayString(withNullability: false),
         orElse: () => null);
 
+    final parameterTypeConverters = parameters
+        .expand((parameter) =>
+            parameter.getTypeConverters(TypeConverterScope.daoMethodParameter))
+        .toSet();
+
+    final allTypeConverters = _typeConverters +
+        _methodElement.getTypeConverters(TypeConverterScope.daoMethod) +
+        parameterTypeConverters;
+
+    if (queryable != null) {
+      final fieldTypeConverters =
+          queryable.fields.mapNotNull((field) => field.typeConverter);
+      allTypeConverters.addAll(fieldTypeConverters);
+    }
+
     return QueryMethod(
       _methodElement,
       name,
@@ -56,6 +78,7 @@ class QueryMethodProcessor extends Processor<QueryMethod> {
       flattenedReturnType,
       parameters,
       queryable,
+      allTypeConverters,
     );
   }
 
@@ -82,12 +105,11 @@ class QueryMethodProcessor extends Processor<QueryMethod> {
     return query.replaceAllMapped(
       RegExp(r'( in )\([?]\)', caseSensitive: false),
       (match) {
+        final matched = match.input.substring(match.start, match.end);
+        final replaced =
+            matched.replaceFirst(RegExp(r'(\?)'), '\$valueList$index');
         index++;
-        final matchedString = match.input.substring(match.start, match.end);
-        return matchedString.replaceFirst(
-          RegExp(r'(\?)'),
-          '\$valueList$index',
-        );
+        return replaced;
       },
     );
   }
