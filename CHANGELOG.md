@@ -1,5 +1,32 @@
 # Changelog
 
+# 0.16.0
+
+### 🚀 Features
+
+* Add **experimental** support for type converters 
+
+# 0.15.0
+
+### Changes
+
+* Update dependencies
+
+### 🚀 Features
+
+* Add support for WITHOUT ROWID tables
+* Check transaction method return types and allow non-void returns
+
+# 0.14.0
+
+### Changes
+
+* Document entity inheritance and add integration test
+* Raise minimum sqflite version to 1.3.0
+* add integration test for transaction rollback
+* Mention missing null propagation in streams
+* Fix types (integer instead of real)
+
 # 0.13.0
 
 ### ⚠️ Breaking Changes

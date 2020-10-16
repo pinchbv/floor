@@ -19,6 +19,7 @@ void main() {
     'field1ColumnName',
     false,
     SqlType.integer,
+    null,
   );
   final nullableField = Field(
     mockFieldElement,
@@ -26,6 +27,7 @@ void main() {
     'field2ColumnName',
     true,
     SqlType.text,
+    null,
   );
   final allFields = [field, nullableField];
 
@@ -48,6 +50,8 @@ void main() {
         primaryKey,
         [],
         [],
+        false,
+        '',
         '',
       );
 
@@ -69,6 +73,8 @@ void main() {
         primaryKey,
         [],
         [],
+        false,
+        '',
         '',
       );
 
@@ -91,6 +97,8 @@ void main() {
         primaryKey,
         [],
         [],
+        false,
+        '',
         '',
       );
 
@@ -122,6 +130,8 @@ void main() {
         primaryKey,
         [foreignKey],
         [],
+        false,
+        '',
         '',
       );
 
@@ -139,65 +149,27 @@ void main() {
     });
   });
 
-  group('Value mapping', () {
-    final primaryKey = PrimaryKey([nullableField], true);
+  test('Create table statement with "WITHOUT ROWID"', () {
+    final primaryKey = PrimaryKey([field], false);
     final entity = Entity(
       mockClassElement,
       'entityName',
-      [nullableField],
+      allFields,
       primaryKey,
       [],
       [],
+      true,
+      '',
       '',
     );
-    const fieldElementDisplayName = 'foo';
 
-    setUp(() {
-      when(mockFieldElement.displayName).thenReturn(fieldElementDisplayName);
-      when(mockFieldElement.type).thenReturn(mockDartType);
-    });
+    final actual = entity.getCreateTableStatement();
 
-    test('Get value mapping', () {
-      when(mockDartType.isDartCoreBool).thenReturn(false);
-
-      final actual = entity.getValueMapping();
-
-      final expected = '<String, dynamic>{'
-          "'${nullableField.columnName}': item.$fieldElementDisplayName"
-          '}';
-      expect(actual, equals(expected));
-    });
-
-    test('Get nullable boolean value mapping', () {
-      when(mockDartType.isDartCoreBool).thenReturn(true);
-
-      final actual = entity.getValueMapping();
-
-      final expected = '<String, dynamic>{'
-          "'${nullableField.columnName}': item.$fieldElementDisplayName == null ? null : (item.$fieldElementDisplayName ? 1 : 0)"
-          '}';
-      expect(actual, equals(expected));
-    });
-
-    test('Get non-nullable boolean value mapping', () {
-      final entity = Entity(
-        mockClassElement,
-        'entityName',
-        [nullableField, field],
-        primaryKey,
-        [],
-        [],
-        '',
-      );
-      when(mockDartType.isDartCoreBool).thenReturn(true);
-
-      final actual = entity.getValueMapping();
-
-      final expected = '<String, dynamic>{'
-          "'${nullableField.columnName}': item.$fieldElementDisplayName == null ? null : (item.$fieldElementDisplayName ? 1 : 0),"
-          " '${field.columnName}': item.$fieldElementDisplayName ? 1 : 0"
-          '}';
-      expect(actual, equals(expected));
-    });
+    final expected = 'CREATE TABLE IF NOT EXISTS `${entity.name}` '
+        '(`${field.columnName}` ${field.sqlType} NOT NULL, '
+        '`${nullableField.columnName}` ${nullableField.sqlType}, '
+        'PRIMARY KEY (`${field.columnName}`)'
+        ') WITHOUT ROWID';
+    expect(actual, equals(expected));
   });
 }

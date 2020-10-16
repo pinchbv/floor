@@ -1,19 +1,29 @@
 import 'package:analyzer/dart/element/element.dart';
-import 'package:floor_annotation/floor_annotation.dart' as annotations
-    show ColumnInfo;
+import 'package:analyzer/dart/element/type.dart';
+import 'package:dartx/dartx.dart';
+import 'package:floor_annotation/floor_annotation.dart' as annotations;
 import 'package:floor_generator/misc/annotations.dart';
 import 'package:floor_generator/misc/constants.dart';
+import 'package:floor_generator/misc/extension/type_converter_element_extension.dart';
+import 'package:floor_generator/misc/extension/type_converters_extension.dart';
 import 'package:floor_generator/misc/type_utils.dart';
 import 'package:floor_generator/processor/processor.dart';
 import 'package:floor_generator/value_object/field.dart';
+import 'package:floor_generator/value_object/type_converter.dart';
 import 'package:source_gen/source_gen.dart';
 
 class FieldProcessor extends Processor<Field> {
+  @nonNull
   final FieldElement _fieldElement;
+  @nullable
+  final TypeConverter _typeConverter;
 
-  FieldProcessor(final FieldElement fieldElement)
-      : assert(fieldElement != null),
-        _fieldElement = fieldElement;
+  FieldProcessor(
+    @nonNull final FieldElement fieldElement,
+    @nullable final TypeConverter typeConverter,
+  )   : assert(fieldElement != null),
+        _fieldElement = fieldElement,
+        _typeConverter = typeConverter;
 
   @nonNull
   @override
@@ -23,13 +33,18 @@ class FieldProcessor extends Processor<Field> {
         _fieldElement.hasAnnotation(annotations.ColumnInfo);
     final columnName = _getColumnName(hasColumnInfoAnnotation, name);
     final isNullable = _getIsNullable(hasColumnInfoAnnotation);
+    final typeConverter = {
+      ..._fieldElement.getTypeConverters(TypeConverterScope.field),
+      _typeConverter
+    }.filterNotNull().closestOrNull;
 
     return Field(
       _fieldElement,
       name,
       columnName,
       isNullable,
-      _getSqlType(),
+      _getSqlType(typeConverter),
+      typeConverter,
     );
   }
 
@@ -56,22 +71,35 @@ class FieldProcessor extends Processor<Field> {
   }
 
   @nonNull
-  String _getSqlType() {
+  String _getSqlType(@nullable final TypeConverter typeConverter) {
     final type = _fieldElement.type;
-    if (type.isDartCoreInt) {
+    if (type.isDefaultSqlType) {
+      return type.asSqlType();
+    } else if (typeConverter != null) {
+      return typeConverter.databaseType.asSqlType();
+    } else {
+      throw InvalidGenerationSourceError(
+        'Column type is not supported for $type.',
+        todo: 'Either make to use a supported type or supply a type converter.',
+        element: _fieldElement,
+      );
+    }
+  }
+}
+
+extension on DartType {
+  String asSqlType() {
+    if (isDartCoreInt) {
       return SqlType.integer;
-    } else if (type.isDartCoreString) {
+    } else if (isDartCoreString) {
       return SqlType.text;
-    } else if (type.isDartCoreBool) {
+    } else if (isDartCoreBool) {
       return SqlType.integer;
-    } else if (type.isDartCoreDouble) {
+    } else if (isDartCoreDouble) {
       return SqlType.real;
-    } else if (type.isUint8List) {
+    } else if (isUint8List) {
       return SqlType.blob;
     }
-    throw InvalidGenerationSourceError(
-      'Column type is not supported for $type.',
-      element: _fieldElement,
-    );
+    throw StateError('This should really be unreachable');
   }
 }

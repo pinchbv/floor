@@ -59,23 +59,6 @@ class DaoWriter extends Writer {
       constructorBuilder
         ..initializers.add(Code(
             "_queryAdapter = QueryAdapter(database${queriesRequireChangeListener ? ', changeListener' : ''})"));
-
-      final queryMapperFields = queryMethods
-          .map((method) => method.queryable)
-          .where((entity) => entity != null)
-          .toSet()
-          .map((entity) {
-        final constructor = entity.constructor;
-        final name = '_${entity.name.decapitalize()}Mapper';
-
-        return Field((builder) => builder
-          ..name = name
-          ..modifier = FieldModifier.final$
-          ..static = true
-          ..assignment = Code('(Map<String, dynamic> row) => $constructor'));
-      });
-
-      classBuilder.fields.addAll(queryMapperFields);
     }
 
     final insertionMethods = dao.insertionMethods;
@@ -92,10 +75,10 @@ class DaoWriter extends Writer {
           ..type = type
           ..modifier = FieldModifier.final$);
 
-        classBuilder..fields.add(field);
+        classBuilder.fields.add(field);
 
         final valueMapper =
-            '(${entity.classElement.displayName} item) => ${entity.getValueMapping()}';
+            '(${entity.classElement.displayName} item) => ${entity.valueMapping}';
 
         final requiresChangeListener =
             dbHasViewStreams || streamEntities.contains(entity);
@@ -120,10 +103,10 @@ class DaoWriter extends Writer {
           ..type = type
           ..modifier = FieldModifier.final$);
 
-        classBuilder..fields.add(field);
+        classBuilder.fields.add(field);
 
         final valueMapper =
-            '(${entity.classElement.displayName} item) => ${entity.getValueMapping()}';
+            '(${entity.classElement.displayName} item) => ${entity.valueMapping}';
 
         final requiresChangeListener =
             dbHasViewStreams || streamEntities.contains(entity);
@@ -148,10 +131,10 @@ class DaoWriter extends Writer {
           ..type = type
           ..modifier = FieldModifier.final$);
 
-        classBuilder..fields.add(field);
+        classBuilder.fields.add(field);
 
         final valueMapper =
-            '(${entity.classElement.displayName} item) => ${entity.getValueMapping()}';
+            '(${entity.classElement.displayName} item) => ${entity.valueMapping}';
 
         final requiresChangeListener =
             dbHasViewStreams || streamEntities.contains(entity);

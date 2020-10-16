@@ -1,6 +1,6 @@
 import 'package:analyzer/dart/element/element.dart';
-import 'package:collection/collection.dart';
 import 'package:floor_generator/misc/annotations.dart';
+import 'package:floor_generator/misc/extension/list_equality_extension.dart';
 import 'package:floor_generator/value_object/field.dart';
 import 'package:floor_generator/value_object/foreign_key.dart';
 import 'package:floor_generator/value_object/index.dart';
@@ -11,6 +11,8 @@ class Entity extends Queryable {
   final PrimaryKey primaryKey;
   final List<ForeignKey> foreignKeys;
   final List<Index> indices;
+  final bool withoutRowid;
+  final String valueMapping;
 
   Entity(
     ClassElement classElement,
@@ -19,7 +21,9 @@ class Entity extends Queryable {
     this.primaryKey,
     this.foreignKeys,
     this.indices,
+    this.withoutRowid,
     String constructor,
+    this.valueMapping,
   ) : super(classElement, name, fields, constructor);
 
   @nonNull
@@ -39,7 +43,9 @@ class Entity extends Queryable {
       databaseDefinition.add(primaryKeyDefinition);
     }
 
-    return 'CREATE TABLE IF NOT EXISTS `$name` (${databaseDefinition.join(', ')})';
+    final withoutRowidClause = withoutRowid ? ' WITHOUT ROWID' : '';
+
+    return 'CREATE TABLE IF NOT EXISTS `$name` (${databaseDefinition.join(', ')})$withoutRowidClause';
   }
 
   @nullable
@@ -53,31 +59,6 @@ class Entity extends Queryable {
     }
   }
 
-  @nonNull
-  String getValueMapping() {
-    final keyValueList = fields.map((field) {
-      final columnName = field.columnName;
-      final attributeValue = _getAttributeValue(field);
-      return "'$columnName': $attributeValue";
-    }).toList();
-
-    return '<String, dynamic>{${keyValueList.join(', ')}}';
-  }
-
-  @nonNull
-  String _getAttributeValue(final Field field) {
-    final parameterName = field.fieldElement.displayName;
-    if (field.fieldElement.type.isDartCoreBool) {
-      if (field.isNullable) {
-        return 'item.$parameterName == null ? null : (item.$parameterName ? 1 : 0)';
-      } else {
-        return 'item.$parameterName ? 1 : 0';
-      }
-    } else {
-      return 'item.$parameterName';
-    }
-  }
-
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -85,12 +66,13 @@ class Entity extends Queryable {
           runtimeType == other.runtimeType &&
           classElement == other.classElement &&
           name == other.name &&
-          const ListEquality<Field>().equals(fields, other.fields) &&
+          fields.equals(other.fields) &&
           primaryKey == other.primaryKey &&
-          const ListEquality<ForeignKey>()
-              .equals(foreignKeys, other.foreignKeys) &&
-          const ListEquality<Index>().equals(indices, other.indices) &&
-          constructor == other.constructor;
+          foreignKeys.equals(other.foreignKeys) &&
+          indices.equals(other.indices) &&
+          withoutRowid == other.withoutRowid &&
+          constructor == other.constructor &&
+          valueMapping == other.valueMapping;
 
   @override
   int get hashCode =>
@@ -100,10 +82,12 @@ class Entity extends Queryable {
       primaryKey.hashCode ^
       foreignKeys.hashCode ^
       indices.hashCode ^
-      constructor.hashCode;
+      constructor.hashCode ^
+      withoutRowid.hashCode ^
+      valueMapping.hashCode;
 
   @override
   String toString() {
-    return 'Entity{classElement: $classElement, name: $name, fields: $fields, primaryKey: $primaryKey, foreignKeys: $foreignKeys, indices: $indices, constructor: $constructor}';
+    return 'Entity{classElement: $classElement, name: $name, fields: $fields, primaryKey: $primaryKey, foreignKeys: $foreignKeys, indices: $indices, constructor: $constructor, withoutRowid: $withoutRowid, valueMapping: $valueMapping}';
   }
 }
