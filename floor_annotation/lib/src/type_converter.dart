@@ -11,7 +11,7 @@ import 'package:meta/meta.dart';
 ///
 /// The type converter is added to the scope of the element so if you put it
 /// on a class, all methods/fields in that class will be able to use the
-/// converters.
+/// converter.
 ///
 /// **The closest type converter wins!**
 /// If you, for example, add a converter on the database level and another one
