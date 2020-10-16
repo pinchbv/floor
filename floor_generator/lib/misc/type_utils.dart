@@ -7,6 +7,12 @@ import 'package:floor_generator/misc/annotations.dart';
 import 'package:source_gen/source_gen.dart';
 
 extension SupportedTypeChecker on DartType {
+  /// Whether this [DartType] is either
+  /// - String
+  /// - bool
+  /// - int
+  /// - double
+  /// - Uint8List
   @nonNull
   bool get isDefaultSqlType {
     return TypeChecker.any([
@@ -14,8 +20,8 @@ extension SupportedTypeChecker on DartType {
       _boolTypeChecker,
       _intTypeChecker,
       _doubleTypeChecker,
-      _uint8ListTypeChecker
-    ]).isExactlyType(isDartCoreList ? flatten() : this);
+      _uint8ListTypeChecker,
+    ]).isExactlyType(this);
   }
 }
 

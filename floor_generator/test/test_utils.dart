@@ -35,6 +35,7 @@ Future<LibraryReader> resolveCompilationUnit(final String sourceFile) async {
 Future<DartType> getDartType(final dynamic value) async {
   final source = '''
   library test;
+  import 'dart:typed_data';
   
   final value = $value;
   ''';

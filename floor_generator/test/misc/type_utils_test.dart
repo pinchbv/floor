@@ -1,5 +1,3 @@
-import 'dart:typed_data';
-
 import 'package:floor_generator/misc/type_utils.dart';
 import 'package:test/test.dart';
 
@@ -41,7 +39,7 @@ void main() {
       });
 
       test('Uint8List is default SQL type', () async {
-        final type = await getDartType(Uint8List(10));
+        final type = await getDartType('Uint8List(10)');
 
         final actual = type.isDefaultSqlType;
 
