@@ -1,5 +1,11 @@
 # Changelog
 
+# 0.16.0
+
+### 🚀 Features
+
+* Add **experimental** support for type converters 
+
 # 0.15.0
 
 ### Changes
