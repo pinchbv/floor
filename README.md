@@ -567,12 +567,12 @@ final result = await personDao.findPersonById(1);
 
 ## Type Converters
 ⚠️ **This feature is still in an experimental state.
-Please use it with caution and file issues for problems you're encountering.**
+Please use it with caution and file issues for problems you encounter.**
 
 SQLite allows storing values of only a handful types.
 Whenever more complex Dart in-memory objects should be stored, there sometimes is the need for converting between Dart and SQLite compatible types.
 Dart's `DateTime`, for instance, provides an object-oriented API for handling time.
-Objects of this class can simply be represented as `int` values by mapping `DateTime` as its timestamp in milliseconds.
+Objects of this class can simply be represented as `int` values by mapping `DateTime` to its timestamp in milliseconds.
 Instead of manually mapping between these types repeatedly, when reading and writing, type converters can be used.
 It's sufficient to define the conversion from a database to an in-memory type and vice versa once, which then is reused automatically.
 
@@ -625,7 +625,7 @@ class Order {
 1. DAO methods
 1. DAO method parameters
 
-The type converter is added to the scope of the element so if you put it on a class, all methods/fields in that class will be able to use the converters.
+The type converter is added to the scope of the element so if you put it on a class, all methods/fields in that class will be able to use the converter.
 
 **The closest type converter wins!**
 If you, for example, add a converter on the database level and another one on a DAO method parameter, which takes care of converting the same types, the one declared next to the DAO method parameter will be used.
