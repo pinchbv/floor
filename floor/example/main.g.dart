@@ -124,9 +124,6 @@ class _$TaskDao extends TaskDao {
 
   final QueryAdapter _queryAdapter;
 
-  static final _taskMapper = (Map<String, dynamic> row) =>
-      Task(row['id'] as int, row['message'] as String);
-
   final InsertionAdapter<Task> _taskInsertionAdapter;
 
   final UpdateAdapter<Task> _taskUpdateAdapter;
@@ -136,18 +133,25 @@ class _$TaskDao extends TaskDao {
   @override
   Future<Task> findTaskById(int id) async {
     return _queryAdapter.query('SELECT * FROM task WHERE id = ?',
-        arguments: <dynamic>[id], mapper: _taskMapper);
+        arguments: <dynamic>[id],
+        mapper: (Map<String, dynamic> row) =>
+            Task(row['id'] as int, row['message'] as String));
   }
 
   @override
   Future<List<Task>> findAllTasks() async {
-    return _queryAdapter.queryList('SELECT * FROM task', mapper: _taskMapper);
+    return _queryAdapter.queryList('SELECT * FROM task',
+        mapper: (Map<String, dynamic> row) =>
+            Task(row['id'] as int, row['message'] as String));
   }
 
   @override
   Stream<List<Task>> findAllTasksAsStream() {
     return _queryAdapter.queryListStream('SELECT * FROM task',
-        queryableName: 'Task', isView: false, mapper: _taskMapper);
+        queryableName: 'Task',
+        isView: false,
+        mapper: (Map<String, dynamic> row) =>
+            Task(row['id'] as int, row['message'] as String));
   }
 
   @override
