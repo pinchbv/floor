@@ -25,16 +25,17 @@ void main() {
       }
     ''');
 
-    final actual = EntityProcessor(classElement).process();
+    final actual = EntityProcessor(classElement, {}).process();
 
     const name = 'Person';
     final fields = classElement.fields
-        .map((fieldElement) => FieldProcessor(fieldElement).process())
+        .map((fieldElement) => FieldProcessor(fieldElement, null).process())
         .toList();
     final primaryKey = PrimaryKey([fields[0]], false);
     const foreignKeys = <ForeignKey>[];
     const indices = <Index>[];
     const constructor = "Person(row['id'] as int, row['name'] as String)";
+    const valueMapping = "<String, dynamic>{'id': item.id, 'name': item.name}";
     final expected = Entity(
       classElement,
       name,
@@ -44,6 +45,7 @@ void main() {
       indices,
       false,
       constructor,
+      valueMapping,
     );
     expect(actual, equals(expected));
   });
@@ -60,16 +62,17 @@ void main() {
       }
     ''');
 
-    final actual = EntityProcessor(classElement).process();
+    final actual = EntityProcessor(classElement, {}).process();
 
     const name = 'Person';
     final fields = classElement.fields
-        .map((fieldElement) => FieldProcessor(fieldElement).process())
+        .map((fieldElement) => FieldProcessor(fieldElement, null).process())
         .toList();
     final primaryKey = PrimaryKey(fields, false);
     const foreignKeys = <ForeignKey>[];
     const indices = <Index>[];
     const constructor = "Person(row['id'] as int, row['name'] as String)";
+    const valueMapping = "<String, dynamic>{'id': item.id, 'name': item.name}";
     final expected = Entity(
       classElement,
       name,
@@ -79,6 +82,7 @@ void main() {
       indices,
       false,
       constructor,
+      valueMapping,
     );
     expect(actual, equals(expected));
   });
@@ -120,7 +124,8 @@ void main() {
         }
     ''');
 
-      final actual = EntityProcessor(classElements[1]).process().foreignKeys[0];
+      final actual =
+          EntityProcessor(classElements[1], {}).process().foreignKeys[0];
 
       final expected = ForeignKey(
         'Person',
@@ -146,11 +151,11 @@ void main() {
       }
     ''');
 
-    final actual = EntityProcessor(classElement).process();
+    final actual = EntityProcessor(classElement, {}).process();
 
     const name = 'Person';
     final fields = classElement.fields
-        .map((fieldElement) => FieldProcessor(fieldElement).process())
+        .map((fieldElement) => FieldProcessor(fieldElement, null).process())
         .toList();
     final primaryKey = PrimaryKey([fields[0]], false);
     const foreignKeys = <ForeignKey>[];
@@ -165,8 +170,57 @@ void main() {
       indices,
       true,
       constructor,
+      "<String, dynamic>{'id': item.id, 'name': item.name}",
     );
     expect(actual, equals(expected));
+  });
+
+  group('Value mapping', () {
+    test('Non-nullable boolean value mapping', () async {
+      final classElement = await createClassElement('''
+      @entity
+      class Person {
+        @primaryKey
+        final int id;
+      
+        @ColumnInfo(nullable: false)
+        final bool isSomething;
+      
+        Person(this.id, this.isSomething);
+      }
+    ''');
+
+      final actual = EntityProcessor(classElement, {}).process().valueMapping;
+
+      const expected = '<String, dynamic>{'
+          "'id': item.id, "
+          "'isSomething': item.isSomething ? 1 : 0"
+          '}';
+      expect(actual, equals(expected));
+    });
+
+    test('Nullable boolean value mapping', () async {
+      final classElement = await createClassElement('''
+      @entity
+      class Person {
+        @primaryKey
+        final int id;
+      
+        @ColumnInfo(nullable: true)
+        final bool isSomething;
+      
+        Person(this.id, this.isSomething);
+      }
+    ''');
+
+      final actual = EntityProcessor(classElement, {}).process().valueMapping;
+
+      const expected = '<String, dynamic>{'
+          "'id': item.id, "
+          "'isSomething': item.isSomething == null ? null : (item.isSomething ? 1 : 0)"
+          '}';
+      expect(actual, equals(expected));
+    });
   });
 }
 

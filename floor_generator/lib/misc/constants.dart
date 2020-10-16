@@ -18,6 +18,8 @@ abstract class AnnotationField {
 
   static const viewName = 'viewName';
   static const viewQuery = 'query';
+
+  static const typeConverterValue = 'value';
 }
 
 abstract class ForeignKeyField {

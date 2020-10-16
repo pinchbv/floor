@@ -1,8 +1,10 @@
 import 'package:analyzer/dart/element/element.dart';
-import 'package:collection/collection.dart';
+import 'package:floor_generator/misc/extension/list_equality_extension.dart';
+import 'package:floor_generator/misc/extension/set_equality_extension.dart';
 import 'package:floor_generator/value_object/dao_getter.dart';
-import 'package:floor_generator/value_object/view.dart';
 import 'package:floor_generator/value_object/entity.dart';
+import 'package:floor_generator/value_object/type_converter.dart';
+import 'package:floor_generator/value_object/view.dart';
 
 /// Representation of the database component.
 class Database {
@@ -12,6 +14,8 @@ class Database {
   final List<View> views;
   final List<DaoGetter> daoGetters;
   final int version;
+  final Set<TypeConverter> databaseTypeConverters;
+  final Set<TypeConverter> allTypeConverters;
   final bool hasViewStreams;
   final Set<Entity> streamEntities;
 
@@ -22,6 +26,8 @@ class Database {
     this.views,
     this.daoGetters,
     this.version,
+    this.databaseTypeConverters,
+    this.allTypeConverters,
   )   : streamEntities =
             daoGetters.expand((dg) => dg.dao.streamEntities).toSet(),
         hasViewStreams = daoGetters.any((dg) => dg.dao.streamViews.isNotEmpty);
@@ -33,14 +39,14 @@ class Database {
           runtimeType == other.runtimeType &&
           classElement == other.classElement &&
           name == other.name &&
-          const ListEquality<Entity>().equals(entities, other.entities) &&
-          const ListEquality<View>().equals(views, other.views) &&
-          const ListEquality<DaoGetter>()
-              .equals(daoGetters, other.daoGetters) &&
+          entities.equals(other.entities) &&
+          views.equals(other.views) &&
+          daoGetters.equals(other.daoGetters) &&
           version == other.version &&
-          hasViewStreams == hasViewStreams &&
-          const SetEquality<Entity>()
-              .equals(streamEntities, other.streamEntities);
+          databaseTypeConverters.equals(other.databaseTypeConverters) &&
+          allTypeConverters.equals(other.allTypeConverters) &&
+          streamEntities.equals(other.streamEntities) &&
+          hasViewStreams == hasViewStreams;
 
   @override
   int get hashCode =>
@@ -50,11 +56,13 @@ class Database {
       views.hashCode ^
       daoGetters.hashCode ^
       version.hashCode ^
-      hasViewStreams.hashCode ^
-      streamEntities.hashCode;
+      databaseTypeConverters.hashCode ^
+      allTypeConverters.hashCode ^
+      streamEntities.hashCode ^
+      hasViewStreams.hashCode;
 
   @override
   String toString() {
-    return 'Database{classElement: $classElement, name: $name, entities: $entities, views: $views, daoGetters: $daoGetters, version: $version, hasViewStreams: $hasViewStreams, streamEntities: $streamEntities}';
+    return 'Database{classElement: $classElement, name: $name, entities: $entities, views: $views, daoGetters: $daoGetters, version: $version, databaseTypeConverters: $databaseTypeConverters, allTypeConverters: $allTypeConverters, streamEntities: $streamEntities, hasViewStreams: $hasViewStreams}';
   }
 }

@@ -1,8 +1,10 @@
 import 'package:analyzer/dart/constant/value.dart';
 import 'package:analyzer/dart/element/element.dart';
+import 'package:dartx/dartx.dart';
 import 'package:floor_annotation/floor_annotation.dart' as annotations;
 import 'package:floor_generator/misc/annotations.dart';
 import 'package:floor_generator/misc/constants.dart';
+import 'package:floor_generator/misc/extension/type_converters_extension.dart';
 import 'package:floor_generator/misc/foreign_key_action.dart';
 import 'package:floor_generator/misc/type_utils.dart';
 import 'package:floor_generator/processor/error/entity_processor_error.dart';
@@ -12,13 +14,16 @@ import 'package:floor_generator/value_object/field.dart';
 import 'package:floor_generator/value_object/foreign_key.dart';
 import 'package:floor_generator/value_object/index.dart';
 import 'package:floor_generator/value_object/primary_key.dart';
+import 'package:floor_generator/value_object/type_converter.dart';
 
 class EntityProcessor extends QueryableProcessor<Entity> {
   final EntityProcessorError _processorError;
 
-  EntityProcessor(final ClassElement classElement)
-      : _processorError = EntityProcessorError(classElement),
-        super(classElement);
+  EntityProcessor(
+    final ClassElement classElement,
+    final Set<TypeConverter> typeConverters,
+  )   : _processorError = EntityProcessorError(classElement),
+        super(classElement, typeConverters);
 
   @nonNull
   @override
@@ -41,6 +46,7 @@ class EntityProcessor extends QueryableProcessor<Entity> {
       _getIndices(fields, name),
       _getWithoutRowid(),
       getConstructor(fields),
+      _getValueMapping(fields),
     );
   }
 
@@ -220,5 +226,45 @@ class EntityProcessor extends QueryableProcessor<Entity> {
             .getField(AnnotationField.entityWithoutRowid)
             .toBoolValue() ??
         false;
+  }
+
+  @nonNull
+  String _getValueMapping(final List<Field> fields) {
+    final keyValueList = fields.map((field) {
+      final columnName = field.columnName;
+      final attributeValue = _getAttributeValue(field);
+      return "'$columnName': $attributeValue";
+    }).toList();
+
+    return '<String, dynamic>{${keyValueList.join(', ')}}';
+  }
+
+  @nonNull
+  String _getAttributeValue(final Field field) {
+    final fieldElement = field.fieldElement;
+    final parameterName = fieldElement.displayName;
+    final fieldType = fieldElement.type;
+
+    String attributeValue;
+
+    if (fieldType.isDefaultSqlType) {
+      attributeValue = 'item.$parameterName';
+    } else {
+      final typeConverter = [...queryableTypeConverters, field.typeConverter]
+          .filterNotNull()
+          .getClosest(fieldType);
+      attributeValue =
+          '_${typeConverter.name.decapitalize()}.encode(item.$parameterName)';
+    }
+
+    if (fieldType.isDartCoreBool) {
+      if (field.isNullable) {
+        return '$attributeValue == null ? null : ($attributeValue ? 1 : 0)';
+      } else {
+        return '$attributeValue ? 1 : 0';
+      }
+    } else {
+      return attributeValue;
+    }
   }
 }

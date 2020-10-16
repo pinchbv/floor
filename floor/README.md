@@ -12,8 +12,7 @@ As a consequence, it's necessary to have an understanding of SQL and SQLite in o
 - no hidden costs
 - iOS, Android, Linux, macOS, Windows
 
-⚠️ The library is on its way to its first stable release!
-After integrating type converters and embeddable objects, the API surface won't change until after 1.0.
+⚠️ The library is on its way to its first stable release and is open to contributions!
 
 [![pub package](https://img.shields.io/pub/v/floor.svg)](https://pub.dartlang.org/packages/floor)
 [![build status](https://github.com/vitusortner/floor/workflows/Continuous%20integration/badge.svg)](https://github.com/vitusortner/floor/actions)
@@ -37,6 +36,7 @@ After integrating type converters and embeddable objects, the API surface won't 
     1. [Streams](#streams)
     1. [Transactions](#transactions)
     1. [Inheritance](#inheritance-1)
+1. [Type Converters](#type-converters)    
 1. [Migrations](#migrations)
 1. [In-Memory Database](#in-memory-database)
 1. [Initialization Callback](#initialization-callback)
@@ -174,7 +174,7 @@ After integrating type converters and embeddable objects, the API surface won't 
     final result = await personDao.findPersonById(1);
     ```
 
-For further examples take a look at the [example](https://github.com/vitusortner/floor/tree/develop/example) and [floor_test](https://github.com/vitusortner/floor/tree/develop/floor_test) directories.
+For further examples take a look at the [example](https://github.com/vitusortner/floor/tree/develop/example) and [floor_test](https://github.com/vitusortner/floor/tree/develop/floor/test/integration) directories.
 
 ## Architecture
 The components for storing and accessing data are **Entity**, **Data Access Object (DAO)** and **Database**.
@@ -233,6 +233,8 @@ Floor entities can hold values of the following Dart types which map to their co
 - `String` - TEXT
 - `bool` - INTEGER (0 = false, 1 = true)
 - `Uint8List` - BLOB
+
+In case you want to store sophisticated Dart objects that can be represented by one of the above types, take a look at [Type Converters](#type-converters). 
 
 ### Primary Keys
 Whenever a compound primary key is required (e.g. *n-m* relationships), the syntax for setting the keys differs from the previously mentioned way of setting primary keys.
@@ -562,6 +564,72 @@ await personDao.insertItem(person);
 
 final result = await personDao.findPersonById(1);
 ```
+
+## Type Converters
+⚠️ **This feature is still in an experimental state.
+Please use it with caution and file issues for problems you encounter.**
+
+SQLite allows storing values of only a handful types.
+Whenever more complex Dart in-memory objects should be stored, there sometimes is the need for converting between Dart and SQLite compatible types.
+Dart's `DateTime`, for instance, provides an object-oriented API for handling time.
+Objects of this class can simply be represented as `int` values by mapping `DateTime` to its timestamp in milliseconds.
+Instead of manually mapping between these types repeatedly, when reading and writing, type converters can be used.
+It's sufficient to define the conversion from a database to an in-memory type and vice versa once, which then is reused automatically.
+
+The implementation and usage of the mentioned `DateTime` to `int` converter is described in the following.
+
+1. Create a converter class that implements the abstract `TypeConverter` and supply the in-memory object type and database type as parameterized types.
+    This class inherits the `decode()` and `encode()` functions which define the conversion from one to the other type.
+```dart
+class DateTimeConverter extends TypeConverter<DateTime, int> {
+  @override
+  DateTime decode(int databaseValue) {
+    return DateTime.fromMillisecondsSinceEpoch(databaseValue);
+  }
+
+  @override
+  int encode(DateTime value) {
+    return value.millisecondsSinceEpoch;
+  }
+}
+```
+ 
+ 2. Apply the created type converter to the database by using the `@TypeConverters` annotation and make sure to additionally import the file of your type converter here.
+Importing it in your database file is **always** necessary because the generated code will be `part` of your database file and this is the location where your type converters get instantiated.  
+```dart
+@TypeConverters([DateTimeConverter])
+@Database(version: 1, entities: [Order])
+abstract class OrderDatabase extends FloorDatabase {
+  OrderDao get orderDao;
+}
+```
+
+3. Use the non-default `DateTime` type in an entity.
+```dart
+@entity
+class Order {
+  @primaryKey
+  final int id;
+
+  final DateTime date;
+
+  Order(this.id, this.date);
+}
+```
+
+### Type converters can be applied to
+1. databases
+1. DAOs
+1. entities/views
+1. entity/view fields
+1. DAO methods
+1. DAO method parameters
+
+The type converter is added to the scope of the element so if you put it on a class, all methods/fields in that class will be able to use the converter.
+
+**The closest type converter wins!**
+If you, for example, add a converter on the database level and another one on a DAO method parameter, which takes care of converting the same types, the one declared next to the DAO method parameter will be used.
+Please refer to the above list to get more information about the precedence of converters.
 
 ## Migrations
 Whenever you are doing changes to your entities, you're required to also migrate the old data.

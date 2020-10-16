@@ -48,13 +48,13 @@ void main() {
       @override
       Future<int> replacePersons(List<Person> persons) async {
         if (database is sqflite.Transaction) {
-          return await super.replacePersons(persons);
+          return super.replacePersons(persons);
         } else {
-          return await (database as sqflite.Database)
+          return (database as sqflite.Database)
               .transaction<int>((transaction) async {
             final transactionDatabase = _$TestDatabase(changeListener)
               ..database = transaction;
-            return await transactionDatabase.personDao.replacePersons(persons);
+            return transactionDatabase.personDao.replacePersons(persons);
           });
         }
       }
@@ -75,13 +75,13 @@ void main() {
       @override
       Future<Person> replacePersons(List<Person> persons) async {
         if (database is sqflite.Transaction) {
-          return await super.replacePersons(persons);
+          return super.replacePersons(persons);
         } else {
-          return await (database as sqflite.Database)
+          return (database as sqflite.Database)
               .transaction<Person>((transaction) async {
             final transactionDatabase = _$TestDatabase(changeListener)
               ..database = transaction;
-            return await transactionDatabase.personDao.replacePersons(persons);
+            return transactionDatabase.personDao.replacePersons(persons);
           });
         }
       }

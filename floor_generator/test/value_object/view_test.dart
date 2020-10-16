@@ -17,6 +17,7 @@ void main() {
     'field1ColumnName',
     false,
     SqlType.integer,
+    null,
   );
   final nullableField = Field(
     mockFieldElement,
@@ -24,6 +25,7 @@ void main() {
     'field2ColumnName',
     true,
     SqlType.text,
+    null,
   );
   final allFields = [field, nullableField];
 
