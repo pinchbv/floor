@@ -26,4 +26,18 @@ void main() {
 
     expect(actual, equals([order]));
   });
+
+  test('find orders by dates', () async {
+    final firstOrder = Order(1, DateTime.fromMillisecondsSinceEpoch(123));
+    final secondOrder = Order(2, DateTime.fromMillisecondsSinceEpoch(456));
+    await orderDao.insertOrder(firstOrder);
+    await orderDao.insertOrder(secondOrder);
+
+    final actual = await orderDao.findOrdersByDates([
+      firstOrder.date,
+      secondOrder.date,
+    ]);
+
+    expect(actual, equals([firstOrder, secondOrder]));
+  });
 }
