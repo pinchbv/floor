@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:analyzer/dart/element/element.dart';
 import 'package:build/build.dart';
 import 'package:code_builder/code_builder.dart';
+import 'package:dartx/dartx.dart';
 import 'package:floor_annotation/floor_annotation.dart' as annotations;
 import 'package:floor_generator/misc/annotations.dart';
 import 'package:floor_generator/processor/database_processor.dart';
@@ -33,9 +34,10 @@ class FloorGenerator extends GeneratorForAnnotation<annotations.Database> {
               database.streamEntities,
               database.hasViewStreams,
             ).write());
-    final typeConverterFields = database.allTypeConverters.map(
-      (typeConverter) => TypeConverterFieldWriter(typeConverter.name).write(),
-    );
+    final distinctTypeConverterFields = database.allTypeConverters
+        .distinctBy((element) => element.name)
+        .map((typeConverter) =>
+            TypeConverterFieldWriter(typeConverter.name).write());
 
     final library = Library((builder) {
       builder
@@ -44,10 +46,10 @@ class FloorGenerator extends GeneratorForAnnotation<annotations.Database> {
         ..body.add(databaseClass)
         ..body.addAll(daoClasses);
 
-      if (typeConverterFields.isNotEmpty) {
+      if (distinctTypeConverterFields.isNotEmpty) {
         builder
           ..body.add(const Code('// ignore_for_file: unused_element\n'))
-          ..body.addAll(typeConverterFields);
+          ..body.addAll(distinctTypeConverterFields);
       }
     });
 
