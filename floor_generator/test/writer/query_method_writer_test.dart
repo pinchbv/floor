@@ -137,8 +137,7 @@ void main() {
     '''));
     });
 
-    test(
-        'generates method with type converter receiving list of orders',
+    test('generates method with type converter receiving list of orders',
         () async {
       final typeConverter = TypeConverter(
         'DateTimeConverter',
