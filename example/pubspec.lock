@@ -196,13 +196,13 @@ packages:
       path: "../floor"
       relative: true
     source: path
-    version: "0.16.0"
+    version: "0.17.0"
   floor_annotation:
     dependency: transitive
     description:
-      path: "../floor_annotation"
-      relative: true
-    source: path
+      name: floor_annotation
+      url: "https://pub.dartlang.org"
+    source: hosted
     version: "0.10.0"
   floor_generator:
     dependency: "direct dev"
@@ -210,7 +210,7 @@ packages:
       path: "../floor_generator"
       relative: true
     source: path
-    version: "0.16.0"
+    version: "0.17.0"
   flutter:
     dependency: "direct main"
     description: flutter
