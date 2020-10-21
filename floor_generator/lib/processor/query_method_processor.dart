@@ -105,7 +105,7 @@ class QueryMethodProcessor extends Processor<QueryMethod> {
   bool _getIsRaw() {
     final isRaw = _methodElement
       .getAnnotation(annotations.Query)
-      .getField(AnnotationField.QUERY_IS_RAW)
+      .getField(AnnotationField.isRaw)
       ?.toBoolValue();
 
       return isRaw ?? false;
