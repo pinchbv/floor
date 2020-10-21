@@ -1,15 +1,12 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:sqflite_ffi_test/sqflite_ffi_test.dart';
 
 import '../test_util/extensions.dart';
 import 'dao/person_dao.dart';
 import 'database.dart';
+import 'model/dog.dart';
 import 'model/person.dart';
 
 void main() {
-  TestWidgetsFlutterBinding.ensureInitialized();
-  sqfliteFfiTestInit();
-
   group('stream query tests', () {
     TestDatabase database;
     PersonDao personDao;
@@ -127,6 +124,37 @@ void main() {
         await personDao.deletePersons(persons);
         expect(actual, emits(<Person>[]));
       });
+    });
+
+    test('regression test streaming updates from other Dao', () async {
+      final person1 = Person(1, 'Simon');
+      final person2 = Person(2, 'Frank');
+      final dog1 = Dog(1, 'Dog', 'Doggie', person1.id);
+      final dog2 = Dog(2, 'OtherDog', 'Doggo', person2.id);
+
+      final actual = personDao.findAllDogsOfPersonAsStream(person1.id);
+      expect(
+          actual,
+          emitsInOrder(<List<Dog>>[
+            [], // initial state,
+            [dog1], // after inserting dog1
+            [dog1], // after inserting dog2
+            //[], // after removing person1. Does not work because
+            // ForeignKey-relations are not considered yet (#321)
+          ]));
+
+      await personDao.insertPerson(person1);
+      await personDao.insertPerson(person2);
+
+      await database.dogDao.insertDog(dog1);
+
+      await database.dogDao.insertDog(dog2);
+
+      // avoid that delete happens before the re-execution of
+      // the select query for the stream
+      await Future<void>.delayed(const Duration(milliseconds: 100));
+
+      await database.personDao.deletePerson(person1);
     });
   });
 }

@@ -1,5 +1,6 @@
 import 'package:floor/floor.dart';
 
+import '../model/dog.dart';
 import '../model/person.dart';
 
 @dao
@@ -28,7 +29,7 @@ abstract class PersonDao {
   @Query('SELECT * FROM person WHERE custom_name LIKE :name')
   Future<List<Person>> findPersonsWithNamesLike(String name);
 
-  @Insert(onConflict: OnConflictStrategy.REPLACE)
+  @Insert(onConflict: OnConflictStrategy.replace)
   Future<void> insertPerson(Person person);
 
   @insert
@@ -70,6 +71,16 @@ abstract class PersonDao {
     await insertPersons(persons);
   }
 
+  @transaction
+  Future<List<Person>> replacePersonsAndReturn(List<Person> persons) async {
+    await replacePersons(persons);
+    return findAllPersons();
+  }
+
   @Query('DELETE FROM person')
   Future<void> deleteAllPersons();
+
+  // Used in regression test for Streams on Entities with update methods in other Dao
+  @Query('SELECT * FROM Dog WHERE owner_id = :id')
+  Stream<List<Dog>> findAllDogsOfPersonAsStream(int id);
 }

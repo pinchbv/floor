@@ -1,3 +1,4 @@
+import 'package:floor/floor.dart';
 import 'package:floor/src/adapter/insertion_adapter.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/mockito.dart';
@@ -13,6 +14,7 @@ void main() {
   const entityName = 'person';
   final valueMapper = (Person person) =>
       <String, dynamic>{'id': person.id, 'name': person.name};
+  const onConflictStrategy = OnConflictStrategy.ignore;
   const conflictAlgorithm = ConflictAlgorithm.ignore;
 
   tearDown(() {
@@ -33,7 +35,7 @@ void main() {
       test('insert item', () async {
         final person = Person(1, 'Simon');
 
-        await underTest.insert(person, conflictAlgorithm);
+        await underTest.insert(person, onConflictStrategy);
 
         final values = <String, dynamic>{'id': person.id, 'name': person.name};
         verify(mockDatabaseExecutor.insert(
@@ -47,12 +49,9 @@ void main() {
         final person1 = Person(1, 'Simon');
         final person2 = Person(2, 'Frank');
         final persons = [person1, person2];
-        final primaryKeys = persons.map((person) => person.id).toList();
         when(mockDatabaseExecutor.batch()).thenReturn(mockDatabaseBatch);
-        when(mockDatabaseBatch.commit(noResult: false))
-            .thenAnswer((_) => Future(() => primaryKeys));
 
-        await underTest.insertList(persons, conflictAlgorithm);
+        await underTest.insertList(persons, onConflictStrategy);
 
         final values1 = <String, dynamic>{
           'id': person1.id,
@@ -74,12 +73,12 @@ void main() {
             values2,
             conflictAlgorithm: conflictAlgorithm,
           ),
-          mockDatabaseBatch.commit(noResult: false),
+          mockDatabaseBatch.commit(noResult: true),
         ]);
       });
 
       test('insert empty list', () async {
-        await underTest.insertList([], conflictAlgorithm);
+        await underTest.insertList([], onConflictStrategy);
 
         verifyZeroInteractions(mockDatabaseExecutor);
       });
@@ -96,7 +95,7 @@ void main() {
         )).thenAnswer((_) => Future(() => person.id));
 
         final actual =
-            await underTest.insertAndReturnId(person, conflictAlgorithm);
+            await underTest.insertAndReturnId(person, onConflictStrategy);
 
         verify(mockDatabaseExecutor.insert(
           entityName,
@@ -116,7 +115,7 @@ void main() {
         )).thenAnswer((_) => Future(() => null));
 
         final actual =
-            await underTest.insertAndReturnId(person, conflictAlgorithm);
+            await underTest.insertAndReturnId(person, onConflictStrategy);
 
         verify(mockDatabaseExecutor.insert(
           entityName,
@@ -136,7 +135,7 @@ void main() {
             .thenAnswer((_) => Future(() => primaryKeys));
 
         final actual =
-            await underTest.insertListAndReturnIds(persons, conflictAlgorithm);
+            await underTest.insertListAndReturnIds(persons, onConflictStrategy);
 
         final values1 = <String, dynamic>{
           'id': person1.id,
@@ -165,7 +164,7 @@ void main() {
 
       test('insert empty list', () async {
         final actual =
-            await underTest.insertListAndReturnIds([], conflictAlgorithm);
+            await underTest.insertListAndReturnIds([], onConflictStrategy);
 
         verifyZeroInteractions(mockDatabaseExecutor);
         expect(actual, equals(<int>[]));
@@ -197,7 +196,7 @@ void main() {
         conflictAlgorithm: conflictAlgorithm,
       )).thenAnswer((_) => Future(() => person.id));
 
-      await underTest.insert(person, conflictAlgorithm);
+      await underTest.insert(person, onConflictStrategy);
 
       verify(mockStreamController.add(entityName));
     });
@@ -210,7 +209,7 @@ void main() {
         conflictAlgorithm: conflictAlgorithm,
       )).thenAnswer((_) => Future(() => null));
 
-      await underTest.insert(person, conflictAlgorithm);
+      await underTest.insert(person, onConflictStrategy);
 
       verifyZeroInteractions(mockStreamController);
     });
@@ -224,26 +223,13 @@ void main() {
       when(mockDatabaseBatch.commit(noResult: false))
           .thenAnswer((_) => Future(() => primaryKeys));
 
-      await underTest.insertList(persons, conflictAlgorithm);
+      await underTest.insertList(persons, onConflictStrategy);
 
       verify(mockStreamController.add(entityName));
     });
 
-    test('do not notify when nothing changed', () async {
-      final person1 = Person(1, 'Simon');
-      final person2 = Person(2, 'Frank');
-      final persons = [person1, person2];
-      when(mockDatabaseExecutor.batch()).thenReturn(mockDatabaseBatch);
-      when(mockDatabaseBatch.commit(noResult: false))
-          .thenAnswer((_) => Future(() => <int>[]));
-
-      await underTest.insertList(persons, conflictAlgorithm);
-
-      verifyZeroInteractions(mockStreamController);
-    });
-
     test('insert empty list', () async {
-      await underTest.insertList([], conflictAlgorithm);
+      await underTest.insertList([], onConflictStrategy);
 
       verifyZeroInteractions(mockStreamController);
     });

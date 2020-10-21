@@ -2,7 +2,6 @@ import 'package:floor/floor.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:matcher/matcher.dart';
 import 'package:sqflite/sqflite.dart';
-import 'package:sqflite_ffi_test/sqflite_ffi_test.dart';
 
 import '../test_util/extensions.dart';
 import 'dao/dog_dao.dart';
@@ -12,9 +11,6 @@ import 'model/dog.dart';
 import 'model/person.dart';
 
 void main() {
-  TestWidgetsFlutterBinding.ensureInitialized();
-  sqfliteFfiTestInit();
-
   group('database tests', () {
     TestDatabase database;
     PersonDao personDao;
@@ -131,6 +127,55 @@ void main() {
 
           final actual = await personDao.findAllPersons();
           expect(actual, equals(newPersons));
+        });
+
+        test('replace persons in transaction with returns', () async {
+          final persons = [Person(1, 'Simon'), Person(2, 'Frank')];
+          await personDao.insertPersons(persons);
+          final newPersons = [Person(3, 'Paul'), Person(4, 'Karl')];
+
+          final actual = await personDao.replacePersonsAndReturn(newPersons);
+
+          expect(actual, equals(newPersons));
+        });
+
+        test('transaction rollback on failure', () async {
+          final persons = [Person(1, 'Simon'), Person(2, 'Frank')];
+          await personDao.insertPersons(persons);
+
+          final newPersons = [Person(3, 'Paul'), Person(3, 'Karl')];
+
+          //should fail and trigger rollback because ids are the same
+          try {
+            await personDao.replacePersons(newPersons);
+            throw AssertionError('replacePersons should fail');
+          } catch (sfe) {
+            // the type SqfliteFfiException is not in scope, so we have to do it this way
+            expect(sfe.runtimeType.toString(), equals('SqfliteFfiException'));
+          }
+
+          final actual = await personDao.findAllPersons();
+          expect(actual, equals(persons));
+        });
+
+        test('transaction rollback on failure with nested transaction',
+            () async {
+          final persons = [Person(1, 'Simon'), Person(2, 'Frank')];
+          await personDao.insertPersons(persons);
+
+          final newPersons = [Person(3, 'Paul'), Person(3, 'Karl')];
+
+          //should fail and trigger rollback because ids are the same
+          try {
+            await personDao.replacePersonsAndReturn(newPersons);
+            throw AssertionError('replacePersonsAndReturn should fail');
+          } catch (sfe) {
+            // the type SqfliteFfiException is not in scope, so we have to do it this way
+            expect(sfe.runtimeType.toString(), equals('SqfliteFfiException'));
+          }
+
+          final actual = await personDao.findAllPersons();
+          expect(actual, equals(persons));
         });
 
         test('Reactivity is retained when using transactions', () async {

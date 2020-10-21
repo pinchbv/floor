@@ -1,11 +1,14 @@
+import 'dart:core';
+
 import 'package:code_builder/code_builder.dart';
+import 'package:dartx/dartx.dart';
 import 'package:floor_generator/misc/annotation_expression.dart';
 import 'package:floor_generator/misc/annotations.dart';
-import 'package:floor_generator/misc/string_utils.dart';
+import 'package:floor_generator/misc/extension/type_converters_extension.dart';
 import 'package:floor_generator/misc/type_utils.dart';
 import 'package:floor_generator/value_object/query_method.dart';
+import 'package:floor_generator/value_object/view.dart';
 import 'package:floor_generator/writer/writer.dart';
-import 'package:source_gen/source_gen.dart';
 
 class QueryMethodWriter implements Writer {
   final QueryMethod _queryMethod;
@@ -16,13 +19,11 @@ class QueryMethodWriter implements Writer {
 
   @override
   Method write() {
-    return _generateQueryMethod();
-  }
-
-  Method _generateQueryMethod() {
     final builder = MethodBuilder()
       ..annotations.add(overrideAnnotationExpression)
-      ..returns = refer(_queryMethod.rawReturnType.getDisplayString())
+      ..returns = refer(_queryMethod.rawReturnType.getDisplayString(
+        withNullability: false,
+      ))
       ..name = _queryMethod.name
       ..requiredParameters.addAll(_generateMethodParameters())
       ..body = Code(_generateMethodBody());
@@ -30,22 +31,16 @@ class QueryMethodWriter implements Writer {
     if (!_queryMethod.returnsStream || _queryMethod.returnsVoid) {
       builder..modifier = MethodModifier.async;
     }
-
     return builder.build();
   }
 
   List<Parameter> _generateMethodParameters() {
     return _queryMethod.parameters.map((parameter) {
-      if (!parameter.type.isSupported) {
-        throw InvalidGenerationSourceError(
-          'The type of this parameter is not supported.',
-          element: parameter,
-        );
-      }
-
       return Parameter((builder) => builder
         ..name = parameter.name
-        ..type = refer(parameter.type.getDisplayString()));
+        ..type = refer(parameter.type.getDisplayString(
+          withNullability: false,
+        )));
     }).toList();
   }
 
@@ -63,7 +58,9 @@ class QueryMethodWriter implements Writer {
       return _methodBody.toString();
     }
 
-    final mapper = '_${_queryMethod.queryable.name.decapitalize()}Mapper';
+    final constructor = _queryMethod.queryable.constructor;
+    final mapper = '(Map<String, dynamic> row) => $constructor';
+
     if (_queryMethod.returnsStream) {
       _methodBody.write(_generateStreamQuery(arguments, mapper));
     } else {
@@ -75,32 +72,40 @@ class QueryMethodWriter implements Writer {
 
   @nonNull
   List<String> _generateInClauseValueLists() {
-    var index = 0;
     return _queryMethod.parameters
-        .map((parameter) {
-          if (parameter.type.isDartCoreList) {
-            index++;
-            return '''final valueList$index = ${parameter.displayName}.map((value) => "'\$value'").join(', ');''';
-          } else {
-            return null;
-          }
-        })
-        .where((string) => string != null)
-        .toList();
+        .where((parameter) => parameter.type.isDartCoreList)
+        .mapIndexed((index, parameter) {
+      // TODO #403 what about type converters that map between e.g. string and list?
+      final flattenedParameterType = parameter.type.flatten();
+      String value;
+      if (flattenedParameterType.isDefaultSqlType) {
+        value = '\$value';
+      } else {
+        final typeConverter =
+            _queryMethod.typeConverters.getClosest(flattenedParameterType);
+        value = '\${_${typeConverter.name.decapitalize()}.encode(value)}';
+      }
+      return '''final valueList$index = ${parameter.displayName}.map((value) => "'$value'").join(', ');''';
+    }).toList();
   }
 
   @nonNull
   List<String> _generateParameters() {
     return _queryMethod.parameters
+        .where((parameter) => !parameter.type.isDartCoreList)
         .map((parameter) {
-          if (!parameter.type.isDartCoreList) {
-            return parameter.displayName;
-          } else {
-            return null;
-          }
-        })
-        .where((string) => string != null)
-        .toList();
+      if (parameter.type.isDefaultSqlType) {
+        if (parameter.type.isDartCoreBool) {
+          return '${parameter.displayName} == null ? null : (${parameter.displayName} ? 1 : 0)';
+        } else {
+          return parameter.displayName;
+        }
+      } else {
+        final typeConverter =
+            _queryMethod.typeConverters.getClosest(parameter.type);
+        return '_${typeConverter.name.decapitalize()}.encode(${parameter.displayName})';
+      }
+    }).toList();
   }
 
   @nullable
@@ -139,11 +144,14 @@ class QueryMethodWriter implements Writer {
     @nullable final String arguments,
     @nonNull final String mapper,
   ) {
-    final entityName = _queryMethod.queryable.name;
-
+    final queryableName = _queryMethod.queryable.name;
+    final isView = _queryMethod.queryable is View;
     final parameters = StringBuffer()..write("'${_queryMethod.query}', ");
     if (arguments != null) parameters.write('arguments: $arguments, ');
-    parameters..write("tableName: '$entityName', ")..write('mapper: $mapper');
+    parameters
+      ..write("queryableName: '$queryableName', ")
+      ..write('isView: $isView, ')
+      ..write('mapper: $mapper');
 
     if (_queryMethod.returnsList) {
       return 'return _queryAdapter.queryListStream($parameters);';

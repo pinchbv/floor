@@ -5,8 +5,10 @@ import 'package:floor_generator/processor/field_processor.dart';
 import 'package:floor_generator/processor/queryable_processor.dart';
 import 'package:floor_generator/value_object/field.dart';
 import 'package:floor_generator/value_object/queryable.dart';
+import 'package:floor_generator/value_object/type_converter.dart';
 import 'package:test/test.dart';
 
+import '../dart_type.dart';
 import '../test_utils.dart';
 
 void main() {
@@ -24,7 +26,7 @@ void main() {
     final actual = TestProcessor(classElement).process();
 
     final fields = classElement.fields
-        .map((fieldElement) => FieldProcessor(fieldElement).process())
+        .map((fieldElement) => FieldProcessor(fieldElement, null).process())
         .toList();
     const constructor = "Person(row['id'] as int, row['name'] as String)";
     final expected = TestQueryable(
@@ -33,6 +35,141 @@ void main() {
       constructor,
     );
     expect(actual, equals(expected));
+  });
+
+  group('type converters', () {
+    test('process queryable with external type converter', () async {
+      final typeConverter = TypeConverter(
+        'TypeConverter',
+        await dateTimeDartType,
+        await intDartType,
+        TypeConverterScope.database,
+      );
+      final classElement = await createClassElement('''
+      class Order {
+        final int id;
+      
+        final DateTime dateTime;
+      
+        Order(this.id, this.dateTime);
+      }
+    ''');
+
+      final actual = TestProcessor(classElement, {typeConverter}).process();
+
+      final idField = FieldProcessor(classElement.fields[0], null).process();
+      final dateTimeField =
+          FieldProcessor(classElement.fields[1], typeConverter).process();
+      final fields = [idField, dateTimeField];
+      const constructor =
+          "Order(row['id'] as int, _typeConverter.decode(row['dateTime'] as int))";
+      final expected = TestQueryable(
+        classElement,
+        fields,
+        constructor,
+      );
+      expect(actual, equals(expected));
+    });
+
+    test('process queryable with local type converter', () async {
+      final classElement = await createClassElement('''
+      @TypeConverters([DateTimeConverter])
+      class Order {
+        final int id;
+      
+        final DateTime dateTime;
+      
+        Order(this.id, this.dateTime);
+      }
+      
+      class DateTimeConverter extends TypeConverter<DateTime, int> {
+        @override
+        DateTime decode(int databaseValue) {
+          return DateTime.fromMillisecondsSinceEpoch(databaseValue);
+        }
+            
+        @override
+        int encode(DateTime value) {
+          return value.millisecondsSinceEpoch;
+        }
+      }
+    ''');
+
+      final actual = TestProcessor(classElement).process();
+
+      final typeConverter = TypeConverter(
+        'DateTimeConverter',
+        await dateTimeDartType,
+        await intDartType,
+        TypeConverterScope.queryable,
+      );
+      final idField = FieldProcessor(classElement.fields[0], null).process();
+      final dateTimeField =
+          FieldProcessor(classElement.fields[1], typeConverter).process();
+      final fields = [idField, dateTimeField];
+      const constructor =
+          "Order(row['id'] as int, _dateTimeConverter.decode(row['dateTime'] as int))";
+      final expected = TestQueryable(
+        classElement,
+        fields,
+        constructor,
+      );
+      expect(actual, equals(expected));
+    });
+
+    test('process queryable and prefer local type converter over external',
+        () async {
+      final externalTypeConverter = TypeConverter(
+        'ExternalConverter',
+        await dateTimeDartType,
+        await intDartType,
+        TypeConverterScope.database,
+      );
+      final classElement = await createClassElement('''
+      @TypeConverters([DateTimeConverter])
+      class Order {
+        final int id;
+      
+        final DateTime dateTime;
+      
+        Order(this.id, this.dateTime);
+      }
+      
+      class DateTimeConverter extends TypeConverter<DateTime, int> {
+        @override
+        DateTime decode(int databaseValue) {
+          return DateTime.fromMillisecondsSinceEpoch(databaseValue);
+        }
+            
+        @override
+        int encode(DateTime value) {
+          return value.millisecondsSinceEpoch;
+        }
+      }
+    ''');
+
+      final actual =
+          TestProcessor(classElement, {externalTypeConverter}).process();
+
+      final typeConverter = TypeConverter(
+        'DateTimeConverter',
+        await dateTimeDartType,
+        await intDartType,
+        TypeConverterScope.queryable,
+      );
+      final idField = FieldProcessor(classElement.fields[0], null).process();
+      final dateTimeField =
+          FieldProcessor(classElement.fields[1], typeConverter).process();
+      final fields = [idField, dateTimeField];
+      const constructor =
+          "Order(row['id'] as int, _dateTimeConverter.decode(row['dateTime'] as int))";
+      final expected = TestQueryable(
+        classElement,
+        fields,
+        constructor,
+      );
+      expect(actual, equals(expected));
+    });
   });
 
   group('Field inheritance', () {
@@ -163,8 +300,7 @@ void main() {
 
       final actual = () => TestProcessor(classElement).process();
 
-      final error =
-          QueryableProcessorError(classElement).PROHIBITED_MIXIN_USAGE;
+      final error = QueryableProcessorError(classElement).prohibitedMixinUsage;
       expect(actual, throwsInvalidGenerationSourceError(error));
     });
   });
@@ -290,6 +426,29 @@ void main() {
 
       const expected =
           "Person(row['id'] as int, row['name'] as String, bar: row['bar'] as String)";
+      expect(actual, equals(expected));
+    });
+
+    test('generate constructor with boolean arguments', () async {
+      final classElement = await createClassElement('''
+      class Person {
+        final int id;
+      
+        final String name;
+        
+        @ColumnInfo(nullable: false)
+        final bool bar;
+        
+        final bool foo
+      
+        Person(this.id, this.name, {this.bar, this.foo});
+      }
+    ''');
+
+      final actual = TestProcessor(classElement).process().constructor;
+
+      const expected =
+          "Person(row['id'] as int, row['name'] as String, bar: (row['bar'] as int) != 0, foo: row['foo'] == null ? null : (row['foo'] as int) != 0)";
       expect(actual, equals(expected));
     });
 
@@ -427,7 +586,10 @@ class TestQueryable extends Queryable {
 }
 
 class TestProcessor extends QueryableProcessor<TestQueryable> {
-  TestProcessor(ClassElement classElement) : super(classElement);
+  TestProcessor(
+    ClassElement classElement, [
+    Set<TypeConverter> typeConverters,
+  ]) : super(classElement, typeConverters ?? {});
 
   @override
   TestQueryable process() {

@@ -8,8 +8,7 @@ class ViewProcessorError {
       : assert(classElement != null),
         _classElement = classElement;
 
-  // ignore: non_constant_identifier_names
-  InvalidGenerationSourceError get MISSING_QUERY {
+  InvalidGenerationSourceError get missingQuery {
     return InvalidGenerationSourceError(
       'There is no SELECT query defined on the database view ${_classElement.displayName}.',
       todo:

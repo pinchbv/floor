@@ -12,3 +12,7 @@ cd ..
 
 cd floor_generator
 flutter packages pub get
+cd ..
+
+cd example
+flutter packages pub get

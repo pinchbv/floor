@@ -1,5 +1,6 @@
 import 'package:code_builder/code_builder.dart';
 import 'package:floor_generator/misc/annotation_expression.dart';
+import 'package:floor_generator/misc/type_utils.dart';
 import 'package:floor_generator/value_object/transaction_method.dart';
 import 'package:floor_generator/writer/writer.dart';
 
@@ -12,7 +13,9 @@ class TransactionMethodWriter implements Writer {
   Method write() {
     return Method((builder) => builder
       ..annotations.add(overrideAnnotationExpression)
-      ..returns = refer(method.returnType.getDisplayString())
+      ..returns = refer(method.returnType.getDisplayString(
+        withNullability: false,
+      ))
       ..name = method.name
       ..requiredParameters.addAll(_generateParameters())
       ..modifier = MethodModifier.async
@@ -23,14 +26,17 @@ class TransactionMethodWriter implements Writer {
     final parameters =
         method.parameterElements.map((parameter) => parameter.name).join(', ');
     final methodCall = '${method.name}($parameters)';
+    final innerType = method.returnType.flatten();
+    final innerTypeName = innerType.getDisplayString(withNullability: false);
+    final finalExpression = innerType.isVoid ? 'await' : 'return';
 
     return '''
     if (database is sqflite.Transaction) {
-      await super.$methodCall;
+      $finalExpression super.$methodCall;
     } else {
-      await (database as sqflite.Database).transaction<void>((transaction) async {
+      $finalExpression (database as sqflite.Database).transaction<$innerTypeName>((transaction) async {
         final transactionDatabase = _\$${method.databaseName}(changeListener)..database = transaction;
-        await transactionDatabase.${method.daoFieldName}.$methodCall;
+        $finalExpression transactionDatabase.${method.daoFieldName}.$methodCall;
       });
     }
     ''';
@@ -40,7 +46,9 @@ class TransactionMethodWriter implements Writer {
     return method.parameterElements.map((parameter) {
       return Parameter((builder) => builder
         ..name = parameter.name
-        ..type = refer(parameter.type.getDisplayString()));
+        ..type = refer(parameter.type.getDisplayString(
+          withNullability: false,
+        )));
     }).toList();
   }
 }

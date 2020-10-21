@@ -1,5 +1,72 @@
 # Changelog
 
+# 0.17.0
+
+### 🐛 Bug Fixes
+
+* Generate distinct type converter instances
+* Fix generation of DAO method with list argument using type converters
+
+# 0.16.0
+
+### 🚀 Features
+
+* Add **experimental** support for type converters 
+
+# 0.15.0
+
+### Changes
+
+* Update dependencies
+
+### 🚀 Features
+
+* Add support for WITHOUT ROWID tables
+* Check transaction method return types and allow non-void returns
+
+# 0.14.0
+
+### Changes
+
+* Document entity inheritance and add integration test
+* Raise minimum sqflite version to 1.3.0
+* add integration test for transaction rollback
+* Mention missing null propagation in streams
+* Fix types (integer instead of real)
+
+# 0.13.0
+
+### ⚠️ Breaking Changes
+
+**You need to migrate the explicit usages of `OnConflictStrategy` and `ForeignKeyAction` from snake case to camel case.**
+
+* Apply camel case to constants
+
+### Changes
+
+* Mention SQL centricity of Floor in README
+* Add banner to README
+* Update the description of the library
+* Migrate OnConflictStrategy to enum
+* Add more precise limitations of entity class and streams to README
+* Add DAO inheritance example to README
+* Fix database and DAO usage example in the README
+* Update README.md
+* Assert example app's behavior
+* Mention that floor uses first constructor found in entity class
+* Remove snapshot version instructions from README
+
+### 🚀 Features
+
+* Support Linux, macOS, Windows
+* Implement simple Streams on DatabaseViews, fix multi-dao changelistener
+
+### 🐛 Bug Fixes
+
+* Await database path retrieval
+* Fix boolean conversion issues, add regression test, fix indentation
+* Fix wrongly parsed arguments in @Query
+
 # 0.12.0
 
 ### Changes

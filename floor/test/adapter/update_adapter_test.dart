@@ -1,3 +1,4 @@
+import 'package:floor/floor.dart';
 import 'package:floor/src/adapter/update_adapter.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/mockito.dart';
@@ -14,7 +15,8 @@ void main() {
   const primaryKeyColumnName = 'id';
   final valueMapper = (Person person) =>
       <String, dynamic>{'id': person.id, 'name': person.name};
-  const conflictAlgorithm = ConflictAlgorithm.abort;
+  const onConflictStrategy = OnConflictStrategy.ignore;
+  const conflictAlgorithm = ConflictAlgorithm.ignore;
 
   final underTest = UpdateAdapter(
     mockDatabaseExecutor,
@@ -34,7 +36,7 @@ void main() {
     test('update item', () async {
       final person = Person(1, 'Simon');
 
-      await underTest.update(person, conflictAlgorithm);
+      await underTest.update(person, onConflictStrategy);
 
       final values = <String, dynamic>{'id': person.id, 'name': person.name};
       verify(mockDatabaseExecutor.update(
@@ -54,7 +56,7 @@ void main() {
       when(mockDatabaseBatch.commit(noResult: false))
           .thenAnswer((_) => Future(() => <int>[1, 1]));
 
-      await underTest.updateList(persons, conflictAlgorithm);
+      await underTest.updateList(persons, onConflictStrategy);
 
       final values1 = <String, dynamic>{'id': person1.id, 'name': person1.name};
       final values2 = <String, dynamic>{'id': person2.id, 'name': person2.name};
@@ -79,7 +81,7 @@ void main() {
     });
 
     test('update items but supply empty list', () async {
-      await underTest.updateList([], conflictAlgorithm);
+      await underTest.updateList([], onConflictStrategy);
 
       verifyZeroInteractions(mockDatabaseExecutor);
     });
@@ -97,8 +99,10 @@ void main() {
         conflictAlgorithm: conflictAlgorithm,
       )).thenAnswer((_) => Future(() => 1));
 
-      final actual =
-          await underTest.updateAndReturnChangedRows(person, conflictAlgorithm);
+      final actual = await underTest.updateAndReturnChangedRows(
+        person,
+        onConflictStrategy,
+      );
 
       verify(mockDatabaseExecutor.update(
         entityName,
@@ -119,7 +123,9 @@ void main() {
           .thenAnswer((_) => Future(() => <int>[1, 1]));
 
       final actual = await underTest.updateListAndReturnChangedRows(
-          persons, conflictAlgorithm);
+        persons,
+        onConflictStrategy,
+      );
 
       final values1 = <String, dynamic>{'id': person1.id, 'name': person1.name};
       final values2 = <String, dynamic>{'id': person2.id, 'name': person2.name};
@@ -145,8 +151,8 @@ void main() {
     });
 
     test('update items but supply empty list', () async {
-      final actual =
-          await underTest.updateListAndReturnChangedRows([], conflictAlgorithm);
+      final actual = await underTest
+          .updateListAndReturnChangedRows([], onConflictStrategy);
 
       verifyZeroInteractions(mockDatabaseExecutor);
       expect(actual, equals(0));

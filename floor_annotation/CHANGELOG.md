@@ -1,5 +1,19 @@
 # Changelog
 
+# 0.10.0
+
+* Add experimental  `TypeConverter` abstract class and `TypeConverters` annotation
+
+# 0.9.0
+
+* Update meta package
+
+# 0.8.0
+
+**⚠️ You need to migrate the explicit usages of `OnConflictStrategy` and `ForeignKeyAction` from snake case to camel case.**
+
+* Apply camel case to constants
+
 # 0.7.0
 
 * Add @DatabaseView annotation

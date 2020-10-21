@@ -7,21 +7,28 @@ import 'package:floor_generator/misc/annotations.dart';
 import 'package:source_gen/source_gen.dart';
 
 extension SupportedTypeChecker on DartType {
+  /// Whether this [DartType] is either
+  /// - String
+  /// - bool
+  /// - int
+  /// - double
+  /// - Uint8List
   @nonNull
-  bool get isSupported {
+  bool get isDefaultSqlType {
     return TypeChecker.any([
       _stringTypeChecker,
       _boolTypeChecker,
       _intTypeChecker,
       _doubleTypeChecker,
-      _uint8ListTypeChecker
-    ]).isExactlyType(isDartCoreList ? flatten() : this);
+      _uint8ListTypeChecker,
+    ]).isExactlyType(this);
   }
 }
 
 extension Uint8ListTypeChecker on DartType {
   @nonNull
-  bool get isUint8List => getDisplayString() == 'Uint8List';
+  bool get isUint8List =>
+      getDisplayString(withNullability: false) == 'Uint8List';
 }
 
 extension StreamTypeChecker on DartType {

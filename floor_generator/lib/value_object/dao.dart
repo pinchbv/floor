@@ -1,10 +1,14 @@
 import 'package:analyzer/dart/element/element.dart';
+import 'package:floor_generator/misc/extension/list_equality_extension.dart';
+import 'package:floor_generator/misc/extension/set_equality_extension.dart';
 import 'package:floor_generator/value_object/deletion_method.dart';
 import 'package:floor_generator/value_object/entity.dart';
 import 'package:floor_generator/value_object/insertion_method.dart';
 import 'package:floor_generator/value_object/query_method.dart';
 import 'package:floor_generator/value_object/transaction_method.dart';
+import 'package:floor_generator/value_object/type_converter.dart';
 import 'package:floor_generator/value_object/update_method.dart';
+import 'package:floor_generator/value_object/view.dart';
 
 class Dao {
   final ClassElement classElement;
@@ -14,7 +18,9 @@ class Dao {
   final List<UpdateMethod> updateMethods;
   final List<DeletionMethod> deletionMethods;
   final List<TransactionMethod> transactionMethods;
-  final List<Entity> streamEntities;
+  final Set<Entity> streamEntities;
+  final Set<View> streamViews;
+  final Set<TypeConverter> typeConverters;
 
   Dao(
     this.classElement,
@@ -25,6 +31,8 @@ class Dao {
     this.deletionMethods,
     this.transactionMethods,
     this.streamEntities,
+    this.streamViews,
+    this.typeConverters,
   );
 
   @override
@@ -34,12 +42,14 @@ class Dao {
           runtimeType == other.runtimeType &&
           classElement == other.classElement &&
           name == other.name &&
-          queryMethods == other.queryMethods &&
-          insertionMethods == other.insertionMethods &&
-          updateMethods == other.updateMethods &&
-          deletionMethods == other.deletionMethods &&
-          transactionMethods == other.transactionMethods &&
-          streamEntities == other.streamEntities;
+          queryMethods.equals(other.queryMethods) &&
+          insertionMethods.equals(other.insertionMethods) &&
+          updateMethods.equals(other.updateMethods) &&
+          deletionMethods.equals(other.deletionMethods) &&
+          transactionMethods.equals(other.transactionMethods) &&
+          streamEntities.equals(streamEntities) &&
+          streamViews.equals(other.streamViews) &&
+          typeConverters.equals(other.typeConverters);
 
   @override
   int get hashCode =>
@@ -50,10 +60,12 @@ class Dao {
       updateMethods.hashCode ^
       deletionMethods.hashCode ^
       transactionMethods.hashCode ^
-      streamEntities.hashCode;
+      streamEntities.hashCode ^
+      streamViews.hashCode ^
+      typeConverters.hashCode;
 
   @override
   String toString() {
-    return 'NewDao{classElement: $classElement, name: $name, queryMethods: $queryMethods, insertionMethods: $insertionMethods, updateMethods: $updateMethods, deletionMethods: $deletionMethods, transactionMethods: $transactionMethods, streamEntities: $streamEntities}';
+    return 'Dao{classElement: $classElement, name: $name, queryMethods: $queryMethods, insertionMethods: $insertionMethods, updateMethods: $updateMethods, deletionMethods: $deletionMethods, transactionMethods: $transactionMethods, streamEntities: $streamEntities, streamViews: $streamViews, typeConverters: $typeConverters}';
   }
 }

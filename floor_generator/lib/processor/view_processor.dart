@@ -5,14 +5,17 @@ import 'package:floor_generator/misc/constants.dart';
 import 'package:floor_generator/misc/type_utils.dart';
 import 'package:floor_generator/processor/error/view_processor_error.dart';
 import 'package:floor_generator/processor/queryable_processor.dart';
+import 'package:floor_generator/value_object/type_converter.dart';
 import 'package:floor_generator/value_object/view.dart';
 
 class ViewProcessor extends QueryableProcessor<View> {
   final ViewProcessorError _processorError;
 
-  ViewProcessor(final ClassElement classElement)
-      : _processorError = ViewProcessorError(classElement),
-        super(classElement);
+  ViewProcessor(
+    final ClassElement classElement,
+    final Set<TypeConverter> typeConverters,
+  )   : _processorError = ViewProcessorError(classElement),
+        super(classElement, typeConverters);
 
   @nonNull
   @override
@@ -31,7 +34,7 @@ class ViewProcessor extends QueryableProcessor<View> {
   String _getName() {
     return classElement
             .getAnnotation(annotations.DatabaseView)
-            .getField(AnnotationField.VIEW_NAME)
+            .getField(AnnotationField.viewName)
             ?.toStringValue() ??
         classElement.displayName;
   }
@@ -40,11 +43,11 @@ class ViewProcessor extends QueryableProcessor<View> {
   String _getQuery() {
     final query = classElement
         .getAnnotation(annotations.DatabaseView)
-        .getField(AnnotationField.VIEW_QUERY)
+        .getField(AnnotationField.viewQuery)
         ?.toStringValue();
 
     if (query == null || !query.trimLeft().toLowerCase().startsWith('select')) {
-      throw _processorError.MISSING_QUERY;
+      throw _processorError.missingQuery;
     }
     return query;
   }

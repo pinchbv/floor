@@ -43,7 +43,7 @@ class _$FlutterDatabaseBuilder {
   /// Creates the database and initializes it.
   Future<FlutterDatabase> build() async {
     final path = name != null
-        ? join(await sqflite.getDatabasesPath(), name)
+        ? await sqfliteDatabaseFactory.getDatabasePath(name)
         : ':memory:';
     final database = _$FlutterDatabase();
     database.database = await database.open(
@@ -64,8 +64,7 @@ class _$FlutterDatabase extends FlutterDatabase {
 
   Future<sqflite.Database> open(String path, List<Migration> migrations,
       [Callback callback]) async {
-    return sqflite.openDatabase(
-      path,
+    final databaseOptions = sqflite.OpenDatabaseOptions(
       version: 1,
       onConfigure: (database) async {
         await database.execute('PRAGMA foreign_keys = ON');
@@ -86,6 +85,7 @@ class _$FlutterDatabase extends FlutterDatabase {
         await callback?.onCreate?.call(database, version);
       },
     );
+    return sqfliteDatabaseFactory.openDatabase(path, options: databaseOptions);
   }
 
   @override
@@ -124,9 +124,6 @@ class _$TaskDao extends TaskDao {
 
   final QueryAdapter _queryAdapter;
 
-  static final _taskMapper = (Map<String, dynamic> row) =>
-      Task(row['id'] as int, row['message'] as String);
-
   final InsertionAdapter<Task> _taskInsertionAdapter;
 
   final UpdateAdapter<Task> _taskUpdateAdapter;
@@ -136,39 +133,45 @@ class _$TaskDao extends TaskDao {
   @override
   Future<Task> findTaskById(int id) async {
     return _queryAdapter.query('SELECT * FROM task WHERE id = ?',
-        arguments: <dynamic>[id], mapper: _taskMapper);
+        arguments: <dynamic>[id],
+        mapper: (Map<String, dynamic> row) =>
+            Task(row['id'] as int, row['message'] as String));
   }
 
   @override
   Future<List<Task>> findAllTasks() async {
-    return _queryAdapter.queryList('SELECT * FROM task', mapper: _taskMapper);
+    return _queryAdapter.queryList('SELECT * FROM task',
+        mapper: (Map<String, dynamic> row) =>
+            Task(row['id'] as int, row['message'] as String));
   }
 
   @override
   Stream<List<Task>> findAllTasksAsStream() {
     return _queryAdapter.queryListStream('SELECT * FROM task',
-        tableName: 'Task', mapper: _taskMapper);
+        queryableName: 'Task',
+        isView: false,
+        mapper: (Map<String, dynamic> row) =>
+            Task(row['id'] as int, row['message'] as String));
   }
 
   @override
   Future<void> insertTask(Task task) async {
-    await _taskInsertionAdapter.insert(task, sqflite.ConflictAlgorithm.abort);
+    await _taskInsertionAdapter.insert(task, OnConflictStrategy.abort);
   }
 
   @override
   Future<void> insertTasks(List<Task> tasks) async {
-    await _taskInsertionAdapter.insertList(
-        tasks, sqflite.ConflictAlgorithm.abort);
+    await _taskInsertionAdapter.insertList(tasks, OnConflictStrategy.abort);
   }
 
   @override
   Future<void> updateTask(Task task) async {
-    await _taskUpdateAdapter.update(task, sqflite.ConflictAlgorithm.abort);
+    await _taskUpdateAdapter.update(task, OnConflictStrategy.abort);
   }
 
   @override
   Future<void> updateTasks(List<Task> task) async {
-    await _taskUpdateAdapter.updateList(task, sqflite.ConflictAlgorithm.abort);
+    await _taskUpdateAdapter.updateList(task, OnConflictStrategy.abort);
   }
 
   @override

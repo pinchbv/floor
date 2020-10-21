@@ -7,7 +7,6 @@ analyzer:
     todo: ignore
   exclude:
     - 'bin/cache/**'
-    - '**.g.dart'
 
 linter:
   rules:
@@ -15,7 +14,7 @@ linter:
     # the Dart Lint rules page to make maintenance easier
     # https://github.com/dart-lang/linter/blob/master/example/all.yaml
     - always_declare_return_types
-#    - always_put_control_body_on_new_line
+    # - always_put_control_body_on_new_line
     # - always_put_required_named_parameters_first # we prefer having parameters in the same order as fields https://github.com/flutter/flutter/issues/10219
     # - always_require_non_null_named_parameters
     # - always_specify_types
@@ -56,7 +55,7 @@ linter:
     # - cascade_invocations # not yet tested
     - close_sinks # not reliable enough
     # - comment_references # blocked on https://github.com/flutter/flutter/issues/20765
-    # - constant_identifier_names # needs an opt-out https://github.com/dart-lang/linter/issues/204
+    - constant_identifier_names
     - control_flow_in_finally
     # - curly_braces_in_flow_control_structures # not yet tested
     - directives_ordering

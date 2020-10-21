@@ -15,12 +15,16 @@ class Entity {
   /// List of primary key column names.
   final List<String> primaryKeys;
 
+  /// Whether the table is a "WITHOUT ROWID table".
+  final bool withoutRowid;
+
   /// Marks a class as a database entity (table).
   const Entity({
     this.tableName,
     this.indices = const [],
     this.foreignKeys = const [],
     this.primaryKeys = const [],
+    this.withoutRowid = false,
   });
 }
 

@@ -1,9 +1,18 @@
-# Floor
-**A supportive SQLite abstraction for your Flutter applications (iOS, Android and macOS)**
+![Floor](https://raw.githubusercontent.com/vitusortner/floor/develop/img/floor.png)
 
-The Floor library provides a lightweight SQLite abstraction with automatic mapping between in-memory objects and database rows while still offering full control of the database with the use of SQL.
+Floor provides a neat SQLite abstraction for your Flutter applications inspired by the [Room persistence library](https://developer.android.com/topic/libraries/architecture/room).
+It comes with automatic mapping between in-memory objects and database rows while still offering full control of the database with the use of SQL.
+As a consequence, it's necessary to have an understanding of SQL and SQLite in order to harvest Floor's full potential.
 
-This package is still in an early phase and the API will likely change.
+- typesafe
+- reactive
+- lightweight
+- SQL centric
+- no hidden magic
+- no hidden costs
+- iOS, Android, Linux, macOS, Windows
+
+⚠️ The library is on its way to its first stable release and is open to contributions!
 
 [![pub package](https://img.shields.io/pub/v/floor.svg)](https://pub.dartlang.org/packages/floor)
 [![build status](https://github.com/vitusortner/floor/workflows/Continuous%20integration/badge.svg)](https://github.com/vitusortner/floor/actions)
@@ -19,16 +28,19 @@ This package is still in an early phase and the API will likely change.
     1. [Primary Keys](#primary-keys)
     1. [Indices](#indices)
     1. [Ignoring Fields](#ignoring-fields)
+    1. [Inheritance](#inheritance)
 1. [Database Views](#database-views)
 1. [Data Access Objects](#data-access-objects)
     1. [Queries](#queries)
     1. [Data Changes](#data-changes)
     1. [Streams](#streams)
     1. [Transactions](#transactions)
-    1. [Inheritance](#inheritance)
+    1. [Inheritance](#inheritance-1)
+1. [Type Converters](#type-converters)    
 1. [Migrations](#migrations)
 1. [In-Memory Database](#in-memory-database)
 1. [Initialization Callback](#initialization-callback)
+1. [Platform Support](#platform-support)
 1. [Testing](#testing)
 1. [Examples](#examples)
 1. [Naming](#naming)
@@ -49,11 +61,11 @@ This package is still in an early phase and the API will likely change.
     dependencies:
       flutter:
         sdk: flutter
-      floor: ^0.12.0
+      floor: ^0.17.0
 
     dev_dependencies:
-      floor_generator: ^0.12.0
-      build_runner: ^1.7.3
+      floor_generator: ^0.17.0
+      build_runner: ^1.10.3
     ````
 
 1. Create an **Entity**
@@ -123,11 +135,10 @@ This package is still in an early phase and the API will likely change.
     // required package imports
     import 'dart:async';
     import 'package:floor/floor.dart';
-    import 'package:path/path.dart';
     import 'package:sqflite/sqflite.dart' as sqflite;
 
     import 'dao/person_dao.dart';
-    import 'model/person.dart';
+    import 'entity/person.dart';
 
     part 'database.g.dart'; // the generated code will be there
 
@@ -163,7 +174,7 @@ This package is still in an early phase and the API will likely change.
     final result = await personDao.findPersonById(1);
     ```
 
-For further examples take a look at the [example](https://github.com/vitusortner/floor/tree/develop/example) and [floor_test](https://github.com/vitusortner/floor/tree/develop/floor_test) directories.
+For further examples take a look at the [example](https://github.com/vitusortner/floor/tree/develop/example) and [floor_test](https://github.com/vitusortner/floor/tree/develop/floor/test/integration) directories.
 
 ## Architecture
 The components for storing and accessing data are **Entity**, **Data Access Object (DAO)** and **Database**.
@@ -197,8 +208,9 @@ For more information about primary keys and especially compound primary keys, re
 `@ColumnInfo` enables custom mapping of single table columns.
 With the annotation, it's possible to give columns a custom name and define if the column is able to store `null`.
 
-**NOTE:**
-Floor automatically uses the **first** constructor defined in the entity class for creating in-memory objects from database rows.  
+#### Limitations
+- Floor automatically uses the **first** constructor defined in the entity class for creating in-memory objects from database rows.
+- There needs to be a constructor.  
 
 ```dart
 @Entity(tableName: 'person')
@@ -216,11 +228,13 @@ class Person {
 ### Supported Types
 Floor entities can hold values of the following Dart types which map to their corresponding SQLite types and vice versa.
 
-- `int` - REAL
+- `int` - INTEGER
 - `double` - REAL
 - `String` - TEXT
-- `bool` - REAL (0 = false, 1 = true)
+- `bool` - INTEGER (0 = false, 1 = true)
 - `Uint8List` - BLOB
+
+In case you want to store sophisticated Dart objects that can be represented by one of the above types, take a look at [Type Converters](#type-converters). 
 
 ### Primary Keys
 Whenever a compound primary key is required (e.g. *n-m* relationships), the syntax for setting the keys differs from the previously mentioned way of setting primary keys.
@@ -308,6 +322,49 @@ class Person {
   Person(this.id, this.name);
 }
 ```
+
+### Inheritance
+
+Just like Daos, entities (and database views) can inherit from a common base class and use their fields. The entity just has to `extend` the base class.
+This construct will be treated as if all the fields in the base class are part of the entity, meaning the database table will 
+have all columns of the entity and the base class. 
+
+The base class does not have to have a separate annotation for the class. Its fields can be annotated just like normal entity columns.
+Foreign keys and indices have to be declared in the entity and can't be defined in the base class.
+
+```dart
+class BaseObject {
+  @PrimaryKey()
+  final int id;
+
+  @ColumnInfo(name: 'create_time', nullable: false)
+  final String createTime;
+
+  @ColumnInfo(name: 'update_time')
+  final String updateTime;
+
+  BaseObject(
+    this.id,
+    this.updateTime, {
+    String createTime,
+  }) : this.createTime = createTime ?? DateTime.now().toString();
+
+  @override
+  List<Object> get props => [];
+}
+
+@Entity(tableName: 'comments')
+class Comment extends BaseObject {
+  final String author;
+
+  final String content;
+
+  Comment(this.author,
+      {int id, this.content = '', String createTime, String updateTime})
+      : super(id, updateTime, createTime: createTime);
+}
+```
+
 ## Database Views
 If you want to define static `SELECT`-statements which return different types than your entities, your best option is to use `@DatabaseView`.
 A database view can be understood as a virtual table, which can be queried like a real table.
@@ -331,7 +388,7 @@ Setters, getters and static fields are automatically ignored (like in entities),
 After defining a database view in your code, you have to add it to your database by adding it to the `views` field of the `@Database` annotation:
 
 ```dart
-@Database(version: 1, entities: [Person], views:[Name])
+@Database(version: 1, entities: [Person], views: [Name])
 abstract class AppDatabase extends FloorDatabase {
   // DAO getters
 }
@@ -339,8 +396,12 @@ abstract class AppDatabase extends FloorDatabase {
 
 You can then query the view via a DAO function like an entity.
 
-**NOTE:**
-Be aware that it is currently not possible to return a `Stream` object from a function which queries a database view.
+It is possible for DatabaseViews to inherit common fields from a base class, just like in entities.
+
+#### Limitations
+- It is now possible to return a `Stream` object from a DAO method which queries a database view. But it will fire on **any** 
+  `@update`, `@insert`, `@delete` events in the whole database, which can get quite taxing on the runtime. Please add it only if you know what you are doing!
+  This is mostly due to the complexity of detecting which entities are involved in a database view.
 
 ## Data Access Objects
 These components are responsible for managing access to the underlying SQLite database and are defined as abstract classes with method signatures and query statements.
@@ -441,12 +502,11 @@ Future<int> deletePersons(List<Person> person);
 ```
 
 ### Streams
-As already mentioned, queries can not only return a value once when called but also a continuous stream of query results.
-The returned stream keeps you in sync with the changes happening to the database table.
-This feature plays really well with the `StreamBuilder` widget.
+As already mentioned, queries cannot only return values once when called but also continuous streams of query results.
+The returned streams keep you in sync with the changes happening in the database tables.
+This feature plays well with the `StreamBuilder` widget which accepts a stream of values and rebuilds itself whenever there is a new emission.
 
-These methods return a broadcast stream.
-Thus, it can have multiple listeners.
+These methods return broadcast streams and thus, can have multiple listeners.
 ```dart
 // definition
 @Query('SELECT * FROM Person')
@@ -461,13 +521,17 @@ StreamBuilder<List<Person>>(
 );
 ```
 
-**NOTE:**
-It is currently not possible to return a `Stream` if the function queries a database view.
-This is mostly due to the complexity of detecting which entities are involved in a database view.
+#### Limitations
+- Only methods annotated with `@insert`, `@update` and `@delete` trigger `Stream` emissions. 
+  Inserting data by using the `@Query()` annotation doesn't.
+- It is now possible to return a `Stream` if the function queries a database view. But it will fire on **any** 
+  `@update`, `@insert`, `@delete` events in the whole database, which can get quite taxing on the runtime. Please add it only if you know what you are doing!
+  This is mostly due to the complexity of detecting which entities are involved in a database view.
+- Functions returning a stream of single items such as `Stream<Person>` do not emit when there is no query result.
 
 ### Transactions
 Whenever you want to perform some operations in a transaction you have to add the `@transaction` annotation to the method.
-It's also required to add the `async` modifier. These methods can only return `Future<void>`.
+It's also required to add the `async` modifier. These methods have to return a `Future`.
 
 ```dart
 @transaction
@@ -500,6 +564,72 @@ await personDao.insertItem(person);
 
 final result = await personDao.findPersonById(1);
 ```
+
+## Type Converters
+⚠️ **This feature is still in an experimental state.
+Please use it with caution and file issues for problems you encounter.**
+
+SQLite allows storing values of only a handful types.
+Whenever more complex Dart in-memory objects should be stored, there sometimes is the need for converting between Dart and SQLite compatible types.
+Dart's `DateTime`, for instance, provides an object-oriented API for handling time.
+Objects of this class can simply be represented as `int` values by mapping `DateTime` to its timestamp in milliseconds.
+Instead of manually mapping between these types repeatedly, when reading and writing, type converters can be used.
+It's sufficient to define the conversion from a database to an in-memory type and vice versa once, which then is reused automatically.
+
+The implementation and usage of the mentioned `DateTime` to `int` converter is described in the following.
+
+1. Create a converter class that implements the abstract `TypeConverter` and supply the in-memory object type and database type as parameterized types.
+    This class inherits the `decode()` and `encode()` functions which define the conversion from one to the other type.
+```dart
+class DateTimeConverter extends TypeConverter<DateTime, int> {
+  @override
+  DateTime decode(int databaseValue) {
+    return DateTime.fromMillisecondsSinceEpoch(databaseValue);
+  }
+
+  @override
+  int encode(DateTime value) {
+    return value.millisecondsSinceEpoch;
+  }
+}
+```
+ 
+ 2. Apply the created type converter to the database by using the `@TypeConverters` annotation and make sure to additionally import the file of your type converter here.
+Importing it in your database file is **always** necessary because the generated code will be `part` of your database file and this is the location where your type converters get instantiated.  
+```dart
+@TypeConverters([DateTimeConverter])
+@Database(version: 1, entities: [Order])
+abstract class OrderDatabase extends FloorDatabase {
+  OrderDao get orderDao;
+}
+```
+
+3. Use the non-default `DateTime` type in an entity.
+```dart
+@entity
+class Order {
+  @primaryKey
+  final int id;
+
+  final DateTime date;
+
+  Order(this.id, this.date);
+}
+```
+
+### Type converters can be applied to
+1. databases
+1. DAOs
+1. entities/views
+1. entity/view fields
+1. DAO methods
+1. DAO method parameters
+
+The type converter is added to the scope of the element so if you put it on a class, all methods/fields in that class will be able to use the converter.
+
+**The closest type converter wins!**
+If you, for example, add a converter on the database level and another one on a DAO method parameter, which takes care of converting the same types, the one declared next to the DAO method parameter will be used.
+Please refer to the above list to get more information about the precedence of converters.
 
 ## Migrations
 Whenever you are doing changes to your entities, you're required to also migrate the old data.
@@ -573,50 +703,28 @@ final database = await $FloorAppDatabase
     .build();
 ```
 
+## Platform Support
+Floor supports iOS, Android, Linux, macOS and Windows.
+The SQLite database access on iOS and Android is provided by [sqflite](https://github.com/tekartik/sqflite/tree/master/sqflite) whereas Linux, macOS and Windows use [sqflite's ffi](https://github.com/tekartik/sqflite/tree/master/sqflite_common_ffi) implementation. 
+
+**There currently is no support for Flutter for web.**
+
 ## Testing
-In order to run database tests on your development machine without the need to deploy the code to an actual device, the setup has to be configured as shown in the following.
+Simply instantiate an in-memory database and run the database tests on your local development machine as shown in the following snippet.
 For more test references, check out the [project's tests](https://github.com/vitusortner/floor/tree/develop/floor/test/integration).
 
 In case you're running Linux, make sure to have sqlite3 and libsqlite3-dev installed.
 
-#### pubspec.yaml
-```yaml
-dependencies:
-  flutter:
-    sdk: flutter
-  floor: ^0.12.0
-
-dev_dependencies:
-  floor_generator: ^0.12.0
-  build_runner: ^1.7.3
-
-  # additional dependencies
-  flutter_test:
-    sdk: flutter
-  sqflite_ffi_test:
-    git:
-      url: git://github.com/tekartik/sqflite_more
-      ref: dart2
-      path: sqflite_ffi_test
-```
-
-#### database_test.dart
 ```dart
 import 'package:floor/floor.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:matcher/matcher.dart';
-import 'package:sqflite/sqflite.dart';
-import 'package:sqflite_ffi_test/sqflite_ffi_test.dart';
 
 // your imports follow here
 import 'dao/person_dao.dart';
 import 'database.dart';
-import 'model/person.dart';
+import 'entity/person.dart';
 
 void main() {
-  TestWidgetsFlutterBinding.ensureInitialized();
-  sqfliteFfiTestInit();
-
   group('database tests', () {
     TestDatabase database;
     PersonDao personDao;

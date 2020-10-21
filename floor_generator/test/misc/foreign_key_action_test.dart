@@ -4,31 +4,31 @@ import 'package:test/test.dart';
 void main() {
   group('foreign key action strings', () {
     test('NO ACTION', () {
-      final actual = ForeignKeyAction.getString(ForeignKeyAction.NO_ACTION);
+      final actual = ForeignKeyAction.getString(ForeignKeyAction.noAction);
 
       expect(actual, equals('NO ACTION'));
     });
 
     test('RESTRICT', () {
-      final actual = ForeignKeyAction.getString(ForeignKeyAction.RESTRICT);
+      final actual = ForeignKeyAction.getString(ForeignKeyAction.restrict);
 
       expect(actual, equals('RESTRICT'));
     });
 
     test('SET NULL', () {
-      final actual = ForeignKeyAction.getString(ForeignKeyAction.SET_NULL);
+      final actual = ForeignKeyAction.getString(ForeignKeyAction.setNull);
 
       expect(actual, equals('SET NULL'));
     });
 
     test('SET DEFAULT', () {
-      final actual = ForeignKeyAction.getString(ForeignKeyAction.SET_DEFAULT);
+      final actual = ForeignKeyAction.getString(ForeignKeyAction.setDefault);
 
       expect(actual, equals('SET DEFAULT'));
     });
 
     test('CASCADE', () {
-      final actual = ForeignKeyAction.getString(ForeignKeyAction.CASCADE);
+      final actual = ForeignKeyAction.getString(ForeignKeyAction.cascade);
 
       expect(actual, equals('CASCADE'));
     });

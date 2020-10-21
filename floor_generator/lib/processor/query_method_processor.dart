@@ -1,34 +1,35 @@
 import 'package:analyzer/dart/element/element.dart';
 import 'package:analyzer/dart/element/type.dart';
-import 'package:floor_annotation/floor_annotation.dart' as annotations
-    show Query;
+import 'package:dartx/dartx.dart';
+import 'package:floor_annotation/floor_annotation.dart' as annotations;
 import 'package:floor_generator/misc/annotations.dart';
 import 'package:floor_generator/misc/constants.dart';
+import 'package:floor_generator/misc/extension/set_extension.dart';
+import 'package:floor_generator/misc/extension/type_converter_element_extension.dart';
 import 'package:floor_generator/misc/type_utils.dart';
 import 'package:floor_generator/processor/error/query_method_processor_error.dart';
 import 'package:floor_generator/processor/processor.dart';
-import 'package:floor_generator/value_object/entity.dart';
 import 'package:floor_generator/value_object/query_method.dart';
 import 'package:floor_generator/value_object/queryable.dart';
-import 'package:floor_generator/value_object/view.dart';
+import 'package:floor_generator/value_object/type_converter.dart';
 
 class QueryMethodProcessor extends Processor<QueryMethod> {
   final QueryMethodProcessorError _processorError;
 
   final MethodElement _methodElement;
-  final List<Entity> _entities;
-  final List<View> _views;
+  final List<Queryable> _queryables;
+  final Set<TypeConverter> _typeConverters;
 
   QueryMethodProcessor(
     final MethodElement methodElement,
-    final List<Entity> entities,
-    final List<View> views,
+    final List<Queryable> queryables,
+    final Set<TypeConverter> typeConverters,
   )   : assert(methodElement != null),
-        assert(entities != null),
-        assert(views != null),
+        assert(queryables != null),
+        assert(typeConverters != null),
         _methodElement = methodElement,
-        _entities = entities,
-        _views = views,
+        _queryables = queryables,
+        _typeConverters = typeConverters,
         _processorError = QueryMethodProcessorError(methodElement);
 
   @nonNull
@@ -49,17 +50,26 @@ class QueryMethodProcessor extends Processor<QueryMethod> {
       returnsStream,
     );
 
-    final queryable = _entities.firstWhere(
-            (entity) =>
-                entity.classElement.displayName ==
-                flattenedReturnType.getDisplayString(),
-            orElse: () => null) ??
-        _views.firstWhere(
-            (view) =>
-                view.classElement.displayName ==
-                flattenedReturnType.getDisplayString(),
-            orElse: () => null); // doesn't return entity nor view
-    _assertViewQueryDoesNotReturnStream(queryable, returnsStream);
+    final queryable = _queryables.firstWhere(
+        (queryable) =>
+            queryable.classElement.displayName ==
+            flattenedReturnType.getDisplayString(withNullability: false),
+        orElse: () => null);
+
+    final parameterTypeConverters = parameters
+        .expand((parameter) =>
+            parameter.getTypeConverters(TypeConverterScope.daoMethodParameter))
+        .toSet();
+
+    final allTypeConverters = _typeConverters +
+        _methodElement.getTypeConverters(TypeConverterScope.daoMethod) +
+        parameterTypeConverters;
+
+    if (queryable != null) {
+      final fieldTypeConverters =
+          queryable.fields.mapNotNull((field) => field.typeConverter);
+      allTypeConverters.addAll(fieldTypeConverters);
+    }
 
     return QueryMethod(
       _methodElement,
@@ -69,7 +79,8 @@ class QueryMethodProcessor extends Processor<QueryMethod> {
       flattenedReturnType,
       parameters,
       queryable,
-      isRaw: isRaw
+      allTypeConverters,
+      isRaw: isRaw,
     );
   }
 
@@ -77,15 +88,15 @@ class QueryMethodProcessor extends Processor<QueryMethod> {
   String _getQuery() {
     final query = _methodElement
         .getAnnotation(annotations.Query)
-        .getField(AnnotationField.QUERY_VALUE)
+        .getField(AnnotationField.queryValue)
         ?.toStringValue()
         ?.replaceAll('\n', ' ')
         ?.replaceAll(RegExp(r'[ ]{2,}'), ' ')
         ?.trim();
 
-    if (query == null || query.isEmpty) throw _processorError.NO_QUERY_DEFINED;
+    if (query == null || query.isEmpty) throw _processorError.noQueryDefined;
 
-    final substitutedQuery = query.replaceAll(RegExp(r':[^\s)]+'), '?');
+    final substitutedQuery = query.replaceAll(RegExp(r':[.\w]+'), '?');
     _assertQueryParameters(substitutedQuery, _methodElement.parameters);
     return _replaceInClauseArguments(substitutedQuery);
   }
@@ -106,12 +117,11 @@ class QueryMethodProcessor extends Processor<QueryMethod> {
     return query.replaceAllMapped(
       RegExp(r'( in )\([?]\)', caseSensitive: false),
       (match) {
+        final matched = match.input.substring(match.start, match.end);
+        final replaced =
+            matched.replaceFirst(RegExp(r'(\?)'), '\$valueList$index');
         index++;
-        final matchedString = match.input.substring(match.start, match.end);
-        return matchedString.replaceFirst(
-          RegExp(r'(\?)'),
-          '\$valueList$index',
-        );
+        return replaced;
       },
     );
   }
@@ -146,16 +156,7 @@ class QueryMethodProcessor extends Processor<QueryMethod> {
     final bool returnsStream,
   ) {
     if (!rawReturnType.isDartAsyncFuture && !returnsStream) {
-      throw _processorError.DOES_NOT_RETURN_FUTURE_NOR_STREAM;
-    }
-  }
-
-  void _assertViewQueryDoesNotReturnStream(
-    final Queryable queryable,
-    final bool returnsStream,
-  ) {
-    if (queryable != null && queryable is View && returnsStream) {
-      throw _processorError.VIEW_NOT_STREAMABLE;
+      throw _processorError.doesNotReturnFutureNorStream;
     }
   }
 
@@ -166,7 +167,7 @@ class QueryMethodProcessor extends Processor<QueryMethod> {
     final queryParameterCount = RegExp(r'\?').allMatches(query).length;
 
     if (queryParameterCount != parameterElements.length) {
-      throw _processorError.QUERY_ARGUMENTS_AND_METHOD_PARAMETERS_DO_NOT_MATCH;
+      throw _processorError.queryArgumentsAndMethodParametersDoNotMatch;
     }
   }
 }

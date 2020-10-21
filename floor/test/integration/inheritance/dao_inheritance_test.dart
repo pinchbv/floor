@@ -3,16 +3,11 @@ import 'dart:async';
 import 'package:floor/floor.dart';
 import 'package:floor_annotation/floor_annotation.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:path/path.dart' hide equals;
 import 'package:sqflite/sqflite.dart' as sqflite;
-import 'package:sqflite_ffi_test/sqflite_ffi_test.dart';
 
 part 'dao_inheritance_test.g.dart';
 
 void main() {
-  TestWidgetsFlutterBinding.ensureInitialized();
-  sqfliteFfiTestInit();
-
   group('dao inheritance tests', () {
     TestDatabase database;
     PersonDao personDao;
@@ -65,10 +60,10 @@ class Person {
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-          other is Person &&
-              runtimeType == other.runtimeType &&
-              id == other.id &&
-              name == other.name;
+      other is Person &&
+          runtimeType == other.runtimeType &&
+          id == other.id &&
+          name == other.name;
 
   @override
   int get hashCode => id.hashCode ^ name.hashCode;
