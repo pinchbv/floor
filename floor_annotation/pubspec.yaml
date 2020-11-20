@@ -7,7 +7,7 @@ homepage: https://github.com/vitusortner/floor
 author: Vitus Ortner <vitusortner.dev@gmail.com>
 
 environment:
-  sdk: '>=2.6.0 <3.0.0'
+  sdk: '>=2.12.0-29.10.beta <3.0.0'
 
 dependencies:
-  meta: ^1.2.3
+  meta: ^1.3.0-nullsafety
