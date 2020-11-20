@@ -12,7 +12,7 @@ jobs:
     timeout-minutes: 10
 
     container:
-      image: google/dart:dart:2.12-beta
+      image: google/dart:2.12-beta
 
     steps:
       - name: Check out code
@@ -35,7 +35,7 @@ jobs:
     timeout-minutes: 10
 
     container:
-      image: google/dart:dart:2.12-beta
+      image: google/dart:2.12-beta
 
     steps:
       - name: Check out code
