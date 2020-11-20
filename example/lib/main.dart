@@ -117,8 +117,9 @@ class TaskListCell extends StatelessWidget {
       onDismissed: (_) async {
         await dao.deleteTask(task);
 
-        Scaffold.of(context).hideCurrentSnackBar();
-        Scaffold.of(context).showSnackBar(
+        final scaffoldMessengerState = ScaffoldMessenger.of(context);
+        scaffoldMessengerState.hideCurrentSnackBar();
+        scaffoldMessengerState.showSnackBar(
           const SnackBar(content: Text('Removed task')),
         );
       },
