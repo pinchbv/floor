@@ -1,6 +1,5 @@
 import 'package:analyzer/dart/element/element.dart';
 import 'package:floor_annotation/floor_annotation.dart' as annotations;
-import 'package:floor_generator/misc/annotations.dart';
 import 'package:floor_generator/misc/constants.dart';
 import 'package:floor_generator/misc/type_utils.dart';
 import 'package:floor_generator/processor/type_converter_processor.dart';
@@ -10,7 +9,6 @@ import 'package:source_gen/source_gen.dart';
 extension TypeConverterElementExtension on Element {
   /// Returns a set of [TypeConverter]s found in the @TypeConverters
   /// annotation on this element
-  @nonNull
   Set<TypeConverter> getTypeConverters(final TypeConverterScope scope) {
     if (hasAnnotation(annotations.TypeConverters)) {
       final typeConverterElements = getAnnotation(annotations.TypeConverters)

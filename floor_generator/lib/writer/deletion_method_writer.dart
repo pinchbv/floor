@@ -1,5 +1,4 @@
 import 'package:code_builder/code_builder.dart';
-import 'package:floor_generator/misc/annotations.dart';
 import 'package:floor_generator/misc/change_method_writer_helper.dart';
 import 'package:floor_generator/misc/string_utils.dart';
 import 'package:floor_generator/value_object/deletion_method.dart';
@@ -11,12 +10,10 @@ class DeletionMethodWriter implements Writer {
 
   DeletionMethodWriter(
     final DeletionMethod method, [
-    final ChangeMethodWriterHelper helper,
-  ])  : assert(method != null),
-        _method = method,
+    final ChangeMethodWriterHelper? helper,
+  ])  : _method = method,
         _helper = helper ?? ChangeMethodWriterHelper(method);
 
-  @nonNull
   @override
   Method write() {
     final methodBuilder = MethodBuilder()..body = Code(_generateMethodBody());
@@ -24,7 +21,6 @@ class DeletionMethodWriter implements Writer {
     return methodBuilder.build();
   }
 
-  @nonNull
   String _generateMethodBody() {
     final entityClassName =
         _method.entity.classElement.displayName.decapitalize();
@@ -44,7 +40,6 @@ class DeletionMethodWriter implements Writer {
     }
   }
 
-  @nonNull
   String _generateVoidReturnMethodBody(
     final String methodSignatureParameterName,
     final String entityClassName,
@@ -56,7 +51,6 @@ class DeletionMethodWriter implements Writer {
     }
   }
 
-  @nonNull
   String _generateIntReturnMethodBody(
     final String methodSignatureParameterName,
     final String entityClassName,

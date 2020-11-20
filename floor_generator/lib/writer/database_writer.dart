@@ -1,6 +1,5 @@
 import 'package:code_builder/code_builder.dart';
 import 'package:floor_generator/misc/annotation_expression.dart';
-import 'package:floor_generator/misc/annotations.dart';
 import 'package:floor_generator/value_object/database.dart';
 import 'package:floor_generator/value_object/entity.dart';
 import 'package:floor_generator/writer/writer.dart';
@@ -11,13 +10,11 @@ class DatabaseWriter implements Writer {
 
   DatabaseWriter(final this.database);
 
-  @nonNull
   @override
   Class write() {
     return _generateDatabaseImplementation(database);
   }
 
-  @nonNull
   Class _generateDatabaseImplementation(final Database database) {
     final databaseName = database.name;
 
@@ -30,14 +27,13 @@ class DatabaseWriter implements Writer {
       ..constructors.add(_generateConstructor()));
   }
 
-  @nonNull
   Constructor _generateConstructor() {
     return Constructor((builder) {
       final parameter = Parameter((builder) => builder
         ..name = 'listener'
         ..type = refer('StreamController<String>'));
 
-      return builder
+      builder
         ..body = const Code(
           'changeListener = listener ?? StreamController<String>.broadcast();',
         )
@@ -45,7 +41,6 @@ class DatabaseWriter implements Writer {
     });
   }
 
-  @nonNull
   List<Method> _generateDaoGetters(final Database database) {
     return database.daoGetters.map((daoGetter) {
       final daoGetterName = daoGetter.name;
@@ -61,7 +56,6 @@ class DatabaseWriter implements Writer {
     }).toList();
   }
 
-  @nonNull
   List<Field> _generateDaoInstances(final Database database) {
     return database.daoGetters.map((daoGetter) {
       final daoGetterName = daoGetter.name;
@@ -73,7 +67,6 @@ class DatabaseWriter implements Writer {
     }).toList();
   }
 
-  @nonNull
   Method _generateOpenMethod(final Database database) {
     final createTableStatements =
         _generateCreateTableSqlStatements(database.entities)
@@ -131,7 +124,6 @@ class DatabaseWriter implements Writer {
           '''));
   }
 
-  @nonNull
   List<String> _generateCreateTableSqlStatements(final List<Entity> entities) {
     return entities.map((entity) => entity.getCreateTableStatement()).toList();
   }

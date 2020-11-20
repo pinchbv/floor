@@ -112,7 +112,7 @@ String _format(final String source) {
 void useDartfmt() => EqualsDart.format = _format;
 
 Matcher throwsInvalidGenerationSourceError([
-  final InvalidGenerationSourceError error,
+  final InvalidGenerationSourceError? error,
 ]) {
   const typeMatcher = TypeMatcher<InvalidGenerationSourceError>();
   if (error == null) {

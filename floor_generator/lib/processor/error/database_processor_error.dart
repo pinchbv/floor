@@ -5,8 +5,7 @@ class DatabaseProcessorError {
   final ClassElement _classElement;
 
   DatabaseProcessorError(final ClassElement classElement)
-      : assert(classElement != null),
-        _classElement = classElement;
+      : _classElement = classElement;
 
   InvalidGenerationSourceError get versionIsMissing {
     return InvalidGenerationSourceError(

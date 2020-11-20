@@ -30,7 +30,7 @@ class QueryMethod {
 
   final List<ParameterElement> parameters;
 
-  final Queryable queryable;
+  final Queryable? queryable;
 
   final Set<TypeConverter> typeConverters;
 

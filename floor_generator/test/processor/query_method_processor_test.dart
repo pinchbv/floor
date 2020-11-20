@@ -15,11 +15,13 @@ import 'package:test/test.dart';
 import '../test_utils.dart';
 
 void main() {
-  List<Entity> entities;
-  List<View> views;
+  late List<Entity> entities;
+  late List<View> views;
 
-  setUpAll(() async => entities = await _getEntities());
-  setUpAll(() async => views = await _getViews());
+  setUpAll(() async {
+    entities = await _getEntities();
+    views = await _getViews();
+  });
 
   test('create query method', () async {
     final methodElement = await _createQueryMethodElement('''

@@ -1,5 +1,4 @@
 import 'package:code_builder/code_builder.dart';
-import 'package:floor_generator/misc/annotations.dart';
 import 'package:floor_generator/writer/writer.dart';
 
 class DatabaseBuilderWriter extends Writer {
@@ -8,7 +7,6 @@ class DatabaseBuilderWriter extends Writer {
   DatabaseBuilderWriter(final String databaseName)
       : _databaseName = databaseName;
 
-  @nonNull
   @override
   Class write() {
     final databaseBuilderName = '_\$${_databaseName}Builder';

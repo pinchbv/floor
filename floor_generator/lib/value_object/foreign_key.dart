@@ -1,5 +1,4 @@
 import 'package:collection/collection.dart';
-import 'package:floor_generator/misc/annotations.dart';
 
 class ForeignKey {
   final String parentName;
@@ -16,7 +15,6 @@ class ForeignKey {
     this.onDelete,
   );
 
-  @nonNull
   String getDefinition() {
     final escapedChildColumns =
         childColumns.map((column) => '`$column`').join(', ');

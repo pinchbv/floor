@@ -1,6 +1,5 @@
 import 'package:analyzer/dart/element/element.dart';
 import 'package:floor_annotation/floor_annotation.dart' as annotations;
-import 'package:floor_generator/misc/annotations.dart';
 import 'package:floor_generator/misc/constants.dart';
 import 'package:floor_generator/misc/type_utils.dart';
 import 'package:floor_generator/processor/error/view_processor_error.dart';
@@ -17,7 +16,6 @@ class ViewProcessor extends QueryableProcessor<View> {
   )   : _processorError = ViewProcessorError(classElement),
         super(classElement, typeConverters);
 
-  @nonNull
   @override
   View process() {
     final fields = getFields();
@@ -30,7 +28,6 @@ class ViewProcessor extends QueryableProcessor<View> {
     );
   }
 
-  @nonNull
   String _getName() {
     return classElement
             .getAnnotation(annotations.DatabaseView)
@@ -39,7 +36,6 @@ class ViewProcessor extends QueryableProcessor<View> {
         classElement.displayName;
   }
 
-  @nonNull
   String _getQuery() {
     final query = classElement
         .getAnnotation(annotations.DatabaseView)

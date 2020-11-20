@@ -588,7 +588,7 @@ class TestQueryable extends Queryable {
 class TestProcessor extends QueryableProcessor<TestQueryable> {
   TestProcessor(
     ClassElement classElement, [
-    Set<TypeConverter> typeConverters,
+    Set<TypeConverter>? typeConverters,
   ]) : super(classElement, typeConverters ?? {});
 
   @override

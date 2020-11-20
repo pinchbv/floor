@@ -1,9 +1,8 @@
 import 'package:analyzer/dart/element/element.dart';
 import 'package:analyzer/dart/element/type.dart';
-import 'package:dartx/dartx.dart';
 import 'package:floor_annotation/floor_annotation.dart' as annotations;
-import 'package:floor_generator/misc/annotations.dart';
 import 'package:floor_generator/misc/constants.dart';
+import 'package:floor_generator/misc/extension/iterable_extension.dart';
 import 'package:floor_generator/misc/extension/type_converter_element_extension.dart';
 import 'package:floor_generator/misc/extension/type_converters_extension.dart';
 import 'package:floor_generator/misc/type_utils.dart';
@@ -13,19 +12,15 @@ import 'package:floor_generator/value_object/type_converter.dart';
 import 'package:source_gen/source_gen.dart';
 
 class FieldProcessor extends Processor<Field> {
-  @nonNull
   final FieldElement _fieldElement;
-  @nullable
-  final TypeConverter _typeConverter;
+  final TypeConverter? _typeConverter;
 
   FieldProcessor(
-    @nonNull final FieldElement fieldElement,
-    @nullable final TypeConverter typeConverter,
-  )   : assert(fieldElement != null),
-        _fieldElement = fieldElement,
+    final FieldElement fieldElement,
+    final TypeConverter? typeConverter,
+  )   : _fieldElement = fieldElement,
         _typeConverter = typeConverter;
 
-  @nonNull
   @override
   Field process() {
     final name = _fieldElement.name;
@@ -36,7 +31,7 @@ class FieldProcessor extends Processor<Field> {
     final typeConverter = {
       ..._fieldElement.getTypeConverters(TypeConverterScope.field),
       _typeConverter
-    }.filterNotNull().closestOrNull;
+    }.whereNotNull().closestOrNull;
 
     return Field(
       _fieldElement,
@@ -48,7 +43,6 @@ class FieldProcessor extends Processor<Field> {
     );
   }
 
-  @nonNull
   String _getColumnName(bool hasColumnInfoAnnotation, String name) {
     return hasColumnInfoAnnotation
         ? _fieldElement
@@ -59,7 +53,6 @@ class FieldProcessor extends Processor<Field> {
         : name;
   }
 
-  @nonNull
   bool _getIsNullable(bool hasColumnInfoAnnotation) {
     return hasColumnInfoAnnotation
         ? _fieldElement
@@ -70,8 +63,7 @@ class FieldProcessor extends Processor<Field> {
         : true; // all Dart fields are nullable by default
   }
 
-  @nonNull
-  String _getSqlType(@nullable final TypeConverter typeConverter) {
+  String _getSqlType(final TypeConverter? typeConverter) {
     final type = _fieldElement.type;
     if (type.isDefaultSqlType) {
       return type.asSqlType();

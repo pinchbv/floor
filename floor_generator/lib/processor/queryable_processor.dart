@@ -1,8 +1,8 @@
 import 'package:analyzer/dart/element/element.dart';
 import 'package:analyzer/dart/element/type.dart';
-import 'package:dartx/dartx.dart';
+import 'package:dartx/dartx.dart' show StringX;
 import 'package:floor_annotation/floor_annotation.dart' as annotations;
-import 'package:floor_generator/misc/annotations.dart';
+import 'package:floor_generator/misc/extension/iterable_extension.dart';
 import 'package:floor_generator/misc/extension/set_extension.dart';
 import 'package:floor_generator/misc/extension/type_converter_element_extension.dart';
 import 'package:floor_generator/misc/extension/type_converters_extension.dart';
@@ -34,7 +34,6 @@ abstract class QueryableProcessor<T extends Queryable> extends Processor<T> {
         queryableTypeConverters = typeConverters +
             classElement.getTypeConverters(TypeConverterScope.queryable);
 
-  @nonNull
   @protected
   List<Field> getFields() {
     if (classElement.mixins.isNotEmpty) {
@@ -54,7 +53,6 @@ abstract class QueryableProcessor<T extends Queryable> extends Processor<T> {
     }).toList();
   }
 
-  @nonNull
   @protected
   String getConstructor(final List<Field> fields) {
     final constructorParameters = classElement.constructors.first.parameters;
@@ -67,16 +65,14 @@ abstract class QueryableProcessor<T extends Queryable> extends Processor<T> {
   }
 
   /// Returns `null` whenever field is @ignored
-  @nullable
-  String _getParameterValue(
+  String? _getParameterValue(
     final ParameterElement parameterElement,
     final List<Field> fields,
   ) {
     final parameterName = parameterElement.displayName;
-    final field = fields.firstWhere(
-      (field) => field.name == parameterName,
-      orElse: () => null, // whenever field is @ignored
-    );
+    final field =
+        // null whenever field is @ignored
+        fields.firstOrNullWhere((field) => field.name == parameterName);
     if (field != null) {
       final databaseValue = "row['${field.columnName}']";
 
@@ -90,7 +86,7 @@ abstract class QueryableProcessor<T extends Queryable> extends Processor<T> {
         );
       } else {
         final typeConverter = [...queryableTypeConverters, field.typeConverter]
-            .filterNotNull()
+            .whereNotNull()
             .getClosest(parameterElement.type);
         final castedDatabaseValue = databaseValue.cast(
           typeConverter.databaseType,

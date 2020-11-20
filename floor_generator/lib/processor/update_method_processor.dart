@@ -2,7 +2,6 @@ import 'package:analyzer/dart/element/element.dart';
 import 'package:analyzer/dart/element/type.dart';
 import 'package:floor_annotation/floor_annotation.dart' as annotations
     show Update;
-import 'package:floor_generator/misc/annotations.dart';
 import 'package:floor_generator/misc/change_method_processor_helper.dart';
 import 'package:floor_generator/misc/constants.dart';
 import 'package:floor_generator/misc/extension/dart_object_extension.dart';
@@ -19,14 +18,11 @@ class UpdateMethodProcessor implements Processor<UpdateMethod> {
   UpdateMethodProcessor(
     final MethodElement methodElement,
     final List<Entity> entities, [
-    final ChangeMethodProcessorHelper changeMethodProcessorHelper,
-  ])  : assert(methodElement != null),
-        assert(entities != null),
-        _methodElement = methodElement,
+    final ChangeMethodProcessorHelper? changeMethodProcessorHelper,
+  ])  : _methodElement = methodElement,
         _helper = changeMethodProcessorHelper ??
             ChangeMethodProcessorHelper(methodElement, entities);
 
-  @nonNull
   @override
   UpdateMethod process() {
     final name = _methodElement.name;
@@ -64,7 +60,6 @@ class UpdateMethodProcessor implements Processor<UpdateMethod> {
     );
   }
 
-  @nonNull
   String _getOnConflictStrategy() {
     return _methodElement
         .getAnnotation(annotations.Update)
@@ -72,7 +67,6 @@ class UpdateMethodProcessor implements Processor<UpdateMethod> {
         .toEnumValueString();
   }
 
-  @nonNull
   DartType _getFlattenedReturnType(final DartType returnType) {
     return _methodElement.library.typeSystem.flatten(returnType);
   }

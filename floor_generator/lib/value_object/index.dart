@@ -1,5 +1,3 @@
-import 'package:floor_generator/misc/annotations.dart';
-
 class Index {
   final String name;
   final String tableName;
@@ -8,7 +6,6 @@ class Index {
 
   Index(this.name, this.tableName, this.unique, this.columnNames);
 
-  @nonNull
   String createQuery() {
     final uniqueSql = unique ? ' UNIQUE' : '';
     final escapedColumnNames =
