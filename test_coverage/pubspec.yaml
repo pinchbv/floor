@@ -1,0 +1,16 @@
+name: test_coverage
+publish_to: none
+
+environment:
+  sdk: '>=2.10.0 <3.0.0'
+
+executables:
+  test_coverage:
+
+dependencies:
+  coverage: ^0.13.3
+  lcov: ^5.5.0
+  path: ^1.6.4
+
+dev_dependencies:
+  test: ^1.11.0

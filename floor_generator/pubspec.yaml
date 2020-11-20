@@ -28,4 +28,5 @@ dev_dependencies:
   mockito: ^4.1.1
   path: ^1.8.0-nullsafety
   test: ^1.16.0-nullsafety
-  test_cov: ^0.2.1
+  test_coverage:
+    path: ../test_coverage/
