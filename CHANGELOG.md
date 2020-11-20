@@ -1,5 +1,12 @@
 # Changelog
 
+# 0.17.0
+
+### 🐛 Bug Fixes
+
+* Generate distinct type converter instances
+* Fix generation of DAO method with list argument using type converters
+
 # 0.16.0
 
 ### 🚀 Features
