@@ -44,7 +44,6 @@ extension AnnotationChecker on Element {
   }
 
   /// Returns the first annotation object found on [type]
-
   DartObject getAnnotation(final Type type) {
     return _typeChecker(type).firstAnnotationOfExact(this);
   }
