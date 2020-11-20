@@ -242,7 +242,7 @@ class EntityProcessor extends QueryableProcessor<Entity> {
     if (fieldType.isDefaultSqlType) {
       attributeValue = 'item.$parameterName';
     } else {
-      final TypeConverter typeConverter = [
+      final typeConverter = [
         ...queryableTypeConverters,
         field.typeConverter,
       ].whereNotNull().getClosest(fieldType);
