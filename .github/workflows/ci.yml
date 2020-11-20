@@ -1,10 +1,6 @@
 name: CI
 
-on:
-  push:
-    branches:
-      - develop
-  pull_request:
+on: [ push, pull_request ]
 
 jobs:
   floor-annotation:
@@ -69,7 +65,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [macos-latest, windows-latest, ubuntu-latest]
+        os: [ macos-latest, windows-latest, ubuntu-latest ]
     timeout-minutes: 10
 
     steps:
