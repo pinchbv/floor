@@ -7,8 +7,7 @@ class EntityProcessorError {
   final ClassElement _classElement;
 
   EntityProcessorError(final ClassElement classElement)
-      : assert(classElement != null),
-        _classElement = classElement;
+      : _classElement = classElement;
 
   InvalidGenerationSourceError get missingPrimaryKey {
     return InvalidGenerationSourceError(

@@ -30,9 +30,7 @@ abstract class QueryableProcessor<T extends Queryable> extends Processor<T> {
   QueryableProcessor(
     this.classElement,
     final Set<TypeConverter> typeConverters,
-  )   : assert(classElement != null),
-        assert(typeConverters != null),
-        _queryableProcessorError = QueryableProcessorError(classElement),
+  )   : _queryableProcessorError = QueryableProcessorError(classElement),
         queryableTypeConverters = typeConverters +
             classElement.getTypeConverters(TypeConverterScope.queryable);
 

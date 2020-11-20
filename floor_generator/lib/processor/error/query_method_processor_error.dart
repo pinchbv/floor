@@ -7,8 +7,7 @@ class QueryMethodProcessorError {
   final MethodElement _methodElement;
 
   QueryMethodProcessorError(final MethodElement methodElement)
-      : assert(methodElement != null),
-        _methodElement = methodElement;
+      : _methodElement = methodElement;
 
   InvalidGenerationSourceError get noQueryDefined {
     return InvalidGenerationSourceError(

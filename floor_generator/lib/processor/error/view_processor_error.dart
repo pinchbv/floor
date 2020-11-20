@@ -7,8 +7,7 @@ class ViewProcessorError {
   final ClassElement _classElement;
 
   ViewProcessorError(final ClassElement classElement)
-      : assert(classElement != null),
-        _classElement = classElement;
+      : _classElement = classElement;
 
   InvalidGenerationSourceError get missingQuery {
     return InvalidGenerationSourceError(
