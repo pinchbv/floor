@@ -57,7 +57,7 @@ jobs:
       - name: Run tests
         if:
         working-directory: floor_generator
-        run: pub run test_coverage
+        run: pub run test_cov --no-sound-null-safety
 
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v1

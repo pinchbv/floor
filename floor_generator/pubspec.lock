@@ -456,13 +456,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "0.3.12-nullsafety.10"
-  test_coverage:
+  test_cov:
     dependency: "direct dev"
     description:
-      path: "../test_coverage"
-      relative: true
-    source: path
-    version: "0.0.0"
+      name: test_cov
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.3.0"
   time:
     dependency: transitive
     description:
