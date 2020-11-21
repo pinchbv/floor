@@ -1,7 +1,7 @@
 // TODO #375 delete once dependencies have migrated
 // ignore_for_file: import_of_legacy_library_into_null_safe
 import 'package:analyzer/dart/element/element.dart';
-import 'package:floor_generator/misc/extension/list_equality_extension.dart';
+import 'package:collection/collection.dart';
 import 'package:floor_generator/value_object/field.dart';
 import 'package:floor_generator/value_object/foreign_key.dart';
 import 'package:floor_generator/value_object/index.dart';
