@@ -1,28 +1,26 @@
-// TODO #375 test
+import 'dart:collection';
+
 extension IterableExtension<T> on Iterable<T> {
-  T? get firstOrNull {
-    if (!iterator.moveNext()) return null;
-    return iterator.current;
-  }
-
-  T? firstOrNullWhere(bool Function(T element) predicate) {
-    for (T element in this) {
-      if (predicate(element)) return element;
-    }
-    return null;
-  }
-
   Iterable<T> sortedByDescending(Comparable Function(T element) selector) {
     return toList()..sort((b, a) => selector(a).compareTo(selector(b)));
   }
 
-  Iterable<R> mapNotNull<R>(R? Function(T element) transform) {
-    return map((element) => transform(element)).whereNotNull();
+  Iterable<R> mapNotNull<R>(R? Function(T element) transform) sync* {
+    for (final element in this) {
+      final transformed = transform(element);
+      if (transformed != null) yield transformed;
+    }
   }
-}
 
-extension NullableIterableExtension<T> on Iterable<T?> {
-  Iterable<T> whereNotNull() {
-    return where((element) => element != null).map((element) => element!);
+  /// Returns a new lazy [Iterable] containing only elements from the collection
+  /// having distinct keys returned by the given [selector] function.
+  ///
+  /// The elements in the resulting list are in the same order as they were in
+  /// the source collection.
+  Iterable<T> distinctBy<R>(R Function(T element) selector) sync* {
+    final existing = HashSet<R>();
+    for (final current in this) {
+      if (existing.add(selector(current))) yield current;
+    }
   }
 }

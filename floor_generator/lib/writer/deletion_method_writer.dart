@@ -2,7 +2,7 @@
 // ignore_for_file: import_of_legacy_library_into_null_safe
 import 'package:code_builder/code_builder.dart';
 import 'package:floor_generator/misc/change_method_writer_helper.dart';
-import 'package:floor_generator/misc/string_utils.dart';
+import 'package:floor_generator/misc/extension/string_extension.dart';
 import 'package:floor_generator/value_object/deletion_method.dart';
 import 'package:floor_generator/writer/writer.dart';
 

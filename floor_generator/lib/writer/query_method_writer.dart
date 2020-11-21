@@ -3,8 +3,9 @@
 import 'dart:core';
 
 import 'package:code_builder/code_builder.dart';
-import 'package:dartx/dartx.dart';
+import 'package:collection/collection.dart';
 import 'package:floor_generator/misc/annotation_expression.dart';
+import 'package:floor_generator/misc/extension/string_extension.dart';
 import 'package:floor_generator/misc/extension/type_converters_extension.dart';
 import 'package:floor_generator/misc/type_utils.dart';
 import 'package:floor_generator/value_object/query_method.dart';
