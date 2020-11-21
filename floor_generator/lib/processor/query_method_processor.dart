@@ -2,6 +2,7 @@
 // ignore_for_file: import_of_legacy_library_into_null_safe
 import 'package:analyzer/dart/element/element.dart';
 import 'package:analyzer/dart/element/type.dart';
+import 'package:collection/collection.dart';
 import 'package:floor_annotation/floor_annotation.dart' as annotations;
 import 'package:floor_generator/misc/constants.dart';
 import 'package:floor_generator/misc/extension/iterable_extension.dart';
@@ -46,7 +47,7 @@ class QueryMethodProcessor extends Processor<QueryMethod> {
       returnsStream,
     );
 
-    final queryable = _queryables.firstOrNullWhere((queryable) =>
+    final queryable = _queryables.firstWhereOrNull((queryable) =>
         queryable.classElement.displayName ==
         flattenedReturnType.getDisplayString(withNullability: false));
 
