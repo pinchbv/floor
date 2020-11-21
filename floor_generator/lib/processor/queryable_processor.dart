@@ -3,9 +3,9 @@
 import 'package:analyzer/dart/element/element.dart';
 import 'package:analyzer/dart/element/type.dart';
 import 'package:collection/collection.dart';
-import 'package:dartx/dartx.dart' show StringX;
 import 'package:floor_annotation/floor_annotation.dart' as annotations;
 import 'package:floor_generator/misc/extension/set_extension.dart';
+import 'package:floor_generator/misc/extension/string_extension.dart';
 import 'package:floor_generator/misc/extension/type_converter_element_extension.dart';
 import 'package:floor_generator/misc/extension/type_converters_extension.dart';
 import 'package:floor_generator/misc/type_utils.dart';

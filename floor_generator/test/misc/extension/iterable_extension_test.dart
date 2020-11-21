@@ -19,6 +19,15 @@ void main() {
       expect(actual, equals([0, 1]));
     });
   });
+
+  group('distinctBy', () {
+    test('distincts values by selector', () {
+      final actual = [_Box(1), _Box(1), _Box(0), _Box(2), _Box(2)]
+          .distinctBy((box) => box.number);
+
+      expect(actual, equals([_Box(1), _Box(0), _Box(2)]));
+    });
+  });
 }
 
 class _Box {
