@@ -67,6 +67,8 @@ class QueryAdapter {
 
     Future<void> executeQueryAndNotifyController() async {
       final result = await query(sql, arguments: arguments, mapper: mapper);
+      // TODO #338 let's allow nulls in Streams
+      // TODO #375
       if (result != null) controller.add(result);
     }
 
