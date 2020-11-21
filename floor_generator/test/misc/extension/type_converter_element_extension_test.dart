@@ -1,3 +1,5 @@
+// TODO #375 delete once dependencies have migrated
+// ignore_for_file: import_of_legacy_library_into_null_safe
 import 'package:floor_generator/misc/extension/type_converter_element_extension.dart';
 import 'package:floor_generator/value_object/type_converter.dart';
 import 'package:test/test.dart';

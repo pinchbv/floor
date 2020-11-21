@@ -1,9 +1,10 @@
+// TODO #375 delete once dependencies have migrated
+// ignore_for_file: import_of_legacy_library_into_null_safe
 import 'package:analyzer/dart/element/element.dart';
 import 'package:analyzer/dart/element/type.dart';
-import 'package:dartx/dartx.dart';
 import 'package:floor_annotation/floor_annotation.dart' as annotations;
-import 'package:floor_generator/misc/annotations.dart';
 import 'package:floor_generator/misc/constants.dart';
+import 'package:floor_generator/misc/extension/iterable_extension.dart';
 import 'package:floor_generator/misc/extension/set_extension.dart';
 import 'package:floor_generator/misc/extension/type_converter_element_extension.dart';
 import 'package:floor_generator/misc/type_utils.dart';
@@ -24,15 +25,11 @@ class QueryMethodProcessor extends Processor<QueryMethod> {
     final MethodElement methodElement,
     final List<Queryable> queryables,
     final Set<TypeConverter> typeConverters,
-  )   : assert(methodElement != null),
-        assert(queryables != null),
-        assert(typeConverters != null),
-        _methodElement = methodElement,
+  )   : _methodElement = methodElement,
         _queryables = queryables,
         _typeConverters = typeConverters,
         _processorError = QueryMethodProcessorError(methodElement);
 
-  @nonNull
   @override
   QueryMethod process() {
     final name = _methodElement.displayName;
@@ -49,11 +46,9 @@ class QueryMethodProcessor extends Processor<QueryMethod> {
       returnsStream,
     );
 
-    final queryable = _queryables.firstWhere(
-        (queryable) =>
-            queryable.classElement.displayName ==
-            flattenedReturnType.getDisplayString(withNullability: false),
-        orElse: () => null);
+    final queryable = _queryables.firstOrNullWhere((queryable) =>
+        queryable.classElement.displayName ==
+        flattenedReturnType.getDisplayString(withNullability: false));
 
     final parameterTypeConverters = parameters
         .expand((parameter) =>
@@ -82,15 +77,14 @@ class QueryMethodProcessor extends Processor<QueryMethod> {
     );
   }
 
-  @nonNull
   String _getQuery() {
     final query = _methodElement
         .getAnnotation(annotations.Query)
         .getField(AnnotationField.queryValue)
         ?.toStringValue()
         ?.replaceAll('\n', ' ')
-        ?.replaceAll(RegExp(r'[ ]{2,}'), ' ')
-        ?.trim();
+        .replaceAll(RegExp(r'[ ]{2,}'), ' ')
+        .trim();
 
     if (query == null || query.isEmpty) throw _processorError.noQueryDefined;
 
@@ -99,7 +93,6 @@ class QueryMethodProcessor extends Processor<QueryMethod> {
     return _replaceInClauseArguments(substitutedQuery);
   }
 
-  @nonNull
   String _replaceInClauseArguments(final String query) {
     var index = 0;
     return query.replaceAllMapped(
@@ -114,7 +107,6 @@ class QueryMethodProcessor extends Processor<QueryMethod> {
     );
   }
 
-  @nonNull
   DartType _getFlattenedReturnType(
     final DartType rawReturnType,
     final bool returnsStream,
@@ -130,7 +122,6 @@ class QueryMethodProcessor extends Processor<QueryMethod> {
     return type;
   }
 
-  @nonNull
   bool _getReturnsList(final DartType returnType, final bool returnsStream) {
     final type = returnsStream
         ? returnType.flatten()

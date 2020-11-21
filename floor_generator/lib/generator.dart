@@ -1,3 +1,5 @@
+// TODO #375 delete once dependencies have migrated
+// ignore_for_file: import_of_legacy_library_into_null_safe
 import 'dart:async';
 
 import 'package:analyzer/dart/element/element.dart';
@@ -5,7 +7,6 @@ import 'package:build/build.dart';
 import 'package:code_builder/code_builder.dart';
 import 'package:dartx/dartx.dart';
 import 'package:floor_annotation/floor_annotation.dart' as annotations;
-import 'package:floor_generator/misc/annotations.dart';
 import 'package:floor_generator/processor/database_processor.dart';
 import 'package:floor_generator/value_object/database.dart';
 import 'package:floor_generator/writer/dao_writer.dart';
@@ -24,7 +25,6 @@ class FloorGenerator extends GeneratorForAnnotation<annotations.Database> {
     final BuildStep buildStep,
   ) {
     final database = _getDatabase(element);
-    if (database == null) return null;
 
     final databaseClass = DatabaseWriter(database).write();
     final daoClasses = database.daoGetters
@@ -56,7 +56,6 @@ class FloorGenerator extends GeneratorForAnnotation<annotations.Database> {
     return library.accept(DartEmitter()).toString();
   }
 
-  @nonNull
   Database _getDatabase(final Element element) {
     if (element is! ClassElement) {
       throw InvalidGenerationSourceError(
@@ -64,13 +63,12 @@ class FloorGenerator extends GeneratorForAnnotation<annotations.Database> {
           element: element);
     }
 
-    final classElement = element as ClassElement;
-    if (!classElement.isAbstract) {
+    if (!element.isAbstract) {
       throw InvalidGenerationSourceError(
           'The database class has to be abstract.',
-          element: classElement);
+          element: element);
     }
 
-    return DatabaseProcessor(classElement).process();
+    return DatabaseProcessor(element).process();
   }
 }

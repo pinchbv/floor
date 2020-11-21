@@ -1,21 +1,20 @@
+// TODO #375 delete once dependencies have migrated
+// ignore_for_file: import_of_legacy_library_into_null_safe
 import 'package:analyzer/dart/element/type.dart';
-import 'package:dartx/dartx.dart';
-import 'package:floor_generator/misc/annotations.dart';
+import 'package:floor_generator/misc/extension/iterable_extension.dart';
 import 'package:floor_generator/value_object/type_converter.dart';
 import 'package:source_gen/source_gen.dart';
 
 extension TypeConvertersExtension on Iterable<TypeConverter> {
   /// Returns the [TypeConverter] in the closest [TypeConverterScope] or null
-  @nullable
-  TypeConverter get closestOrNull {
+  TypeConverter? get closestOrNull {
     return sortedByDescending((typeConverter) => typeConverter.scope.index)
         .firstOrNull;
   }
 
   /// Returns the [TypeConverter] in the closest [TypeConverterScope] for
   /// [dartType] or null
-  @nullable
-  TypeConverter getClosestOrNull(DartType dartType) {
+  TypeConverter? getClosestOrNull(DartType dartType) {
     return sortedByDescending((typeConverter) => typeConverter.scope.index)
         .firstOrNullWhere(
             (typeConverter) => typeConverter.fieldType == dartType);
@@ -23,7 +22,6 @@ extension TypeConvertersExtension on Iterable<TypeConverter> {
 
   /// Returns the [TypeConverter] in the closest [TypeConverterScope] for
   /// [dartType]
-  @nonNull
   TypeConverter getClosest(DartType dartType) {
     final closest = getClosestOrNull(dartType);
     if (closest == null) {

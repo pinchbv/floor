@@ -1,6 +1,7 @@
+// TODO #375 delete once dependencies have migrated
+// ignore_for_file: import_of_legacy_library_into_null_safe
 import 'package:analyzer/dart/element/element.dart';
 import 'package:analyzer/dart/element/type.dart';
-import 'package:floor_generator/misc/annotations.dart';
 import 'package:floor_generator/misc/change_method_processor_helper.dart';
 import 'package:floor_generator/processor/processor.dart';
 import 'package:floor_generator/value_object/deletion_method.dart';
@@ -14,14 +15,11 @@ class DeletionMethodProcessor implements Processor<DeletionMethod> {
   DeletionMethodProcessor(
     final MethodElement methodElement,
     final List<Entity> entities, [
-    final ChangeMethodProcessorHelper changeMethodProcessorHelper,
-  ])  : assert(methodElement != null),
-        assert(entities != null),
-        _methodElement = methodElement,
+    final ChangeMethodProcessorHelper? changeMethodProcessorHelper,
+  ])  : _methodElement = methodElement,
         _helper = changeMethodProcessorHelper ??
             ChangeMethodProcessorHelper(methodElement, entities);
 
-  @nonNull
   @override
   DeletionMethod process() {
     final name = _methodElement.name;
@@ -58,7 +56,6 @@ class DeletionMethodProcessor implements Processor<DeletionMethod> {
     );
   }
 
-  @nonNull
   DartType _getFlattenedReturnType(final DartType returnType) {
     return _methodElement.library.typeSystem.flatten(returnType);
   }

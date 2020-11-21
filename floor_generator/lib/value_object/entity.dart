@@ -1,5 +1,6 @@
+// TODO #375 delete once dependencies have migrated
+// ignore_for_file: import_of_legacy_library_into_null_safe
 import 'package:analyzer/dart/element/element.dart';
-import 'package:floor_generator/misc/annotations.dart';
 import 'package:floor_generator/misc/extension/list_equality_extension.dart';
 import 'package:floor_generator/value_object/field.dart';
 import 'package:floor_generator/value_object/foreign_key.dart';
@@ -26,7 +27,6 @@ class Entity extends Queryable {
     this.valueMapping,
   ) : super(classElement, name, fields, constructor);
 
-  @nonNull
   String getCreateTableStatement() {
     final databaseDefinition = fields.map((field) {
       final autoIncrement =
@@ -48,8 +48,7 @@ class Entity extends Queryable {
     return 'CREATE TABLE IF NOT EXISTS `$name` (${databaseDefinition.join(', ')})$withoutRowidClause';
   }
 
-  @nullable
-  String _createPrimaryKeyDefinition() {
+  String? _createPrimaryKeyDefinition() {
     if (primaryKey.autoGenerateId) {
       return null;
     } else {

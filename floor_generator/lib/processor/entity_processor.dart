@@ -1,9 +1,11 @@
+// TODO #375 delete once dependencies have migrated
+// ignore_for_file: import_of_legacy_library_into_null_safe
 import 'package:analyzer/dart/constant/value.dart';
 import 'package:analyzer/dart/element/element.dart';
-import 'package:dartx/dartx.dart';
+import 'package:dartx/dartx.dart' show StringX;
 import 'package:floor_annotation/floor_annotation.dart' as annotations;
-import 'package:floor_generator/misc/annotations.dart';
 import 'package:floor_generator/misc/constants.dart';
+import 'package:floor_generator/misc/extension/iterable_extension.dart';
 import 'package:floor_generator/misc/extension/type_converters_extension.dart';
 import 'package:floor_generator/misc/foreign_key_action.dart';
 import 'package:floor_generator/misc/type_utils.dart';
@@ -25,7 +27,6 @@ class EntityProcessor extends QueryableProcessor<Entity> {
   )   : _processorError = EntityProcessorError(classElement),
         super(classElement, typeConverters);
 
-  @nonNull
   @override
   Entity process() {
     final name = _getName();
@@ -50,7 +51,6 @@ class EntityProcessor extends QueryableProcessor<Entity> {
     );
   }
 
-  @nonNull
   String _getName() {
     return classElement
             .getAnnotation(annotations.Entity)
@@ -59,7 +59,6 @@ class EntityProcessor extends QueryableProcessor<Entity> {
         classElement.displayName;
   }
 
-  @nonNull
   List<ForeignKey> _getForeignKeys() {
     return classElement
             .getAnnotation(annotations.Entity)
@@ -107,11 +106,10 @@ class EntityProcessor extends QueryableProcessor<Entity> {
             onUpdate,
             onDelete,
           );
-        })?.toList() ??
+        }).toList() ??
         [];
   }
 
-  @nonNull
   List<Index> _getIndices(final List<Field> fields, final String tableName) {
     return classElement
             .getAnnotation(annotations.Entity)
@@ -119,12 +117,14 @@ class EntityProcessor extends QueryableProcessor<Entity> {
             ?.toListValue()
             ?.map((indexObject) {
           final unique = indexObject.getField(IndexField.unique)?.toBoolValue();
+          // can't happen as Index.unique is non-nullable
+          if (unique == null) throw ArgumentError.notNull();
 
           final values = indexObject
               .getField(IndexField.value)
               ?.toListValue()
               ?.map((valueObject) => valueObject.toStringValue())
-              ?.toList();
+              .toList();
 
           if (values == null || values.isEmpty) {
             throw _processorError.missingIndexColumnName;
@@ -143,11 +143,10 @@ class EntityProcessor extends QueryableProcessor<Entity> {
               _generateIndexName(tableName, indexColumnNames);
 
           return Index(name, tableName, unique, indexColumnNames);
-        })?.toList() ??
+        }).toList() ??
         [];
   }
 
-  @nonNull
   String _generateIndexName(
     final String tableName,
     final List<String> columnNames,
@@ -155,7 +154,6 @@ class EntityProcessor extends QueryableProcessor<Entity> {
     return Index.defaultPrefix + tableName + '_' + columnNames.join('_');
   }
 
-  @nonNull
   List<String> _getColumns(
     final DartObject object,
     final String foreignKeyField,
@@ -164,11 +162,10 @@ class EntityProcessor extends QueryableProcessor<Entity> {
             .getField(foreignKeyField)
             ?.toListValue()
             ?.map((object) => object.toStringValue())
-            ?.toList() ??
+            .toList() ??
         [];
   }
 
-  @nonNull
   PrimaryKey _getPrimaryKey(final List<Field> fields) {
     final compoundPrimaryKey = _getCompoundPrimaryKey(fields);
 
@@ -179,8 +176,7 @@ class EntityProcessor extends QueryableProcessor<Entity> {
     }
   }
 
-  @nullable
-  PrimaryKey _getCompoundPrimaryKey(final List<Field> fields) {
+  PrimaryKey? _getCompoundPrimaryKey(final List<Field> fields) {
     final compoundPrimaryKeyColumnNames = classElement
         .getAnnotation(annotations.Entity)
         .getField(AnnotationField.entityPrimaryKeys)
@@ -204,7 +200,6 @@ class EntityProcessor extends QueryableProcessor<Entity> {
     return PrimaryKey(compoundPrimaryKeyFields, false);
   }
 
-  @nonNull
   PrimaryKey _getPrimaryKeyFromAnnotation(final List<Field> fields) {
     final primaryKeyField = fields.firstWhere(
         (field) => field.fieldElement.hasAnnotation(annotations.PrimaryKey),
@@ -219,7 +214,6 @@ class EntityProcessor extends QueryableProcessor<Entity> {
     return PrimaryKey([primaryKeyField], autoGenerate);
   }
 
-  @nonNull
   bool _getWithoutRowid() {
     return classElement
             .getAnnotation(annotations.Entity)
@@ -228,7 +222,6 @@ class EntityProcessor extends QueryableProcessor<Entity> {
         false;
   }
 
-  @nonNull
   String _getValueMapping(final List<Field> fields) {
     final keyValueList = fields.map((field) {
       final columnName = field.columnName;
@@ -239,7 +232,6 @@ class EntityProcessor extends QueryableProcessor<Entity> {
     return '<String, dynamic>{${keyValueList.join(', ')}}';
   }
 
-  @nonNull
   String _getAttributeValue(final Field field) {
     final fieldElement = field.fieldElement;
     final parameterName = fieldElement.displayName;
@@ -250,9 +242,10 @@ class EntityProcessor extends QueryableProcessor<Entity> {
     if (fieldType.isDefaultSqlType) {
       attributeValue = 'item.$parameterName';
     } else {
-      final typeConverter = [...queryableTypeConverters, field.typeConverter]
-          .filterNotNull()
-          .getClosest(fieldType);
+      final typeConverter = [
+        ...queryableTypeConverters,
+        field.typeConverter,
+      ].whereNotNull().getClosest(fieldType);
       attributeValue =
           '_${typeConverter.name.decapitalize()}.encode(item.$parameterName)';
     }

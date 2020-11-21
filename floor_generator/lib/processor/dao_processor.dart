@@ -1,3 +1,5 @@
+// TODO #375 delete once dependencies have migrated
+// ignore_for_file: import_of_legacy_library_into_null_safe
 import 'package:analyzer/dart/element/element.dart';
 import 'package:floor_annotation/floor_annotation.dart' as annotations;
 import 'package:floor_generator/misc/extension/set_extension.dart';
@@ -34,13 +36,7 @@ class DaoProcessor extends Processor<Dao> {
     final List<Entity> entities,
     final List<View> views,
     final Set<TypeConverter> typeConverters,
-  )   : assert(classElement != null),
-        assert(daoGetterName != null),
-        assert(databaseName != null),
-        assert(entities != null),
-        assert(views != null),
-        assert(typeConverters != null),
-        _classElement = classElement,
+  )   : _classElement = classElement,
         _daoGetterName = daoGetterName,
         _databaseName = databaseName,
         _entities = entities,

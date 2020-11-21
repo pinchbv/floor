@@ -1,3 +1,5 @@
+// TODO #375 delete once dependencies have migrated
+// ignore_for_file: import_of_legacy_library_into_null_safe
 import 'package:analyzer/dart/element/element.dart';
 import 'package:analyzer/dart/element/type.dart';
 import 'package:floor_generator/misc/extension/list_equality_extension.dart';
@@ -30,7 +32,7 @@ class QueryMethod {
 
   final List<ParameterElement> parameters;
 
-  final Queryable queryable;
+  final Queryable? queryable;
 
   final Set<TypeConverter> typeConverters;
 

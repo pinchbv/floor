@@ -210,7 +210,7 @@ packages:
       path: "../floor_generator"
       relative: true
     source: path
-    version: "0.17.0"
+    version: "1.0.0-nullsafety.0"
   flutter:
     dependency: "direct main"
     description: flutter

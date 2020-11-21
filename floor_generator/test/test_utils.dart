@@ -1,3 +1,5 @@
+// TODO #375 delete once dependencies have migrated
+// ignore_for_file: import_of_legacy_library_into_null_safe
 import 'dart:io';
 
 import 'package:analyzer/dart/element/element.dart';
@@ -112,7 +114,7 @@ String _format(final String source) {
 void useDartfmt() => EqualsDart.format = _format;
 
 Matcher throwsInvalidGenerationSourceError([
-  final InvalidGenerationSourceError error,
+  final InvalidGenerationSourceError? error,
 ]) {
   const typeMatcher = TypeMatcher<InvalidGenerationSourceError>();
   if (error == null) {

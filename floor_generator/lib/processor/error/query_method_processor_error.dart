@@ -1,3 +1,5 @@
+// TODO #375 delete once dependencies have migrated
+// ignore_for_file: import_of_legacy_library_into_null_safe
 import 'package:analyzer/dart/element/element.dart';
 import 'package:source_gen/source_gen.dart';
 
@@ -5,8 +7,7 @@ class QueryMethodProcessorError {
   final MethodElement _methodElement;
 
   QueryMethodProcessorError(final MethodElement methodElement)
-      : assert(methodElement != null),
-        _methodElement = methodElement;
+      : _methodElement = methodElement;
 
   InvalidGenerationSourceError get noQueryDefined {
     return InvalidGenerationSourceError(

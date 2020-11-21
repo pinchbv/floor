@@ -1,9 +1,10 @@
+// TODO #375 delete once dependencies have migrated
+// ignore_for_file: import_of_legacy_library_into_null_safe
 import 'dart:core';
 
 import 'package:code_builder/code_builder.dart';
 import 'package:dartx/dartx.dart';
 import 'package:floor_generator/misc/annotation_expression.dart';
-import 'package:floor_generator/misc/annotations.dart';
 import 'package:floor_generator/misc/extension/type_converters_extension.dart';
 import 'package:floor_generator/misc/type_utils.dart';
 import 'package:floor_generator/value_object/query_method.dart';
@@ -13,9 +14,7 @@ import 'package:floor_generator/writer/writer.dart';
 class QueryMethodWriter implements Writer {
   final QueryMethod _queryMethod;
 
-  QueryMethodWriter(final QueryMethod queryMethod)
-      : assert(queryMethod != null),
-        _queryMethod = queryMethod;
+  QueryMethodWriter(final QueryMethod queryMethod) : _queryMethod = queryMethod;
 
   @override
   Method write() {
@@ -53,12 +52,14 @@ class QueryMethodWriter implements Writer {
     }
 
     final arguments = _generateArguments();
-    if (_queryMethod.returnsVoid) {
+    final queryable = _queryMethod.queryable;
+    // null queryable implies void-returning query method
+    if (_queryMethod.returnsVoid || queryable == null) {
       _methodBody.write(_generateNoReturnQuery(arguments));
       return _methodBody.toString();
     }
 
-    final constructor = _queryMethod.queryable.constructor;
+    final constructor = queryable.constructor;
     final mapper = '(Map<String, dynamic> row) => $constructor';
 
     if (_queryMethod.returnsStream) {
@@ -70,7 +71,6 @@ class QueryMethodWriter implements Writer {
     return _methodBody.toString();
   }
 
-  @nonNull
   List<String> _generateInClauseValueLists() {
     return _queryMethod.parameters
         .where((parameter) => parameter.type.isDartCoreList)
@@ -89,7 +89,6 @@ class QueryMethodWriter implements Writer {
     }).toList();
   }
 
-  @nonNull
   List<String> _generateParameters() {
     return _queryMethod.parameters
         .where((parameter) => !parameter.type.isDartCoreList)
@@ -108,23 +107,20 @@ class QueryMethodWriter implements Writer {
     }).toList();
   }
 
-  @nullable
-  String _generateArguments() {
+  String? _generateArguments() {
     final parameters = _generateParameters();
     return parameters.isNotEmpty ? '<dynamic>[${parameters.join(', ')}]' : null;
   }
 
-  @nonNull
-  String _generateNoReturnQuery(@nullable final String arguments) {
+  String _generateNoReturnQuery(final String? arguments) {
     final parameters = StringBuffer()..write("'${_queryMethod.query}'");
     if (arguments != null) parameters.write(', arguments: $arguments');
     return 'await _queryAdapter.queryNoReturn($parameters);';
   }
 
-  @nonNull
   String _generateQuery(
-    @nullable final String arguments,
-    @nonNull final String mapper,
+    final String? arguments,
+    final String mapper,
   ) {
     final parameters = StringBuffer()..write("'${_queryMethod.query}', ");
     if (arguments != null) parameters.write('arguments: $arguments, ');
@@ -137,13 +133,16 @@ class QueryMethodWriter implements Writer {
     }
   }
 
-  @nonNull
   String _generateStreamQuery(
-    @nullable final String arguments,
-    @nonNull final String mapper,
+    final String? arguments,
+    final String mapper,
   ) {
-    final queryableName = _queryMethod.queryable.name;
-    final isView = _queryMethod.queryable is View;
+    final queryable = _queryMethod.queryable;
+    // can't be null as validated before
+    if (queryable == null) throw ArgumentError.notNull();
+
+    final queryableName = queryable.name;
+    final isView = queryable is View;
     final parameters = StringBuffer()..write("'${_queryMethod.query}', ");
     if (arguments != null) parameters.write('arguments: $arguments, ');
     parameters

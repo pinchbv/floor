@@ -1,8 +1,9 @@
+// TODO #375 delete once dependencies have migrated
+// ignore_for_file: import_of_legacy_library_into_null_safe
 import 'package:analyzer/dart/element/element.dart';
-import 'package:dartx/dartx.dart';
 import 'package:floor_annotation/floor_annotation.dart' as annotations;
-import 'package:floor_generator/misc/annotations.dart';
 import 'package:floor_generator/misc/constants.dart';
+import 'package:floor_generator/misc/extension/iterable_extension.dart';
 import 'package:floor_generator/misc/extension/set_extension.dart';
 import 'package:floor_generator/misc/extension/type_converter_element_extension.dart';
 import 'package:floor_generator/misc/type_utils.dart';
@@ -24,11 +25,9 @@ class DatabaseProcessor extends Processor<Database> {
   final ClassElement _classElement;
 
   DatabaseProcessor(final ClassElement classElement)
-      : assert(classElement != null),
-        _classElement = classElement,
+      : _classElement = classElement,
         _processorError = DatabaseProcessorError(classElement);
 
-  @nonNull
   @override
   Database process() {
     final databaseName = _classElement.displayName;
@@ -60,7 +59,6 @@ class DatabaseProcessor extends Processor<Database> {
     );
   }
 
-  @nonNull
   int _getDatabaseVersion() {
     final version = _classElement
         .getAnnotation(annotations.Database)
@@ -73,7 +71,6 @@ class DatabaseProcessor extends Processor<Database> {
     return version;
   }
 
-  @nonNull
   List<DaoGetter> _getDaoGetters(
     final String databaseName,
     final List<Entity> entities,
@@ -97,19 +94,16 @@ class DatabaseProcessor extends Processor<Database> {
     }).toList();
   }
 
-  @nonNull
   bool _isDao(final FieldElement fieldElement) {
     final element = fieldElement.type.element;
     return element is ClassElement ? _isDaoClass(element) : false;
   }
 
-  @nonNull
   bool _isDaoClass(final ClassElement classElement) {
     return classElement.hasAnnotation(annotations.dao.runtimeType) &&
         classElement.isAbstract;
   }
 
-  @nonNull
   List<Entity> _getEntities(
     final ClassElement databaseClassElement,
     final Set<TypeConverter> typeConverters,
@@ -119,13 +113,13 @@ class DatabaseProcessor extends Processor<Database> {
         .getField(AnnotationField.databaseEntities)
         ?.toListValue()
         ?.map((object) => object.toTypeValue().element)
-        ?.whereType<ClassElement>()
-        ?.where(_isEntity)
-        ?.map((classElement) => EntityProcessor(
+        .whereType<ClassElement>()
+        .where(_isEntity)
+        .map((classElement) => EntityProcessor(
               classElement,
               typeConverters,
             ).process())
-        ?.toList();
+        .toList();
 
     if (entities == null || entities.isEmpty) {
       throw _processorError.noEntitiesDefined;
@@ -134,7 +128,6 @@ class DatabaseProcessor extends Processor<Database> {
     return entities;
   }
 
-  @nonNull
   List<View> _getViews(
     final ClassElement databaseClassElement,
     final Set<TypeConverter> typeConverters,
@@ -144,17 +137,16 @@ class DatabaseProcessor extends Processor<Database> {
             .getField(AnnotationField.databaseViews)
             ?.toListValue()
             ?.map((object) => object.toTypeValue().element)
-            ?.whereType<ClassElement>()
-            ?.where(_isView)
-            ?.map((classElement) => ViewProcessor(
+            .whereType<ClassElement>()
+            .where(_isView)
+            .map((classElement) => ViewProcessor(
                   classElement,
                   typeConverters,
                 ).process())
-            ?.toList() ??
+            .toList() ??
         [];
   }
 
-  @nonNull
   Set<TypeConverter> _getAllTypeConverters(
     final List<DaoGetter> daoGetters,
     final List<Queryable> queryables,
@@ -179,13 +171,11 @@ class DatabaseProcessor extends Processor<Database> {
         fieldTypeConverters;
   }
 
-  @nonNull
   bool _isEntity(final ClassElement classElement) {
     return classElement.hasAnnotation(annotations.Entity) &&
         !classElement.isAbstract;
   }
 
-  @nonNull
   bool _isView(final ClassElement classElement) {
     return classElement.hasAnnotation(annotations.DatabaseView) &&
         !classElement.isAbstract;
