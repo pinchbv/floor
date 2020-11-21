@@ -21,7 +21,7 @@ class QueryMethodWriter implements Writer {
     final builder = MethodBuilder()
       ..annotations.add(overrideAnnotationExpression)
       ..returns = refer(_queryMethod.rawReturnType.getDisplayString(
-        withNullability: false,
+        withNullability: true,
       ))
       ..name = _queryMethod.name
       ..requiredParameters.addAll(_generateMethodParameters())
@@ -38,7 +38,7 @@ class QueryMethodWriter implements Writer {
       return Parameter((builder) => builder
         ..name = parameter.name
         ..type = refer(parameter.type.getDisplayString(
-          withNullability: false,
+          withNullability: true,
         )));
     }).toList();
   }
@@ -95,6 +95,7 @@ class QueryMethodWriter implements Writer {
         .map((parameter) {
       if (parameter.type.isDefaultSqlType) {
         if (parameter.type.isDartCoreBool) {
+          // TODO #375 arguments can't be null - something needs to change here
           return '${parameter.displayName} == null ? null : (${parameter.displayName} ? 1 : 0)';
         } else {
           return parameter.displayName;
@@ -109,7 +110,7 @@ class QueryMethodWriter implements Writer {
 
   String? _generateArguments() {
     final parameters = _generateParameters();
-    return parameters.isNotEmpty ? '<dynamic>[${parameters.join(', ')}]' : null;
+    return parameters.isNotEmpty ? '[${parameters.join(', ')}]' : null;
   }
 
   String _generateNoReturnQuery(final String? arguments) {

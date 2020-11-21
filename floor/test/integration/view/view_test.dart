@@ -29,10 +29,10 @@ abstract class ViewTestDatabase extends FloorDatabase {
 
 void main() {
   group('database tests', () {
-    ViewTestDatabase database;
-    PersonDao personDao;
-    DogDao dogDao;
-    NameDao nameDao;
+    late ViewTestDatabase database;
+    late PersonDao personDao;
+    late DogDao dogDao;
+    late NameDao nameDao;
 
     setUp(() async {
       database = await $FloorViewTestDatabase.inMemoryDatabaseBuilder().build();

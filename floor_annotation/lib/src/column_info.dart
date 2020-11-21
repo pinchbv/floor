@@ -6,5 +6,6 @@ class ColumnInfo {
   /// Defines if the associated column is allowed to contain 'null'.
   final bool nullable;
 
+  // TODO #375 change nullable to false as default
   const ColumnInfo({this.name, this.nullable = true});
 }

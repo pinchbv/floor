@@ -1,3 +1,5 @@
+// TODO #375 delete once dependencies have migrated
+// ignore_for_file: import_of_legacy_library_into_null_safe
 import 'package:floor/src/adapter/deletion_adapter.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/mockito.dart';
@@ -34,7 +36,7 @@ void main() {
       verify(mockDatabaseExecutor.delete(
         entityName,
         where: '$primaryKeyColumnName = ?',
-        whereArgs: <dynamic>[person.id],
+        whereArgs: [person.id],
       ));
     });
 
@@ -53,12 +55,12 @@ void main() {
         mockDatabaseBatch.delete(
           entityName,
           where: '$primaryKeyColumnName = ?',
-          whereArgs: <dynamic>[person1.id],
+          whereArgs: [person1.id],
         ),
         mockDatabaseBatch.delete(
           entityName,
           where: '$primaryKeyColumnName = ?',
-          whereArgs: <dynamic>[person2.id],
+          whereArgs: [person2.id],
         ),
         mockDatabaseBatch.commit(noResult: false),
       ]);
@@ -77,7 +79,7 @@ void main() {
       when(mockDatabaseExecutor.delete(
         entityName,
         where: '$primaryKeyColumnName = ?',
-        whereArgs: <dynamic>[person.id],
+        whereArgs: [person.id],
       )).thenAnswer((_) => Future(() => 1));
 
       final actual = await underTest.deleteAndReturnChangedRows(person);
@@ -85,7 +87,7 @@ void main() {
       verify(mockDatabaseExecutor.delete(
         entityName,
         where: '$primaryKeyColumnName = ?',
-        whereArgs: <dynamic>[person.id],
+        whereArgs: [person.id],
       ));
       expect(actual, equals(1));
     });
@@ -105,12 +107,12 @@ void main() {
         mockDatabaseBatch.delete(
           entityName,
           where: '$primaryKeyColumnName = ?',
-          whereArgs: <dynamic>[person1.id],
+          whereArgs: [person1.id],
         ),
         mockDatabaseBatch.delete(
           entityName,
           where: '$primaryKeyColumnName = ?',
-          whereArgs: <dynamic>[person2.id],
+          whereArgs: [person2.id],
         ),
         mockDatabaseBatch.commit(noResult: false),
       ]);

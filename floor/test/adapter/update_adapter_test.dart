@@ -1,3 +1,5 @@
+// TODO #375 delete once dependencies have migrated
+// ignore_for_file: import_of_legacy_library_into_null_safe
 import 'package:floor/floor.dart';
 import 'package:floor/src/adapter/update_adapter.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -43,7 +45,7 @@ void main() {
         entityName,
         values,
         where: '$primaryKeyColumnName = ?',
-        whereArgs: <dynamic>[person.id],
+        whereArgs: [person.id],
         conflictAlgorithm: conflictAlgorithm,
       ));
     });
@@ -66,14 +68,14 @@ void main() {
           entityName,
           values1,
           where: '$primaryKeyColumnName = ?',
-          whereArgs: <dynamic>[person1.id],
+          whereArgs: [person1.id],
           conflictAlgorithm: conflictAlgorithm,
         ),
         mockDatabaseBatch.update(
           entityName,
           values2,
           where: '$primaryKeyColumnName = ?',
-          whereArgs: <dynamic>[person2.id],
+          whereArgs: [person2.id],
           conflictAlgorithm: conflictAlgorithm,
         ),
         mockDatabaseBatch.commit(noResult: false),
@@ -95,7 +97,7 @@ void main() {
         entityName,
         values,
         where: '$primaryKeyColumnName = ?',
-        whereArgs: <dynamic>[person.id],
+        whereArgs: [person.id],
         conflictAlgorithm: conflictAlgorithm,
       )).thenAnswer((_) => Future(() => 1));
 
@@ -108,7 +110,7 @@ void main() {
         entityName,
         values,
         where: '$primaryKeyColumnName = ?',
-        whereArgs: <dynamic>[person.id],
+        whereArgs: [person.id],
         conflictAlgorithm: conflictAlgorithm,
       ));
       expect(actual, equals(1));
@@ -135,14 +137,14 @@ void main() {
           entityName,
           values1,
           where: '$primaryKeyColumnName = ?',
-          whereArgs: <dynamic>[person1.id],
+          whereArgs: [person1.id],
           conflictAlgorithm: conflictAlgorithm,
         ),
         mockDatabaseBatch.update(
           entityName,
           values2,
           where: '$primaryKeyColumnName = ?',
-          whereArgs: <dynamic>[person2.id],
+          whereArgs: [person2.id],
           conflictAlgorithm: conflictAlgorithm,
         ),
         mockDatabaseBatch.commit(noResult: false),

@@ -9,8 +9,8 @@ part 'bool_test.g.dart';
 
 void main() {
   group('Bool tests', () {
-    TestDatabase database;
-    BoolDao boolDao;
+    late TestDatabase database;
+    late BoolDao boolDao;
 
     setUp(() async {
       database = await $FloorTestDatabase.inMemoryDatabaseBuilder().build();
@@ -22,7 +22,7 @@ void main() {
     });
 
     test('find by nonNull true', () async {
-      final obj = BooleanClass(true, nullable: false, nonnullable: true);
+      final obj = BooleanClass(true, nullable: false, nonNullable: true);
       await boolDao.insertBoolC(obj);
 
       final actual = await boolDao.findWithNonNullable(true);
@@ -30,7 +30,7 @@ void main() {
     });
 
     test('find by nonNull false and convert null boolean', () async {
-      final obj = BooleanClass(true, nullable: null, nonnullable: false);
+      final obj = BooleanClass(true, nullable: null, nonNullable: false);
       await boolDao.insertBoolC(obj);
 
       final actual = await boolDao.findWithNonNullable(false);
@@ -38,7 +38,7 @@ void main() {
     });
 
     test('find by nullable null', () async {
-      final obj = BooleanClass(true, nullable: null, nonnullable: true);
+      final obj = BooleanClass(true, nullable: null, nonNullable: true);
       await boolDao.insertBoolC(obj);
 
       // null == null is false in SQL so this will not return any results.
@@ -50,7 +50,7 @@ void main() {
     });
 
     test('find by nullable true', () async {
-      final obj = BooleanClass(true, nullable: true, nonnullable: true);
+      final obj = BooleanClass(true, nullable: true, nonNullable: true);
       await boolDao.insertBoolC(obj);
 
       final actual = await boolDao.findWithNullable(true);
@@ -58,7 +58,7 @@ void main() {
     });
 
     test('find by nullable false', () async {
-      final obj = BooleanClass(true, nullable: false, nonnullable: true);
+      final obj = BooleanClass(true, nullable: false, nonNullable: true);
       await boolDao.insertBoolC(obj);
 
       final actual = await boolDao.findWithNullable(false);
@@ -73,12 +73,12 @@ class BooleanClass {
   final bool id;
 
   @ColumnInfo(nullable: true)
-  final bool nullable;
+  final bool? nullable;
 
   @ColumnInfo(nullable: false)
-  final bool nonnullable;
+  final bool nonNullable;
 
-  BooleanClass(this.id, {this.nullable, this.nonnullable});
+  BooleanClass(this.id, {this.nullable, required this.nonNullable});
 
   @override
   bool operator ==(Object other) =>
@@ -87,14 +87,14 @@ class BooleanClass {
           runtimeType == other.runtimeType &&
           id == other.id &&
           nullable == other.nullable &&
-          nonnullable == other.nonnullable;
+          nonNullable == other.nonNullable;
 
   @override
-  int get hashCode => id.hashCode ^ nullable.hashCode ^ nonnullable.hashCode;
+  int get hashCode => id.hashCode ^ nullable.hashCode ^ nonNullable.hashCode;
 
   @override
   String toString() {
-    return 'BooleanClass{id: $id, nullable: $nullable, nonnullable: $nonnullable}';
+    return 'BooleanClass{id: $id, nullable: $nullable, nonNullable: $nonNullable}';
   }
 }
 
@@ -105,14 +105,14 @@ abstract class TestDatabase extends FloorDatabase {
 
 @dao
 abstract class BoolDao {
-  @Query('SELECT * FROM BooleanClass where nonnullable = :val')
-  Future<BooleanClass> findWithNonNullable(bool val);
+  @Query('SELECT * FROM BooleanClass where nonNullable = :val')
+  Future<BooleanClass?> findWithNonNullable(bool val);
 
   @Query('SELECT * FROM BooleanClass where nullable = :val')
-  Future<BooleanClass> findWithNullable(bool val);
+  Future<BooleanClass?> findWithNullable(bool? val);
 
   @Query('SELECT * FROM BooleanClass where nullable is null')
-  Future<BooleanClass> findWithNullableBeingNull();
+  Future<BooleanClass?> findWithNullableBeingNull();
 
   @insert
   Future<void> insertBoolC(BooleanClass person);

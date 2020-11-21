@@ -63,6 +63,7 @@ class FieldProcessor extends Processor<Field> {
                 ?.toBoolValue() ??
             true
         : true; // all Dart fields are nullable by default
+    // TODO #375 not true anymore!
   }
 
   String _getSqlType(final TypeConverter? typeConverter) {

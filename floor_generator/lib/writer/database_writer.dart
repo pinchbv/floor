@@ -33,7 +33,7 @@ class DatabaseWriter implements Writer {
     return Constructor((builder) {
       final parameter = Parameter((builder) => builder
         ..name = 'listener'
-        ..type = refer('StreamController<String>'));
+        ..type = refer('StreamController<String>?'));
 
       builder
         ..body = const Code(
@@ -64,7 +64,7 @@ class DatabaseWriter implements Writer {
       final daoTypeName = daoGetter.dao.classElement.displayName;
 
       return Field((builder) => builder
-        ..type = refer(daoTypeName)
+        ..type = refer('$daoTypeName?')
         ..name = '_${daoGetterName}Instance');
     }).toList();
   }
@@ -92,7 +92,7 @@ class DatabaseWriter implements Writer {
       ..type = refer('List<Migration>'));
     final callbackParameter = Parameter((builder) => builder
       ..name = 'callback'
-      ..type = refer('Callback'));
+      ..type = refer('Callback?'));
 
     return Method((builder) => builder
       ..name = 'open'

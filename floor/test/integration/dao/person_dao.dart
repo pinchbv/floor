@@ -12,13 +12,13 @@ abstract class PersonDao {
   Stream<List<Person>> findAllPersonsAsStream();
 
   @Query('SELECT * FROM person WHERE id = :id')
-  Future<Person> findPersonById(int id);
+  Future<Person?> findPersonById(int id);
 
   @Query('SELECT * FROM person WHERE id = :id')
   Stream<Person> findPersonByIdAsStream(int id);
 
   @Query('SELECT * FROM person WHERE id = :id AND custom_name = :name')
-  Future<Person> findPersonByIdAndName(int id, String name);
+  Future<Person?> findPersonByIdAndName(int id, String name);
 
   @Query('SELECT * FROM person WHERE id IN (:ids)')
   Future<List<Person>> findPersonsWithIds(List<int> ids);

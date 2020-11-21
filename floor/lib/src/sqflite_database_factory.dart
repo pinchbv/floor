@@ -5,7 +5,8 @@ import 'package:sqflite/sqflite.dart';
 import 'package:sqflite/sqlite_api.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 
-final sqfliteDatabaseFactory = () {
+// TODO #375 type inference seems to fail here
+final DatabaseFactory sqfliteDatabaseFactory = () {
   if (Platform.isAndroid || Platform.isIOS) {
     return databaseFactory;
   } else if (Platform.isLinux || Platform.isMacOS || Platform.isWindows) {
@@ -20,6 +21,6 @@ final sqfliteDatabaseFactory = () {
 
 extension DatabaseFactoryExtension on DatabaseFactory {
   Future<String> getDatabasePath(final String name) async {
-    return join(await getDatabasesPath(), name);
+    return join(await getDatabasesPath() ?? '', name);
   }
 }

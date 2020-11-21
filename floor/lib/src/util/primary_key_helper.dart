@@ -6,10 +6,15 @@ class PrimaryKeyHelper {
   }
 
   /// Obtains the primary key values
-  static List<dynamic> getPrimaryKeyValues(
+  static List<Object> getPrimaryKeyValues(
     final List<String> primaryKeys,
-    final Map<String, dynamic> values,
+    final Map<String, Object?> values,
   ) {
-    return primaryKeys.map<dynamic>((key) => values[key]).toList();
+    return primaryKeys
+        .map((key) => values[key])
+        // TODO #375 extract
+        .where((element) => element != null)
+        .map((element) => element!)
+        .toList();
   }
 }

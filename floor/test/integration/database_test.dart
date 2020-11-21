@@ -12,9 +12,9 @@ import 'model/person.dart';
 
 void main() {
   group('database tests', () {
-    TestDatabase database;
-    PersonDao personDao;
-    DogDao dogDao;
+    late TestDatabase database;
+    late PersonDao personDao;
+    late DogDao dogDao;
 
     setUp(() async {
       final migration1to2 = Migration(1, 2, (database) async {
@@ -68,7 +68,7 @@ void main() {
 
         await personDao.updatePerson(updatedPerson);
 
-        final actual = await personDao.findPersonById(person.id);
+        final actual = await personDao.findPersonById(person.id!);
         expect(actual, equals(updatedPerson));
       });
 
@@ -216,7 +216,7 @@ void main() {
 
           final actual = await personDao.updatePersonWithReturn(updatedPerson);
 
-          final persistentPerson = await personDao.findPersonById(person.id);
+          final persistentPerson = await personDao.findPersonById(person.id!);
           expect(persistentPerson, equals(updatedPerson));
           expect(actual, equals(1));
         });
@@ -265,10 +265,10 @@ void main() {
         test('find dog for person', () async {
           final person = Person(1, 'Simon');
           await personDao.insertPerson(person);
-          final dog = Dog(2, 'Peter', 'Pete', person.id);
+          final dog = Dog(2, 'Peter', 'Pete', person.id!);
           await dogDao.insertDog(dog);
 
-          final actual = await dogDao.findDogForPersonId(person.id);
+          final actual = await dogDao.findDogForPersonId(person.id!);
 
           expect(actual, equals(dog));
         });
@@ -276,7 +276,7 @@ void main() {
         test('cascade delete dog on deletion of person', () async {
           final person = Person(1, 'Simon');
           await personDao.insertPerson(person);
-          final dog = Dog(2, 'Peter', 'Pete', person.id);
+          final dog = Dog(2, 'Peter', 'Pete', person.id!);
           await dogDao.insertDog(dog);
 
           await personDao.deletePerson(person);
@@ -304,7 +304,7 @@ void main() {
           final person2 = Person(2, 'Frank');
           final person3 = Person(3, 'Paul');
           await personDao.insertPersons([person1, person2, person3]);
-          final ids = [person1.id, person2.id];
+          final ids = [person1.id!, person2.id!];
 
           final actual = await personDao.findPersonsWithIds(ids);
 

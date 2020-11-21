@@ -1,3 +1,6 @@
+// TODO #375 delete once dependencies have migrated
+// ignore_for_file: import_of_legacy_library_into_null_safe
+
 import 'dart:async';
 
 import 'package:floor/src/adapter/query_adapter.dart';
@@ -139,10 +142,10 @@ void main() {
 
   group('stream queries', () {
     // ignore: close_sinks
-    StreamController<String> streamController;
+    StreamController<String>? streamController;
     const entityName = 'person';
 
-    QueryAdapter underTest;
+    late QueryAdapter underTest;
 
     setUp(() {
       streamController = StreamController<String>();
@@ -150,7 +153,7 @@ void main() {
     });
 
     tearDown(() {
-      streamController.close();
+      streamController!.close();
       streamController = null;
     });
 
@@ -196,7 +199,7 @@ void main() {
 
       final actual = underTest.queryStream(sql,
           queryableName: entityName, isView: false, mapper: mapper);
-      streamController.add(entityName);
+      streamController!.add(entityName);
 
       expect(actual, emitsInOrder(<Person>[person, person]));
     });
@@ -249,7 +252,7 @@ void main() {
 
       final actual = underTest.queryListStream(sql,
           queryableName: entityName, isView: false, mapper: mapper);
-      streamController.add(entityName);
+      streamController!.add(entityName);
 
       expect(
         actual,
@@ -281,8 +284,8 @@ void main() {
         ]),
       );
 
-      streamController.add(entityName);
-      streamController.add('otherEntity');
+      streamController!.add(entityName);
+      streamController!.add('otherEntity');
     });
   });
 }
