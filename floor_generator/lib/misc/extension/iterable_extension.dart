@@ -1,13 +1,8 @@
-// TODO #375 delete once dependencies have migrated
-// ignore_for_file: import_of_legacy_library_into_null_safe
 // TODO #375 test
 extension IterableExtension<T> on Iterable<T> {
   T? get firstOrNull {
-    try {
-      return first;
-    } catch (e) {
-      return null;
-    }
+    if (!iterator.moveNext()) return null;
+    return iterator.current;
   }
 
   T? firstOrNullWhere(bool Function(T element) predicate) {
@@ -22,9 +17,7 @@ extension IterableExtension<T> on Iterable<T> {
   }
 
   Iterable<R> mapNotNull<R>(R? Function(T element) transform) {
-    return map((element) => transform(element))
-        .where((element) => element != null)
-        .map((element) => element!);
+    return map((element) => transform(element)).whereNotNull();
   }
 }
 
