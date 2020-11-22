@@ -8,8 +8,8 @@ import 'model/person.dart';
 
 void main() {
   group('stream query tests', () {
-    TestDatabase database;
-    PersonDao personDao;
+    late TestDatabase database;
+    late PersonDao personDao;
 
     setUp(() async {
       database = await $FloorTestDatabase.inMemoryDatabaseBuilder().build();
@@ -34,7 +34,7 @@ void main() {
         final person = Person(1, 'Simon');
         await personDao.insertPerson(person);
 
-        final actual = personDao.findPersonByIdAsStream(person.id);
+        final actual = personDao.findPersonByIdAsStream(person.id!);
 
         expect(actual, emits(person));
       });
@@ -68,7 +68,7 @@ void main() {
         final updatedPerson = Person(person.id, 'Frank');
         await personDao.insertPerson(person);
 
-        final actual = personDao.findPersonByIdAsStream(person.id);
+        final actual = personDao.findPersonByIdAsStream(person.id!);
         expect(actual, emits(person));
         await personDao.updatePerson(updatedPerson);
 
@@ -129,10 +129,10 @@ void main() {
     test('regression test streaming updates from other Dao', () async {
       final person1 = Person(1, 'Simon');
       final person2 = Person(2, 'Frank');
-      final dog1 = Dog(1, 'Dog', 'Doggie', person1.id);
-      final dog2 = Dog(2, 'OtherDog', 'Doggo', person2.id);
+      final dog1 = Dog(1, 'Dog', 'Doggie', person1.id!);
+      final dog2 = Dog(2, 'OtherDog', 'Doggo', person2.id!);
 
-      final actual = personDao.findAllDogsOfPersonAsStream(person1.id);
+      final actual = personDao.findAllDogsOfPersonAsStream(person1.id!);
       expect(
           actual,
           emitsInOrder(<List<Dog>>[

@@ -252,7 +252,8 @@ class EntityProcessor extends QueryableProcessor<Entity> {
 
     if (fieldType.isDartCoreBool) {
       if (field.isNullable) {
-        return '$attributeValue == null ? null : ($attributeValue ? 1 : 0)';
+        // force! underlying non-nullable type as null check has been done
+        return '$attributeValue == null ? null : ($attributeValue! ? 1 : 0)';
       } else {
         return '$attributeValue ? 1 : 0';
       }

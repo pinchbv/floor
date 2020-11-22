@@ -185,7 +185,6 @@ void main() {
         @primaryKey
         final int id;
       
-        @ColumnInfo(nullable: false)
         final bool isSomething;
       
         Person(this.id, this.isSomething);
@@ -208,8 +207,7 @@ void main() {
         @primaryKey
         final int id;
       
-        @ColumnInfo(nullable: true)
-        final bool isSomething;
+        final bool? isSomething;
       
         Person(this.id, this.isSomething);
       }
@@ -219,7 +217,7 @@ void main() {
 
       const expected = '<String, dynamic>{'
           "'id': item.id, "
-          "'isSomething': item.isSomething == null ? null : (item.isSomething ? 1 : 0)"
+          "'isSomething': item.isSomething == null ? null : (item.isSomething! ? 1 : 0)"
           '}';
       expect(actual, equals(expected));
     });

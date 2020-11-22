@@ -33,12 +33,12 @@ void main() {
 
     expect(actual, equalsDart(r'''
       class _$TestDatabase extends TestDatabase {
-        _$TestDatabase([StreamController<String> listener]) {
+        _$TestDatabase([StreamController<String>? listener]) {
          changeListener = listener ?? StreamController<String>.broadcast();
         }
       
         Future<sqflite.Database> open(String path, List<Migration> migrations,
-            [Callback callback]) async {
+            [Callback? callback]) async {
           final databaseOptions = sqflite.OpenDatabaseOptions(
             version: 1,
             onConfigure: (database) async {
@@ -55,7 +55,7 @@ void main() {
             },
             onCreate: (database, version) async {
               await database.execute(
-                  'CREATE TABLE IF NOT EXISTS `Person` (`id` INTEGER, `name` TEXT, PRIMARY KEY (`id`))');
+                  'CREATE TABLE IF NOT EXISTS `Person` (`id` INTEGER NOT NULL, `name` TEXT NOT NULL, PRIMARY KEY (`id`))');
 
               await callback?.onCreate?.call(database, version);
             },
@@ -74,9 +74,9 @@ void main() {
       @Entity(tableName: 'custom_table_name')
       class Person {
         @PrimaryKey(autoGenerate: true)
-        final int id;
+        final int? id;
       
-        @ColumnInfo(name: 'custom_name', nullable: false)
+        @ColumnInfo(name: 'custom_name')
         final String name;
       
         Person(this.id, this.name);
@@ -87,12 +87,12 @@ void main() {
 
     expect(actual, equalsDart(r'''
       class _$TestDatabase extends TestDatabase {
-        _$TestDatabase([StreamController<String> listener]) {
+        _$TestDatabase([StreamController<String>? listener]) {
           changeListener = listener ?? StreamController<String>.broadcast();
         }
         
         Future<sqflite.Database> open(String path, List<Migration> migrations,
-            [Callback callback]) async {
+            [Callback? callback]) async {
           final databaseOptions = sqflite.OpenDatabaseOptions(
             version: 1,
             onConfigure: (database) async {
@@ -149,12 +149,12 @@ void main() {
 
     expect(actual, equalsDart(r"""
       class _$TestDatabase extends TestDatabase {
-        _$TestDatabase([StreamController<String> listener]) {
+        _$TestDatabase([StreamController<String>? listener]) {
          changeListener = listener ?? StreamController<String>.broadcast();
         }
       
         Future<sqflite.Database> open(String path, List<Migration> migrations,
-            [Callback callback]) async {
+            [Callback? callback]) async {
           final databaseOptions = sqflite.OpenDatabaseOptions(
             version: 1,
             onConfigure: (database) async {
@@ -171,7 +171,7 @@ void main() {
             },
             onCreate: (database, version) async {
               await database.execute(
-                  'CREATE TABLE IF NOT EXISTS `Person` (`id` INTEGER, `name` TEXT, PRIMARY KEY (`id`))');
+                  'CREATE TABLE IF NOT EXISTS `Person` (`id` INTEGER NOT NULL, `name` TEXT NOT NULL, PRIMARY KEY (`id`))');
                   
               await database.execute(
                   '''CREATE VIEW IF NOT EXISTS `names` AS SELECT custom_name as name FROM person''');

@@ -57,6 +57,7 @@ jobs:
       - name: Run tests
         if:
         working-directory: floor_generator
+        # TODO #375 remove --no-sound-null-safety once all dependencies have migrated
         run: pub run test_cov --no-sound-null-safety
 
       - name: Upload coverage to Codecov
@@ -101,7 +102,8 @@ jobs:
           sudo apt-get -y install sqlite3 libsqlite3-dev
 
       - name: Run tests
-        run: flutter test --coverage --coverage-path coverage/lcov.info
+        # TODO #375 remove --no-sound-null-safety once all dependencies have migrated
+        run: flutter test --coverage --coverage-path coverage/lcov.info --no-sound-null-safety
         working-directory: floor
 
       - name: Upload coverage to Codecov

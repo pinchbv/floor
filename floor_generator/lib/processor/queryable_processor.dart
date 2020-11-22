@@ -123,13 +123,13 @@ extension on String {
         return '($this as int) != 0';
       }
     } else if (dartType.isDartCoreString) {
-      return '$this as String';
+      return '$this as String${isNullable ? '?' : ''}';
     } else if (dartType.isDartCoreInt) {
-      return '$this as int';
+      return '$this as int${isNullable ? '?' : ''}';
     } else if (dartType.isUint8List) {
-      return '$this as Uint8List';
+      return '$this as Uint8List${isNullable ? '?' : ''}';
     } else if (dartType.isDartCoreDouble) {
-      return '$this as double'; // must be double
+      return '$this as double${isNullable ? '?' : ''}';
     } else {
       throw InvalidGenerationSourceError(
         'Trying to convert unsupported type $dartType.',

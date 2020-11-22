@@ -32,4 +32,14 @@ class QueryMethodProcessorError {
       element: _methodElement,
     );
   }
+
+  InvalidGenerationSourceError queryMethodParameterIsNull(
+    final ParameterElement parameterElement,
+  ) {
+    return InvalidGenerationSourceError(
+      'Query method parameters have to be non-nullable.',
+      todo: 'Define ${parameterElement.displayName} as non-nullable.',
+      element: _methodElement,
+    );
+  }
 }

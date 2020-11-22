@@ -5,6 +5,7 @@ import 'package:analyzer/dart/element/type.dart';
 import 'package:collection/collection.dart';
 import 'package:floor_annotation/floor_annotation.dart' as annotations;
 import 'package:floor_generator/misc/constants.dart';
+import 'package:floor_generator/misc/extension/dart_type_extension.dart';
 import 'package:floor_generator/misc/extension/iterable_extension.dart';
 import 'package:floor_generator/misc/extension/set_extension.dart';
 import 'package:floor_generator/misc/extension/type_converter_element_extension.dart';
@@ -144,8 +145,14 @@ class QueryMethodProcessor extends Processor<QueryMethod> {
     final String query,
     final List<ParameterElement> parameterElements,
   ) {
-    final queryParameterCount = RegExp(r'\?').allMatches(query).length;
+    // TODO #375 test
+    for (final parameter in parameterElements) {
+      if (parameter.type.isNullable) {
+        throw _processorError.queryMethodParameterIsNull(parameter);
+      }
+    }
 
+    final queryParameterCount = RegExp(r'\?').allMatches(query).length;
     if (queryParameterCount != parameterElements.length) {
       throw _processorError.queryArgumentsAndMethodParametersDoNotMatch;
     }

@@ -420,7 +420,7 @@ void main() {
         
         final String bar;
       
-        Person(this.id, this.name, {this.bar});
+        Person(this.id, this.name, {required this.bar});
       }
     ''');
 
@@ -437,13 +437,12 @@ void main() {
         final int id;
       
         final String name;
-        
-        @ColumnInfo(nullable: false)
-        final bool bar;
-        
-        final bool foo
       
-        Person(this.id, this.name, {this.bar, this.foo});
+        final bool bar;
+      
+        final bool? foo;
+      
+        Person(this.id, this.name, {required this.bar, this.foo});
       }
     ''');
 
@@ -463,7 +462,7 @@ void main() {
         
         final String bar;
       
-        Person({this.id, this.name, this.bar});
+        Person({required this.id, required this.name, required this.bar});
       }
     ''');
 
@@ -481,7 +480,7 @@ void main() {
       
         final String name;
         
-        final String bar;
+        final String? bar;
       
         Person(this.id, this.name, [this.bar]);
       }
@@ -490,18 +489,18 @@ void main() {
       final actual = TestProcessor(classElement).process().constructor;
 
       const expected =
-          "Person(row['id'] as int, row['name'] as String, row['bar'] as String)";
+          "Person(row['id'] as int, row['name'] as String, row['bar'] as String?)";
       expect(actual, equals(expected));
     });
 
     test('generate constructor with optional arguments', () async {
       final classElement = await createClassElement('''
       class Person {
-        final int id;
+        final int? id;
       
-        final String name;
+        final String? name;
         
-        final String bar;
+        final String? bar;
       
         Person([this.id, this.name, this.bar]);
       }
@@ -510,8 +509,58 @@ void main() {
       final actual = TestProcessor(classElement).process().constructor;
 
       const expected =
-          "Person(row['id'] as int, row['name'] as String, row['bar'] as String)";
+          "Person(row['id'] as int?, row['name'] as String?, row['bar'] as String?)";
       expect(actual, equals(expected));
+    });
+
+    group('nullability', () {
+      test('generates constructor with only nullable types', () async {
+        final classElement = await createClassElement('''
+          class Person {
+            final int? id;
+            
+            final double? doubleId; 
+          
+            final String? name;
+            
+            final bool? bar;
+            
+            final Uint8List? blob;
+          
+            Person(this.id, this.doubleId, this.name, this.bar, this.blob);
+          }
+        ''');
+
+        final actual = TestProcessor(classElement).process().constructor;
+
+        const expected =
+            "Person(row['id'] as int?, row['doubleId'] as double?, row['name'] as String?, row['bar'] == null ? null : (row['bar'] as int) != 0, row['blob'] as Uint8List?)";
+        expect(actual, equals(expected));
+      });
+
+      test('generates constructor with only non-nullable types', () async {
+        final classElement = await createClassElement('''
+          class Person {
+            final int id;
+            
+            final double doubleId; 
+          
+            final String name;
+            
+            final bool bar;
+            
+            final Uint8List blob;
+          
+            Person(this.id, this.doubleId, this.name, this.bar, this.blob);
+          }
+        ''');
+
+        final actual = TestProcessor(classElement).process().constructor;
+
+        const expected =
+            "Person(row['id'] as int, row['doubleId'] as double, row['name'] as String, (row['bar'] as int) != 0, row['blob'] as Uint8List)";
+        expect(actual, equals(expected));
+      });
     });
   });
 
@@ -524,7 +573,7 @@ void main() {
         final String name;
         
         @ignore
-        String foo;
+        String? foo;
       
         Person(this.id, this.name);
       }
@@ -547,7 +596,7 @@ void main() {
         final String name;
         
         @ignore
-        String foo;
+        String? foo;
       
         Person(this.id, this.name, [this.foo = 'foo']);
       }

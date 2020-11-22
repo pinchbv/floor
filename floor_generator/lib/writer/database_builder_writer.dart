@@ -15,7 +15,7 @@ class DatabaseBuilderWriter extends Writer {
 
     final nameField = Field((builder) => builder
       ..name = 'name'
-      ..type = refer('String')
+      ..type = refer('String?')
       ..modifier = FieldModifier.final$);
 
     final migrationsField = Field((builder) => builder
@@ -26,7 +26,7 @@ class DatabaseBuilderWriter extends Writer {
 
     final callbackField = Field((builder) => builder
       ..name = '_callback'
-      ..type = refer('Callback'));
+      ..type = refer('Callback?'));
 
     final constructor = Constructor((builder) => builder
       ..requiredParameters.add(Parameter((builder) => builder
@@ -64,7 +64,7 @@ class DatabaseBuilderWriter extends Writer {
       ..docs.add('/// Creates the database and initializes it.')
       ..body = Code('''
         final path = name != null
-          ? await sqfliteDatabaseFactory.getDatabasePath(name)
+          ? await sqfliteDatabaseFactory.getDatabasePath(name!)
           : ':memory:';
         final database = _\$$_databaseName();
         database.database = await database.open(

@@ -8,19 +8,20 @@ abstract class FloorDatabase {
   /// [StreamController] that is responsible for notifying listeners about changes
   /// in specific tables. It acts as an event bus.
   @protected
-  StreamController<String> changeListener;
+  // TODO #375 late final?
+  late StreamController<String> changeListener;
 
   /// Use this whenever you need direct access to the sqflite database.
-  sqflite.DatabaseExecutor database;
+  // TODO #375 late final?
+  late sqflite.DatabaseExecutor database;
 
   /// Closes the database.
   Future<void> close() async {
-    await changeListener?.close();
+    await changeListener.close();
 
-    final immutableDatabase = database;
-    if (immutableDatabase is sqflite.Database &&
-        (immutableDatabase?.isOpen ?? false)) {
-      await immutableDatabase.close();
+    final database = this.database;
+    if (database is sqflite.Database && database.isOpen) {
+      await database.close();
     }
   }
 }

@@ -9,8 +9,8 @@ part 'entity_inheritance_test.g.dart';
 
 void main() {
   group('entity inheritance tests', () {
-    TestDatabase database;
-    CommentDao commentDao;
+    late TestDatabase database;
+    late CommentDao commentDao;
 
     setUp(() async {
       database = await $FloorTestDatabase.inMemoryDatabaseBuilder().build();
@@ -34,19 +34,19 @@ void main() {
 
 // data models:
 class BaseObject {
-  @PrimaryKey()
+  @primaryKey
   final int id;
 
-  @ColumnInfo(name: 'create_time', nullable: false)
+  @ColumnInfo(name: 'create_time')
   final String createTime;
 
   @ColumnInfo(name: 'update_time')
-  final String updateTime;
+  final String? updateTime;
 
   BaseObject(
-    this.id,
-    this.updateTime, {
-    String createTime,
+    this.id, {
+    this.updateTime,
+    String? createTime,
   }) : createTime = createTime ?? DateTime.now().toString();
 }
 
@@ -56,9 +56,13 @@ class Comment extends BaseObject {
 
   final String content;
 
-  Comment(int id, this.author,
-      {this.content = '', String createTime, String updateTime})
-      : super(id, updateTime, createTime: createTime);
+  Comment(
+    int id,
+    this.author, {
+    this.content = '',
+    String? createTime,
+    String? updateTime,
+  }) : super(id, updateTime: updateTime, createTime: createTime);
 
   @override
   bool operator ==(Object other) =>
@@ -94,7 +98,7 @@ abstract class TestDatabase extends FloorDatabase {
 @dao
 abstract class CommentDao {
   @Query('SELECT * FROM comments WHERE id = :id')
-  Future<Comment> findCommentById(int id);
+  Future<Comment?> findCommentById(int id);
 
   @insert
   Future<void> addComment(Comment c);

@@ -7,18 +7,15 @@ import 'package:sqflite/sqlite_api.dart';
 class InsertionAdapter<T> {
   final DatabaseExecutor _database;
   final String _entityName;
-  final Map<String, dynamic> Function(T) _valueMapper;
-  final StreamController<String> _changeListener;
+  final Map<String, Object?> Function(T) _valueMapper;
+  final StreamController<String>? _changeListener;
 
   InsertionAdapter(
     final DatabaseExecutor database,
     final String entityName,
-    final Map<String, dynamic> Function(T) valueMapper, [
-    final StreamController<String> changeListener,
-  ])  : assert(database != null),
-        assert(entityName != null),
-        assert(entityName.isNotEmpty),
-        assert(valueMapper != null),
+    final Map<String, Object?> Function(T) valueMapper, [
+    final StreamController<String>? changeListener,
+  ])  : assert(entityName.isNotEmpty),
         _database = database,
         _entityName = entityName,
         _valueMapper = valueMapper,
@@ -45,9 +42,7 @@ class InsertionAdapter<T> {
       );
     }
     await batch.commit(noResult: true);
-    if (_changeListener != null) {
-      _changeListener.add(_entityName);
-    }
+    _changeListener?.add(_entityName);
   }
 
   Future<int> insertAndReturnId(
@@ -71,9 +66,7 @@ class InsertionAdapter<T> {
       );
     }
     final result = (await batch.commit(noResult: false)).cast<int>();
-    if (_changeListener != null && result.isNotEmpty) {
-      _changeListener.add(_entityName);
-    }
+    if (result.isNotEmpty) _changeListener?.add(_entityName);
     return result;
   }
 
@@ -86,9 +79,7 @@ class InsertionAdapter<T> {
       _valueMapper(item),
       conflictAlgorithm: onConflictStrategy.asSqfliteConflictAlgorithm(),
     );
-    if (_changeListener != null && result != null) {
-      _changeListener.add(_entityName);
-    }
+    if (result != 0) _changeListener?.add(_entityName);
     return result;
   }
 }

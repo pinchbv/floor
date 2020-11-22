@@ -1,3 +1,5 @@
+// TODO #375 delete once dependencies have migrated
+// ignore_for_file: import_of_legacy_library_into_null_safe
 import 'package:floor/floor.dart';
 import 'package:floor/src/adapter/insertion_adapter.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -12,8 +14,7 @@ void main() {
   final mockDatabaseBatch = MockDatabaseBatch();
 
   const entityName = 'person';
-  final valueMapper = (Person person) =>
-      <String, dynamic>{'id': person.id, 'name': person.name};
+  final valueMapper = (Person person) => {'id': person.id, 'name': person.name};
   const onConflictStrategy = OnConflictStrategy.ignore;
   const conflictAlgorithm = ConflictAlgorithm.ignore;
 
@@ -37,6 +38,7 @@ void main() {
 
         await underTest.insert(person, onConflictStrategy);
 
+        // TODO #375 let's get rid of all dynamics!
         final values = <String, dynamic>{'id': person.id, 'name': person.name};
         verify(mockDatabaseExecutor.insert(
           entityName,
@@ -105,14 +107,14 @@ void main() {
         expect(actual, equals(person.id));
       });
 
-      test('insert item but transaction failed (returns null)', () async {
+      test('insert item but transaction failed (return 0)', () async {
         final person = Person(1, 'Simon');
         final values = <String, dynamic>{'id': person.id, 'name': person.name};
         when(mockDatabaseExecutor.insert(
           entityName,
           values,
           conflictAlgorithm: conflictAlgorithm,
-        )).thenAnswer((_) => Future(() => null));
+        )).thenAnswer((_) => Future(() => 0));
 
         final actual =
             await underTest.insertAndReturnId(person, onConflictStrategy);
@@ -122,7 +124,7 @@ void main() {
           values,
           conflictAlgorithm: conflictAlgorithm,
         ));
-        expect(actual, isNull);
+        expect(actual, equals(0));
       });
 
       test('insert items and return primary keys', () async {
@@ -191,8 +193,8 @@ void main() {
     test('insert item', () async {
       final person = Person(1, 'Simon');
       when(mockDatabaseExecutor.insert(
-        any,
-        any,
+        entityName,
+        valueMapper(person),
         conflictAlgorithm: conflictAlgorithm,
       )).thenAnswer((_) => Future(() => person.id));
 
@@ -201,13 +203,13 @@ void main() {
       verify(mockStreamController.add(entityName));
     });
 
-    test('insert item but transaction failed (returns null)', () async {
+    test('insert item but transaction failed (returns 0)', () async {
       final person = Person(1, 'Simon');
       when(mockDatabaseExecutor.insert(
-        any,
-        any,
+        entityName,
+        valueMapper(person),
         conflictAlgorithm: conflictAlgorithm,
-      )).thenAnswer((_) => Future(() => null));
+      )).thenAnswer((_) => Future(() => 0));
 
       await underTest.insert(person, onConflictStrategy);
 
