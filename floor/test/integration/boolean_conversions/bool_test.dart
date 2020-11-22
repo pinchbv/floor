@@ -70,7 +70,7 @@ void main() {
 @entity
 class BooleanClass {
   @primaryKey
-  final bool id;
+  final bool? id;
 
   @ColumnInfo(nullable: true)
   final bool? nullable;

@@ -96,7 +96,7 @@ class QueryMethodWriter implements Writer {
         .map((parameter) {
       if (parameter.type.isDefaultSqlType) {
         if (parameter.type.isDartCoreBool) {
-          // TODO #375 arguments can't be null - something needs to change here
+          // TODO #375 arguments don't have to be null - something needs to change here
           return '${parameter.displayName} == null ? null : (${parameter.displayName} ? 1 : 0)';
         } else {
           return parameter.displayName;

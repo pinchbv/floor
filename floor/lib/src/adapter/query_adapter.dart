@@ -18,10 +18,15 @@ class QueryAdapter {
   /// Executes a SQLite query that may return a single value.
   Future<T?> query<T>(
     final String sql, {
-    final List<Object>? arguments,
+    final List<Object?>? arguments,
     required final T Function(Map<String, Object?>) mapper,
   }) async {
-    final rows = await _database.rawQuery(sql, arguments);
+    // TODO #375 is this unwanted behavior of sqflite?
+    //  https://github.com/tekartik/sqflite/pull/535#discussion_r528254447
+    final safeArguments = arguments
+        ?.map((element) => element == null ? 'NULL' : element)
+        .toList();
+    final rows = await _database.rawQuery(sql, safeArguments);
 
     if (rows.isEmpty) {
       return null;
@@ -35,27 +40,37 @@ class QueryAdapter {
   /// Executes a SQLite query that may return multiple values.
   Future<List<T>> queryList<T>(
     final String sql, {
-    final List<Object>? arguments,
+    final List<Object?>? arguments,
     required final T Function(Map<String, Object?>) mapper,
   }) async {
-    final rows = await _database.rawQuery(sql, arguments);
+    // TODO #375 is this unwanted behavior of sqflite?
+    //  https://github.com/tekartik/sqflite/pull/535#discussion_r528254447
+    final safeArguments = arguments
+        ?.map((element) => element == null ? 'NULL' : element)
+        .toList();
+    final rows = await _database.rawQuery(sql, safeArguments);
     return rows.map((row) => mapper(row)).toList();
   }
 
   Future<void> queryNoReturn(
     final String sql, {
-    final List<Object>? arguments,
+    final List<Object?>? arguments,
   }) async {
     // TODO #94 differentiate between different query kinds (select, update, delete, insert)
     //  this enables to notify the observers
     //  also requires extracting the table name :(
-    await _database.rawQuery(sql, arguments);
+    // TODO #375 is this unwanted behavior of sqflite?
+    //  https://github.com/tekartik/sqflite/pull/535#discussion_r528254447
+    final safeArguments = arguments
+        ?.map((element) => element == null ? 'NULL' : element)
+        .toList();
+    await _database.rawQuery(sql, safeArguments);
   }
 
   /// Executes a SQLite query that returns a stream of single query results.
   Stream<T> queryStream<T>(
     final String sql, {
-    final List<Object>? arguments,
+    final List<Object?>? arguments,
     required final String queryableName,
     required final bool isView,
     required final T Function(Map<String, Object?>) mapper,

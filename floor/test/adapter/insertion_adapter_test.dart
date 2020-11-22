@@ -124,7 +124,7 @@ void main() {
           values,
           conflictAlgorithm: conflictAlgorithm,
         ));
-        expect(actual, isNull);
+        expect(actual, equals(0));
       });
 
       test('insert items and return primary keys', () async {
