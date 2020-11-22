@@ -1,4 +1,6 @@
+import 'package:floor_annotation/floor_annotation.dart' as annotations;
 import 'package:floor_generator/misc/constants.dart';
+import 'package:floor_generator/misc/extension/foreign_key_action_extension.dart';
 import 'package:floor_generator/value_object/entity.dart';
 import 'package:floor_generator/value_object/field.dart';
 import 'package:floor_generator/value_object/foreign_key.dart';
@@ -119,8 +121,8 @@ void main() {
         'parentName',
         ['parentColumn'],
         ['childColumn'],
-        'foo',
-        'bar',
+        annotations.ForeignKeyAction.cascade,
+        annotations.ForeignKeyAction.noAction,
       );
       final primaryKey = PrimaryKey([nullableField], true);
       final entity = Entity(
@@ -142,8 +144,8 @@ void main() {
           'FOREIGN KEY (`${foreignKey.childColumns[0]}`) '
           'REFERENCES `${foreignKey.parentName}` '
           '(`${foreignKey.parentColumns[0]}`) '
-          'ON UPDATE ${foreignKey.onUpdate} '
-          'ON DELETE ${foreignKey.onDelete}'
+          'ON UPDATE ${foreignKey.onUpdate.toSql()} '
+          'ON DELETE ${foreignKey.onDelete.toSql()}'
           ')';
       expect(actual, equals(expected));
     });

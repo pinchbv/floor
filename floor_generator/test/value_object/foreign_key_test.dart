@@ -1,3 +1,4 @@
+import 'package:floor_annotation/floor_annotation.dart' as annotations;
 import 'package:floor_generator/value_object/foreign_key.dart';
 import 'package:test/test.dart';
 
@@ -8,8 +9,8 @@ void main() {
         'Person',
         ['id'],
         ['owner_id'],
-        'CASCADE',
-        'SET NULL',
+        annotations.ForeignKeyAction.cascade,
+        annotations.ForeignKeyAction.setNull,
       );
 
       final actual = foreignKey.getDefinition();
@@ -26,8 +27,8 @@ void main() {
         'Person',
         ['id', 'foo'],
         ['owner_id', 'bar'],
-        'CASCADE',
-        'SET NULL',
+        annotations.ForeignKeyAction.cascade,
+        annotations.ForeignKeyAction.setNull,
       );
 
       final actual = foreignKey.getDefinition();

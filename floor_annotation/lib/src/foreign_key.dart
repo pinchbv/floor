@@ -15,13 +15,13 @@ class ForeignKey {
   /// Action to take when the parent [Entity] is updated from the database.
   ///
   /// By default, [ForeignKeyAction.noAction] is used.
-  final int onUpdate;
+  final ForeignKeyAction onUpdate;
 
   /// [ForeignKeyAction]
   /// Action to take when the parent [Entity] is deleted from the database.
   ///
   /// By default, [ForeignKeyAction.noAction] is used.
-  final int onDelete;
+  final ForeignKeyAction onDelete;
 
   /// Declares a foreign key on another [Entity].
   const ForeignKey({
@@ -35,13 +35,13 @@ class ForeignKey {
 
 /// Constants definition for values that can be used in
 /// [ForeignKey.onDelete] and [ForeignKey.onUpdate]
-abstract class ForeignKeyAction {
+enum ForeignKeyAction {
   /// Possible value for [ForeignKey.onDelete] or [ForeignKey.onUpdate].
   ///
   /// When a parent key is modified or deleted from the database, no special
   /// action is taken. This means that SQLite will not make any effort to fix
   /// the constraint failure, instead, reject the change.
-  static const noAction = 1;
+  noAction,
 
   /// Possible value for [ForeignKey.onDelete] or [ForeignKey.onUpdate].
   ///
@@ -57,7 +57,7 @@ abstract class ForeignKeyAction {
   /// Even if the foreign key constraint it is attached to is deferred(),
   /// configuring a RESTRICT action causes SQLite to return an error immediately
   /// if a parent key with dependent child keys is deleted or modified.
-  static const restrict = 2;
+  restrict,
 
   /// Possible value for [ForeignKey.onDelete] or [ForeignKey.onUpdate].
   ///
@@ -65,14 +65,14 @@ abstract class ForeignKeyAction {
   /// (for [ForeignKey.onDelete]) or modified (for [ForeignKey.onUpdate]), the
   /// child key columns of all rows in the child table that mapped to the parent
   /// key are set to contain NULL values.
-  static const setNull = 3;
+  setNull,
 
   /// Possible value for [ForeignKey.onDelete] or [ForeignKey.onUpdate].
   ///
   /// The 'SET DEFAULT' actions are similar to SET_NULL, except that each of the
   /// child key columns is set to contain the columns default value instead of
   /// NULL.
-  static const setDefault = 4;
+  setDefault,
 
   /// Possible value for [ForeignKey.onDelete] or [ForeignKey.onUpdate].
   ///
@@ -82,5 +82,5 @@ abstract class ForeignKeyAction {
   /// deleted parent row is also deleted. For an [ForeignKey.onUpdate] action,
   /// it means that the values stored in each dependent child key are modified
   /// to match the new parent key values.
-  static const cascade = 5;
+  cascade,
 }
