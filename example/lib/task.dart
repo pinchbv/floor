@@ -3,7 +3,7 @@ import 'package:floor/floor.dart';
 @entity
 class Task {
   @PrimaryKey(autoGenerate: true)
-  final int id;
+  final int? id;
 
   final String message;
 
