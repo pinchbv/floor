@@ -13,8 +13,7 @@ void main() {
 
   const entityName = 'person';
   const primaryKeyColumnName = 'id';
-  final valueMapper = (Person person) =>
-      <String, dynamic>{'id': person.id, 'name': person.name};
+  final valueMapper = (Person person) => {'id': person.id, 'name': person.name};
 
   final underTest = DeletionAdapter(
     mockDatabaseExecutor,

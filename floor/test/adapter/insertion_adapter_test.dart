@@ -14,8 +14,7 @@ void main() {
   final mockDatabaseBatch = MockDatabaseBatch();
 
   const entityName = 'person';
-  final valueMapper =
-      (Person person) => <String, Object>{'id': person.id, 'name': person.name};
+  final valueMapper = (Person person) => {'id': person.id, 'name': person.name};
   const onConflictStrategy = OnConflictStrategy.ignore;
   const conflictAlgorithm = ConflictAlgorithm.ignore;
 

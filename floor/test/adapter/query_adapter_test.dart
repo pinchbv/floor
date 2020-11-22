@@ -27,7 +27,7 @@ void main() {
       test('returns item without arguments', () async {
         final person = Person(1, 'Frank');
         final queryResult = Future(() => [
-              <String, dynamic>{'id': person.id, 'name': person.name}
+              {'id': person.id, 'name': person.name}
             ]);
         when(mockDatabaseExecutor.rawQuery(sql)).thenAnswer((_) => queryResult);
 
@@ -41,7 +41,7 @@ void main() {
         final person = Person(1, 'Frank');
         final arguments = [person.id, person.name];
         final queryResult = Future(() => [
-              <String, dynamic>{'id': person.id, 'name': person.name}
+              {'id': person.id, 'name': person.name}
             ]);
         when(mockDatabaseExecutor.rawQuery(sql, arguments))
             .thenAnswer((_) => queryResult);
@@ -66,8 +66,8 @@ void main() {
       test('exception because query returns multiple items', () async {
         final person = Person(1, 'Frank');
         final queryResult = Future(() => [
-              <String, dynamic>{'id': person.id, 'name': person.name},
-              <String, dynamic>{'id': 2, 'name': 'Peter'},
+              {'id': person.id, 'name': person.name},
+              {'id': 2, 'name': 'Peter'},
             ]);
         when(mockDatabaseExecutor.rawQuery(sql)).thenAnswer((_) => queryResult);
 
@@ -83,8 +83,8 @@ void main() {
         final person = Person(1, 'Frank');
         final person2 = Person(2, 'Peter');
         final queryResult = Future(() => [
-              <String, dynamic>{'id': person.id, 'name': person.name},
-              <String, dynamic>{'id': person2.id, 'name': person2.name},
+              {'id': person.id, 'name': person.name},
+              {'id': person2.id, 'name': person2.name},
             ]);
         when(mockDatabaseExecutor.rawQuery(sql)).thenAnswer((_) => queryResult);
 
@@ -99,8 +99,8 @@ void main() {
         final person2 = Person(2, 'Peter');
         final arguments = [person.id, person2.id];
         final queryResult = Future(() => [
-              <String, dynamic>{'id': person.id, 'name': person.name},
-              <String, dynamic>{'id': person2.id, 'name': person2.name},
+              {'id': person.id, 'name': person.name},
+              {'id': person2.id, 'name': person2.name},
             ]);
         when(mockDatabaseExecutor.rawQuery(sql, arguments))
             .thenAnswer((_) => queryResult);
@@ -160,7 +160,7 @@ void main() {
     test('query item and emit persistent item without arguments', () {
       final person = Person(1, 'Frank');
       final queryResult = Future(() => [
-            <String, dynamic>{'id': person.id, 'name': person.name}
+            {'id': person.id, 'name': person.name}
           ]);
       when(mockDatabaseExecutor.rawQuery(sql)).thenAnswer((_) => queryResult);
 
@@ -174,7 +174,7 @@ void main() {
       final person = Person(1, 'Frank');
       final arguments = [person.id, person.name];
       final queryResult = Future(() => [
-            <String, dynamic>{'id': person.id, 'name': person.name}
+            {'id': person.id, 'name': person.name}
           ]);
       when(mockDatabaseExecutor.rawQuery(sql, arguments))
           .thenAnswer((_) => queryResult);
@@ -193,7 +193,7 @@ void main() {
     test('query item and emit persistent item and new', () {
       final person = Person(1, 'Frank');
       final queryResult = Future(() => [
-            <String, dynamic>{'id': person.id, 'name': person.name}
+            {'id': person.id, 'name': person.name}
           ]);
       when(mockDatabaseExecutor.rawQuery(sql)).thenAnswer((_) => queryResult);
 
@@ -208,8 +208,8 @@ void main() {
       final person = Person(1, 'Frank');
       final person2 = Person(2, 'Peter');
       final queryResult = Future(() => [
-            <String, dynamic>{'id': person.id, 'name': person.name},
-            <String, dynamic>{'id': person2.id, 'name': person2.name},
+            {'id': person.id, 'name': person.name},
+            {'id': person2.id, 'name': person2.name},
           ]);
       when(mockDatabaseExecutor.rawQuery(sql)).thenAnswer((_) => queryResult);
 
@@ -224,8 +224,8 @@ void main() {
       final person2 = Person(2, 'Peter');
       final arguments = [person.id, person2.id];
       final queryResult = Future(() => [
-            <String, dynamic>{'id': person.id, 'name': person.name},
-            <String, dynamic>{'id': person2.id, 'name': person2.name},
+            {'id': person.id, 'name': person.name},
+            {'id': person2.id, 'name': person2.name},
           ]);
       when(mockDatabaseExecutor.rawQuery(sql, arguments))
           .thenAnswer((_) => queryResult);
@@ -245,8 +245,8 @@ void main() {
       final person = Person(1, 'Frank');
       final person2 = Person(2, 'Peter');
       final queryResult = Future(() => [
-            <String, dynamic>{'id': person.id, 'name': person.name},
-            <String, dynamic>{'id': person2.id, 'name': person2.name},
+            {'id': person.id, 'name': person.name},
+            {'id': person2.id, 'name': person2.name},
           ]);
       when(mockDatabaseExecutor.rawQuery(sql)).thenAnswer((_) => queryResult);
 
@@ -268,8 +268,8 @@ void main() {
       final person = Person(1, 'Frank');
       final person2 = Person(2, 'Peter');
       final queryResult = Future(() => [
-            <String, dynamic>{'id': person.id, 'name': person.name},
-            <String, dynamic>{'id': person2.id, 'name': person2.name},
+            {'id': person.id, 'name': person.name},
+            {'id': person2.id, 'name': person2.name},
           ]);
       when(mockDatabaseExecutor.rawQuery(sql)).thenAnswer((_) => queryResult);
 

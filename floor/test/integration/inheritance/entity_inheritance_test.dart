@@ -37,7 +37,7 @@ class BaseObject {
   @primaryKey
   final int id;
 
-  @ColumnInfo(name: 'create_time', nullable: false)
+  @ColumnInfo(name: 'create_time')
   final String createTime;
 
   @ColumnInfo(name: 'update_time')

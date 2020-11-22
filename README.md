@@ -212,6 +212,8 @@ With the annotation, it's possible to give columns a custom name and define if t
 - Floor automatically uses the **first** constructor defined in the entity class for creating in-memory objects from database rows.
 - There needs to be a constructor.  
 
+TODO #375 remove all mentions of `CollumnInfo.nullable`
+
 ```dart
 @Entity(tableName: 'person')
 class Person {

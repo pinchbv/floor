@@ -55,7 +55,7 @@ class QueryAdapter {
   /// Executes a SQLite query that returns a stream of single query results.
   Stream<T> queryStream<T>(
     final String sql, {
-    final List<Object?>? arguments,
+    final List<Object>? arguments,
     required final String queryableName,
     required final bool isView,
     required final T Function(Map<String, Object?>) mapper,
