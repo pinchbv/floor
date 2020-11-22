@@ -37,18 +37,6 @@ void main() {
       expect(actual, equals(obj));
     });
 
-    test('find by nullable null', () async {
-      final obj = BooleanClass(true, nullable: null, nonNullable: true);
-      await boolDao.insertBoolC(obj);
-
-      // null == null is false in SQL so this will not return any results.
-      final actual = await boolDao.findWithNullable(null);
-      expect(actual, equals(null));
-
-      final actual2 = await boolDao.findWithNullableBeingNull();
-      expect(actual2, equals(obj));
-    });
-
     test('find by nullable true', () async {
       final obj = BooleanClass(true, nullable: true, nonNullable: true);
       await boolDao.insertBoolC(obj);
@@ -109,9 +97,9 @@ abstract class BoolDao {
   Future<BooleanClass?> findWithNonNullable(bool val);
 
   @Query('SELECT * FROM BooleanClass where nullable = :val')
-  Future<BooleanClass?> findWithNullable(bool? val);
+  Future<BooleanClass?> findWithNullable(bool val);
 
-  @Query('SELECT * FROM BooleanClass where nullable is null')
+  @Query('SELECT * FROM BooleanClass where nullable IS NULL')
   Future<BooleanClass?> findWithNullableBeingNull();
 
   @insert

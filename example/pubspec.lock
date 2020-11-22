@@ -189,7 +189,7 @@ packages:
       path: "../floor"
       relative: true
     source: path
-    version: "0.17.0"
+    version: "1.0.0-nullsafety.0"
   floor_annotation:
     dependency: transitive
     description:

@@ -18,15 +18,10 @@ class QueryAdapter {
   /// Executes a SQLite query that may return a single value.
   Future<T?> query<T>(
     final String sql, {
-    final List<Object?>? arguments,
+    final List<Object>? arguments,
     required final T Function(Map<String, Object?>) mapper,
   }) async {
-    // TODO #375 is this unwanted behavior of sqflite?
-    //  https://github.com/tekartik/sqflite/pull/535#discussion_r528254447
-    final safeArguments = arguments
-        ?.map((element) => element == null ? 'NULL' : element)
-        .toList();
-    final rows = await _database.rawQuery(sql, safeArguments);
+    final rows = await _database.rawQuery(sql, arguments);
 
     if (rows.isEmpty) {
       return null;
@@ -40,31 +35,21 @@ class QueryAdapter {
   /// Executes a SQLite query that may return multiple values.
   Future<List<T>> queryList<T>(
     final String sql, {
-    final List<Object?>? arguments,
+    final List<Object>? arguments,
     required final T Function(Map<String, Object?>) mapper,
   }) async {
-    // TODO #375 is this unwanted behavior of sqflite?
-    //  https://github.com/tekartik/sqflite/pull/535#discussion_r528254447
-    final safeArguments = arguments
-        ?.map((element) => element == null ? 'NULL' : element)
-        .toList();
-    final rows = await _database.rawQuery(sql, safeArguments);
+    final rows = await _database.rawQuery(sql, arguments);
     return rows.map((row) => mapper(row)).toList();
   }
 
   Future<void> queryNoReturn(
     final String sql, {
-    final List<Object?>? arguments,
+    final List<Object>? arguments,
   }) async {
     // TODO #94 differentiate between different query kinds (select, update, delete, insert)
     //  this enables to notify the observers
     //  also requires extracting the table name :(
-    // TODO #375 is this unwanted behavior of sqflite?
-    //  https://github.com/tekartik/sqflite/pull/535#discussion_r528254447
-    final safeArguments = arguments
-        ?.map((element) => element == null ? 'NULL' : element)
-        .toList();
-    await _database.rawQuery(sql, safeArguments);
+    await _database.rawQuery(sql, arguments);
   }
 
   /// Executes a SQLite query that returns a stream of single query results.

@@ -1,11 +1,11 @@
 // TODO #375 delete once dependencies have migrated
 // ignore_for_file: import_of_legacy_library_into_null_safe
 import 'package:analyzer/dart/element/element.dart';
-import 'package:analyzer/dart/element/nullability_suffix.dart';
 import 'package:analyzer/dart/element/type.dart';
 import 'package:collection/collection.dart';
 import 'package:floor_annotation/floor_annotation.dart' as annotations;
 import 'package:floor_generator/misc/constants.dart';
+import 'package:floor_generator/misc/extension/dart_type_extension.dart';
 import 'package:floor_generator/misc/extension/type_converter_element_extension.dart';
 import 'package:floor_generator/misc/extension/type_converters_extension.dart';
 import 'package:floor_generator/misc/type_utils.dart';
@@ -57,14 +57,7 @@ class FieldProcessor extends Processor<Field> {
   }
 
   bool _getIsNullable(bool hasColumnInfoAnnotation) {
-    final nullabilitySuffix = _fieldElement.type.nullabilitySuffix;
-    switch (nullabilitySuffix) {
-      case NullabilitySuffix.question:
-      case NullabilitySuffix.star: // support legacy code without non-nullables
-        return true;
-      case NullabilitySuffix.none:
-        return false;
-    }
+    return _fieldElement.type.isNullable;
 
     // TODO #375 ignoring @ColumnInfo.nullable for now
     // return hasColumnInfoAnnotation
