@@ -21,6 +21,28 @@ void main() {
 
     const name = 'id';
     const columnName = 'id';
+    const isNullable = false;
+    const sqlType = SqlType.integer;
+    final expected = Field(
+      fieldElement,
+      name,
+      columnName,
+      isNullable,
+      sqlType,
+      null,
+    );
+    expect(actual, equals(expected));
+  });
+
+  test('Process field with nullable Dart type', () async {
+    final fieldElement = await _generateFieldElement('''
+      final int? id;
+    ''');
+
+    final actual = FieldProcessor(fieldElement, null).process();
+
+    const name = 'id';
+    const columnName = 'id';
     const isNullable = true;
     const sqlType = SqlType.integer;
     final expected = Field(
@@ -72,7 +94,7 @@ void main() {
 
     const name = 'dateTime';
     const columnName = 'dateTime';
-    const isNullable = true;
+    const isNullable = false;
     const sqlType = SqlType.integer; // converted from DateTime
     final expected = Field(
       fieldElement,
@@ -95,7 +117,7 @@ void main() {
 
     const name = 'dateTime';
     const columnName = 'dateTime';
-    const isNullable = true;
+    const isNullable = false;
     const sqlType = SqlType.integer; // converted from DateTime
     final typeConverter = TypeConverter(
       'DateTimeConverter',
@@ -131,7 +153,7 @@ void main() {
 
     const name = 'dateTime';
     const columnName = 'dateTime';
-    const isNullable = true;
+    const isNullable = false;
     const sqlType = SqlType.integer; // converted from DateTime
     final typeConverter = TypeConverter(
       'DateTimeConverter',
