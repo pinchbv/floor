@@ -5,8 +5,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
-  FlutterDatabase database;
-  TaskDao taskDao;
+  late FlutterDatabase database;
+  late TaskDao taskDao;
 
   setUp(() async {
     database = await $FloorFlutterDatabase.inMemoryDatabaseBuilder().build();
@@ -42,7 +42,7 @@ void main() {
       await Future<void>.delayed(const Duration(milliseconds: 100));
       await tester.pump();
 
-      final text = tester.widget<TextField>(textFieldFinder).controller.text;
+      final text = tester.widget<TextField>(textFieldFinder).controller!.text;
       expect(text, isEmpty);
     });
   });

@@ -37,9 +37,9 @@ class TasksWidget extends StatelessWidget {
   final TaskDao dao;
 
   const TasksWidget({
-    Key key,
-    @required this.title,
-    @required this.dao,
+    Key? key,
+    required this.title,
+    required this.dao,
   }) : super(key: key);
 
   @override
@@ -62,8 +62,8 @@ class TasksListView extends StatelessWidget {
   final TaskDao dao;
 
   const TasksListView({
-    Key key,
-    @required this.dao,
+    Key? key,
+    required this.dao,
   }) : super(key: key);
 
   @override
@@ -74,7 +74,7 @@ class TasksListView extends StatelessWidget {
         builder: (_, snapshot) {
           if (!snapshot.hasData) return Container();
 
-          final tasks = snapshot.data;
+          final tasks = snapshot.requireData;
 
           return ListView.builder(
             itemCount: tasks.length,
@@ -96,9 +96,9 @@ class TaskListCell extends StatelessWidget {
   final TaskDao dao;
 
   const TaskListCell({
-    Key key,
-    @required this.task,
-    @required this.dao,
+    Key? key,
+    required this.task,
+    required this.dao,
   }) : super(key: key);
 
   @override
@@ -132,9 +132,9 @@ class TasksTextField extends StatelessWidget {
   final TaskDao dao;
 
   TasksTextField({
-    Key key,
-    @required this.dao,
-  })  : _textEditingController = TextEditingController(),
+    Key? key,
+    required this.dao,
+  })   : _textEditingController = TextEditingController(),
         super(key: key);
 
   @override
