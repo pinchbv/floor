@@ -168,6 +168,7 @@ Future<ClassElement> createClassElement(final String clazz) async {
   final library = await resolveSource('''
       library test;
       
+      import 'dart:typed_data';
       import 'package:floor_annotation/floor_annotation.dart';
       
       $clazz
