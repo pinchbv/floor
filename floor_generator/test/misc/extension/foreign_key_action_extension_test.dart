@@ -1,5 +1,5 @@
-import 'package:floor_generator/misc/extension/foreign_key_action.dart';
 import 'package:floor_annotation/floor_annotation.dart' as annotations;
+import 'package:floor_generator/misc/extension/foreign_key_action_extension.dart';
 import 'package:test/test.dart';
 
 void main() {

@@ -1,7 +1,7 @@
 import 'package:floor_annotation/floor_annotation.dart';
 import 'package:floor_generator/misc/annotations.dart';
 
-extension ToSQL on ForeignKeyAction {
+extension ForeignKeyActionExtension on ForeignKeyAction {
   @nonNull
   String toSql() {
     switch (this) {

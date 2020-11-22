@@ -1,5 +1,6 @@
 import 'package:analyzer/dart/element/element.dart';
 import 'package:build_test/build_test.dart';
+import 'package:floor_annotation/floor_annotation.dart' as annotations;
 import 'package:floor_generator/misc/constants.dart';
 import 'package:floor_generator/processor/entity_processor.dart';
 import 'package:floor_generator/processor/error/entity_processor_error.dart';
@@ -134,8 +135,8 @@ void main() {
         'Person',
         ['id'],
         ['owner_id'],
-        ForeignKeyAction.cascade,
-        ForeignKeyAction.setNull,
+        annotations.ForeignKeyAction.cascade,
+        annotations.ForeignKeyAction.setNull,
       );
       expect(actual, equals(expected));
     });
@@ -176,7 +177,7 @@ void main() {
           }
       ''');
 
-      final processor = EntityProcessor(classElements[1]);
+      final processor = EntityProcessor(classElements[1], {});
       expect(
           processor.process,
           throwsInvalidGenerationSourceError(
