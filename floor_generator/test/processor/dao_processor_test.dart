@@ -32,7 +32,7 @@ void main() {
       }
     ''');
 
-    final actual = DaoProcessor(classElement, '', '', entities, views)
+    final actual = DaoProcessor(classElement, '', '', entities, views, {})
         .process()
         .methodsLength;
 
@@ -59,7 +59,7 @@ void main() {
       }
     ''');
 
-    final actual = DaoProcessor(classElement, '', '', entities, views)
+    final actual = DaoProcessor(classElement, '', '', entities, views, {})
         .process()
         .methodsLength;
 
@@ -80,7 +80,7 @@ void main() {
       }
     ''');
 
-    final actual = DaoProcessor(classElement, '', '', entities, views)
+    final actual = DaoProcessor(classElement, '', '', entities, views, {})
         .process()
         .methodsLength;
 
@@ -101,7 +101,7 @@ void main() {
       }
     ''');
 
-    final actual = DaoProcessor(classElement, '', '', entities, views)
+    final actual = DaoProcessor(classElement, '', '', entities, views, {})
         .process()
         .methodsLength;
 
@@ -122,7 +122,7 @@ void main() {
       }
     ''');
 
-    final actual = DaoProcessor(classElement, '', '', entities, views)
+    final actual = DaoProcessor(classElement, '', '', entities, views, {})
         .process()
         .methodsLength;
 
@@ -150,7 +150,7 @@ void main() {
       ''');
 
     final processedDao =
-        DaoProcessor(classElement, '', '', entities, views).process();
+        DaoProcessor(classElement, '', '', entities, views, {}).process();
 
     expect(processedDao.methodsLength, equals(4));
     expect(processedDao.streamViews, equals(views));
@@ -223,7 +223,7 @@ Future<List<Entity>> _getEntities() async {
 
   return library.classes
       .where((classElement) => classElement.hasAnnotation(annotations.Entity))
-      .map((classElement) => EntityProcessor(classElement).process())
+      .map((classElement) => EntityProcessor(classElement, {}).process())
       .toList();
 }
 
@@ -246,6 +246,6 @@ Future<List<View>> _getViews() async {
   return library.classes
       .where((classElement) =>
           classElement.hasAnnotation(annotations.DatabaseView))
-      .map((classElement) => ViewProcessor(classElement).process())
+      .map((classElement) => ViewProcessor(classElement, {}).process())
       .toList();
 }

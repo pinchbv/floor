@@ -1,5 +1,29 @@
 # Changelog
 
+# 0.17.0
+
+### 🐛 Bug Fixes
+
+* Generate distinct type converter instances
+* Fix generation of DAO method with list argument using type converters
+
+# 0.16.0
+
+### 🚀 Features
+
+* Add **experimental** support for type converters 
+
+# 0.15.0
+
+### Changes
+
+* Update dependencies
+
+### 🚀 Features
+
+* Add support for WITHOUT ROWID tables
+* Check transaction method return types and allow non-void returns
+
 # 0.14.0
 
 ### Changes

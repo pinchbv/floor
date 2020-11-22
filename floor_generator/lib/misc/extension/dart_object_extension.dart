@@ -8,6 +8,7 @@ extension DartObjectExtension on DartObject {
   /// [orElse] if the enum was not valid.
   String toEnumValueString({@required String orElse()}) {
     final interfaceType = type as InterfaceType;
+    final enumName = interfaceType.getDisplayString(withNullability: false);
     final enumValue = interfaceType.element.fields
         .where((element) => element.isEnumConstant)
         .map((fieldElement) => fieldElement.name)
@@ -16,7 +17,7 @@ extension DartObjectExtension on DartObject {
     if (enumValue == null) {
       return orElse();
     } else {
-      return '$interfaceType.$enumValue';
+      return '$enumName.$enumValue';
     }
   }
 

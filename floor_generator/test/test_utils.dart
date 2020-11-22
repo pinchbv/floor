@@ -35,6 +35,7 @@ Future<LibraryReader> resolveCompilationUnit(final String sourceFile) async {
 Future<DartType> getDartType(final dynamic value) async {
   final source = '''
   library test;
+  import 'dart:typed_data';
   
   final value = $value;
   ''';
@@ -110,15 +111,20 @@ String _format(final String source) {
 /// Should be invoked in `main()` of every test in `test/**_test.dart`.
 void useDartfmt() => EqualsDart.format = _format;
 
-Matcher throwsInvalidGenerationSourceError(
+Matcher throwsInvalidGenerationSourceError([
   final InvalidGenerationSourceError error,
-) {
-  return throwsA(
-    const TypeMatcher<InvalidGenerationSourceError>()
-        .having((e) => e.message, 'message', error.message)
-        .having((e) => e.todo, 'todo', error.todo)
-        .having((e) => e.element, 'element', error.element),
-  );
+]) {
+  const typeMatcher = TypeMatcher<InvalidGenerationSourceError>();
+  if (error == null) {
+    return throwsA(typeMatcher);
+  } else {
+    return throwsA(
+      typeMatcher
+          .having((e) => e.message, 'message', error.message)
+          .having((e) => e.todo, 'todo', error.todo)
+          .having((e) => e.element, 'element', error.element),
+    );
+  }
 }
 
 Future<Dao> createDao(final String methodSignature) async {
@@ -144,16 +150,16 @@ Future<Dao> createDao(final String methodSignature) async {
 
   final entities = library.classes
       .where((classElement) => classElement.hasAnnotation(annotations.Entity))
-      .map((classElement) => EntityProcessor(classElement).process())
+      .map((classElement) => EntityProcessor(classElement, {}).process())
       .toList();
   final views = library.classes
       .where((classElement) =>
           classElement.hasAnnotation(annotations.DatabaseView))
-      .map((classElement) => ViewProcessor(classElement).process())
+      .map((classElement) => ViewProcessor(classElement, {}).process())
       .toList();
 
-  return DaoProcessor(daoClass, 'personDao', 'TestDatabase', entities, views)
-      .process();
+  return DaoProcessor(
+      daoClass, 'personDao', 'TestDatabase', entities, views, {}).process();
 }
 
 Future<ClassElement> createClassElement(final String clazz) async {
@@ -170,6 +176,26 @@ Future<ClassElement> createClassElement(final String clazz) async {
   return library.classes.first;
 }
 
+extension StringTestExtension on String {
+  Future<DartType> asDartType() async {
+    return getDartTypeFromString(this);
+  }
+
+  Future<ClassElement> asClassElement() async {
+    final library = await resolveSource('''
+      library test;
+      
+      import 'package:floor_annotation/floor_annotation.dart';
+      
+      $this
+      ''', (resolver) async {
+      return LibraryReader(await resolver.findLibraryByName('test'));
+    });
+
+    return library.classes.first;
+  }
+}
+
 Future<Entity> getPersonEntity() async {
   final library = await resolveSource('''
       library test;
@@ -183,7 +209,7 @@ Future<Entity> getPersonEntity() async {
 
   return library.classes
       .where((classElement) => classElement.hasAnnotation(annotations.Entity))
-      .map((classElement) => EntityProcessor(classElement).process())
+      .map((classElement) => EntityProcessor(classElement, {}).process())
       .first;
 }
 
@@ -191,7 +217,7 @@ extension StringExtension on String {
   Future<MethodElement> asDaoMethodElement() async {
     final library = await resolveSource('''
       library test;
-      
+            
       import 'package:floor_annotation/floor_annotation.dart';
       
       @dao

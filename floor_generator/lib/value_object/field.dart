@@ -1,5 +1,6 @@
 import 'package:analyzer/dart/element/element.dart';
 import 'package:floor_generator/misc/annotations.dart';
+import 'package:floor_generator/value_object/type_converter.dart';
 
 /// Represents an Entity field and thus a table column.
 class Field {
@@ -8,6 +9,8 @@ class Field {
   final String columnName;
   final bool isNullable;
   final String sqlType;
+  @nullable
+  final TypeConverter typeConverter;
 
   Field(
     this.fieldElement,
@@ -15,6 +18,7 @@ class Field {
     this.columnName,
     this.isNullable,
     this.sqlType,
+    this.typeConverter,
   );
 
   /// The database column definition.
@@ -41,7 +45,8 @@ class Field {
           name == other.name &&
           columnName == other.columnName &&
           isNullable == other.isNullable &&
-          sqlType == other.sqlType;
+          sqlType == other.sqlType &&
+          typeConverter == other.typeConverter;
 
   @override
   int get hashCode =>
@@ -49,10 +54,11 @@ class Field {
       name.hashCode ^
       columnName.hashCode ^
       isNullable.hashCode ^
-      sqlType.hashCode;
+      sqlType.hashCode ^
+      typeConverter.hashCode;
 
   @override
   String toString() {
-    return 'Field{fieldElement: $fieldElement, name: $name, columnName: $columnName, isNullable: $isNullable, sqlType: $sqlType}';
+    return 'Field{fieldElement: $fieldElement, name: $name, columnName: $columnName, isNullable: $isNullable, sqlType: $sqlType, typeConverter: $typeConverter}';
   }
 }

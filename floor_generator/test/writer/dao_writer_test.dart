@@ -66,9 +66,6 @@ void main() {
         
           final QueryAdapter _queryAdapter;
         
-          static final _personMapper = (Map<String, dynamic> row) =>
-              Person(row['id'] as int, row['name'] as String);
-        
           final InsertionAdapter<Person> _personInsertionAdapter;
         
           final UpdateAdapter<Person> _personUpdateAdapter;
@@ -77,7 +74,7 @@ void main() {
         
           @override
           Future<List<Person>> findAllPersons() async {
-            return _queryAdapter.queryList('SELECT * FROM person', mapper: _personMapper);
+            return _queryAdapter.queryList('SELECT * FROM person', mapper: (Map<String, dynamic> row) => Person(row['id'] as int, row['name'] as String));
           }
           
           @override
@@ -151,9 +148,6 @@ void main() {
         
           final QueryAdapter _queryAdapter;
         
-          static final _personMapper = (Map<String, dynamic> row) =>
-              Person(row['id'] as int, row['name'] as String);
-        
           final InsertionAdapter<Person> _personInsertionAdapter;
         
           final UpdateAdapter<Person> _personUpdateAdapter;
@@ -162,7 +156,7 @@ void main() {
         
           @override
           Stream<List<Person>> findAllPersonsAsStream() {
-            return _queryAdapter.queryListStream('SELECT * FROM person', queryableName: 'Person', isView: false, mapper: _personMapper);
+            return _queryAdapter.queryListStream('SELECT * FROM person', queryableName: 'Person', isView: false, mapper: (Map<String, dynamic> row) => Person(row['id'] as int, row['name'] as String));
           }
           
           @override
@@ -277,6 +271,7 @@ void main() {
       [], // indices,
       false, // withoutRowid,
       '', // constructor
+      '', // valueMapping
     );
     final actual = DaoWriter(dao, {otherEntity}, false).write();
 
@@ -432,15 +427,15 @@ Future<Dao> _createDao(final String dao) async {
 
   final entities = library.classes
       .where((classElement) => classElement.hasAnnotation(annotations.Entity))
-      .map((classElement) => EntityProcessor(classElement).process())
+      .map((classElement) => EntityProcessor(classElement, {}).process())
       .toList();
 
   final views = library.classes
       .where((classElement) =>
           classElement.hasAnnotation(annotations.DatabaseView))
-      .map((classElement) => ViewProcessor(classElement).process())
+      .map((classElement) => ViewProcessor(classElement, {}).process())
       .toList();
 
-  return DaoProcessor(daoClass, 'personDao', 'TestDatabase', entities, views)
-      .process();
+  return DaoProcessor(
+      daoClass, 'personDao', 'TestDatabase', entities, views, {}).process();
 }

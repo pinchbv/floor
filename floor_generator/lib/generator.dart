@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:analyzer/dart/element/element.dart';
 import 'package:build/build.dart';
 import 'package:code_builder/code_builder.dart';
+import 'package:dartx/dartx.dart';
 import 'package:floor_annotation/floor_annotation.dart' as annotations;
 import 'package:floor_generator/misc/annotations.dart';
 import 'package:floor_generator/processor/database_processor.dart';
@@ -11,6 +12,7 @@ import 'package:floor_generator/writer/dao_writer.dart';
 import 'package:floor_generator/writer/database_builder_writer.dart';
 import 'package:floor_generator/writer/database_writer.dart';
 import 'package:floor_generator/writer/floor_writer.dart';
+import 'package:floor_generator/writer/type_converter_field_writer.dart';
 import 'package:source_gen/source_gen.dart';
 
 /// Floor generator that produces the implementation of the persistence code.
@@ -23,18 +25,33 @@ class FloorGenerator extends GeneratorForAnnotation<annotations.Database> {
   ) {
     final database = _getDatabase(element);
     if (database == null) return null;
-    final daoGetters = database.daoGetters;
 
     final databaseClass = DatabaseWriter(database).write();
-    final daoClasses = daoGetters.map((daoGetter) => DaoWriter(
-            daoGetter.dao, database.streamEntities, database.hasViewStreams)
-        .write());
+    final daoClasses = database.daoGetters
+        .map((daoGetter) => daoGetter.dao)
+        .map((dao) => DaoWriter(
+              dao,
+              database.streamEntities,
+              database.hasViewStreams,
+            ).write());
+    final distinctTypeConverterFields = database.allTypeConverters
+        .distinctBy((element) => element.name)
+        .map((typeConverter) =>
+            TypeConverterFieldWriter(typeConverter.name).write());
 
-    final library = Library((builder) => builder
-      ..body.add(FloorWriter(database.name).write())
-      ..body.add(DatabaseBuilderWriter(database.name).write())
-      ..body.add(databaseClass)
-      ..body.addAll(daoClasses));
+    final library = Library((builder) {
+      builder
+        ..body.add(FloorWriter(database.name).write())
+        ..body.add(DatabaseBuilderWriter(database.name).write())
+        ..body.add(databaseClass)
+        ..body.addAll(daoClasses);
+
+      if (distinctTypeConverterFields.isNotEmpty) {
+        builder
+          ..body.add(const Code('// ignore_for_file: unused_element\n'))
+          ..body.addAll(distinctTypeConverterFields);
+      }
+    });
 
     return library.accept(DartEmitter()).toString();
   }

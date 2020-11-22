@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - develop
+      - nullsafety
   pull_request:
 
 jobs:
@@ -69,7 +70,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [macos-latest, windows-latest, ubuntu-latest]
+        os: [ macos-latest, windows-latest, ubuntu-latest ]
     timeout-minutes: 10
 
     steps:
