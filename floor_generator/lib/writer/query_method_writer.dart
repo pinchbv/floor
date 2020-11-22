@@ -39,6 +39,8 @@ class QueryMethodWriter implements Writer {
       return Parameter((builder) => builder
         ..name = parameter.name
         ..type = refer(parameter.type.getDisplayString(
+          // processor disallows nullable method parameters and throws if found,
+          // still interested in nullability here to future-proof codebase
           withNullability: true,
         )));
     }).toList();

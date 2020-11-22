@@ -21,6 +21,10 @@ final DatabaseFactory sqfliteDatabaseFactory = () {
 
 extension DatabaseFactoryExtension on DatabaseFactory {
   Future<String> getDatabasePath(final String name) async {
-    return join(await getDatabasesPath() ?? '', name);
+    final databasesPath = await getDatabasesPath();
+    if (databasesPath == null) {
+      throw StateError('Database path was empty for $name');
+    }
+    return join(databasesPath, name);
   }
 }

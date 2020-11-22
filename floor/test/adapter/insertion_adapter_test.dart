@@ -38,6 +38,7 @@ void main() {
 
         await underTest.insert(person, onConflictStrategy);
 
+        // TODO #375 let's get rid of all dynamics!
         final values = <String, dynamic>{'id': person.id, 'name': person.name};
         verify(mockDatabaseExecutor.insert(
           entityName,

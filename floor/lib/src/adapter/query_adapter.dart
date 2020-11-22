@@ -96,6 +96,9 @@ class QueryAdapter {
     required final bool isView,
     required final T Function(Map<String, Object?>) mapper,
   }) {
+    final changeListener = _changeListener;
+    if (changeListener == null) throw ArgumentError.notNull();
+
     final controller = StreamController<List<T>>.broadcast();
 
     Future<void> executeQueryAndNotifyController() async {
@@ -106,9 +109,6 @@ class QueryAdapter {
     controller.onListen = () async => executeQueryAndNotifyController();
 
     // Views listen on all events, Entities only on events that changed the same entity.
-    // TODO #375 why is this needed?
-    // ignore: close_sinks
-    final changeListener = ArgumentError.checkNotNull(_changeListener);
     final subscription = changeListener.stream
         .where((updatedTable) => isView || updatedTable == queryableName)
         .listen(

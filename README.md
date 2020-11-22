@@ -213,6 +213,7 @@ With the annotation, it's possible to give columns a custom name and define if t
 - There needs to be a constructor.  
 
 TODO #375 remove all mentions of `CollumnInfo.nullable`
+TODO #375 mention that DAO query methods on single elements need to return nullable
 
 ```dart
 @Entity(tableName: 'person')

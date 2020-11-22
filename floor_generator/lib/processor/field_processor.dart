@@ -27,10 +27,8 @@ class FieldProcessor extends Processor<Field> {
   @override
   Field process() {
     final name = _fieldElement.name;
-    final hasColumnInfoAnnotation =
-        _fieldElement.hasAnnotation(annotations.ColumnInfo);
-    final columnName = _getColumnName(hasColumnInfoAnnotation, name);
-    final isNullable = _getIsNullable(hasColumnInfoAnnotation);
+    final columnName = _getColumnName(name);
+    final isNullable = _fieldElement.type.isNullable;
     final typeConverter = {
       ..._fieldElement.getTypeConverters(TypeConverterScope.field),
       _typeConverter
@@ -46,27 +44,14 @@ class FieldProcessor extends Processor<Field> {
     );
   }
 
-  String _getColumnName(bool hasColumnInfoAnnotation, String name) {
-    return hasColumnInfoAnnotation
+  String _getColumnName(final String name) {
+    return _fieldElement.hasAnnotation(annotations.ColumnInfo)
         ? _fieldElement
                 .getAnnotation(annotations.ColumnInfo)
                 .getField(AnnotationField.columnInfoName)
                 ?.toStringValue() ??
             name
         : name;
-  }
-
-  bool _getIsNullable(bool hasColumnInfoAnnotation) {
-    return _fieldElement.type.isNullable;
-
-    // TODO #375 ignoring @ColumnInfo.nullable for now
-    // return hasColumnInfoAnnotation
-    //     ? _fieldElement
-    //             .getAnnotation(annotations.ColumnInfo)
-    //             .getField(AnnotationField.columnInfoNullable)
-    //             ?.toBoolValue() ??
-    //         true
-    //     : true; // all Dart fields are nullable by default
   }
 
   String _getSqlType(final TypeConverter? typeConverter) {
