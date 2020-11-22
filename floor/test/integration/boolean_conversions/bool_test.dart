@@ -60,10 +60,8 @@ class BooleanClass {
   @primaryKey
   final bool? id;
 
-  @ColumnInfo(nullable: true)
   final bool? nullable;
 
-  @ColumnInfo(nullable: false)
   final bool nonNullable;
 
   BooleanClass(this.id, {this.nullable, required this.nonNullable});

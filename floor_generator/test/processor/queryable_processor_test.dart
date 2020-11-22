@@ -438,7 +438,6 @@ void main() {
       
         final String name;
         
-        @ColumnInfo(nullable: false)
         final bool bar;
         
         final bool foo
