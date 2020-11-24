@@ -30,6 +30,16 @@ abstract class ForeignKeyField {
   static const onDelete = 'onDelete';
 }
 
+abstract class Fts3Field {
+  static const tokenizer = 'tokenizer';
+  static const tokenizerArgs = 'tokenizerArgs';
+}
+
+abstract class Fts4Field {
+  static const tokenizer = 'tokenizer';
+  static const tokenizerArgs = 'tokenizerArgs';
+}
+
 abstract class IndexField {
   static const name = 'name';
   static const unique = 'unique';
