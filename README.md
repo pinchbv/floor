@@ -584,12 +584,20 @@ The implementation and usage of the mentioned `DateTime` to `int` converter is d
 class DateTimeConverter extends TypeConverter<DateTime, int> {
   @override
   DateTime decode(int databaseValue) {
-    return DateTime.fromMillisecondsSinceEpoch(databaseValue);
+    try {
+      return DateTime.fromMillisecondsSinceEpoch(databaseValue);
+    } catch (e) {
+      return null;
+    }
   }
 
   @override
   int encode(DateTime value) {
-    return value.millisecondsSinceEpoch;
+    try {
+      return value.millisecondsSinceEpoch;
+    } catch (e) {
+      return null;
+    }
   }
 }
 ```
