@@ -46,11 +46,24 @@ class ViewProcessor extends QueryableProcessor<View> {
         .getField(AnnotationField.viewQuery)
         ?.toStringValue();
 
-    final lowerQuery = query.toLowerCase();
-    if (query == null ||
-        (!lowerQuery.trimLeft().startsWith('select') &&
-            !(lowerQuery.trimLeft().startsWith('with') &&
-                lowerQuery.contains('select')))) {
+    if (query == null || !(query.isSelectQuery || query.isCteWithSelect)) {
+      throw _processorError.missingQuery;
+    }
+    return query;
+  }
+}
+
+extension on String {
+  bool get isSelectQuery => toLowerCase().trimLeft().startsWith('select');
+
+  /// whether the string is a common table expression
+  /// followed by a `SELECT` query
+  bool get isCteWithSelect {
+    final lowerCasedString = toLowerCase();
+    return lowerCasedString.trimLeft().startsWith('with') &&
+        'select'.allMatches(lowerCasedString).length >= 2;
+  }
+}
       throw _processorError.missingQuery;
     }
     return query;
