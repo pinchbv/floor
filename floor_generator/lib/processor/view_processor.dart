@@ -46,7 +46,11 @@ class ViewProcessor extends QueryableProcessor<View> {
         .getField(AnnotationField.viewQuery)
         ?.toStringValue();
 
-    if (query == null || !query.trimLeft().toLowerCase().startsWith('select')) {
+    final lowerQuery = query.toLowerCase();
+    if (query == null ||
+        (!lowerQuery.trimLeft().startsWith('select') &&
+            !(lowerQuery.trimLeft().startsWith('with') &&
+                lowerQuery.contains('select')))) {
       throw _processorError.missingQuery;
     }
     return query;
