@@ -54,7 +54,8 @@ void main() {
     final fields = classElement.fields
         .map((fieldElement) => FieldProcessor(fieldElement, null).process())
         .toList();
-    const query = 'WITH subquery as (SELECT * from otherentity) SELECT subquery.*';
+    const query =
+        'WITH subquery as (SELECT * from otherentity) SELECT subquery.*';
     const constructor = "Person(row['id'] as int, row['name'] as String)";
     final expected = View(
       classElement,
