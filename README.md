@@ -579,17 +579,25 @@ It's sufficient to define the conversion from a database to an in-memory type an
 The implementation and usage of the mentioned `DateTime` to `int` converter is described in the following.
 
 1. Create a converter class that implements the abstract `TypeConverter` and supply the in-memory object type and database type as parameterized types.
-    This class inherits the `decode()` and `encode()` functions which define the conversion from one to the other type.
+    This class inherits the `decode()` and `encode()` functions which define the conversion from one to the other type. In the converter we will check if the parameters int databaseValue or DateTime value are nulls, if they are we simply return null. If they aren't the DateTimeConverter will do the convertion.
 ```dart
 class DateTimeConverter extends TypeConverter<DateTime, int> {
   @override
   DateTime decode(int databaseValue) {
-    return DateTime.fromMillisecondsSinceEpoch(databaseValue);
+    try {
+      return DateTime.fromMillisecondsSinceEpoch(databaseValue);
+    } catch (e) {
+      return null;
+    }
   }
 
   @override
   int encode(DateTime value) {
-    return value.millisecondsSinceEpoch;
+    try {
+      return value.millisecondsSinceEpoch;
+    } catch (e) {
+      return null;
+    }
   }
 }
 ```
