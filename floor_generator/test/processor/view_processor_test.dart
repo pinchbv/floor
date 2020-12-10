@@ -66,7 +66,7 @@ void main() {
     );
     expect(actual, equals(expected));
   });
-test('Throws when processing view without SELECT', () async {
+  test('Throws when processing view without SELECT', () async {
     final classElement = await createClassElement('''
       @DatabaseView("DELETE all from Person")
       class Person {
