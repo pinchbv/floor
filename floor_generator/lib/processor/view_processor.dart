@@ -64,8 +64,3 @@ extension on String {
         'select'.allMatches(lowerCasedString).length >= 2;
   }
 }
-      throw _processorError.missingQuery;
-    }
-    return query;
-  }
-}
