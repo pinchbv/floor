@@ -260,18 +260,23 @@ class EntityProcessor extends QueryableProcessor<Entity> {
     }
   }
 
-  // TODO #375
-  @nonNull
   annotations.ForeignKeyAction _getForeignKeyAction(
-      DartObject foreignKeyObject, String triggerName) {
+    DartObject foreignKeyObject,
+    String triggerName,
+  ) {
     final field = foreignKeyObject.getField(triggerName);
+    // TODO #375 remove suppress when getField is null aware
+    // ignore: unnecessary_null_comparison
     if (field == null) {
       // field was not defined, return default value
       return annotations.ForeignKeyAction.noAction;
     }
 
-    return field.toForeignKeyAction(
-        orElse: () =>
-            throw _processorError.wrongForeignKeyAction(field, triggerName));
+    final foreignKeyAction = field.toForeignKeyAction();
+    if (foreignKeyAction == null) {
+      throw _processorError.wrongForeignKeyAction(field, triggerName);
+    } else {
+      return foreignKeyAction;
+    }
   }
 }

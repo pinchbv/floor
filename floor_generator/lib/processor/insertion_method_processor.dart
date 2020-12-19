@@ -79,14 +79,19 @@ class InsertionMethodProcessor implements Processor<InsertionMethod> {
   }
 
   String _getOnConflictStrategy() {
-    return _methodElement
+    final onConflictStrategy = _methodElement
         .getAnnotation(annotations.Insert)
         .getField(AnnotationField.onConflict)
-        .toEnumValueString(
-            orElse: () => throw InvalidGenerationSourceError(
-                  'Value of ${AnnotationField.onConflict} must be one of ${annotations.OnConflictStrategy.values.map((e) => e.toString()).join(',')}',
-                  element: _methodElement,
-                ));
+        .toEnumValueString();
+
+    if (onConflictStrategy == null) {
+      throw InvalidGenerationSourceError(
+        'Value of ${AnnotationField.onConflict} must be one of ${annotations.OnConflictStrategy.values.map((e) => e.toString()).join(',')}',
+        element: _methodElement,
+      );
+    } else {
+      return onConflictStrategy;
+    }
   }
 
   void _assertMethodReturnsFuture(final DartType returnType) {

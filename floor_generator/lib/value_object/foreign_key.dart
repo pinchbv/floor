@@ -2,7 +2,6 @@
 // ignore_for_file: import_of_legacy_library_into_null_safe
 import 'package:collection/collection.dart';
 import 'package:floor_annotation/floor_annotation.dart' show ForeignKeyAction;
-import 'package:floor_generator/misc/annotations.dart';
 import 'package:floor_generator/misc/extension/foreign_key_action_extension.dart';
 
 class ForeignKey {

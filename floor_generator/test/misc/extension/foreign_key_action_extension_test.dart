@@ -28,9 +28,5 @@ void main() {
       final actual = annotations.ForeignKeyAction.cascade.toSql();
       expect(actual, equals('CASCADE'));
     });
-
-    test('null throws ArgumentError', () {
-      expect(() => null.toSql(), throwsArgumentError);
-    });
   });
 }
