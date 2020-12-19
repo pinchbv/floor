@@ -1,5 +1,6 @@
 // TODO #375 delete once dependencies have migrated
 // ignore_for_file: import_of_legacy_library_into_null_safe
+import 'package:analyzer/dart/constant/value.dart';
 import 'package:analyzer/dart/element/element.dart';
 import 'package:source_gen/source_gen.dart';
 
@@ -67,6 +68,16 @@ class EntityProcessorError {
       'No matching columns found for the given index. (${columnNames.join(', ')})',
       todo:
           "Make sure to add a correct index column name like: Index(values: ['foo'])').",
+      element: _classElement,
+    );
+  }
+
+  InvalidGenerationSourceError wrongForeignKeyAction(
+      DartObject field, String triggerName) {
+    return InvalidGenerationSourceError(
+      'No ForeignKeyAction with the value $field exists for the $triggerName trigger.',
+      todo:
+          'Make sure to add a correct ForeignKeyAction like `ForeignKeyAction.noAction` or leave it out entirely.',
       element: _classElement,
     );
   }

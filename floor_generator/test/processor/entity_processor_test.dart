@@ -2,7 +2,10 @@
 // ignore_for_file: import_of_legacy_library_into_null_safe
 import 'package:analyzer/dart/element/element.dart';
 import 'package:build_test/build_test.dart';
+import 'package:floor_annotation/floor_annotation.dart' as annotations;
+import 'package:floor_generator/misc/constants.dart';
 import 'package:floor_generator/processor/entity_processor.dart';
+import 'package:floor_generator/processor/error/entity_processor_error.dart';
 import 'package:floor_generator/processor/field_processor.dart';
 import 'package:floor_generator/value_object/entity.dart';
 import 'package:floor_generator/value_object/foreign_key.dart';
@@ -11,6 +14,7 @@ import 'package:floor_generator/value_object/primary_key.dart';
 import 'package:source_gen/source_gen.dart';
 import 'package:test/test.dart';
 
+import '../mocks.dart';
 import '../test_utils.dart';
 
 void main() {
@@ -133,10 +137,54 @@ void main() {
         'Person',
         ['id'],
         ['owner_id'],
-        'CASCADE',
-        'SET NULL',
+        annotations.ForeignKeyAction.cascade,
+        annotations.ForeignKeyAction.setNull,
       );
       expect(actual, equals(expected));
+    });
+
+    test('error with wrong onUpdate Annotation', () async {
+      final classElements = await _createClassElements('''
+          @entity
+          class Person {
+            @primaryKey
+            final int id;
+            
+            final String name;
+          
+            Person(this.id, this.name);
+          }
+          
+          @Entity(
+            foreignKeys: [
+              ForeignKey(
+                childColumns: ['owner_id'],
+                parentColumns: ['id'],
+                entity: Person,
+                onUpdate: null
+                onDelete: ForeignKeyAction.setNull,
+              )
+            ],
+          )
+          class Dog {
+            @primaryKey
+            final int id;
+          
+            final String name;
+          
+            @ColumnInfo(name: 'owner_id')
+            final int ownerId;
+          
+            Dog(this.id, this.name, this.ownerId);
+          }
+      ''');
+
+      final processor = EntityProcessor(classElements[1], {});
+      expect(
+          processor.process,
+          throwsInvalidGenerationSourceError(
+              EntityProcessorError(classElements[1]).wrongForeignKeyAction(
+                  MockDartObject(), ForeignKeyField.onUpdate)));
     });
   });
 

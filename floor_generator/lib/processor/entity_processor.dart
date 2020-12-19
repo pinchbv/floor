@@ -5,9 +5,9 @@ import 'package:analyzer/dart/element/element.dart';
 import 'package:collection/collection.dart';
 import 'package:floor_annotation/floor_annotation.dart' as annotations;
 import 'package:floor_generator/misc/constants.dart';
+import 'package:floor_generator/misc/extension/dart_object_extension.dart';
 import 'package:floor_generator/misc/extension/string_extension.dart';
 import 'package:floor_generator/misc/extension/type_converters_extension.dart';
-import 'package:floor_generator/misc/foreign_key_action.dart';
 import 'package:floor_generator/misc/type_utils.dart';
 import 'package:floor_generator/processor/error/entity_processor_error.dart';
 import 'package:floor_generator/processor/queryable_processor.dart';
@@ -91,13 +91,11 @@ class EntityProcessor extends QueryableProcessor<Entity> {
             throw _processorError.missingParentColumns;
           }
 
-          final onUpdateAnnotationValue =
-              foreignKeyObject.getField(ForeignKeyField.onUpdate)?.toIntValue();
-          final onUpdate = ForeignKeyAction.getString(onUpdateAnnotationValue);
+          final onUpdate =
+              _getForeignKeyAction(foreignKeyObject, ForeignKeyField.onUpdate);
 
-          final onDeleteAnnotationValue =
-              foreignKeyObject.getField(ForeignKeyField.onDelete)?.toIntValue();
-          final onDelete = ForeignKeyAction.getString(onDeleteAnnotationValue);
+          final onDelete =
+              _getForeignKeyAction(foreignKeyObject, ForeignKeyField.onDelete);
 
           return ForeignKey(
             parentName,
@@ -259,6 +257,26 @@ class EntityProcessor extends QueryableProcessor<Entity> {
       }
     } else {
       return attributeValue;
+    }
+  }
+
+  annotations.ForeignKeyAction _getForeignKeyAction(
+    DartObject foreignKeyObject,
+    String triggerName,
+  ) {
+    final field = foreignKeyObject.getField(triggerName);
+    // TODO #375 remove suppress when getField is null aware
+    // ignore: unnecessary_null_comparison
+    if (field == null) {
+      // field was not defined, return default value
+      return annotations.ForeignKeyAction.noAction;
+    }
+
+    final foreignKeyAction = field.toForeignKeyAction();
+    if (foreignKeyAction == null) {
+      throw _processorError.wrongForeignKeyAction(field, triggerName);
+    } else {
+      return foreignKeyAction;
     }
   }
 }
