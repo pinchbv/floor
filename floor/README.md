@@ -593,7 +593,8 @@ class DateTimeConverter extends TypeConverter<DateTime, int> {
   int encode(DateTime value) {
     return value == null ? null : value.millisecondsSinceEpoch;
   }
-}```
+}
+```
  
  2. Apply the created type converter to the database by using the `@TypeConverters` annotation and make sure to additionally import the file of your type converter here.
 Importing it in your database file is **always** necessary because the generated code will be `part` of your database file and this is the location where your type converters get instantiated.  
