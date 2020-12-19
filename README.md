@@ -584,23 +584,16 @@ The implementation and usage of the mentioned `DateTime` to `int` converter is d
 class DateTimeConverter extends TypeConverter<DateTime, int> {
   @override
   DateTime decode(int databaseValue) {
-    try {
-      return DateTime.fromMillisecondsSinceEpoch(databaseValue);
-    } catch (e) {
-      return null;
-    }
+    return databaseValue == null
+        ? null
+        : DateTime.fromMillisecondsSinceEpoch(databaseValue);
   }
 
   @override
   int encode(DateTime value) {
-    try {
-      return value.millisecondsSinceEpoch;
-    } catch (e) {
-      return null;
-    }
+    return value == null ? null : value.millisecondsSinceEpoch;
   }
-}
-```
+}```
  
  2. Apply the created type converter to the database by using the `@TypeConverters` annotation and make sure to additionally import the file of your type converter here.
 Importing it in your database file is **always** necessary because the generated code will be `part` of your database file and this is the location where your type converters get instantiated.  
