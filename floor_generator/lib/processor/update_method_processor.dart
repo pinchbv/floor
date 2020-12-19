@@ -3,7 +3,7 @@
 import 'package:analyzer/dart/element/element.dart';
 import 'package:analyzer/dart/element/type.dart';
 import 'package:floor_annotation/floor_annotation.dart' as annotations
-    show Update;
+    show Update, OnConflictStrategy;
 import 'package:floor_generator/misc/change_method_processor_helper.dart';
 import 'package:floor_generator/misc/constants.dart';
 import 'package:floor_generator/misc/extension/dart_object_extension.dart';
@@ -66,7 +66,11 @@ class UpdateMethodProcessor implements Processor<UpdateMethod> {
     return _methodElement
         .getAnnotation(annotations.Update)
         .getField(AnnotationField.onConflict)
-        .toEnumValueString();
+        .toEnumValueString(
+            orElse: () => throw InvalidGenerationSourceError(
+                  'Value of ${AnnotationField.onConflict} must be one of ${annotations.OnConflictStrategy.values.map((e) => e.toString()).join(',')}',
+                  element: _methodElement,
+                ));
   }
 
   DartType _getFlattenedReturnType(final DartType returnType) {
