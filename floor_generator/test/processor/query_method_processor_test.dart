@@ -137,6 +137,36 @@ void main() {
       );
     });
 
+    test('parses IN clause without space after IN', () async {
+      final methodElement = await _createQueryMethodElement('''
+      @Query('update sports set rated = 1 where id in(:ids)')
+      Future<void> setRated(List<int> ids);
+    ''');
+
+      final actual =
+          QueryMethodProcessor(methodElement, [], {}).process().query;
+
+      expect(
+        actual,
+        equals(r'update sports set rated = 1 where id in($valueList0)'),
+      );
+    });
+
+    test('parses IN clause with multiple spaces after IN', () async {
+      final methodElement = await _createQueryMethodElement('''
+      @Query('update sports set rated = 1 where id in      (:ids)')
+      Future<void> setRated(List<int> ids);
+    ''');
+
+      final actual =
+          QueryMethodProcessor(methodElement, [], {}).process().query;
+
+      expect(
+        actual,
+        equals(r'update sports set rated = 1 where id in ($valueList0)'),
+      );
+    });
+
     test('Parse query with multiple IN clauses', () async {
       final methodElement = await _createQueryMethodElement('''
       @Query('update sports set rated = 1 where id in (:ids) and where foo in (:bar)')
