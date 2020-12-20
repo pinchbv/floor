@@ -344,10 +344,10 @@ class BaseObject {
   final String updateTime;
 
   BaseObject(
-      this.id,
-      this.updateTime, {
-        String createTime,
-      }) : this.createTime = createTime ?? DateTime.now().toString();
+    this.id,
+    this.updateTime, {
+    String createTime,
+  }) : this.createTime = createTime ?? DateTime.now().toString();
 
   @override
   List<Object> get props => [];
@@ -514,10 +514,10 @@ Stream<List<Person>> findAllPersonsAsStream();
 
 // usage
 StreamBuilder<List<Person>>(
-stream: dao.findAllPersonsAsStream(),
-builder: (BuildContext context, AsyncSnapshot<List<Person>> snapshot) {
-// do something with the values here
-},
+  stream: dao.findAllPersonsAsStream(),
+  builder: (BuildContext context, AsyncSnapshot<List<Person>> snapshot) {
+    // do something with the values here
+  },
 );
 ```
 
@@ -670,8 +670,8 @@ final migration1to2 = Migration(1, 2, (database) async {
 
 final database = await $FloorAppDatabase
     .databaseBuilder('app_database.db')
-.addMigrations([migration1to2])
-.build();
+    .addMigrations([migration1to2])
+    .build();
 ```
 
 ## In-Memory Database
@@ -694,15 +694,15 @@ Their usage can be seen in the following snippet.
 
 ```dart
 final callback = Callback(
-  onCreate: (database, version) { /* database has been created */ },
-  onOpen: (database) { /* database has been opened */ },
-  onUpgrade: (database, startVersion, endVersion) { /* database has been upgraded */ },
+   onCreate: (database, version) { /* database has been created */ },
+   onOpen: (database) { /* database has been opened */ },
+   onUpgrade: (database, startVersion, endVersion) { /* database has been upgraded */ },
 );
 
 final database = await $FloorAppDatabase
     .databaseBuilder('app_database.db')
-.addCallback(callback)
-.build();
+    .addCallback(callback)
+    .build();
 ```
 
 ## Platform Support
