@@ -36,7 +36,7 @@ As a consequence, it's necessary to have an understanding of SQL and SQLite in o
     1. [Streams](#streams)
     1. [Transactions](#transactions)
     1. [Inheritance](#inheritance-1)
-1. [Type Converters](#type-converters)    
+1. [Type Converters](#type-converters)
 1. [Migrations](#migrations)
 1. [In-Memory Database](#in-memory-database)
 1. [Initialization Callback](#initialization-callback)
@@ -49,7 +49,7 @@ As a consequence, it's necessary to have an understanding of SQL and SQLite in o
 
 ## Quick Start
 1. Add the runtime dependency `floor` as well as the generator `floor_generator` to your `pubspec.yaml`.
-    The third dependency is `build_runner` which has to be included as a dev dependency just like the generator.
+   The third dependency is `build_runner` which has to be included as a dev dependency just like the generator.
 
     - `floor` holds all the code you are going to use in your application.
 
@@ -70,11 +70,11 @@ As a consequence, it's necessary to have an understanding of SQL and SQLite in o
 
 1. Create an **Entity**
 
-    It will represent a database table as well as the scaffold of your business object.
-    `@entity` marks the class as a persistent class.
-    It's required to add a primary key to your table.
-    You can do so by adding the `@primaryKey` annotation to an `int` property.
-    There is no restriction on where you put the file containing the entity.
+   It will represent a database table as well as the scaffold of your business object.
+   `@entity` marks the class as a persistent class.
+   It's required to add a primary key to your table.
+   You can do so by adding the `@primaryKey` annotation to an `int` property.
+   There is no restriction on where you put the file containing the entity.
 
     ````dart
     // entity/person.dart
@@ -94,12 +94,12 @@ As a consequence, it's necessary to have an understanding of SQL and SQLite in o
 
 1. Create a **DAO (Data Access Object)**
 
-    This component is responsible for managing access to the underlying SQLite database.
-    The abstract class contains the method signatures for querying the database which have to return a `Future` or `Stream`.
+   This component is responsible for managing access to the underlying SQLite database.
+   The abstract class contains the method signatures for querying the database which have to return a `Future` or `Stream`.
 
     - You can define queries by adding the `@Query` annotation to a method.
-        The SQL statement has to get added in parenthesis.
-        The method must return a `Future` or `Stream` of the `Entity` you're querying for.
+      The SQL statement has to get added in parenthesis.
+      The method must return a `Future` or `Stream` of the `Entity` you're querying for.
 
     - `@insert` marks a method as an insertion method.
 
@@ -123,11 +123,11 @@ As a consequence, it's necessary to have an understanding of SQL and SQLite in o
 
 1. Create the **Database**
 
-    It has to be an abstract class which extends `FloorDatabase`.
-    Furthermore, it's required to add `@Database()` to the signature of the class.
-    Make sure to add the created entity to the `entities` attribute of the `@Database` annotation.
+   It has to be an abstract class which extends `FloorDatabase`.
+   Furthermore, it's required to add `@Database()` to the signature of the class.
+   Make sure to add the created entity to the `entities` attribute of the `@Database` annotation.
 
-    In order to make the generated code work, it's required to also add the listed imports.
+   In order to make the generated code work, it's required to also add the listed imports.
 
     ```dart
     // database.dart
@@ -149,20 +149,20 @@ As a consequence, it's necessary to have an understanding of SQL and SQLite in o
     ```
 
 1. Make sure to add `part 'database.g.dart';` beneath the imports of this file.
-    It's important to note that 'database' has to get exchanged with the filename of the database definition.
-    In this case, the file is named `database.dart`.
+   It's important to note that 'database' has to get exchanged with the filename of the database definition.
+   In this case, the file is named `database.dart`.
 
 1. Run the generator with `flutter packages pub run build_runner build`.
-    To automatically run it, whenever a file changes, use `flutter packages pub run build_runner watch`.
+   To automatically run it, whenever a file changes, use `flutter packages pub run build_runner watch`.
 
 1. Use the generated code.
-    For obtaining an instance of the database, use the generated `$FloorAppDatabase` class, which allows access to a database builder.
-    The name is being composed by `$Floor` and the database class name.
-    The string passed to `databaseBuilder()` will be the database file name.
-    For initializing the database, call `build()` and make sure to `await` the result.
-    
-    In order to retrieve the `PersonDao` instance, invoking the `persoDao` getter on the database instance is enough.
-    Its functions can be used as shown in the following snippet.
+   For obtaining an instance of the database, use the generated `$FloorAppDatabase` class, which allows access to a database builder.
+   The name is being composed by `$Floor` and the database class name.
+   The string passed to `databaseBuilder()` will be the database file name.
+   For initializing the database, call `build()` and make sure to `await` the result.
+
+   In order to retrieve the `PersonDao` instance, invoking the `persoDao` getter on the database instance is enough.
+   Its functions can be used as shown in the following snippet.
 
     ```dart
     final database = await $FloorAppDatabase.databaseBuilder('app_database.db').build();
@@ -210,7 +210,7 @@ With the annotation, it's possible to give columns a custom name and define if t
 
 #### Limitations
 - Floor automatically uses the **first** constructor defined in the entity class for creating in-memory objects from database rows.
-- There needs to be a constructor.  
+- There needs to be a constructor.
 
 ```dart
 @Entity(tableName: 'person')
@@ -234,7 +234,7 @@ Floor entities can hold values of the following Dart types which map to their co
 - `bool` - INTEGER (0 = false, 1 = true)
 - `Uint8List` - BLOB
 
-In case you want to store sophisticated Dart objects that can be represented by one of the above types, take a look at [Type Converters](#type-converters). 
+In case you want to store sophisticated Dart objects that can be represented by one of the above types, take a look at [Type Converters](#type-converters).
 
 ### Primary Keys
 Whenever a compound primary key is required (e.g. *n-m* relationships), the syntax for setting the keys differs from the previously mentioned way of setting primary keys.
@@ -326,8 +326,8 @@ class Person {
 ### Inheritance
 
 Just like Daos, entities (and database views) can inherit from a common base class and use their fields. The entity just has to `extend` the base class.
-This construct will be treated as if all the fields in the base class are part of the entity, meaning the database table will 
-have all columns of the entity and the base class. 
+This construct will be treated as if all the fields in the base class are part of the entity, meaning the database table will
+have all columns of the entity and the base class.
 
 The base class does not have to have a separate annotation for the class. Its fields can be annotated just like normal entity columns.
 Foreign keys and indices have to be declared in the entity and can't be defined in the base class.
@@ -399,7 +399,7 @@ You can then query the view via a DAO function like an entity.
 It is possible for DatabaseViews to inherit common fields from a base class, just like in entities.
 
 #### Limitations
-- It is now possible to return a `Stream` object from a DAO method which queries a database view. But it will fire on **any** 
+- It is now possible to return a `Stream` object from a DAO method which queries a database view. But it will fire on **any**
   `@update`, `@insert`, `@delete` events in the whole database, which can get quite taxing on the runtime. Please add it only if you know what you are doing!
   This is mostly due to the complexity of detecting which entities are involved in a database view.
 
@@ -522,9 +522,9 @@ StreamBuilder<List<Person>>(
 ```
 
 #### Limitations
-- Only methods annotated with `@insert`, `@update` and `@delete` trigger `Stream` emissions. 
+- Only methods annotated with `@insert`, `@update` and `@delete` trigger `Stream` emissions.
   Inserting data by using the `@Query()` annotation doesn't.
-- It is now possible to return a `Stream` if the function queries a database view. But it will fire on **any** 
+- It is now possible to return a `Stream` if the function queries a database view. But it will fire on **any**
   `@update`, `@insert`, `@delete` events in the whole database, which can get quite taxing on the runtime. Please add it only if you know what you are doing!
   This is mostly due to the complexity of detecting which entities are involved in a database view.
 - Functions returning a stream of single items such as `Stream<Person>` do not emit when there is no query result.
@@ -544,7 +544,7 @@ Future<void> replacePersons(List<Person> persons) async {
 ### Inheritance
 Data access object classes support inheritance as shown in the following.
 There is no limit to inheritance levels and thus, each abstract parent can have another abstract parent.
-Bear in mind that only abstract classes allow method signatures without an implementation body and thereby, make sure to position your to-be-inherited methods in an abstract class and extend this class with your DAO.  
+Bear in mind that only abstract classes allow method signatures without an implementation body and thereby, make sure to position your to-be-inherited methods in an abstract class and extend this class with your DAO.
 
 ```dart
 @dao
@@ -579,7 +579,7 @@ It's sufficient to define the conversion from a database to an in-memory type an
 The implementation and usage of the mentioned `DateTime` to `int` converter is described in the following.
 
 1. Create a converter class that implements the abstract `TypeConverter` and supply the in-memory object type and database type as parameterized types.
-    This class inherits the `decode()` and `encode()` functions which define the conversion from one to the other type.
+   This class inherits the `decode()` and `encode()` functions which define the conversion from one to the other type.
 ```dart
 class DateTimeConverter extends TypeConverter<DateTime, int> {
   @override
@@ -595,9 +595,9 @@ class DateTimeConverter extends TypeConverter<DateTime, int> {
   }
 }
 ```
- 
- 2. Apply the created type converter to the database by using the `@TypeConverters` annotation and make sure to additionally import the file of your type converter here.
-Importing it in your database file is **always** necessary because the generated code will be `part` of your database file and this is the location where your type converters get instantiated.  
+
+2. Apply the created type converter to the database by using the `@TypeConverters` annotation and make sure to additionally import the file of your type converter here.
+   Importing it in your database file is **always** necessary because the generated code will be `part` of your database file and this is the location where your type converters get instantiated.
 ```dart
 @TypeConverters([DateTimeConverter])
 @Database(version: 1, entities: [Order])
@@ -707,7 +707,7 @@ final database = await $FloorAppDatabase
 
 ## Platform Support
 Floor supports iOS, Android, Linux, macOS and Windows.
-The SQLite database access on iOS and Android is provided by [sqflite](https://github.com/tekartik/sqflite/tree/master/sqflite) whereas Linux, macOS and Windows use [sqflite's ffi](https://github.com/tekartik/sqflite/tree/master/sqflite_common_ffi) implementation. 
+The SQLite database access on iOS and Android is provided by [sqflite](https://github.com/tekartik/sqflite/tree/master/sqflite) whereas Linux, macOS and Windows use [sqflite's ffi](https://github.com/tekartik/sqflite/tree/master/sqflite_common_ffi) implementation.
 
 **There currently is no support for Flutter for web.**
 
