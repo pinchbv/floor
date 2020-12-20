@@ -172,10 +172,10 @@ packages:
   floor_annotation:
     dependency: "direct main"
     description:
-      path: "../floor_annotation"
-      relative: true
-    source: path
-    version: "0.10.0"
+      name: floor_annotation
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.11.0"
   glob:
     dependency: transitive
     description:
@@ -266,7 +266,7 @@ packages:
       name: meta
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "1.2.3"
+    version: "1.2.4"
   mime:
     dependency: transitive
     description:

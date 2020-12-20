@@ -61,10 +61,10 @@ As a consequence, it's necessary to have an understanding of SQL and SQLite in o
     dependencies:
       flutter:
         sdk: flutter
-      floor: ^0.17.0
+      floor: ^0.18.0
 
     dev_dependencies:
-      floor_generator: ^0.17.0
+      floor_generator: ^0.18.0
       build_runner: ^1.10.3
     ````
 
