@@ -32,7 +32,7 @@ void main() {
 
       final actual = await personDao.findPersonByPicture(person.picture);
 
-      expect(actual, equals(person));
+      expect(actual, isNull);
     });
   });
 }
