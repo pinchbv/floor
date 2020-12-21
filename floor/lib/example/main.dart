@@ -7,7 +7,7 @@ part 'main.g.dart';
 
 @entity
 class Task {
-  @PrimaryKey(autoGenerate: true)
+  @primaryKey
   final int id;
   final String message;
 
