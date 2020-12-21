@@ -55,7 +55,6 @@ jobs:
         run: dartfmt -n --set-exit-if-changed .
 
       - name: Run tests
-        if:
         working-directory: floor_generator
         run: pub run test_cov
 
@@ -110,6 +109,34 @@ jobs:
           token: ${{ secrets.CODECOV_TOKEN }}
           flags: floor
           file: ./floor/coverage/lcov.info
+
+  floor_test:
+    runs-on: macos-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v2
+
+      - name: Install Flutter
+        uses: subosito/flutter-action@v1
+        with:
+          channel: stable
+
+      - name: Install dependencies
+        run: flutter packages get
+        working-directory: example
+
+      - name: Analyze
+        run: flutter analyze
+        working-directory: example
+
+      - name: Start iOS simulator
+        run: xcrun simctl boot "iPhone 12"
+
+      - name: Run integration tests
+        working-directory: floor_test
+        run: flutter drive --driver=test_driver/integration_test.dart --target=integration_test/main_test.dart
 
   example:
     runs-on: ubuntu-latest
