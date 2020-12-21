@@ -1,0 +1,2 @@
+fixes:
+  - "::floor/" # move root e.g., "path/" => "floor/path/"
