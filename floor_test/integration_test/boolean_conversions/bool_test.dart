@@ -44,10 +44,6 @@ void main() {
       final obj = BooleanClass(true, nullable: null, nonnullable: true);
       await boolDao.insertBoolC(obj);
 
-      // null == null is false in SQL so this will not return any results.
-      final actual = await boolDao.findWithNullable(null);
-      expect(actual, equals(null));
-
       final actual2 = await boolDao.findWithNullableBeingNull();
       expect(actual2, equals(obj));
     });

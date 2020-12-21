@@ -1,4 +1,4 @@
-package dev.vitus.floor_test
+package dev.vitus.floor_test;
 
 import androidx.test.rule.ActivityTestRule;
 import dev.flutter.plugins.integration_test.FlutterTestRunner;
