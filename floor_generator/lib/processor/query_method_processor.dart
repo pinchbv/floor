@@ -103,7 +103,7 @@ class QueryMethodProcessor extends Processor<QueryMethod> {
   String _replaceInClauseArguments(final String query) {
     var index = 0;
     return query.replaceAllMapped(
-      RegExp(r'( in )\([?]\)', caseSensitive: false),
+      RegExp(r'( in\s*)\([?]\)', caseSensitive: false),
       (match) {
         final matched = match.input.substring(match.start, match.end);
         final replaced =

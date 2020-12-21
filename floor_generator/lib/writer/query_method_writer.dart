@@ -79,13 +79,13 @@ class QueryMethodWriter implements Writer {
       final flattenedParameterType = parameter.type.flatten();
       String value;
       if (flattenedParameterType.isDefaultSqlType) {
-        value = 'value';
+        value = '\$value';
       } else {
         final typeConverter =
             _queryMethod.typeConverters.getClosest(flattenedParameterType);
-        value = '${typeConverter.name}.encode(value)';
+        value = '\${_${typeConverter.name.decapitalize()}.encode(value)}';
       }
-      return '''final valueList$index = ${parameter.displayName}.map((value) => "'\$$value'").join(', ');''';
+      return '''final valueList$index = ${parameter.displayName}.map((value) => "'$value'").join(', ');''';
     }).toList();
   }
 

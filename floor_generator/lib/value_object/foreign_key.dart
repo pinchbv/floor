@@ -1,12 +1,14 @@
 import 'package:collection/collection.dart';
+import 'package:floor_annotation/floor_annotation.dart' show ForeignKeyAction;
 import 'package:floor_generator/misc/annotations.dart';
+import 'package:floor_generator/misc/extension/foreign_key_action_extension.dart';
 
 class ForeignKey {
   final String parentName;
   final List<String> parentColumns;
   final List<String> childColumns;
-  final String onUpdate;
-  final String onDelete;
+  final ForeignKeyAction onUpdate;
+  final ForeignKeyAction onDelete;
 
   ForeignKey(
     this.parentName,
@@ -25,8 +27,8 @@ class ForeignKey {
 
     return 'FOREIGN KEY ($escapedChildColumns)'
         ' REFERENCES `$parentName` ($escapedParentColumns)'
-        ' ON UPDATE $onUpdate'
-        ' ON DELETE $onDelete';
+        ' ON UPDATE ${onUpdate.toSql()}'
+        ' ON DELETE ${onDelete.toSql()}';
   }
 
   final _listEquality = const ListEquality<String>();

@@ -1,7 +1,7 @@
 import 'package:analyzer/dart/element/element.dart';
 import 'package:analyzer/dart/element/type.dart';
 import 'package:floor_annotation/floor_annotation.dart' as annotations
-    show Insert;
+    show Insert, OnConflictStrategy;
 import 'package:floor_generator/misc/annotations.dart';
 import 'package:floor_generator/misc/change_method_processor_helper.dart';
 import 'package:floor_generator/misc/constants.dart';
@@ -87,7 +87,11 @@ class InsertionMethodProcessor implements Processor<InsertionMethod> {
     return _methodElement
         .getAnnotation(annotations.Insert)
         .getField(AnnotationField.onConflict)
-        .toEnumValueString();
+        .toEnumValueString(
+            orElse: () => throw InvalidGenerationSourceError(
+                  'Value of ${AnnotationField.onConflict} must be one of ${annotations.OnConflictStrategy.values.map((e) => e.toString()).join(',')}',
+                  element: _methodElement,
+                ));
   }
 
   void _assertMethodReturnsFuture(final DartType returnType) {

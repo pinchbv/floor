@@ -136,6 +136,31 @@ void main() {
       }
     '''));
     });
+
+    test('generates method with type converter receiving list of orders',
+        () async {
+      final typeConverter = TypeConverter(
+        'DateTimeConverter',
+        await dateTimeDartType,
+        await intDartType,
+        TypeConverterScope.database,
+      );
+      final queryMethod = await '''
+      @Query('SELECT * FROM Order WHERE date IN (:dates)')
+      Future<List<Order>> findByDates(List<DateTime> dates);
+    '''
+          .asOrderQueryMethod({typeConverter});
+
+      final actual = QueryMethodWriter(queryMethod).write();
+
+      expect(actual, equalsDart(r'''
+      @override
+      Future<List<Order>> findByDates(List<DateTime> dates) async {
+        final valueList0 = dates.map((value) => "'${_dateTimeConverter.encode(value)}'").join(', ');
+        return _queryAdapter.queryList('SELECT * FROM Order WHERE date IN ($valueList0)', mapper: (Map<String, dynamic> row) => Order(row['id'] as int, _dateTimeConverter.decode(row['dateTime'] as int)));
+      }
+    '''));
+    });
   });
 
   test('query boolean parameter', () async {
@@ -247,6 +272,23 @@ void main() {
       Future<List<Person>> findWithIds(List<int> ids) async {
         final valueList0 = ids.map((value) => "'$value'").join(', ');
         return _queryAdapter.queryList('SELECT * FROM Person WHERE id IN ($valueList0)', mapper: (Map<String, dynamic> row) => Person(row['id'] as int, row['name'] as String));
+      }
+    '''));
+  });
+
+  test('writes query with IN clause without space after IN', () async {
+    final queryMethod = await _createQueryMethod('''
+      @Query('SELECT * FROM Person WHERE id IN(:ids)')
+      Future<List<Person>> findWithIds(List<int> ids);
+    ''');
+
+    final actual = QueryMethodWriter(queryMethod).write();
+
+    expect(actual, equalsDart(r'''
+      @override
+      Future<List<Person>> findWithIds(List<int> ids) async {
+        final valueList0 = ids.map((value) => "'$value'").join(', ');
+        return _queryAdapter.queryList('SELECT * FROM Person WHERE id IN($valueList0)', mapper: (Map<String, dynamic> row) => Person(row['id'] as int, row['name'] as String));
       }
     '''));
   });

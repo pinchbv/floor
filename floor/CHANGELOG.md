@@ -1,5 +1,32 @@
 # Changelog
 
+# 0.18.0
+
+* Documentation update on DateTimeConverter sample
+* Change ForeignKeyAction to enum in the generator
+* Add primary key auto increment test
+
+### 🚀 Features
+
+* Add support for WITH statements for DatabaseViews
+
+### 🐛 Bug Fixes
+
+* More tolerant query with list parameter parsing
+
+# 0.17.0
+
+### 🐛 Bug Fixes
+
+* Generate distinct type converter instances
+* Fix generation of DAO method with list argument using type converters
+
+# 0.16.0
+
+### 🚀 Features
+
+* Add **experimental** support for type converters 
+
 # 0.15.0
 
 ### Changes
