@@ -13,6 +13,7 @@ As a consequence, it's necessary to have an understanding of SQL and SQLite in o
 - iOS, Android, Linux, macOS, Windows
 
 ⚠️ The library is on its way to its first stable release and is open to contributions!
+Refer to [GitHub Discussions](https://github.com/vitusortner/floor/discussions) for questions, ideas, and discussions.
 
 [![pub package](https://img.shields.io/pub/v/floor.svg)](https://pub.dartlang.org/packages/floor)
 [![build status](https://github.com/vitusortner/floor/workflows/Continuous%20integration/badge.svg)](https://github.com/vitusortner/floor/actions)
@@ -44,7 +45,7 @@ As a consequence, it's necessary to have an understanding of SQL and SQLite in o
 1. [Testing](#testing)
 1. [Examples](#examples)
 1. [Naming](#naming)
-1. [Bugs and Feedback](#bugs-and-feedback)
+1. [Bugs, Ideas, and Feedback](#bugs-ideas-and-feedback)
 1. [License](#license)
 
 ## Quick Start
@@ -762,8 +763,9 @@ The library's name derives from the following.
 *Floor* as the *bottom layer* of a [Room](https://developer.android.com/topic/libraries/architecture/room) which points to the analogy of the database layer being the bottom and foundation layer of most applications.
 Where *fl* also gives a pointer that the library is used in the Flutter context.
 
-## Bugs and Feedback
-For bugs, questions and discussions please use [Github Issues](https://github.com/vitusortner/floor/issues).
+## Bugs, Ideas, and Feedback
+For bugs please use [GitHub Issues](https://github.com/vitusortner/floor/issues).
+For questions, ideas, and discussions use [GitHub Discussions](https://github.com/vitusortner/floor/discussions).
 For general communication use [floor's Slack](https://join.slack.com/t/floor-flutter/shared_invite/zt-d7i4yhgn-070n~ijDwXVHTpTxcVC47w).
 
 ## License
