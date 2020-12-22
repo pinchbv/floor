@@ -15,7 +15,7 @@ abstract class PersonDao {
   Future<Person?> findPersonById(int id);
 
   @Query('SELECT * FROM person WHERE id = :id')
-  Stream<Person> findPersonByIdAsStream(int id);
+  Stream<Person?> findPersonByIdAsStream(int id);
 
   @Query('SELECT * FROM person WHERE id = :id AND custom_name = :name')
   Future<Person?> findPersonByIdAndName(int id, String name);

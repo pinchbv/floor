@@ -112,7 +112,7 @@ void main() {
         verify(mockDatabaseExecutor.rawQuery(sql, arguments));
       });
 
-      test('returns emtpy list when query returns nothing', () async {
+      test('returns empty list when query returns nothing', () async {
         final queryResult = Future(() => <Map<String, dynamic>>[]);
         when(mockDatabaseExecutor.rawQuery(sql)).thenAnswer((_) => queryResult);
 
@@ -202,6 +202,16 @@ void main() {
       streamController!.add(entityName);
 
       expect(actual, emitsInOrder(<Person>[person, person]));
+    });
+
+    test('query item emits null when query has no result', () {
+      final queryResult = Future(() => <Map<String, Object?>>[]);
+      when(mockDatabaseExecutor.rawQuery(sql)).thenAnswer((_) => queryResult);
+
+      final actual = underTest.queryStream(sql,
+          queryableName: entityName, isView: false, mapper: mapper);
+
+      expect(actual, emits(null));
     });
 
     test('query items and emit persistent items without arguments', () async {

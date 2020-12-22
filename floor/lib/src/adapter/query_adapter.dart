@@ -52,8 +52,9 @@ class QueryAdapter {
     await _database.rawQuery(sql, arguments);
   }
 
-  /// Executes a SQLite query that returns a stream of single query results.
-  Stream<T> queryStream<T>(
+  /// Executes a SQLite query that returns a stream of single query results
+  /// or `null`.
+  Stream<T?> queryStream<T>(
     final String sql, {
     final List<Object>? arguments,
     required final String queryableName,
@@ -63,13 +64,11 @@ class QueryAdapter {
     final changeListener = _changeListener;
     if (changeListener == null) throw ArgumentError.notNull();
 
-    final controller = StreamController<T>.broadcast();
+    final controller = StreamController<T?>.broadcast();
 
     Future<void> executeQueryAndNotifyController() async {
       final result = await query(sql, arguments: arguments, mapper: mapper);
-      // TODO #338 let's allow nulls in Streams
-      // TODO #375
-      if (result != null) controller.add(result);
+      controller.add(result);
     }
 
     controller.onListen = () async => executeQueryAndNotifyController();
@@ -86,6 +85,23 @@ class QueryAdapter {
     controller.onCancel = () => subscription.cancel();
 
     return controller.stream;
+  }
+
+  // TODO #375 should we offer this?
+  Stream<T> queryStreamNotNull<T>(
+    final String sql, {
+    final List<Object>? arguments,
+    required final String queryableName,
+    required final bool isView,
+    required final T Function(Map<String, Object?>) mapper,
+  }) {
+    return queryStream(
+      sql,
+      arguments: arguments,
+      queryableName: queryableName,
+      isView: isView,
+      mapper: mapper,
+    ).where((result) => result != null).map((result) => result!);
   }
 
   /// Executes a SQLite query that returns a stream of multiple query results.
