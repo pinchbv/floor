@@ -518,7 +518,7 @@ These methods return broadcast streams and thus, can have multiple listeners.
 A function returning a stream of single items will emit `null` when no matching row is found.
 Thereby, it's necessary to make the function return a stream of a nullable type.
 For example `Stream<Person?>`.
-In case you're not interested in `null`s, you can simply use `Stream.filter((value) => value != null)` to get rid of them.
+In case you're not interested in `null`s, you can simply use `Stream.where((value) => value != null)` to get rid of them.
 
 ```dart
 // definition
