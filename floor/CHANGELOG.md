@@ -1,5 +1,11 @@
 # Changelog
 
+# 1.0.0-nullsafety.0
+
+### 🚀 Features
+
+* Make floor null safe
+
 # 0.18.0
 
 * Documentation update on DateTimeConverter sample
@@ -25,7 +31,7 @@
 
 ### 🚀 Features
 
-* Add **experimental** support for type converters 
+* Add **experimental** support for type converters
 
 # 0.15.0
 
@@ -52,7 +58,8 @@
 
 ### ⚠️ Breaking Changes
 
-**You need to migrate the explicit usages of `OnConflictStrategy` and `ForeignKeyAction` from snake case to camel case.**
+**You need to migrate the explicit usages of `OnConflictStrategy` and `ForeignKeyAction` from snake case to camel
+case.**
 
 * Apply camel case to constants
 
@@ -85,12 +92,12 @@
 
 ### Changes
 
-* Ignore Getters&Setters 
-* Use Flutter bundled pub to get and upgrade project dependencies 
+* Ignore Getters&Setters
+* Use Flutter bundled pub to get and upgrade project dependencies
 * Generate database implementation on every CI run
 * Throw exception when querying for unsupported type
 * Add generated code for example app
-* Add workflow scripts 
+* Add workflow scripts
 * Run real database tests on development machine and CI
 
 ### 🚀 Features

@@ -1,5 +1,11 @@
 # Changelog
 
+# 1.0.0-nullsafety.0
+
+### 🚀 Features
+
+* Make floor null safe
+
 # 0.11.0
 
 * Change `ForeignKeyAction` int constants to enum
@@ -14,7 +20,8 @@
 
 # 0.8.0
 
-**⚠️ You need to migrate the explicit usages of `OnConflictStrategy` and `ForeignKeyAction` from snake case to camel case.**
+**⚠️ You need to migrate the explicit usages of `OnConflictStrategy` and `ForeignKeyAction` from snake case to camel
+case.**
 
 * Apply camel case to constants
 
@@ -55,7 +62,7 @@
 
 ### 🐛 Bug Fixes
 
-*  Correct mapper instance name referenced by generated query methods
+* Correct mapper instance name referenced by generated query methods
 
 # 0.2.0
 
