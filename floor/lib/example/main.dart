@@ -17,7 +17,7 @@ class Task {
 @dao
 abstract class TaskDao {
   @Query('SELECT * FROM task WHERE id = :id')
-  Future<Task> findTaskById(int id);
+  Future<Task?> findTaskById(int id);
 
   @Query('SELECT * FROM task')
   Future<List<Task>> findAllTasks();
