@@ -278,6 +278,23 @@ void main() {
     '''));
   });
 
+  test('writes query with IN clause without space after IN', () async {
+    final queryMethod = await _createQueryMethod('''
+      @Query('SELECT * FROM Person WHERE id IN(:ids)')
+      Future<List<Person>> findWithIds(List<int> ids);
+    ''');
+
+    final actual = QueryMethodWriter(queryMethod).write();
+
+    expect(actual, equalsDart(r'''
+      @override
+      Future<List<Person>> findWithIds(List<int> ids) async {
+        final valueList0 = ids.map((value) => "'$value'").join(', ');
+        return _queryAdapter.queryList('SELECT * FROM Person WHERE id IN($valueList0)', mapper: (Map<String, dynamic> row) => Person(row['id'] as int, row['name'] as String));
+      }
+    '''));
+  });
+
   test('Query with multiple IN clauses', () async {
     final queryMethod = await _createQueryMethod('''
       @Query('SELECT * FROM Person WHERE id IN (:ids) AND id IN (:idx)')

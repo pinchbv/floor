@@ -1,5 +1,5 @@
 # Miscellaneous
-floor/test/integration/**/*.g.dart
+floor/**/*.g.dart
 *.class
 *.log
 *.pyc

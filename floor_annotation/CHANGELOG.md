@@ -1,5 +1,9 @@
 # Changelog
 
+# 0.11.0
+
+* Change `ForeignKeyAction` int constants to enum
+
 # 0.10.0
 
 * Add experimental  `TypeConverter` abstract class and `TypeConverters` annotation
