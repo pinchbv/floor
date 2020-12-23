@@ -78,7 +78,7 @@ jobs:
           - os: macos-latest
             flutter-path: /Users/runner/hostedtoolcache/flutter
           - os: windows-latest
-            flutter-path: /opt/hostedtoolcache/flutter
+            flutter-path: C:\hostedtoolcache\windows\flutter
     timeout-minutes: 10
 
     steps:
