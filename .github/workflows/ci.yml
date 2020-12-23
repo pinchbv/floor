@@ -70,11 +70,24 @@ jobs:
     strategy:
       matrix:
         os: [ macos-latest, windows-latest, ubuntu-latest ]
+        include:
+          - os: ubuntu-latest
+            flutter-path: /opt/hostedtoolcache/flutter
+          - os: macos-latest
+            flutter-path: /Users/runner/hostedtoolcache/flutter
+          - os: windows-latest
+            flutter-path: /opt/hostedtoolcache/flutter
     timeout-minutes: 10
 
     steps:
       - name: Check out code
         uses: actions/checkout@v2
+
+      - name: Cache Flutter
+        uses: actions/cache@v2
+        with:
+          path: ${{ matrix.flutter-path }}
+          key: ${{ runner.os }}-flutter
 
       - name: Install Flutter
         uses: subosito/flutter-action@v1
