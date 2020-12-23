@@ -4,7 +4,6 @@ on:
   push:
     branches:
       - develop
-      - nullsafety
   pull_request:
 
 jobs:
