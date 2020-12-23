@@ -6,6 +6,9 @@ on:
       - develop
   pull_request:
 
+env:
+  FLUTTER_CHANNEL: stable
+
 jobs:
   floor-annotation:
     runs-on: ubuntu-latest
@@ -86,12 +89,12 @@ jobs:
         uses: actions/cache@v2
         with:
           path: ${{ matrix.flutter-path }}
-          key: ${{ runner.os }}-flutter
+          key: ${{ runner.os }}-flutter-${{ env.FLUTTER_CHANNEL }}
 
       - name: Install Flutter
         uses: subosito/flutter-action@v1
         with:
-          channel: stable
+          channel: ${{ env.FLUTTER_CHANNEL}}
 
       - name: Install dependencies
         run: flutter packages get
@@ -122,7 +125,7 @@ jobs:
           flags: floor
           file: ./floor/coverage/lcov.info
 
-  floor_test:
+  floor-test:
     runs-on: macos-latest
     timeout-minutes: 10
 
@@ -130,18 +133,24 @@ jobs:
       - name: Check out code
         uses: actions/checkout@v2
 
+      - name: Cache Flutter
+        uses: actions/cache@v2
+        with:
+          path: /Users/runner/hostedtoolcache/flutter
+          key: macos-latest-flutter-${{ env.FLUTTER_CHANNEL }}
+
       - name: Install Flutter
         uses: subosito/flutter-action@v1
         with:
-          channel: stable
+          channel: ${{ env.FLUTTER_CHANNEL}}
 
       - name: Install dependencies
         run: flutter packages get
-        working-directory: example
+        working-directory: floor_test
 
       - name: Analyze
         run: flutter analyze
-        working-directory: example
+        working-directory: floor_test
 
       - name: Start iOS simulator
         run: xcrun simctl boot "iPhone 12"
@@ -158,10 +167,16 @@ jobs:
       - name: Check out code
         uses: actions/checkout@v2
 
+      - name: Cache Flutter
+        uses: actions/cache@v2
+        with:
+          path: /opt/hostedtoolcache/flutter
+          key: ubuntu-latest-flutter-${{ env.FLUTTER_CHANNEL }}
+
       - name: Install Flutter
         uses: subosito/flutter-action@v1
         with:
-          channel: stable
+          channel: ${{ env.FLUTTER_CHANNEL}}
 
       - name: Install dependencies
         run: flutter packages get
