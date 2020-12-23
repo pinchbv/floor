@@ -21,6 +21,13 @@ jobs:
       - name: Check out code
         uses: actions/checkout@v2
 
+      - name: Cache dependencies
+        uses: actions/cache@v2
+        with:
+          path: /usr/lib/dart/bin:/root/.pub-cache
+          key: ${{ runner.os }}-pub-${{ hashFiles('**/pubspec.lock') }}
+          restore-keys: ${{ runner.os }}-pub-
+
       - name: Install dependencies
         working-directory: floor_annotation
         run: pub get
@@ -43,6 +50,13 @@ jobs:
     steps:
       - name: Check out code
         uses: actions/checkout@v2
+
+      - name: Cache dependencies
+        uses: actions/cache@v2
+        with:
+          path: /usr/lib/dart/bin:/root/.pub-cache
+          key: ${{ runner.os }}-pub-${{ hashFiles('**/pubspec.lock') }}
+          restore-keys: ${{ runner.os }}-pub-
 
       - name: Install dependencies
         working-directory: floor_generator
@@ -96,6 +110,13 @@ jobs:
         with:
           channel: ${{ env.FLUTTER_CHANNEL}}
 
+      - name: Cache dependencies
+        uses: actions/cache@v2
+        with:
+          path: ${{ env.FLUTTER_HOME }}/.pub-cache
+          key: ${{ runner.os }}-pub-${{ hashFiles('**/pubspec.lock') }}
+          restore-keys: ${{ runner.os }}-pub-
+
       - name: Install dependencies
         run: flutter packages get
         working-directory: floor
@@ -143,6 +164,13 @@ jobs:
         uses: subosito/flutter-action@v1
         with:
           channel: ${{ env.FLUTTER_CHANNEL}}
+
+      - name: Cache dependencies
+        uses: actions/cache@v2
+        with:
+          path: ${{ env.FLUTTER_HOME }}/.pub-cache
+          key: ${{ runner.os }}-pub-${{ hashFiles('**/pubspec.lock') }}
+          restore-keys: ${{ runner.os }}-pub-
 
       - name: Install dependencies
         run: flutter packages get
