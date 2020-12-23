@@ -54,14 +54,14 @@ void main() {
   test('query item', () async {
     final queryMethod = await _createQueryMethod('''
       @Query('SELECT * FROM Person WHERE id = :id')
-      Future<Person> findById(int id);
+      Future<Person?> findById(int id);
     ''');
 
     final actual = QueryMethodWriter(queryMethod).write();
 
     expect(actual, equalsDart(r'''
       @override
-      Future<Person> findById(int id) async {
+      Future<Person?> findById(int id) async {
         return _queryAdapter.query('SELECT * FROM Person WHERE id = ?', arguments: [id], mapper: (Map<String, dynamic> row) => Person(row['id'] as int, row['name'] as String));
       }
     '''));
@@ -77,7 +77,7 @@ void main() {
       );
       final queryMethod = await '''
       @Query('SELECT * FROM Order WHERE id = :id')
-      Future<Order> findById(int id);
+      Future<Order?> findById(int id);
     '''
           .asOrderQueryMethod({typeConverter});
 
@@ -85,7 +85,7 @@ void main() {
 
       expect(actual, equalsDart(r'''
       @override
-      Future<Order> findById(int id) async {
+      Future<Order?> findById(int id) async {
         return _queryAdapter.query('SELECT * FROM Order WHERE id = ?', arguments: [id], mapper: (Map<String, dynamic> row) => Order(row['id'] as int, _dateTimeConverter.decode(row['dateTime'] as int)));
       }
     '''));
@@ -101,7 +101,7 @@ void main() {
       final queryMethod = await '''
       @TypeConverters([DateTimeConverter])
       @Query('SELECT * FROM Order WHERE dateTime = :dateTime')
-      Future<Order> findByDateTime(DateTime dateTime);
+      Future<Order?> findByDateTime(DateTime dateTime);
     '''
           .asOrderQueryMethod({typeConverter});
 
@@ -109,7 +109,7 @@ void main() {
 
       expect(actual, equalsDart(r'''
       @override
-      Future<Order> findByDateTime(DateTime dateTime) async {
+      Future<Order?> findByDateTime(DateTime dateTime) async {
         return _queryAdapter.query('SELECT * FROM Order WHERE dateTime = ?', arguments: [_dateTimeConverter.encode(dateTime)], mapper: (Map<String, dynamic> row) => Order(row['id'] as int, _externalTypeConverter.decode(row['dateTime'] as int)));
       }
     '''));
@@ -125,7 +125,7 @@ void main() {
       );
       final queryMethod = await '''
       @Query('SELECT * FROM Order WHERE dateTime = :dateTime')
-      Future<Order> findByDateTime(@TypeConverters([DateTimeConverter]) DateTime dateTime);
+      Future<Order?> findByDateTime(@TypeConverters([DateTimeConverter]) DateTime dateTime);
     '''
           .asOrderQueryMethod({typeConverter});
 
@@ -133,7 +133,7 @@ void main() {
 
       expect(actual, equalsDart(r'''
       @override
-      Future<Order> findByDateTime(DateTime dateTime) async {
+      Future<Order?> findByDateTime(DateTime dateTime) async {
         return _queryAdapter.query('SELECT * FROM Order WHERE dateTime = ?', arguments: [_dateTimeConverter.encode(dateTime)], mapper: (Map<String, dynamic> row) => Order(row['id'] as int, _externalTypeConverter.decode(row['dateTime'] as int)));
       }
     '''));
@@ -184,14 +184,14 @@ void main() {
   test('query item multiple parameters', () async {
     final queryMethod = await _createQueryMethod('''
       @Query('SELECT * FROM Person WHERE id = :id AND name = :name')
-      Future<Person> findById(int id, String name);
+      Future<Person?> findById(int id, String name);
     ''');
 
     final actual = QueryMethodWriter(queryMethod).write();
 
     expect(actual, equalsDart(r'''
       @override
-      Future<Person> findById(int id, String name) async {
+      Future<Person?> findById(int id, String name) async {
         return _queryAdapter.query('SELECT * FROM Person WHERE id = ? AND name = ?', arguments: [id, name], mapper: (Map<String, dynamic> row) => Person(row['id'] as int, row['name'] as String));
       }
     '''));
@@ -216,14 +216,14 @@ void main() {
   test('query item stream', () async {
     final queryMethod = await _createQueryMethod('''
       @Query('SELECT * FROM Person WHERE id = :id')
-      Stream<Person> findByIdAsStream(int id);
+      Stream<Person?> findByIdAsStream(int id);
     ''');
 
     final actual = QueryMethodWriter(queryMethod).write();
 
     expect(actual, equalsDart(r'''
       @override
-      Stream<Person> findByIdAsStream(int id) {
+      Stream<Person?> findByIdAsStream(int id) {
         return _queryAdapter.queryStream('SELECT * FROM Person WHERE id = ?', arguments: [id], queryableName: 'Person', isView: false, mapper: (Map<String, dynamic> row) => Person(row['id'] as int, row['name'] as String));
       }
     '''));
@@ -316,7 +316,7 @@ void main() {
   test('query with unsupported type throws', () async {
     final queryMethod = await _createQueryMethod('''
       @Query('SELECT * FROM Person WHERE id = :person')
-      Future<Person> findById(Person person);
+      Future<Person?> findById(Person person);
     ''');
 
     final actual = () => QueryMethodWriter(queryMethod).write();

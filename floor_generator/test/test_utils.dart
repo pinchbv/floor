@@ -12,6 +12,7 @@ import 'package:floor_annotation/floor_annotation.dart' as annotations;
 import 'package:floor_generator/misc/type_utils.dart';
 import 'package:floor_generator/processor/dao_processor.dart';
 import 'package:floor_generator/processor/entity_processor.dart';
+import 'package:floor_generator/processor/error/processor_error.dart';
 import 'package:floor_generator/processor/view_processor.dart';
 import 'package:floor_generator/value_object/dao.dart';
 import 'package:floor_generator/value_object/entity.dart';
@@ -127,6 +128,10 @@ Matcher throwsInvalidGenerationSourceError([
           .having((e) => e.element, 'element', error.element),
     );
   }
+}
+
+Matcher throwsProcessorError() {
+  return throwsA(const TypeMatcher<ProcessorError>());
 }
 
 Future<Dao> createDao(final String methodSignature) async {

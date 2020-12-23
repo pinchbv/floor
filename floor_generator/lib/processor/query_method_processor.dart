@@ -43,9 +43,17 @@ class QueryMethodProcessor extends Processor<QueryMethod> {
 
     _assertReturnsFutureOrStream(rawReturnType, returnsStream);
 
+    final returnsList = _getReturnsList(rawReturnType, returnsStream);
     final flattenedReturnType = _getFlattenedReturnType(
       rawReturnType,
       returnsStream,
+      returnsList,
+    );
+
+    _assertReturnsNullableSingle(
+      returnsStream,
+      returnsList,
+      flattenedReturnType,
     );
 
     final queryable = _queryables.firstWhereOrNull((queryable) =>
@@ -112,16 +120,12 @@ class QueryMethodProcessor extends Processor<QueryMethod> {
   DartType _getFlattenedReturnType(
     final DartType rawReturnType,
     final bool returnsStream,
+    final bool returnsList,
   ) {
-    final returnsList = _getReturnsList(rawReturnType, returnsStream);
-
     final type = returnsStream
         ? _methodElement.returnType.flatten()
         : _methodElement.library.typeSystem.flatten(rawReturnType);
-    if (returnsList) {
-      return type.flatten();
-    }
-    return type;
+    return returnsList ? type.flatten() : type;
   }
 
   bool _getReturnsList(final DartType returnType, final bool returnsStream) {
@@ -146,6 +150,8 @@ class QueryMethodProcessor extends Processor<QueryMethod> {
     final List<ParameterElement> parameterElements,
   ) {
     // TODO #375 test
+    // TODO #375 should we allow nullable parameters but instead of passing `null`
+    //  to sqflite, map Dart `null` to SQL `NULL`?
     for (final parameter in parameterElements) {
       if (parameter.type.isNullable) {
         throw _processorError.queryMethodParameterIsNull(parameter);
@@ -155,6 +161,22 @@ class QueryMethodProcessor extends Processor<QueryMethod> {
     final queryParameterCount = RegExp(r'\?').allMatches(query).length;
     if (queryParameterCount != parameterElements.length) {
       throw _processorError.queryArgumentsAndMethodParametersDoNotMatch;
+    }
+  }
+
+  void _assertReturnsNullableSingle(
+    final bool returnsStream,
+    final bool returnsList,
+    final DartType flattenedReturnType,
+  ) {
+    if (!returnsList &&
+        !flattenedReturnType.isVoid &&
+        !flattenedReturnType.isNullable) {
+      if (returnsStream) {
+        throw _processorError.doesNotReturnNullableStream;
+      } else {
+        throw _processorError.doesNotReturnNullableFuture;
+      }
     }
   }
 }

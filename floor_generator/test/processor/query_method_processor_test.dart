@@ -83,7 +83,7 @@ void main() {
     test('parse query', () async {
       final methodElement = await _createQueryMethodElement('''
       @Query('SELECT * FROM Person WHERE id = :id')
-      Future<Person> findPerson(int id);
+      Future<Person?> findPerson(int id);
     ''');
 
       final actual =
@@ -98,7 +98,7 @@ void main() {
           SELECT * FROM person
           WHERE id = :id AND custom_name = :name
         ''')
-        Future<Person> findPersonByIdAndName(int id, String name);
+        Future<Person?> findPersonByIdAndName(int id, String name);
       """);
 
       final actual =
@@ -114,7 +114,7 @@ void main() {
       final methodElement = await _createQueryMethodElement('''
         @Query('SELECT * FROM person '
             'WHERE id = :id AND custom_name = :name')
-        Future<Person> findPersonByIdAndName(int id, String name);    
+        Future<Person?> findPersonByIdAndName(int id, String name);    
       ''');
 
       final actual =
@@ -236,7 +236,7 @@ void main() {
     test('exception when method does not return future', () async {
       final methodElement = await _createQueryMethodElement('''
       @Query('SELECT * FROM Person')
-      List<Person> findAllPersons();
+      List<Person?> findAllPersons();
     ''');
 
       final actual = () =>
@@ -280,7 +280,7 @@ void main() {
         () async {
       final methodElement = await _createQueryMethodElement('''
       @Query('SELECT * FROM Person WHERE id = :id AND name = :name')
-      Future<Person> findPersonByIdAndName(int id);
+      Future<Person?> findPersonByIdAndName(int id);
     ''');
 
       final actual = () =>
@@ -296,7 +296,7 @@ void main() {
         () async {
       final methodElement = await _createQueryMethodElement('''
       @Query('SELECT * FROM Person WHERE id = :id')
-      Future<Person> findPersonByIdAndName(int id, String name);
+      Future<Person?> findPersonByIdAndName(int id, String name);
     ''');
 
       final actual = () =>
@@ -306,6 +306,36 @@ void main() {
       final error = QueryMethodProcessorError(methodElement)
           .queryArgumentsAndMethodParametersDoNotMatch;
       expect(actual, throwsInvalidGenerationSourceError(error));
+    });
+
+    test(
+        'throws when method returns Future of non-nullable type for single item query',
+        () async {
+      final methodElement = await _createQueryMethodElement('''
+      @Query('SELECT * FROM Person WHERE id = :id')
+      Future<Person> findPersonById(int id);      
+    ''');
+
+      final actual = () =>
+          QueryMethodProcessor(methodElement, [...entities, ...views], {})
+              .process();
+
+      expect(actual, throwsProcessorError());
+    });
+
+    test(
+        'throws when method returns Stream of non-nullable type for single item query',
+        () async {
+      final methodElement = await _createQueryMethodElement('''
+      @Query('SELECT * FROM Person WHERE id = :id')
+      Stream<Person> findPersonById(int id);      
+    ''');
+
+      final actual = () =>
+          QueryMethodProcessor(methodElement, [...entities, ...views], {})
+              .process();
+
+      expect(actual, throwsProcessorError());
     });
   });
 }

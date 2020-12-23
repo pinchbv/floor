@@ -1,6 +1,7 @@
 // TODO #375 delete once dependencies have migrated
 // ignore_for_file: import_of_legacy_library_into_null_safe
 import 'package:analyzer/dart/element/element.dart';
+import 'package:floor_generator/processor/error/processor_error.dart';
 import 'package:source_gen/source_gen.dart';
 
 class QueryMethodProcessorError {
@@ -39,6 +40,24 @@ class QueryMethodProcessorError {
     return InvalidGenerationSourceError(
       'Query method parameters have to be non-nullable.',
       todo: 'Define ${parameterElement.displayName} as non-nullable.',
+      element: _methodElement,
+    );
+  }
+
+  ProcessorError get doesNotReturnNullableStream {
+    return ProcessorError(
+      message: 'Queries returning streams of single elements might emit null.',
+      todo:
+          'Make the method return a Stream of a nullable type e.g. Stream<Person?>.',
+      element: _methodElement,
+    );
+  }
+
+  ProcessorError get doesNotReturnNullableFuture {
+    return ProcessorError(
+      message: 'Queries returning single elements might return null.',
+      todo:
+          'Make the method return a Future of a nullable type e.g. Future<Person?>.',
       element: _methodElement,
     );
   }
