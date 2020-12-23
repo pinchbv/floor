@@ -158,7 +158,7 @@ jobs:
         uses: actions/cache@v2
         with:
           path: /Users/runner/hostedtoolcache/flutter
-          key: macos-latest-flutter-${{ env.FLUTTER_CHANNEL }}
+          key: macOS-flutter-${{ env.FLUTTER_CHANNEL }}
 
       - name: Install Flutter
         uses: subosito/flutter-action@v1
@@ -199,7 +199,7 @@ jobs:
         uses: actions/cache@v2
         with:
           path: /opt/hostedtoolcache/flutter
-          key: ubuntu-latest-flutter-${{ env.FLUTTER_CHANNEL }}
+          key: Linux-flutter-${{ env.FLUTTER_CHANNEL }}
 
       - name: Install Flutter
         uses: subosito/flutter-action@v1
