@@ -144,7 +144,7 @@ jobs:
         uses: actions/cache@v2
         with:
           path: /Users/runner/hostedtoolcache/flutter
-          key: macOS-flutter-${{ env.FLUTTER_CHANNEL }}
+          key: ${{ runner.os }}-flutter-${{ env.FLUTTER_CHANNEL }}
 
       - name: Install Flutter
         uses: subosito/flutter-action@v1
@@ -169,6 +169,13 @@ jobs:
       - name: Start iOS simulator
         run: xcrun simctl boot "iPhone 12"
 
+      - name: Cache Pods
+        uses: actions/cache@v2
+        with:
+          path: Pods
+          key: ${{ runner.os }}-pods-${{ hashFiles('**/Podfile.lock') }}
+          restore-keys: ${{ runner.os }}-pods-
+
       - name: Run integration tests
         working-directory: floor_test
         run: flutter drive --driver=test_driver/integration_test.dart --target=integration_test/main_test.dart
@@ -185,7 +192,7 @@ jobs:
         uses: actions/cache@v2
         with:
           path: /opt/hostedtoolcache/flutter
-          key: Linux-flutter-${{ env.FLUTTER_CHANNEL }}
+          key: ${{ runner.os }}-flutter-${{ env.FLUTTER_CHANNEL }}
 
       - name: Install Flutter
         uses: subosito/flutter-action@v1
