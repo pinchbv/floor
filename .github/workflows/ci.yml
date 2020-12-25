@@ -169,12 +169,25 @@ jobs:
       - name: Start iOS simulator
         run: xcrun simctl boot "iPhone 12"
 
-      - name: Cache Pods
+      - name: Cache Xcode Derived Data
         uses: actions/cache@v2
         with:
-          path: Pods
-          key: ${{ runner.os }}-pods-${{ hashFiles('**/Podfile.lock') }}
-          restore-keys: ${{ runner.os }}-pods-
+          path: ~/Library/Developer/Xcode/DerivedData
+          key: ${{ runner.os }}-derived-data
+
+#      - name: Cache Flutter Framework
+#        uses: actions/cache@v2
+#        with:
+#          path: floor_test/ios/Flutter
+#          key: ${{ runner.os }}-pods-${{ hashFiles('**/Podfile.lock') }}
+#          restore-keys: ${{ runner.os }}-pods-
+#
+#      - name: Cache Pods
+#        uses: actions/cache@v2
+#        with:
+#          path: floor_test/ios/Pods
+#          key: ${{ runner.os }}-pods-${{ hashFiles('floor_test/ios/Podfile.lock') }}
+#          restore-keys: ${{ runner.os }}-pods-
 
       - name: Run integration tests
         working-directory: floor_test
