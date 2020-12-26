@@ -42,6 +42,7 @@ Refer to [GitHub Discussions](https://github.com/vitusortner/floor/discussions) 
 1. [In-Memory Database](#in-memory-database)
 1. [Initialization Callback](#initialization-callback)
 1. [Platform Support](#platform-support)
+1. [Isolates](#isolates)
 1. [Testing](#testing)
 1. [Examples](#examples)
 1. [Naming](#naming)
@@ -711,6 +712,11 @@ Floor supports iOS, Android, Linux, macOS and Windows.
 The SQLite database access on iOS and Android is provided by [sqflite](https://github.com/tekartik/sqflite/tree/master/sqflite) whereas Linux, macOS and Windows use [sqflite's ffi](https://github.com/tekartik/sqflite/tree/master/sqflite_common_ffi) implementation.
 
 **There currently is no support for Flutter for web.**
+
+## Isolates
+As floor is based on sqflite, Android and iOS apps access the SQLite database on a native background thread.
+On Linux, macOS, and Windows, a separate isolate is used.
+You can do some further reading on sqflite's background work mechanisms [here](https://github.com/tekartik/sqflite/blob/master/sqflite/doc/usage_recommendations.md).
 
 ## Testing
 Simply instantiate an in-memory database and run the database tests on your local development machine as shown in the following snippet.
