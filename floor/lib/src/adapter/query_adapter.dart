@@ -13,8 +13,6 @@ class QueryAdapter {
   ])  : _database = database,
         _changeListener = changeListener;
 
-  // TODO #375 should we allow returning non-nullables here if people are
-  //  very sure there is a value?
   /// Executes a SQLite query that may return a single value.
   Future<T?> query<T>(
     final String sql, {
@@ -61,9 +59,8 @@ class QueryAdapter {
     required final bool isView,
     required final T Function(Map<String, Object?>) mapper,
   }) {
-    final changeListener = _changeListener;
-    if (changeListener == null) throw ArgumentError.notNull();
-
+    // ignore: close_sinks
+    final changeListener = ArgumentError.checkNotNull(_changeListener);
     final controller = StreamController<T?>.broadcast();
 
     Future<void> executeQueryAndNotifyController() async {
@@ -87,23 +84,6 @@ class QueryAdapter {
     return controller.stream;
   }
 
-  // TODO #375 should we offer this?
-  Stream<T> queryStreamNotNull<T>(
-    final String sql, {
-    final List<Object>? arguments,
-    required final String queryableName,
-    required final bool isView,
-    required final T Function(Map<String, Object?>) mapper,
-  }) {
-    return queryStream(
-      sql,
-      arguments: arguments,
-      queryableName: queryableName,
-      isView: isView,
-      mapper: mapper,
-    ).where((result) => result != null).map((result) => result!);
-  }
-
   /// Executes a SQLite query that returns a stream of multiple query results.
   Stream<List<T>> queryListStream<T>(
     final String sql, {
@@ -112,9 +92,8 @@ class QueryAdapter {
     required final bool isView,
     required final T Function(Map<String, Object?>) mapper,
   }) {
-    final changeListener = _changeListener;
-    if (changeListener == null) throw ArgumentError.notNull();
-
+    // ignore: close_sinks
+    final changeListener = ArgumentError.checkNotNull(_changeListener);
     final controller = StreamController<List<T>>.broadcast();
 
     Future<void> executeQueryAndNotifyController() async {
