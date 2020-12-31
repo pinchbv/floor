@@ -22,7 +22,7 @@ void main() {
       expect(tableCreateActual, equals(tableCreateExpected));
     });
 
-    test('Fts3 Definition', () {
+    test('Fts4 Definition', () {
       final Fts fts = Fts4(
         'icu',
         ['th_TH'],
