@@ -8,6 +8,9 @@ edit_uri: edit/develop/docs/
 markdown_extensions:
   - pymdownx.highlight
   - pymdownx.superfences
+  - admonition
+  - toc:
+      permalink: true
 
 theme:
   name: material
@@ -20,6 +23,8 @@ theme:
     repo: fontawesome/brands/github
     logo: octicons/note-16
   favicon: img/favicon.png
+  features:
+    - toc.integrate
 
 nav:
   - Home: index.md
