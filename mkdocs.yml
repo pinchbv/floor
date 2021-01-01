@@ -3,6 +3,7 @@ site_description: "Floor - The typesafe, reactive, and lightweight SQLite abstra
 site_url: https://vitusortner.github.io/floor/
 repo_name: floor
 repo_url: https://github.com/vitusortner/floor
+edit_uri: edit/develop/docs/
 
 markdown_extensions:
   - pymdownx.highlight
