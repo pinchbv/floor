@@ -3,10 +3,14 @@ site_description: "Floor - The typesafe, reactive, and lightweight SQLite abstra
 site_url: https://vitusortner.github.io/floor/
 repo_name: floor
 repo_url: https://github.com/vitusortner/floor
+edit_uri: edit/develop/docs/
 
 markdown_extensions:
   - pymdownx.highlight
   - pymdownx.superfences
+  - admonition
+  - toc:
+      permalink: true
 
 theme:
   name: material
@@ -19,6 +23,8 @@ theme:
     repo: fontawesome/brands/github
     logo: octicons/note-16
   favicon: img/favicon.png
+  features:
+    - toc.integrate
 
 nav:
   - Home: index.md

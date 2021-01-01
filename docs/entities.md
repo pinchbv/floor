@@ -18,9 +18,9 @@ For more information about primary keys and especially compound primary keys, re
 `@ColumnInfo` enables custom mapping of single table columns.
 With the annotation, it's possible to give columns a custom name and define if the column is able to store `null`.
 
-#### Limitations
-- Floor automatically uses the **first** constructor defined in the entity class for creating in-memory objects from database rows.
-- There needs to be a constructor.
+!!! attention
+    - Floor automatically uses the **first** constructor defined in the entity class for creating in-memory objects from database rows.
+    - There needs to be a constructor.
 
 ```dart
 @Entity(tableName: 'person')
@@ -44,7 +44,7 @@ Floor entities can hold values of the following Dart types which map to their co
 - `bool` - INTEGER (0 = false, 1 = true)
 - `Uint8List` - BLOB
 
-In case you want to store sophisticated Dart objects that can be represented by one of the above types, take a look at [Type Converters](#type-converters).
+In case you want to store sophisticated Dart objects that can be represented by one of the above types, take a look at [Type Converters](type-converters.md).
 
 ### Primary Keys
 Whenever a compound primary key is required (e.g. *n-m* relationships), the syntax for setting the keys differs from the previously mentioned way of setting primary keys.

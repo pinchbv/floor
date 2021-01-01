@@ -117,13 +117,13 @@ StreamBuilder<List<Person>>(
 );
 ```
 
-#### Limitations
-- Only methods annotated with `@insert`, `@update` and `@delete` trigger `Stream` emissions.
-  Inserting data by using the `@Query()` annotation doesn't.
-- It is now possible to return a `Stream` if the function queries a database view. But it will fire on **any**
-  `@update`, `@insert`, `@delete` events in the whole database, which can get quite taxing on the runtime. Please add it only if you know what you are doing!
-  This is mostly due to the complexity of detecting which entities are involved in a database view.
-- Functions returning a stream of single items such as `Stream<Person>` do not emit when there is no query result.
+!!! attention
+    - Only methods annotated with `@insert`, `@update` and `@delete` trigger `Stream` emissions.
+      Inserting data by using the `@Query()` annotation doesn't.
+    - It is now possible to return a `Stream` if the function queries a database view. But it will fire on **any**
+      `@update`, `@insert`, `@delete` events in the whole database, which can get quite taxing on the runtime. Please add it only if you know what you are doing!
+      This is mostly due to the complexity of detecting which entities are involved in a database view.
+    - Functions returning a stream of single items such as `Stream<Person>` do not emit when there is no query result.
 
 ## Transactions
 Whenever you want to perform some operations in a transaction you have to add the `@transaction` annotation to the method.
