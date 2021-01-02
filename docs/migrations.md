@@ -1,4 +1,4 @@
-# Migtations
+# Migrations
 
 Whenever you are doing changes to your entities, you're required to also migrate the old data.
 
