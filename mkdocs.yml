@@ -1,4 +1,4 @@
-site_name: Floor
+site_name: Floor SQLite
 site_description: "Floor - The typesafe, reactive, and lightweight SQLite abstraction for your Flutter applications"
 site_url: https://vitusortner.github.io/floor/
 repo_name: floor
@@ -21,25 +21,31 @@ theme:
     code: Jetbrains Mono
   icon:
     repo: fontawesome/brands/github
-    logo: octicons/note-16
+    logo: octicons/terminal-24
   favicon: img/favicon.png
   features:
     - toc.integrate
+    - navigation.tabs
 
 nav:
-  - Home: index.md
-  - Getting Started: getting-started.md
-  - Architecture: architecture.md
-  - Entities: entities.md
-  - Database Views: database-views.md
-  - Data Access Objects: daos.md
-  - Type Converters: type-converters.md
-  - Migrations: migrations.md
-  - In Memory Database: in-memory-database.md
-  - Initialization Callback: initialization-callback.md
-  - Platform Support: platform-support.md
-  - Isolates: isolates.md
-  - Testing: testing.md
-  - Examples: examples.md
-  - Naming: naming.md
-  - Feedback: feedback.md
+  - Home:
+    - Welcome: index.md
+    - Naming: naming.md
+    - Feedback: feedback.md
+
+  - Documentation:
+    - Getting Started: getting-started.md
+    - Architecture: architecture.md
+    - Entities: entities.md
+    - Database Views: database-views.md
+    - Data Access Objects: daos.md
+    - Type Converters: type-converters.md
+    - Migrations: migrations.md
+    - In Memory Database: in-memory-database.md
+    - Initialization Callback: initialization-callback.md
+    - Platform Support: platform-support.md
+    - Isolates: isolates.md
+    - Testing: testing.md
+    - Examples: examples.md
+
+  - Changelog: changelog.md
