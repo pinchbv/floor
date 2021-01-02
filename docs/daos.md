@@ -62,6 +62,8 @@ await dao.findPersonsWithNamesLike(name);
 Use the `@insert`, `@update` and `@delete` annotations for inserting and changing persistent data.
 All these methods accept single or multiple entity instances.
 
+### Insert
+
 `@insert` marks a method as an insertion method.
 When using the capitalized `@Insert` you can specify a conflict strategy.
 Else it just defaults to aborting the insert.
@@ -70,6 +72,15 @@ These methods can return a `Future` of either `void`, `int` or `List<int>`.
 - `int` return primary key of inserted item
 - `List<int>` return primary keys of inserted items
 
+```dart
+@Insert(onConflict: OnConflictStrategy.rollback)
+Future<void> insertPerson(Person person);
+
+@insert
+Future<List<int>> insertPersons(List<Person> persons);
+```
+
+### Update
 
 `@update` marks a method as an update method.
 When using the capitalized `@Update` you can specify a conflict strategy.
@@ -78,6 +89,15 @@ These methods can return a `Future` of either `void` or `int`.
 - `void` return nothing
 - `int` return number of changed rows
 
+```dart
+@Update(onConflict: OnConflictStrategy.replace)
+Future<void> updatePerson(Person person);
+
+@update
+Future<int> updatePersons(List<Person> persons);
+```
+
+### Delete
 
 `@delete` marks a method as a deletion method.
 These methods can return a `Future` of either `void` or `int`.
@@ -85,16 +105,11 @@ These methods can return a `Future` of either `void` or `int`.
 - `int` return number of deleted rows
 
 ```dart
-// examples of changing multiple items with return
-
-@insert
-Future<List<int>> insertPersons(List<Person> person);
-
-@update
-Future<int> updatePersons(List<Person> person);
+@delete
+Future<void> deletePerson(Person person);
 
 @delete
-Future<int> deletePersons(List<Person> person);
+Future<int> deletePersons(List<Person> persons);
 ```
 
 ## Streams

@@ -1,7 +1,8 @@
 # Type Converters
 
-⚠️ **This feature is still in an experimental state.
-Please use it with caution and file issues for problems you encounter.**
+!!! attention
+    This feature is still in an experimental state.
+    Please use it with caution and file issues for problems you encounter.
 
 SQLite allows storing values of only a handful types.
 Whenever more complex Dart in-memory objects should be stored, there sometimes is the need for converting between Dart and SQLite compatible types.
@@ -53,7 +54,10 @@ class Order {
 }
 ```
 
-## Type converters can be applied to
+---
+
+**Type converters can be applied to**
+
 1. databases
 1. DAOs
 1. entities/views
