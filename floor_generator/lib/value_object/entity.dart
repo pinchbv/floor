@@ -48,6 +48,11 @@ class Entity extends Queryable {
     return 'CREATE TABLE IF NOT EXISTS `$name` (${databaseDefinition.join(', ')})$withoutRowidClause';
   }
 
+  @nonNull
+  String getDropTableStatement() {
+    return 'DROP TABLE IF EXISTS `$name`';
+  }
+
   @nullable
   String _createPrimaryKeyDefinition() {
     if (primaryKey.autoGenerateId) {
