@@ -20,6 +20,6 @@ final sqfliteDatabaseFactory = () {
 
 extension DatabaseFactoryExtension on DatabaseFactory {
   Future<String> getDatabasePath(final String name) async {
-    return join(await getDatabasesPath(), name);
+    return join(await this.getDatabasesPath(), name);
   }
 }
