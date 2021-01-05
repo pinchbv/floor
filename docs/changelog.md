@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.0.0-nullsafety.0
+
+### 🚀 Features
+
+* Make floor null safe
+
 ## 0.18.0
 
 * Documentation update on DateTimeConverter sample

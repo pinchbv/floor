@@ -36,10 +36,10 @@ The third dependency is `build_runner` which has to be included as a dev depende
 dependencies:
   flutter:
     sdk: flutter
-  floor: ^0.18.0
+  floor: ^1.0.0-nullsafety
 
 dev_dependencies:
-  floor_generator: ^0.18.0
+  floor_generator: ^1.0.0-nullsafety
   build_runner: ^1.10.3
 ````
 
@@ -88,7 +88,7 @@ abstract class PersonDao {
   Future<List<Person>> findAllPersons();
   
   @Query('SELECT * FROM Person WHERE id = :id')
-  Stream<Person> findPersonById(int id);
+  Stream<Person?> findPersonById(int id);
   
   @insert
   Future<void> insertPerson(Person person);

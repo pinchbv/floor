@@ -10,7 +10,7 @@ abstract class PersonDao {
   Future<List<Person>> findAllPersons();
 
   @Query('SELECT * FROM Person WHERE id = :id')
-  Stream<Person> findPersonById(int id);
+  Stream<Person?> findPersonById(int id);
 
   @insert
   Future<void> insertPerson(Person person);
@@ -19,18 +19,22 @@ abstract class PersonDao {
 
 ## Queries
 Method signatures turn into query methods by adding the `@Query()` annotation with the query in parenthesis to them.
-Be patient about the correctness of your SQL statements.
-They are only partly validated while generating the code.
+Be mindful about the correctness of your SQL statements as they are only partly validated while generating the code.
 These queries have to return either a `Future` or a `Stream` of an entity or `void`.
 Returning `Future<void>` comes in handy whenever you want to delete the full content of a table, for instance.
 Some query method examples can be seen in the following.
 
+A function returning a single item will return `null` when no matching row is found.
+Thereby, the function is required to return a nullable type.
+For example `Person?`.
+This way, we leave the handling of an absent row up to you and don't attempt to guess intention.
+
 ```dart
 @Query('SELECT * FROM Person WHERE id = :id')
-Future<Person> findPersonById(int id);
+Future<Person?> findPersonById(int id);
 
 @Query('SELECT * FROM Person WHERE id = :id AND name = :name')
-Future<Person> findPersonByIdAndName(int id, String name);
+Future<Person?> findPersonByIdAndName(int id, String name);
 
 @Query('SELECT * FROM Person')
 Future<List<Person>> findAllPersons(); // select multiple items
@@ -116,12 +120,23 @@ Future<int> deletePersons(List<Person> persons);
 As already mentioned, queries cannot only return values once when called but also continuous streams of query results.
 The returned streams keep you in sync with the changes happening in the database tables.
 This feature plays well with the `StreamBuilder` widget which accepts a stream of values and rebuilds itself whenever there is a new emission.
-
 These methods return broadcast streams and thus, can have multiple listeners.
+
+A function returning a stream of single items will emit `null` when no matching row is found.
+Thereby, it's necessary to make the function return a stream of a nullable type.
+For example `Stream<Person?>`.
+In case you're not interested in `null`s, you can simply use `Stream.where((value) => value != null)` to get rid of them.
+
 ```dart
 // definition
-@Query('SELECT * FROM Person')
-Stream<List<Person>> findAllPersonsAsStream();
+@dao
+abstract class PersonDao {
+  @Query('SELECT * FROM Person WHERE id = :id')
+  Stream<Person?> findPersonByIdAsStream(int id);
+
+  @Query('SELECT * FROM Person')
+  Stream<List<Person>> findAllPersonsAsStream();
+}
 
 // usage
 StreamBuilder<List<Person>>(
@@ -138,7 +153,6 @@ StreamBuilder<List<Person>>(
     - It is now possible to return a `Stream` if the function queries a database view. But it will fire on **any**
       `@update`, `@insert`, `@delete` events in the whole database, which can get quite taxing on the runtime. Please add it only if you know what you are doing!
       This is mostly due to the complexity of detecting which entities are involved in a database view.
-    - Functions returning a stream of single items such as `Stream<Person>` do not emit when there is no query result.
 
 ## Transactions
 Whenever you want to perform some operations in a transaction you have to add the `@transaction` annotation to the method.
@@ -161,7 +175,7 @@ Bear in mind that only abstract classes allow method signatures without an imple
 @dao
 abstract class PersonDao extends AbstractDao<Person> {
   @Query('SELECT * FROM Person WHERE id = :id')
-  Future<Person> findPersonById(int id);
+  Future<Person?> findPersonById(int id);
 }
 
 abstract class AbstractDao<T> {
