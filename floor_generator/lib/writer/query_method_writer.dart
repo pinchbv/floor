@@ -59,7 +59,7 @@ class QueryMethodWriter implements Writer {
     }
 
     final constructor = _queryMethod.queryable.constructor;
-    final mapper = '(Map<String, dynamic> row) => $constructor';
+    final mapper = '(Map<String, dynamic> row) => $constructor(row)';
 
     if (_queryMethod.returnsStream) {
       _methodBody.write(_generateStreamQuery(arguments, mapper));

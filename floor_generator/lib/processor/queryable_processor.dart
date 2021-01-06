@@ -63,7 +63,7 @@ abstract class QueryableProcessor<T extends Queryable> extends Processor<T> {
         .where((parameterValue) => parameterValue != null)
         .join(', ');
 
-    return '${classElement.displayName}($parameterValues)';
+    return '${classElement.displayName}.fromJson';
   }
 
   /// Returns `null` whenever field is @ignored
