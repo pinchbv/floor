@@ -14,10 +14,11 @@ dependencies:
     sdk: flutter
   floor:
     path: ../floor/
-
+  json_annotation: ^3.1.1
 dev_dependencies:
   flutter_test:
     sdk: flutter
   floor_generator:
     path: ../floor_generator/
   build_runner: ^1.10.3
+  json_serializable: ^3.5.0
