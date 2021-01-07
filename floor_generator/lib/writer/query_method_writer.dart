@@ -49,9 +49,10 @@ class QueryMethodWriter implements Writer {
 
   bool _isMapFromJson(ClassElement classElement) {
     return classElement
-        .getAnnotation(annotations.Entity)
-        .getField(AnnotationField.entityMapFromJson)
-        .toBoolValue() ?? false;
+            .getAnnotation(annotations.Entity)
+            .getField(AnnotationField.entityMapFromJson)
+            .toBoolValue() ??
+        false;
   }
 
   String _generateMethodBody() {
