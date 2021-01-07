@@ -15,6 +15,7 @@ abstract class AnnotationField {
   static const entityIndices = 'indices';
   static const entityPrimaryKeys = 'primaryKeys';
   static const entityWithoutRowid = 'withoutRowid';
+  static const entityMapFromJson = 'mapFromJson';
 
   static const viewName = 'viewName';
   static const viewQuery = 'query';

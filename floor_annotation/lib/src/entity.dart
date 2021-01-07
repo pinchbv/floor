@@ -18,6 +18,9 @@ class Entity {
   /// Whether the table is a "WITHOUT ROWID table".
   final bool withoutRowid;
 
+  /// Whether create object from map with json serializable instead of default constructor
+  final bool mapFromJson;
+
   /// Marks a class as a database entity (table).
   const Entity({
     this.tableName,
@@ -25,6 +28,7 @@ class Entity {
     this.foreignKeys = const [],
     this.primaryKeys = const [],
     this.withoutRowid = false,
+    this.mapFromJson = false,
   });
 }
 

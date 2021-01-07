@@ -1,9 +1,12 @@
 import 'dart:core';
 
+import 'package:analyzer/dart/element/element.dart';
 import 'package:code_builder/code_builder.dart';
 import 'package:dartx/dartx.dart';
+import 'package:floor_annotation/floor_annotation.dart' as annotations;
 import 'package:floor_generator/misc/annotation_expression.dart';
 import 'package:floor_generator/misc/annotations.dart';
+import 'package:floor_generator/misc/constants.dart';
 import 'package:floor_generator/misc/extension/type_converters_extension.dart';
 import 'package:floor_generator/misc/type_utils.dart';
 import 'package:floor_generator/value_object/query_method.dart';
@@ -44,6 +47,13 @@ class QueryMethodWriter implements Writer {
     }).toList();
   }
 
+  bool _isMapFromJson(ClassElement classElement) {
+    return classElement
+        .getAnnotation(annotations.Entity)
+        .getField(AnnotationField.entityMapFromJson)
+        .toBoolValue() ?? false;
+  }
+
   String _generateMethodBody() {
     final _methodBody = StringBuffer();
 
@@ -58,8 +68,10 @@ class QueryMethodWriter implements Writer {
       return _methodBody.toString();
     }
 
-    final constructor = _queryMethod.queryable.constructor;
-    final mapper = '(Map<String, dynamic> row) => $constructor(row)';
+    final constructor = _isMapFromJson(_queryMethod.queryable.classElement)
+        ? '${_queryMethod.queryable.classElement.displayName}.fromJson(row)'
+        : _queryMethod.queryable.constructor;
+    final mapper = '(Map<String, dynamic> row) => $constructor';
 
     if (_queryMethod.returnsStream) {
       _methodBody.write(_generateStreamQuery(arguments, mapper));
