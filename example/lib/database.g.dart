@@ -80,7 +80,7 @@ class _$FlutterDatabase extends FlutterDatabase {
       },
       onCreate: (database, version) async {
         await database.execute(
-            'CREATE TABLE IF NOT EXISTS `Task` (`id` INTEGER PRIMARY KEY AUTOINCREMENT, `message` TEXT)');
+            'CREATE TABLE IF NOT EXISTS `Task` (`id` INTEGER PRIMARY KEY AUTOINCREMENT, `message` TEXT, `mapFromJson` TEXT)');
 
         await callback?.onCreate?.call(database, version);
       },
@@ -100,22 +100,31 @@ class _$TaskDao extends TaskDao {
         _taskInsertionAdapter = InsertionAdapter(
             database,
             'Task',
-            (Task item) =>
-                <String, dynamic>{'id': item.id, 'message': item.message},
+            (Task item) => <String, dynamic>{
+                  'id': item.id,
+                  'message': item.message,
+                  'mapFromJson': item.mapFromJson
+                },
             changeListener),
         _taskUpdateAdapter = UpdateAdapter(
             database,
             'Task',
             ['id'],
-            (Task item) =>
-                <String, dynamic>{'id': item.id, 'message': item.message},
+            (Task item) => <String, dynamic>{
+                  'id': item.id,
+                  'message': item.message,
+                  'mapFromJson': item.mapFromJson
+                },
             changeListener),
         _taskDeletionAdapter = DeletionAdapter(
             database,
             'Task',
             ['id'],
-            (Task item) =>
-                <String, dynamic>{'id': item.id, 'message': item.message},
+            (Task item) => <String, dynamic>{
+                  'id': item.id,
+                  'message': item.message,
+                  'mapFromJson': item.mapFromJson
+                },
             changeListener);
 
   final sqflite.DatabaseExecutor database;
@@ -134,15 +143,13 @@ class _$TaskDao extends TaskDao {
   Future<Task> findTaskById(int id) async {
     return _queryAdapter.query('SELECT * FROM task WHERE id = ?',
         arguments: <dynamic>[id],
-        mapper: (Map<String, dynamic> row) =>
-            Task(row['id'] as int, row['message'] as String));
+        mapper: (Map<String, dynamic> row) => Task.fromJson(row));
   }
 
   @override
   Future<List<Task>> findAllTasks() async {
     return _queryAdapter.queryList('SELECT * FROM task',
-        mapper: (Map<String, dynamic> row) =>
-            Task(row['id'] as int, row['message'] as String));
+        mapper: (Map<String, dynamic> row) => Task.fromJson(row));
   }
 
   @override
@@ -150,8 +157,7 @@ class _$TaskDao extends TaskDao {
     return _queryAdapter.queryListStream('SELECT * FROM task',
         queryableName: 'Task',
         isView: false,
-        mapper: (Map<String, dynamic> row) =>
-            Task(row['id'] as int, row['message'] as String));
+        mapper: (Map<String, dynamic> row) => Task.fromJson(row));
   }
 
   @override
