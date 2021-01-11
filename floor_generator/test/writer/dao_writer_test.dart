@@ -272,6 +272,7 @@ void main() {
       false, // withoutRowid,
       '', // constructor
       '', // valueMapping
+      null, // fts
     );
     final actual = DaoWriter(dao, {otherEntity}, false).write();
 

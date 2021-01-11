@@ -12,6 +12,7 @@ import 'package:floor_generator/processor/queryable_processor.dart';
 import 'package:floor_generator/value_object/entity.dart';
 import 'package:floor_generator/value_object/field.dart';
 import 'package:floor_generator/value_object/foreign_key.dart';
+import 'package:floor_generator/value_object/fts.dart';
 import 'package:floor_generator/value_object/index.dart';
 import 'package:floor_generator/value_object/primary_key.dart';
 import 'package:floor_generator/value_object/type_converter.dart';
@@ -47,6 +48,7 @@ class EntityProcessor extends QueryableProcessor<Entity> {
       _getWithoutRowid(),
       getConstructor(fields),
       _getValueMapping(fields),
+      _getFts(),
     );
   }
 
@@ -107,6 +109,51 @@ class EntityProcessor extends QueryableProcessor<Entity> {
           );
         })?.toList() ??
         [];
+  }
+
+  @nullable
+  Fts _getFts() {
+    if (classElement.hasAnnotation(annotations.Fts3)) {
+      return _getFts3();
+    } else if (classElement.hasAnnotation(annotations.Fts4)) {
+      return _getFts4();
+    } else {
+      return null;
+    }
+  }
+
+  Fts _getFts3() {
+    final ftsObject = classElement.getAnnotation(annotations.Fts3);
+
+    final tokenizer =
+        ftsObject?.getField(Fts3Field.tokenizer)?.toStringValue() ??
+            annotations.FtsTokenizer.simple;
+
+    final tokenizerArgs = ftsObject
+            .getField(Fts3Field.tokenizerArgs)
+            ?.toListValue()
+            ?.map((object) => object.toStringValue())
+            ?.toList() ??
+        [];
+
+    return Fts3(tokenizer, tokenizerArgs);
+  }
+
+  Fts _getFts4() {
+    final ftsObject = classElement.getAnnotation(annotations.Fts4);
+
+    final tokenizer =
+        ftsObject?.getField(Fts4Field.tokenizer)?.toStringValue() ??
+            annotations.FtsTokenizer.simple;
+
+    final tokenizerArgs = ftsObject
+            .getField(Fts4Field.tokenizerArgs)
+            ?.toListValue()
+            ?.map((object) => object.toStringValue())
+            ?.toList() ??
+        [];
+
+    return Fts4(tokenizer, tokenizerArgs);
   }
 
   @nonNull
