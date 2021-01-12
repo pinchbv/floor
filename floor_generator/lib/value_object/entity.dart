@@ -7,12 +7,15 @@ import 'package:floor_generator/value_object/index.dart';
 import 'package:floor_generator/value_object/primary_key.dart';
 import 'package:floor_generator/value_object/queryable.dart';
 
+import 'fts.dart';
+
 class Entity extends Queryable {
   final PrimaryKey primaryKey;
   final List<ForeignKey> foreignKeys;
   final List<Index> indices;
   final bool withoutRowid;
   final String valueMapping;
+  final Fts fts;
 
   Entity(
     ClassElement classElement,
@@ -24,6 +27,7 @@ class Entity extends Queryable {
     this.withoutRowid,
     String constructor,
     this.valueMapping,
+    this.fts,
   ) : super(classElement, name, fields, constructor);
 
   @nonNull
@@ -45,7 +49,14 @@ class Entity extends Queryable {
 
     final withoutRowidClause = withoutRowid ? ' WITHOUT ROWID' : '';
 
-    return 'CREATE TABLE IF NOT EXISTS `$name` (${databaseDefinition.join(', ')})$withoutRowidClause';
+    if (fts == null) {
+      return 'CREATE TABLE IF NOT EXISTS `$name` (${databaseDefinition.join(', ')})$withoutRowidClause';
+    } else {
+      if (fts.tableCreateOption().isNotEmpty) {
+        databaseDefinition.add('${fts.tableCreateOption()}');
+      }
+      return 'CREATE VIRTUAL TABLE IF NOT EXISTS `$name` ${fts.usingOption}(${databaseDefinition.join(', ')})';
+    }
   }
 
   @nullable
@@ -84,10 +95,11 @@ class Entity extends Queryable {
       indices.hashCode ^
       constructor.hashCode ^
       withoutRowid.hashCode ^
+      fts.hashCode ^
       valueMapping.hashCode;
 
   @override
   String toString() {
-    return 'Entity{classElement: $classElement, name: $name, fields: $fields, primaryKey: $primaryKey, foreignKeys: $foreignKeys, indices: $indices, constructor: $constructor, withoutRowid: $withoutRowid, valueMapping: $valueMapping}';
+    return 'Entity{classElement: $classElement, name: $name, fields: $fields, primaryKey: $primaryKey, foreignKeys: $foreignKeys, indices: $indices, constructor: $constructor, withoutRowid: $withoutRowid, valueMapping: $valueMapping, fts: $fts}';
   }
 }
