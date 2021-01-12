@@ -7,6 +7,7 @@ export 'src/database_view.dart';
 export 'src/delete.dart';
 export 'src/entity.dart';
 export 'src/foreign_key.dart';
+export 'src/fts.dart';
 export 'src/ignore.dart';
 export 'src/index.dart';
 export 'src/insert.dart';
