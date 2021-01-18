@@ -32,7 +32,7 @@ The third dependency is `build_runner` which has to be included as a dev depende
 - `floor_generator` includes the code for generating the database classes.
 - `build_runner` enables a concrete way of generating source code files.
 
-````yaml
+```yaml
 dependencies:
   flutter:
     sdk: flutter
@@ -41,7 +41,7 @@ dependencies:
 dev_dependencies:
   floor_generator: ^0.18.0
   build_runner: ^1.10.3
-````
+```
 
 ### 2. Create an Entity
 
@@ -51,7 +51,7 @@ It's required to add a primary key to your table.
 You can do so by adding the `@primaryKey` annotation to an `int` property.
 There is no restriction on where you put the file containing the entity.
 
-````dart
+```dart
 // entity/person.dart
 
 import 'package:floor/floor.dart';
@@ -65,7 +65,7 @@ class Person {
   
   Person(this.id, this.name);
 }
-````
+```
 
 ### 3. Create a DAO (Data Access Object)
 
