@@ -15,16 +15,16 @@ markdown_extensions:
 theme:
   name: material
   palette:
-    primary: white
+    primary: blue grey
+    accent: purple
   font:
-    text: Source Sans Pro
+    text: Inter
     code: Jetbrains Mono
   icon:
     repo: fontawesome/brands/github
     logo: octicons/terminal-24
   favicon: img/favicon.png
   features:
-    - toc.integrate
     - navigation.tabs
 
 nav:
