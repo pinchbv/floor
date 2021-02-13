@@ -14,8 +14,8 @@ void main() {
   };
 
   group('Fts Database Test', () {
-    MailDatabase mailDatabase;
-    MailDao mailDao;
+    late MailDatabase mailDatabase;
+    late MailDao mailDao;
 
     setUp(() async {
       mailDatabase = await $FloorMailDatabase.inMemoryDatabaseBuilder().build();
@@ -35,7 +35,7 @@ void main() {
 
       expect(mailList.length, equals(5));
 
-      final mail = await mailDao.findMailById(1);
+      final mail = (await mailDao.findMailById(1))!;
 
       expect(mailMap[1], mail.text);
 

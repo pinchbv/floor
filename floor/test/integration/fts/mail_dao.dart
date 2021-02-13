@@ -5,7 +5,7 @@ import 'mail.dart';
 @dao
 abstract class MailDao {
   @Query('SELECT * FROM mail WHERE rowid = :id')
-  Future<Mail> findMailById(int id);
+  Future<Mail?> findMailById(int id);
 
   @Query('SELECT * FROM mail WHERE text match :key')
   Future<List<Mail>> findMailByKey(String key);

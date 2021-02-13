@@ -124,14 +124,14 @@ class EntityProcessor extends QueryableProcessor<Entity> {
     final ftsObject = classElement.getAnnotation(annotations.Fts3);
 
     final tokenizer =
-        ftsObject?.getField(Fts3Field.tokenizer)?.toStringValue() ??
+        ftsObject.getField(Fts3Field.tokenizer)?.toStringValue() ??
             annotations.FtsTokenizer.simple;
 
     final tokenizerArgs = ftsObject
             .getField(Fts3Field.tokenizerArgs)
             ?.toListValue()
             ?.map((object) => object.toStringValue())
-            ?.toList() ??
+            .toList() ??
         [];
 
     return Fts3(tokenizer, tokenizerArgs);
@@ -141,14 +141,14 @@ class EntityProcessor extends QueryableProcessor<Entity> {
     final ftsObject = classElement.getAnnotation(annotations.Fts4);
 
     final tokenizer =
-        ftsObject?.getField(Fts4Field.tokenizer)?.toStringValue() ??
+        ftsObject.getField(Fts4Field.tokenizer)?.toStringValue() ??
             annotations.FtsTokenizer.simple;
 
     final tokenizerArgs = ftsObject
             .getField(Fts4Field.tokenizerArgs)
             ?.toListValue()
             ?.map((object) => object.toStringValue())
-            ?.toList() ??
+            .toList() ??
         [];
 
     return Fts4(tokenizer, tokenizerArgs);

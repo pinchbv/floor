@@ -16,7 +16,7 @@ class Entity extends Queryable {
   final List<Index> indices;
   final bool withoutRowid;
   final String valueMapping;
-  final Fts fts;
+  final Fts? fts;
 
   Entity(
     ClassElement classElement,
@@ -52,10 +52,10 @@ class Entity extends Queryable {
     if (fts == null) {
       return 'CREATE TABLE IF NOT EXISTS `$name` (${databaseDefinition.join(', ')})$withoutRowidClause';
     } else {
-      if (fts.tableCreateOption().isNotEmpty) {
-        databaseDefinition.add('${fts.tableCreateOption()}');
+      if (fts!.tableCreateOption().isNotEmpty) {
+        databaseDefinition.add('${fts!.tableCreateOption()}');
       }
-      return 'CREATE VIRTUAL TABLE IF NOT EXISTS `$name` ${fts.usingOption}(${databaseDefinition.join(', ')})';
+      return 'CREATE VIRTUAL TABLE IF NOT EXISTS `$name` ${fts!.usingOption}(${databaseDefinition.join(', ')})';
     }
   }
 
