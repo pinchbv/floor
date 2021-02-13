@@ -15,7 +15,7 @@ For bugs, questions and discussions please use [Github Issues](https://github.co
 For general communication use [floor's Slack](https://join.slack.com/t/floor-flutter/shared_invite/zt-d7i4yhgn-070n~ijDwXVHTpTxcVC47w).
 
 ## License
-    Copyright 2019 Vitus Ortner
+    Copyright 2021 The Floor Project Authors
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.

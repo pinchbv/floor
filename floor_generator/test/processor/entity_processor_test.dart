@@ -9,6 +9,7 @@ import 'package:floor_generator/processor/error/entity_processor_error.dart';
 import 'package:floor_generator/processor/field_processor.dart';
 import 'package:floor_generator/value_object/entity.dart';
 import 'package:floor_generator/value_object/foreign_key.dart';
+import 'package:floor_generator/value_object/fts.dart';
 import 'package:floor_generator/value_object/index.dart';
 import 'package:floor_generator/value_object/primary_key.dart';
 import 'package:source_gen/source_gen.dart';
@@ -52,6 +53,7 @@ void main() {
       false,
       constructor,
       valueMapping,
+      null,
     );
     expect(actual, equals(expected));
   });
@@ -89,6 +91,7 @@ void main() {
       false,
       constructor,
       valueMapping,
+      null,
     );
     expect(actual, equals(expected));
   });
@@ -188,6 +191,56 @@ void main() {
     });
   });
 
+  group('fts keys', () {
+    test('fts key with fts3', () async {
+      final classElements = await _createClassElements('''
+        
+        @entity
+        @fts3
+        class MailInfo {
+          @primaryKey
+          @ColumnInfo(name: 'rowid')
+          final int id;
+        
+          final String text;
+        
+          MailInfo(this.id, this.text);
+        }
+    ''');
+
+      final actual = EntityProcessor(classElements[0], {}).process().fts;
+
+      final Fts expected = Fts3('simple', []);
+
+      expect(actual, equals(expected));
+    });
+  });
+
+  group('fts keys', () {
+    test('fts key with fts4', () async {
+      final classElements = await _createClassElements('''
+        
+        @entity
+        @fts4
+        class MailInfo {
+          @primaryKey
+          @ColumnInfo(name: 'rowid')
+          final int id;
+        
+          final String text;
+        
+          MailInfo(this.id, this.text);
+        }
+    ''');
+
+      final actual = EntityProcessor(classElements[0], {}).process().fts;
+
+      final Fts expected = Fts4('simple', []);
+
+      expect(actual, equals(expected));
+    });
+  });
+
   test('Process entity with "WITHOUT ROWID"', () async {
     final classElement = await createClassElement('''
       @Entity(withoutRowid: true)
@@ -221,6 +274,7 @@ void main() {
       true,
       constructor,
       "<String, dynamic>{'id': item.id, 'name': item.name}",
+      null,
     );
     expect(actual, equals(expected));
   });

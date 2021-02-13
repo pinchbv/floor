@@ -276,6 +276,7 @@ void main() {
       false,
       '',
       '',
+      null,
     );
     final actual = DaoWriter(dao, {otherEntity}, false).write();
 

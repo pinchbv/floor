@@ -4,6 +4,7 @@ import 'package:floor_generator/misc/extension/foreign_key_action_extension.dart
 import 'package:floor_generator/value_object/entity.dart';
 import 'package:floor_generator/value_object/field.dart';
 import 'package:floor_generator/value_object/foreign_key.dart';
+import 'package:floor_generator/value_object/fts.dart';
 import 'package:floor_generator/value_object/primary_key.dart';
 import 'package:mockito/mockito.dart';
 import 'package:test/test.dart';
@@ -55,6 +56,7 @@ void main() {
         false,
         '',
         '',
+        null,
       );
 
       final actual = entity.getCreateTableStatement();
@@ -78,6 +80,7 @@ void main() {
         false,
         '',
         '',
+        null,
       );
 
       final actual = entity.getCreateTableStatement();
@@ -102,6 +105,7 @@ void main() {
         false,
         '',
         '',
+        null,
       );
 
       final actual = entity.getCreateTableStatement();
@@ -135,6 +139,7 @@ void main() {
         false,
         '',
         '',
+        null,
       );
 
       final actual = entity.getCreateTableStatement();
@@ -146,6 +151,37 @@ void main() {
           '(`${foreignKey.parentColumns[0]}`) '
           'ON UPDATE ${foreignKey.onUpdate.toSql()} '
           'ON DELETE ${foreignKey.onDelete.toSql()}'
+          ')';
+      expect(actual, equals(expected));
+    });
+  });
+
+  group('Fts key', () {
+    test('Create table statement with fts key', () {
+      final fts = Fts4(
+        'porter',
+        [],
+      );
+      final primaryKey = PrimaryKey([], true);
+      final entity = Entity(
+        mockClassElement,
+        'entityName',
+        [nullableField],
+        primaryKey,
+        [],
+        [],
+        false,
+        '',
+        '',
+        fts,
+      );
+
+      final actual = entity.getCreateTableStatement();
+
+      final expected = 'CREATE VIRTUAL TABLE IF NOT EXISTS `${entity.name}` '
+          'USING fts4'
+          '(`${nullableField.columnName}` ${nullableField.sqlType}, '
+          'tokenize=porter '
           ')';
       expect(actual, equals(expected));
     });
@@ -163,6 +199,7 @@ void main() {
       true,
       '',
       '',
+      null,
     );
 
     final actual = entity.getCreateTableStatement();
