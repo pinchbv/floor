@@ -21,7 +21,7 @@ void main() {
     await tester.runAsync(() async {
       await tester.pumpWidget(FloorApp(taskDao));
       final textFieldFinder = find.byType(TextField);
-      final raisedButtonFinder = find.byType(RaisedButton);
+      final raisedButtonFinder = find.byType(OutlinedButton);
 
       await tester.enterText(textFieldFinder, 'Hello world!');
       await tester.tap(raisedButtonFinder);
@@ -35,7 +35,7 @@ void main() {
     await tester.runAsync(() async {
       await tester.pumpWidget(FloorApp(taskDao));
       final textFieldFinder = find.byType(TextField);
-      final raisedButtonFinder = find.byType(RaisedButton);
+      final raisedButtonFinder = find.byType(OutlinedButton);
 
       await tester.enterText(textFieldFinder, 'Hello world!');
       await tester.tap(raisedButtonFinder);
@@ -51,7 +51,7 @@ void main() {
     await tester.runAsync(() async {
       await tester.pumpWidget(FloorApp(taskDao));
       final textFieldFinder = find.byType(TextField);
-      final raisedButtonFinder = find.byType(RaisedButton);
+      final raisedButtonFinder = find.byType(OutlinedButton);
       final listViewFinder = find.byType(ListView);
       final textFinder = find.byType(Text);
 

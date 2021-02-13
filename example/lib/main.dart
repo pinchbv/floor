@@ -160,8 +160,7 @@ class TasksTextField extends StatelessWidget {
           ),
           Padding(
             padding: const EdgeInsets.only(right: 16),
-            child: OutlineButton(
-              textColor: Colors.blueGrey,
+            child: OutlinedButton(
               child: const Text('Save'),
               onPressed: () async {
                 await _persistMessage();
