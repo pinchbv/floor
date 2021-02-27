@@ -1,5 +1,31 @@
 # Changelog
 
+# 0.19.0
+
+### Changes
+
+* Update website theme
+* Update license with all authors
+* Fix getting started syntax highlighting
+* Improve FTS documentation
+* Introduce tab navigation to website
+* Fix typo in doc title
+* Improve website
+* Slim down README
+* Create MkDocs website
+* Add isolates section to README
+* Run CI only on pushes to develop
+* Use GitHub Discussions for ideas and feedback
+* Add example to floor package
+
+### 🚀 Features
+
+* Add Full-text Search support
+
+### 🐛 Bug Fixes
+
+* Fix desktop database path retrieval
+
 # 0.18.0
 
 * Documentation update on DateTimeConverter sample
