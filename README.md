@@ -36,11 +36,11 @@ The third dependency is `build_runner` which has to be included as a dev depende
 dependencies:
   flutter:
     sdk: flutter
-  floor: ^0.18.0
+  floor: ^0.19.0
 
 dev_dependencies:
-  floor_generator: ^0.18.0
-  build_runner: ^1.10.3
+  floor_generator: ^0.19.0
+  build_runner: ^1.11.1
 ```
 
 ### 2. Create an Entity
@@ -60,9 +60,9 @@ import 'package:floor/floor.dart';
 class Person {
   @primaryKey
   final int id;
-  
+
   final String name;
-  
+
   Person(this.id, this.name);
 }
 ```
@@ -86,10 +86,10 @@ import 'package:floor/floor.dart';
 abstract class PersonDao {
   @Query('SELECT * FROM Person')
   Future<List<Person>> findAllPersons();
-  
+
   @Query('SELECT * FROM Person WHERE id = :id')
   Stream<Person> findPersonById(int id);
-  
+
   @insert
   Future<void> insertPerson(Person person);
 }
