@@ -1,5 +1,11 @@
 # Changelog
 
+# 0.19.1
+
+### Changes
+
+* Remove floor example to pass static analysis
+
 # 0.19.0
 
 ### Changes
@@ -51,7 +57,7 @@
 
 ### 🚀 Features
 
-* Add **experimental** support for type converters 
+* Add **experimental** support for type converters
 
 # 0.15.0
 
@@ -111,12 +117,12 @@
 
 ### Changes
 
-* Ignore Getters&Setters 
-* Use Flutter bundled pub to get and upgrade project dependencies 
+* Ignore Getters&Setters
+* Use Flutter bundled pub to get and upgrade project dependencies
 * Generate database implementation on every CI run
 * Throw exception when querying for unsupported type
 * Add generated code for example app
-* Add workflow scripts 
+* Add workflow scripts
 * Run real database tests on development machine and CI
 
 ### 🚀 Features
