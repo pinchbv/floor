@@ -36,10 +36,10 @@ The third dependency is `build_runner` which has to be included as a dev depende
 dependencies:
   flutter:
     sdk: flutter
-  floor: ^0.19.0
+  floor: ^0.19.1
 
 dev_dependencies:
-  floor_generator: ^0.19.0
+  floor_generator: ^0.19.1
   build_runner: ^1.11.1
 ```
 
@@ -60,9 +60,9 @@ import 'package:floor/floor.dart';
 class Person {
   @primaryKey
   final int id;
-
+  
   final String name;
-
+  
   Person(this.id, this.name);
 }
 ```

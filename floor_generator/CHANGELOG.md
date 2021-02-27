@@ -1,5 +1,11 @@
 # Changelog
 
+# 0.19.1
+
+### Changes
+
+* Remove floor example to pass static analysis
+
 # 0.19.0
 
 ### Changes
