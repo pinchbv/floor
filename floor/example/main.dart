@@ -1,9 +1,9 @@
 import 'dart:async';
 
 import 'package:floor/floor.dart';
-import 'package:sqflite/sqflite.dart' as sqflite;
+// import 'package:sqflite/sqflite.dart' as sqflite;
 
-part 'main.g.dart';
+// part 'main.g.dart';
 
 @entity
 class Task {
