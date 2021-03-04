@@ -56,7 +56,7 @@ class EntityProcessor extends QueryableProcessor<Entity> {
   String _getName() {
     return classElement
             .getAnnotation(annotations.Entity)
-            .getField(AnnotationField.entityTableName)
+            .getField(AnnotationField.entityTableName)!
             .toStringValue() ??
         classElement.displayName;
   }
@@ -130,7 +130,7 @@ class EntityProcessor extends QueryableProcessor<Entity> {
     final tokenizerArgs = ftsObject
             .getField(Fts3Field.tokenizerArgs)
             ?.toListValue()
-            ?.map((object) => object.toStringValue())
+            ?.map((object) => object.toStringValue()!)
             .toList() ??
         [];
 
@@ -147,7 +147,7 @@ class EntityProcessor extends QueryableProcessor<Entity> {
     final tokenizerArgs = ftsObject
             .getField(Fts4Field.tokenizerArgs)
             ?.toListValue()
-            ?.map((object) => object.toStringValue())
+            ?.map((object) => object.toStringValue()!)
             .toList() ??
         [];
 
@@ -167,7 +167,7 @@ class EntityProcessor extends QueryableProcessor<Entity> {
           final values = indexObject
               .getField(IndexField.value)
               ?.toListValue()
-              ?.map((valueObject) => valueObject.toStringValue())
+              ?.map((valueObject) => valueObject.toStringValue()!)
               .toList();
 
           if (values == null || values.isEmpty) {
@@ -175,7 +175,7 @@ class EntityProcessor extends QueryableProcessor<Entity> {
           }
 
           final indexColumnNames = fields
-              .map((field) => field.columnName)
+              .map<String>((field) => field.columnName)
               .where((columnName) => values.any((value) => value == columnName))
               .toList();
 
@@ -205,7 +205,7 @@ class EntityProcessor extends QueryableProcessor<Entity> {
     return object
             .getField(foreignKeyField)
             ?.toListValue()
-            ?.map((object) => object.toStringValue())
+            ?.map((object) => object.toStringValue()!)
             .toList() ??
         [];
   }
@@ -261,7 +261,7 @@ class EntityProcessor extends QueryableProcessor<Entity> {
   bool _getWithoutRowid() {
     return classElement
             .getAnnotation(annotations.Entity)
-            .getField(AnnotationField.entityWithoutRowid)
+            .getField(AnnotationField.entityWithoutRowid)!
             .toBoolValue() ??
         false;
   }
