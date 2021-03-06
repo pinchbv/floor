@@ -6,13 +6,17 @@
 
 * Make floor null safe
 
+# 0.12.0
+
+* Add `@Fts3` and `@Fts4` annotations
+
 # 0.11.0
 
 * Change `ForeignKeyAction` int constants to enum
 
 # 0.10.0
 
-* Add experimental  `TypeConverter` abstract class and `TypeConverters` annotation
+* Add experimental `TypeConverter` abstract class and `TypeConverters` annotation
 
 # 0.9.0
 
