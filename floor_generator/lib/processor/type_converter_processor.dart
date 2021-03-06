@@ -18,7 +18,7 @@ class TypeConverterProcessor extends Processor<TypeConverter> {
 
   @override
   TypeConverter process() {
-    final typeArguments = _classElement.supertype.typeArguments;
+    final typeArguments = _classElement.supertype!.typeArguments;
     final fieldType = typeArguments[0];
     final databaseType = typeArguments[1];
 
