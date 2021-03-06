@@ -112,7 +112,7 @@ class DatabaseProcessor extends Processor<Database> {
         .getAnnotation(annotations.Database)
         .getField(AnnotationField.databaseEntities)
         ?.toListValue()
-        ?.map((object) => object.toTypeValue()!.element)
+        ?.mapNotNull((object) => object.toTypeValue()?.element)
         .whereType<ClassElement>()
         .where(_isEntity)
         .map((classElement) => EntityProcessor(
@@ -136,7 +136,7 @@ class DatabaseProcessor extends Processor<Database> {
             .getAnnotation(annotations.Database)
             .getField(AnnotationField.databaseViews)
             ?.toListValue()
-            ?.map((object) => object.toTypeValue()!.element)
+            ?.mapNotNull((object) => object.toTypeValue()?.element)
             .whereType<ClassElement>()
             .where(_isView)
             .map((classElement) => ViewProcessor(

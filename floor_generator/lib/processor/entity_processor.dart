@@ -6,6 +6,7 @@ import 'package:collection/collection.dart';
 import 'package:floor_annotation/floor_annotation.dart' as annotations;
 import 'package:floor_generator/misc/constants.dart';
 import 'package:floor_generator/misc/extension/dart_object_extension.dart';
+import 'package:floor_generator/misc/extension/iterable_extension.dart';
 import 'package:floor_generator/misc/extension/string_extension.dart';
 import 'package:floor_generator/misc/extension/type_converters_extension.dart';
 import 'package:floor_generator/misc/type_utils.dart';
@@ -56,8 +57,8 @@ class EntityProcessor extends QueryableProcessor<Entity> {
   String _getName() {
     return classElement
             .getAnnotation(annotations.Entity)
-            .getField(AnnotationField.entityTableName)!
-            .toStringValue() ??
+            .getField(AnnotationField.entityTableName)
+            ?.toStringValue() ??
         classElement.displayName;
   }
 
@@ -130,7 +131,7 @@ class EntityProcessor extends QueryableProcessor<Entity> {
     final tokenizerArgs = ftsObject
             .getField(Fts3Field.tokenizerArgs)
             ?.toListValue()
-            ?.map((object) => object.toStringValue()!)
+            ?.mapNotNull((object) => object.toStringValue())
             .toList() ??
         [];
 
@@ -147,7 +148,7 @@ class EntityProcessor extends QueryableProcessor<Entity> {
     final tokenizerArgs = ftsObject
             .getField(Fts4Field.tokenizerArgs)
             ?.toListValue()
-            ?.map((object) => object.toStringValue()!)
+            ?.mapNotNull((object) => object.toStringValue())
             .toList() ??
         [];
 
@@ -167,7 +168,7 @@ class EntityProcessor extends QueryableProcessor<Entity> {
           final values = indexObject
               .getField(IndexField.value)
               ?.toListValue()
-              ?.map((valueObject) => valueObject.toStringValue()!)
+              ?.mapNotNull((valueObject) => valueObject.toStringValue())
               .toList();
 
           if (values == null || values.isEmpty) {
@@ -175,7 +176,7 @@ class EntityProcessor extends QueryableProcessor<Entity> {
           }
 
           final indexColumnNames = fields
-              .map<String>((field) => field.columnName)
+              .map((field) => field.columnName)
               .where((columnName) => values.any((value) => value == columnName))
               .toList();
 
@@ -205,7 +206,7 @@ class EntityProcessor extends QueryableProcessor<Entity> {
     return object
             .getField(foreignKeyField)
             ?.toListValue()
-            ?.map((object) => object.toStringValue()!)
+            ?.mapNotNull((object) => object.toStringValue())
             .toList() ??
         [];
   }
@@ -261,8 +262,8 @@ class EntityProcessor extends QueryableProcessor<Entity> {
   bool _getWithoutRowid() {
     return classElement
             .getAnnotation(annotations.Entity)
-            .getField(AnnotationField.entityWithoutRowid)!
-            .toBoolValue() ??
+            .getField(AnnotationField.entityWithoutRowid)
+            ?.toBoolValue() ??
         false;
   }
 

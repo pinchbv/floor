@@ -47,7 +47,7 @@ void main() {
 
       final actual = () => element.getTypeConverters(typeConverterScope);
 
-      expect(actual, throwsInvalidGenerationSourceError());
+      expect(actual, throwsProcessorError());
     });
 
     test('throws error when empty list in annotation', () async {
@@ -60,7 +60,7 @@ void main() {
 
       final actual = () => element.getTypeConverters(typeConverterScope);
 
-      expect(actual, throwsInvalidGenerationSourceError());
+      expect(actual, throwsProcessorError());
     });
 
     test('throws error when element in annotation is not TypeConverter',
@@ -74,7 +74,7 @@ void main() {
 
       final actual = () => element.getTypeConverters(typeConverterScope);
 
-      expect(actual, throwsInvalidGenerationSourceError());
+      expect(actual, throwsProcessorError());
     });
   });
 }

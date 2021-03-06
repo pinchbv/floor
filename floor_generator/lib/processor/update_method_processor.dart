@@ -6,6 +6,7 @@ import 'package:floor_annotation/floor_annotation.dart' as annotations
     show Update, OnConflictStrategy;
 import 'package:floor_generator/misc/change_method_processor_helper.dart';
 import 'package:floor_generator/misc/constants.dart';
+import 'package:floor_generator/misc/extension/dart_object_extension.dart';
 import 'package:floor_generator/misc/type_utils.dart';
 import 'package:floor_generator/processor/processor.dart';
 import 'package:floor_generator/value_object/entity.dart';
@@ -62,19 +63,10 @@ class UpdateMethodProcessor implements Processor<UpdateMethod> {
   }
 
   String _getOnConflictStrategy() {
-    String? onConflictStrategy;
-    final onConflict = _methodElement
+    final onConflictStrategy = _methodElement
         .getAnnotation(annotations.Update)
-        .getField(AnnotationField.onConflict);
-
-    if (onConflict != null) {
-      final index = onConflict.getField('index')!.toIntValue()!;
-      final enumConstant = (onConflict.type!.element! as ClassElement)
-          .fields
-          .where((f) => f.isEnumConstant)
-          .toList()[index];
-      onConflictStrategy = '${enumConstant.type}.${enumConstant.name}';
-    }
+        .getField(AnnotationField.onConflict)
+        ?.toEnumValueString();
 
     if (onConflictStrategy == null) {
       throw InvalidGenerationSourceError(
