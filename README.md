@@ -88,7 +88,7 @@ abstract class PersonDao {
   Future<List<Person>> findAllPersons();
   
   @Query('SELECT * FROM Person WHERE id = :id')
-  Stream<Person>? findPersonById(int id);
+  Stream<Person?> findPersonById(int id);
 
   @insert
   Future<void> insertPerson(Person person);
