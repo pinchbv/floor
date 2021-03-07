@@ -1,13 +1,10 @@
 import 'package:floor/src/adapter/deletion_adapter.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';
-import 'package:sqflite/sqflite.dart';
 
 import '../test_util/person.dart';
 import 'deletion_adapter_test.mocks.dart';
 
-@GenerateMocks([DatabaseExecutor, Batch])
 void main() {
   final mockDatabaseExecutor = MockDatabaseExecutor();
   final mockDatabaseBatch = MockBatch();

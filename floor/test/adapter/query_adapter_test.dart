@@ -2,14 +2,11 @@ import 'dart:async';
 
 import 'package:floor/src/adapter/query_adapter.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';
-import 'package:sqflite/sqlite_api.dart';
 
 import '../test_util/person.dart';
 import 'query_adapter_test.mocks.dart';
 
-@GenerateMocks([DatabaseExecutor])
 void main() {
   final mockDatabaseExecutor = MockDatabaseExecutor();
 

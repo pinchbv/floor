@@ -3,14 +3,12 @@ import 'dart:async';
 import 'package:floor/floor.dart';
 import 'package:floor/src/adapter/insertion_adapter.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';
 import 'package:sqflite/sqflite.dart';
 
 import '../test_util/person.dart';
 import 'insertion_adapter_test.mocks.dart';
 
-@GenerateMocks([DatabaseExecutor, Batch, StreamController])
 void main() {
   final mockDatabaseExecutor = MockDatabaseExecutor();
   final mockDatabaseBatch = MockBatch();

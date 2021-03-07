@@ -1,13 +1,10 @@
 import 'package:floor/src/adapter/migration_adapter.dart';
 import 'package:floor/src/migration.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';
-import 'package:sqflite/sqlite_api.dart';
 
 import 'migration_adapter_test.mocks.dart';
 
-@GenerateMocks([Database])
 void main() {
   final mockMigrationDatabase = MockDatabase();
 
