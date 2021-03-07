@@ -17,7 +17,7 @@ dependencies:
 
 dev_dependencies:
   floor_generator: ^1.0.0-nullsafety
-  build_runner: ^1.10.3
+  build_runner: ^1.11.5
 ```
 
 ## 2. Create an Entity
