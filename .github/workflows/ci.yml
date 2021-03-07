@@ -100,8 +100,7 @@ jobs:
           sudo apt-get -y install sqlite3 libsqlite3-dev
 
       - name: Run tests
-        # TODO #375 remove --no-sound-null-safety once all dependencies have migrated
-        run: flutter test --coverage --coverage-path coverage/lcov.info --no-sound-null-safety
+        run: flutter test --coverage --coverage-path coverage/lcov.info
         working-directory: floor
 
       - name: Upload coverage to Codecov
