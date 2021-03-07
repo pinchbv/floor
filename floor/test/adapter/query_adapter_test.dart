@@ -2,11 +2,14 @@ import 'dart:async';
 
 import 'package:floor/src/adapter/query_adapter.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';
+import 'package:sqflite/sqlite_api.dart';
 
-import '../test_util/mocks.dart';
 import '../test_util/person.dart';
+import 'query_adapter_test.mocks.dart';
 
+@GenerateMocks([DatabaseExecutor])
 void main() {
   final mockDatabaseExecutor = MockDatabaseExecutor();
 
@@ -129,6 +132,9 @@ void main() {
 
       test('executes query with argument', () async {
         final arguments = [123];
+        final queryResult = Future(() => <Map<String, dynamic>>[]);
+        when(mockDatabaseExecutor.rawQuery(sql, arguments))
+            .thenAnswer((_) => queryResult);
 
         await underTest.queryNoReturn(sql, arguments: arguments);
 

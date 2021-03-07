@@ -1,13 +1,16 @@
 import 'package:floor/src/adapter/deletion_adapter.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';
+import 'package:sqflite/sqflite.dart';
 
-import '../test_util/mocks.dart';
 import '../test_util/person.dart';
+import 'deletion_adapter_test.mocks.dart';
 
+@GenerateMocks([DatabaseExecutor, Batch])
 void main() {
   final mockDatabaseExecutor = MockDatabaseExecutor();
-  final mockDatabaseBatch = MockDatabaseBatch();
+  final mockDatabaseBatch = MockBatch();
 
   const entityName = 'person';
   const primaryKeyColumnName = 'id';
@@ -27,6 +30,11 @@ void main() {
   group('delete without return', () {
     test('delete item', () async {
       final person = Person(1, 'Simon');
+      when(mockDatabaseExecutor.delete(
+        entityName,
+        where: '$primaryKeyColumnName = ?',
+        whereArgs: [person.id],
+      )).thenAnswer((_) => Future(() => 1));
 
       await underTest.delete(person);
 

@@ -1,15 +1,17 @@
 import 'package:floor/floor.dart';
 import 'package:floor/src/adapter/update_adapter.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';
 import 'package:sqflite/sqflite.dart';
 
-import '../test_util/mocks.dart';
 import '../test_util/person.dart';
+import 'deletion_adapter_test.mocks.dart';
 
+@GenerateMocks([DatabaseExecutor, Batch])
 void main() {
   final mockDatabaseExecutor = MockDatabaseExecutor();
-  final mockDatabaseBatch = MockDatabaseBatch();
+  final mockDatabaseBatch = MockBatch();
 
   const entityName = 'person';
   const primaryKeyColumnName = 'id';
@@ -34,10 +36,17 @@ void main() {
   group('update without return', () {
     test('update item', () async {
       final person = Person(1, 'Simon');
+      final values = <String, dynamic>{'id': person.id, 'name': person.name};
+      when(mockDatabaseExecutor.update(
+        entityName,
+        values,
+        where: '$primaryKeyColumnName = ?',
+        whereArgs: [person.id],
+        conflictAlgorithm: conflictAlgorithm,
+      )).thenAnswer((_) => Future(() => 1));
 
       await underTest.update(person, onConflictStrategy);
 
-      final values = <String, dynamic>{'id': person.id, 'name': person.name};
       verify(mockDatabaseExecutor.update(
         entityName,
         values,
