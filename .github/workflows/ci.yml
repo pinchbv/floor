@@ -86,7 +86,7 @@ jobs:
         working-directory: floor
 
       - name: Run generator
-        run: flutter packages pub run build_runner build --delete-conflicting-outputs
+        run: flutter packages pub run build_runner build --delete-conflicting-outputs --build-filter="test/integration/**/*.g.dart"
         working-directory: floor
 
       - name: Analyze
