@@ -7,7 +7,6 @@ analyzer:
     todo: ignore
   exclude:
     - 'bin/cache/**'
-    - '*/**.mocks.dart'
 
 linter:
   rules:

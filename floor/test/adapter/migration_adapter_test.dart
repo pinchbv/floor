@@ -3,7 +3,7 @@ import 'package:floor/src/migration.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/mockito.dart';
 
-import 'migration_adapter_test.mocks.dart';
+import '../test_util/mocks.dart';
 
 void main() {
   final mockMigrationDatabase = MockDatabase();

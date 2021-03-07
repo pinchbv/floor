@@ -6,8 +6,8 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/mockito.dart';
 import 'package:sqflite/sqflite.dart';
 
+import '../test_util/mocks.dart';
 import '../test_util/person.dart';
-import 'insertion_adapter_test.mocks.dart';
 
 void main() {
   final mockDatabaseExecutor = MockDatabaseExecutor();
