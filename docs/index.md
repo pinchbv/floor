@@ -4,6 +4,7 @@ Floor provides a neat SQLite abstraction for your Flutter applications inspired 
 It comes with automatic mapping between in-memory objects and database rows while still offering full control of the database with the use of SQL.
 As a consequence, it's necessary to have an understanding of SQL and SQLite in order to harvest Floor's full potential.
 
+- null-safe
 - typesafe
 - reactive
 - lightweight
@@ -13,7 +14,7 @@ As a consequence, it's necessary to have an understanding of SQL and SQLite in o
 - iOS, Android, Linux, macOS, Windows
 
 !!! important
-    The library is on its way to its first stable release and is open to contributions!
+    The library is open to contributions!
     Refer to [GitHub Discussions](https://github.com/vitusortner/floor/discussions) for questions, ideas, and discussions.
 
 [![pub package](https://img.shields.io/pub/v/floor.svg)](https://pub.dartlang.org/packages/floor)
