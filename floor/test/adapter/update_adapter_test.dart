@@ -34,7 +34,7 @@ void main() {
   group('update without return', () {
     test('update item', () async {
       final person = Person(1, 'Simon');
-      final values = <String, dynamic>{'id': person.id, 'name': person.name};
+      final values = {'id': person.id, 'name': person.name};
       when(mockDatabaseExecutor.update(
         entityName,
         values,
@@ -64,8 +64,8 @@ void main() {
 
       await underTest.updateList(persons, onConflictStrategy);
 
-      final values1 = <String, dynamic>{'id': person1.id, 'name': person1.name};
-      final values2 = <String, dynamic>{'id': person2.id, 'name': person2.name};
+      final values1 = {'id': person1.id, 'name': person1.name};
+      final values2 = {'id': person2.id, 'name': person2.name};
       verifyInOrder([
         mockDatabaseExecutor.batch(),
         mockDatabaseBatch.update(
@@ -96,7 +96,7 @@ void main() {
   group('update with return', () {
     test('update item and return changed rows (1)', () async {
       final person = Person(1, 'Simon');
-      final values = <String, dynamic>{'id': person.id, 'name': person.name};
+      final values = {'id': person.id, 'name': person.name};
       when(mockDatabaseExecutor.update(
         entityName,
         values,
@@ -133,8 +133,8 @@ void main() {
         onConflictStrategy,
       );
 
-      final values1 = <String, dynamic>{'id': person1.id, 'name': person1.name};
-      final values2 = <String, dynamic>{'id': person2.id, 'name': person2.name};
+      final values1 = {'id': person1.id, 'name': person1.name};
+      final values2 = {'id': person2.id, 'name': person2.name};
       verifyInOrder([
         mockDatabaseExecutor.batch(),
         mockDatabaseBatch.update(

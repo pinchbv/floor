@@ -36,7 +36,7 @@ void main() {
       test('insert item', () async {
         final person = Person(1, 'Simon');
         // TODO #375 let's get rid of all dynamics!
-        final values = <String, dynamic>{'id': person.id, 'name': person.name};
+        final values = {'id': person.id, 'name': person.name};
         when(mockDatabaseExecutor.insert(
           entityName,
           values,
@@ -56,14 +56,8 @@ void main() {
         final person1 = Person(1, 'Simon');
         final person2 = Person(2, 'Frank');
         final persons = [person1, person2];
-        final values1 = <String, dynamic>{
-          'id': person1.id,
-          'name': person1.name
-        };
-        final values2 = <String, dynamic>{
-          'id': person2.id,
-          'name': person2.name
-        };
+        final values1 = {'id': person1.id, 'name': person1.name};
+        final values2 = {'id': person2.id, 'name': person2.name};
         when(mockDatabaseExecutor.batch()).thenReturn(mockDatabaseBatch);
         when(mockDatabaseExecutor.insert(
           entityName,
@@ -106,7 +100,7 @@ void main() {
     group('insertion with return', () {
       test('insert item and return primary key', () async {
         final person = Person(1, 'Simon');
-        final values = <String, dynamic>{'id': person.id, 'name': person.name};
+        final values = {'id': person.id, 'name': person.name};
         when(mockDatabaseExecutor.insert(
           entityName,
           values,
@@ -126,7 +120,7 @@ void main() {
 
       test('insert item but transaction failed (return 0)', () async {
         final person = Person(1, 'Simon');
-        final values = <String, dynamic>{'id': person.id, 'name': person.name};
+        final values = {'id': person.id, 'name': person.name};
         when(mockDatabaseExecutor.insert(
           entityName,
           values,
@@ -156,14 +150,8 @@ void main() {
         final actual =
             await underTest.insertListAndReturnIds(persons, onConflictStrategy);
 
-        final values1 = <String, dynamic>{
-          'id': person1.id,
-          'name': person1.name
-        };
-        final values2 = <String, dynamic>{
-          'id': person2.id,
-          'name': person2.name
-        };
+        final values1 = {'id': person1.id, 'name': person1.name};
+        final values2 = {'id': person2.id, 'name': person2.name};
         verifyInOrder([
           mockDatabaseExecutor.batch(),
           mockDatabaseBatch.insert(
