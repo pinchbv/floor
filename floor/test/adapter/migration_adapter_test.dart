@@ -6,10 +6,10 @@ import 'package:mockito/mockito.dart';
 import '../test_util/mocks.dart';
 
 void main() {
-  final mockMigrationDatabase = MockSqfliteDatabase();
+  final mockDatabase = MockDatabase();
 
   tearDown(() {
-    clearInteractions(mockMigrationDatabase);
+    clearInteractions(mockDatabase);
   });
 
   test('run single migration', () async {
@@ -21,15 +21,16 @@ void main() {
         await database.execute(sql);
       })
     ];
+    when(mockDatabase.execute(sql)).thenAnswer((_) => Future(() {}));
 
     await MigrationAdapter.runMigrations(
-      mockMigrationDatabase,
+      mockDatabase,
       startVersion,
       endVersion,
       migrations,
     );
 
-    verify(mockMigrationDatabase.execute(sql));
+    verify(mockDatabase.execute(sql));
   });
 
   test('run multiple migrations in order', () async {
@@ -49,18 +50,22 @@ void main() {
         await database.execute(sql2);
       }),
     ];
+    final future = Future(() {});
+    when(mockDatabase.execute(sql1)).thenAnswer((_) => future);
+    when(mockDatabase.execute(sql2)).thenAnswer((_) => future);
+    when(mockDatabase.execute(sql3)).thenAnswer((_) => future);
 
     await MigrationAdapter.runMigrations(
-      mockMigrationDatabase,
+      mockDatabase,
       startVersion,
       endVersion,
       migrations,
     );
 
     verifyInOrder([
-      mockMigrationDatabase.execute(sql1),
-      mockMigrationDatabase.execute(sql2),
-      mockMigrationDatabase.execute(sql3),
+      mockDatabase.execute(sql1),
+      mockDatabase.execute(sql2),
+      mockDatabase.execute(sql3),
     ]);
   });
 
@@ -75,14 +80,14 @@ void main() {
     ];
 
     final actual = () => MigrationAdapter.runMigrations(
-          mockMigrationDatabase,
+          mockDatabase,
           startVersion,
           endVersion,
           migrations,
         );
 
     expect(actual, throwsStateError);
-    verifyZeroInteractions(mockMigrationDatabase);
+    verifyZeroInteractions(mockDatabase);
   });
 
   test('exception when no matching end version found', () {
@@ -96,13 +101,13 @@ void main() {
     ];
 
     final actual = () => MigrationAdapter.runMigrations(
-          mockMigrationDatabase,
+          mockDatabase,
           startVersion,
           endVersion,
           migrations,
         );
 
     expect(actual, throwsStateError);
-    verifyZeroInteractions(mockMigrationDatabase);
+    verifyZeroInteractions(mockDatabase);
   });
 }

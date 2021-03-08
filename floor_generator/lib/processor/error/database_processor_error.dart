@@ -1,3 +1,4 @@
+// ignore_for_file: import_of_legacy_library_into_null_safe
 import 'package:analyzer/dart/element/element.dart';
 import 'package:source_gen/source_gen.dart';
 
@@ -5,8 +6,7 @@ class DatabaseProcessorError {
   final ClassElement _classElement;
 
   DatabaseProcessorError(final ClassElement classElement)
-      : assert(classElement != null),
-        _classElement = classElement;
+      : _classElement = classElement;
 
   InvalidGenerationSourceError get versionIsMissing {
     return InvalidGenerationSourceError(

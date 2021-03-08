@@ -1,5 +1,3 @@
-import 'package:meta/meta.dart';
-
 /// Marks a class as a FloorDatabase.
 class Database {
   /// The database version.
@@ -13,8 +11,8 @@ class Database {
 
   /// Marks a class as a FloorDatabase.
   const Database({
-    @required this.version,
-    @required this.entities,
+    required this.version,
+    required this.entities,
     this.views = const [],
   });
 }

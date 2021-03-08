@@ -59,7 +59,7 @@ void main() {
             TypeConverterScope.dao,
           ).process();
 
-      expect(actual, throwsInvalidGenerationSourceError());
+      expect(actual, throwsProcessorError());
     });
   });
 }

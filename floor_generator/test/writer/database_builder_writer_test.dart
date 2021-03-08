@@ -1,3 +1,4 @@
+// ignore_for_file: import_of_legacy_library_into_null_safe
 import 'package:code_builder/code_builder.dart';
 import 'package:floor_generator/writer/database_builder_writer.dart';
 import 'package:test/test.dart';
@@ -16,11 +17,11 @@ void main() {
       class _$FooBarBuilder {
         _$FooBarBuilder(this.name);
       
-        final String name;
+        final String? name;
       
         final List<Migration> _migrations = [];
 
-        Callback _callback;
+        Callback? _callback;
       
         /// Adds migrations to the builder.
         _$FooBarBuilder addMigrations(List<Migration> migrations) {
@@ -37,7 +38,7 @@ void main() {
         /// Creates the database and initializes it.
         Future<FooBar> build() async {
           final path = name != null
-            ? await sqfliteDatabaseFactory.getDatabasePath(name)
+            ? await sqfliteDatabaseFactory.getDatabasePath(name!)
             : ':memory:'; 
           final database = _$FooBar();
           database.database = await database.open(

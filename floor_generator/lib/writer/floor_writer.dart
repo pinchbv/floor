@@ -1,5 +1,5 @@
+// ignore_for_file: import_of_legacy_library_into_null_safe
 import 'package:code_builder/code_builder.dart';
-import 'package:floor_generator/misc/annotations.dart';
 import 'package:floor_generator/writer/writer.dart';
 
 class FloorWriter extends Writer {
@@ -7,7 +7,6 @@ class FloorWriter extends Writer {
 
   FloorWriter(final String databaseName) : _databaseName = databaseName;
 
-  @nonNull
   @override
   Class write() {
     final databaseBuilderName = '_\$${_databaseName}Builder';

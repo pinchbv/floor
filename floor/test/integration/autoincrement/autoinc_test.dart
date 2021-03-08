@@ -9,8 +9,8 @@ part 'autoinc_test.g.dart';
 
 void main() {
   group('AutoIncrement tests', () {
-    TestDatabase database;
-    AIDao aiDao;
+    late TestDatabase database;
+    late AIDao aiDao;
 
     setUp(() async {
       database = await $FloorTestDatabase.inMemoryDatabaseBuilder().build();
@@ -22,21 +22,22 @@ void main() {
     });
 
     test('first id is 1', () async {
-      final obj = AutoIncEntity(1.0,id:null);
+      final obj = AutoIncEntity(1.0, id: null);
       await aiDao.insertAIEntity(obj);
 
       final actual = await aiDao.findWithId(1);
-      expect(actual, equals(AutoIncEntity(1.0,id:1)));
+      expect(actual, equals(AutoIncEntity(1.0, id: 1)));
     });
 
     test('retrieve multiple entities', () async {
-      final obj = AutoIncEntity(1.5,id:null);
-      final obj2 = AutoIncEntity(1.7,id:null);
+      final obj = AutoIncEntity(1.5, id: null);
+      final obj2 = AutoIncEntity(1.7, id: null);
       await aiDao.insertAIEntity(obj);
       await aiDao.insertAIEntity(obj2);
 
       final actual = await aiDao.findAll();
-      expect(actual, equals([AutoIncEntity(1.5,id:1),AutoIncEntity(1.7,id:2)]));
+      expect(actual,
+          equals([AutoIncEntity(1.5, id: 1), AutoIncEntity(1.7, id: 2)]));
     });
   });
 }
@@ -44,7 +45,7 @@ void main() {
 @entity
 class AutoIncEntity {
   @PrimaryKey(autoGenerate: true)
-  final int id;
+  final int? id;
 
   final double decimal;
 
@@ -75,7 +76,7 @@ abstract class TestDatabase extends FloorDatabase {
 @dao
 abstract class AIDao {
   @Query('SELECT * FROM AutoIncEntity where id = :val')
-  Future<AutoIncEntity> findWithId(int val);
+  Future<AutoIncEntity?> findWithId(int val);
 
   @Query('SELECT * FROM AutoIncEntity')
   Future<List<AutoIncEntity>> findAll();

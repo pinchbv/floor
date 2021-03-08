@@ -1,6 +1,5 @@
 import 'package:analyzer/dart/element/element.dart';
-import 'package:floor_generator/misc/annotations.dart';
-import 'package:floor_generator/misc/extension/list_equality_extension.dart';
+import 'package:collection/collection.dart';
 import 'package:floor_generator/value_object/field.dart';
 import 'package:floor_generator/value_object/foreign_key.dart';
 import 'package:floor_generator/value_object/index.dart';
@@ -15,7 +14,7 @@ class Entity extends Queryable {
   final List<Index> indices;
   final bool withoutRowid;
   final String valueMapping;
-  final Fts fts;
+  final Fts? fts;
 
   Entity(
     ClassElement classElement,
@@ -30,7 +29,6 @@ class Entity extends Queryable {
     this.fts,
   ) : super(classElement, name, fields, constructor);
 
-  @nonNull
   String getCreateTableStatement() {
     final databaseDefinition = fields.map((field) {
       final autoIncrement =
@@ -52,15 +50,14 @@ class Entity extends Queryable {
     if (fts == null) {
       return 'CREATE TABLE IF NOT EXISTS `$name` (${databaseDefinition.join(', ')})$withoutRowidClause';
     } else {
-      if (fts.tableCreateOption().isNotEmpty) {
-        databaseDefinition.add('${fts.tableCreateOption()}');
+      if (fts!.tableCreateOption().isNotEmpty) {
+        databaseDefinition.add('${fts!.tableCreateOption()}');
       }
-      return 'CREATE VIRTUAL TABLE IF NOT EXISTS `$name` ${fts.usingOption}(${databaseDefinition.join(', ')})';
+      return 'CREATE VIRTUAL TABLE IF NOT EXISTS `$name` ${fts!.usingOption}(${databaseDefinition.join(', ')})';
     }
   }
 
-  @nullable
-  String _createPrimaryKeyDefinition() {
+  String? _createPrimaryKeyDefinition() {
     if (primaryKey.autoGenerateId) {
       return null;
     } else {

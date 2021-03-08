@@ -1,5 +1,17 @@
 # Changelog
 
+## 1.0.0-nullsafety.1
+
+### Changes
+
+* Migrate to stable Dart 2.12
+
+## 1.0.0-nullsafety.0
+
+### 🚀 Features
+
+* Make floor null safe
+
 ## 0.19.1
 
 ### Changes

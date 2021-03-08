@@ -11,7 +11,8 @@ void main() {
   final mockDatabaseExecutor = MockDatabaseExecutor();
 
   const sql = 'abcd';
-  final mapper = (Map<String, dynamic> row) => Person(row['id'], row['name']);
+  final mapper = (Map<String, Object?> row) =>
+      Person(row['id'] as int, row['name'] as String);
 
   tearDown(() {
     clearInteractions(mockDatabaseExecutor);
@@ -24,7 +25,7 @@ void main() {
       test('returns item without arguments', () async {
         final person = Person(1, 'Frank');
         final queryResult = Future(() => [
-              <String, dynamic>{'id': person.id, 'name': person.name}
+              {'id': person.id, 'name': person.name}
             ]);
         when(mockDatabaseExecutor.rawQuery(sql)).thenAnswer((_) => queryResult);
 
@@ -38,7 +39,7 @@ void main() {
         final person = Person(1, 'Frank');
         final arguments = [person.id, person.name];
         final queryResult = Future(() => [
-              <String, dynamic>{'id': person.id, 'name': person.name}
+              {'id': person.id, 'name': person.name}
             ]);
         when(mockDatabaseExecutor.rawQuery(sql, arguments))
             .thenAnswer((_) => queryResult);
@@ -51,7 +52,7 @@ void main() {
       });
 
       test('null when query returns nothing', () async {
-        final queryResult = Future(() => <Map<String, dynamic>>[]);
+        final queryResult = Future(() => <Map<String, Object?>>[]);
         when(mockDatabaseExecutor.rawQuery(sql)).thenAnswer((_) => queryResult);
 
         final actual = await underTest.query(sql, mapper: mapper);
@@ -63,8 +64,8 @@ void main() {
       test('exception because query returns multiple items', () async {
         final person = Person(1, 'Frank');
         final queryResult = Future(() => [
-              <String, dynamic>{'id': person.id, 'name': person.name},
-              <String, dynamic>{'id': 2, 'name': 'Peter'},
+              {'id': person.id, 'name': person.name},
+              {'id': 2, 'name': 'Peter'},
             ]);
         when(mockDatabaseExecutor.rawQuery(sql)).thenAnswer((_) => queryResult);
 
@@ -80,8 +81,8 @@ void main() {
         final person = Person(1, 'Frank');
         final person2 = Person(2, 'Peter');
         final queryResult = Future(() => [
-              <String, dynamic>{'id': person.id, 'name': person.name},
-              <String, dynamic>{'id': person2.id, 'name': person2.name},
+              {'id': person.id, 'name': person.name},
+              {'id': person2.id, 'name': person2.name},
             ]);
         when(mockDatabaseExecutor.rawQuery(sql)).thenAnswer((_) => queryResult);
 
@@ -96,8 +97,8 @@ void main() {
         final person2 = Person(2, 'Peter');
         final arguments = [person.id, person2.id];
         final queryResult = Future(() => [
-              <String, dynamic>{'id': person.id, 'name': person.name},
-              <String, dynamic>{'id': person2.id, 'name': person2.name},
+              {'id': person.id, 'name': person.name},
+              {'id': person2.id, 'name': person2.name},
             ]);
         when(mockDatabaseExecutor.rawQuery(sql, arguments))
             .thenAnswer((_) => queryResult);
@@ -109,8 +110,8 @@ void main() {
         verify(mockDatabaseExecutor.rawQuery(sql, arguments));
       });
 
-      test('returns emtpy list when query returns nothing', () async {
-        final queryResult = Future(() => <Map<String, dynamic>>[]);
+      test('returns empty list when query returns nothing', () async {
+        final queryResult = Future(() => <Map<String, Object?>>[]);
         when(mockDatabaseExecutor.rawQuery(sql)).thenAnswer((_) => queryResult);
 
         final actual = await underTest.queryList(sql, mapper: mapper);
@@ -129,6 +130,9 @@ void main() {
 
       test('executes query with argument', () async {
         final arguments = [123];
+        final queryResult = Future(() => <Map<String, Object?>>[]);
+        when(mockDatabaseExecutor.rawQuery(sql, arguments))
+            .thenAnswer((_) => queryResult);
 
         await underTest.queryNoReturn(sql, arguments: arguments);
 
@@ -139,10 +143,10 @@ void main() {
 
   group('stream queries', () {
     // ignore: close_sinks
-    StreamController<String> streamController;
+    StreamController<String>? streamController;
     const entityName = 'person';
 
-    QueryAdapter underTest;
+    late QueryAdapter underTest;
 
     setUp(() {
       streamController = StreamController<String>();
@@ -150,14 +154,14 @@ void main() {
     });
 
     tearDown(() {
-      streamController.close();
+      streamController!.close();
       streamController = null;
     });
 
     test('query item and emit persistent item without arguments', () {
       final person = Person(1, 'Frank');
       final queryResult = Future(() => [
-            <String, dynamic>{'id': person.id, 'name': person.name}
+            {'id': person.id, 'name': person.name}
           ]);
       when(mockDatabaseExecutor.rawQuery(sql)).thenAnswer((_) => queryResult);
 
@@ -171,7 +175,7 @@ void main() {
       final person = Person(1, 'Frank');
       final arguments = [person.id, person.name];
       final queryResult = Future(() => [
-            <String, dynamic>{'id': person.id, 'name': person.name}
+            {'id': person.id, 'name': person.name}
           ]);
       when(mockDatabaseExecutor.rawQuery(sql, arguments))
           .thenAnswer((_) => queryResult);
@@ -190,23 +194,33 @@ void main() {
     test('query item and emit persistent item and new', () {
       final person = Person(1, 'Frank');
       final queryResult = Future(() => [
-            <String, dynamic>{'id': person.id, 'name': person.name}
+            {'id': person.id, 'name': person.name}
           ]);
       when(mockDatabaseExecutor.rawQuery(sql)).thenAnswer((_) => queryResult);
 
       final actual = underTest.queryStream(sql,
           queryableName: entityName, isView: false, mapper: mapper);
-      streamController.add(entityName);
+      streamController!.add(entityName);
 
       expect(actual, emitsInOrder(<Person>[person, person]));
+    });
+
+    test('query item emits null when query has no result', () {
+      final queryResult = Future(() => <Map<String, Object?>>[]);
+      when(mockDatabaseExecutor.rawQuery(sql)).thenAnswer((_) => queryResult);
+
+      final actual = underTest.queryStream(sql,
+          queryableName: entityName, isView: false, mapper: mapper);
+
+      expect(actual, emits(null));
     });
 
     test('query items and emit persistent items without arguments', () async {
       final person = Person(1, 'Frank');
       final person2 = Person(2, 'Peter');
       final queryResult = Future(() => [
-            <String, dynamic>{'id': person.id, 'name': person.name},
-            <String, dynamic>{'id': person2.id, 'name': person2.name},
+            {'id': person.id, 'name': person.name},
+            {'id': person2.id, 'name': person2.name},
           ]);
       when(mockDatabaseExecutor.rawQuery(sql)).thenAnswer((_) => queryResult);
 
@@ -221,8 +235,8 @@ void main() {
       final person2 = Person(2, 'Peter');
       final arguments = [person.id, person2.id];
       final queryResult = Future(() => [
-            <String, dynamic>{'id': person.id, 'name': person.name},
-            <String, dynamic>{'id': person2.id, 'name': person2.name},
+            {'id': person.id, 'name': person.name},
+            {'id': person2.id, 'name': person2.name},
           ]);
       when(mockDatabaseExecutor.rawQuery(sql, arguments))
           .thenAnswer((_) => queryResult);
@@ -242,14 +256,14 @@ void main() {
       final person = Person(1, 'Frank');
       final person2 = Person(2, 'Peter');
       final queryResult = Future(() => [
-            <String, dynamic>{'id': person.id, 'name': person.name},
-            <String, dynamic>{'id': person2.id, 'name': person2.name},
+            {'id': person.id, 'name': person.name},
+            {'id': person2.id, 'name': person2.name},
           ]);
       when(mockDatabaseExecutor.rawQuery(sql)).thenAnswer((_) => queryResult);
 
       final actual = underTest.queryListStream(sql,
           queryableName: entityName, isView: false, mapper: mapper);
-      streamController.add(entityName);
+      streamController!.add(entityName);
 
       expect(
         actual,
@@ -265,8 +279,8 @@ void main() {
       final person = Person(1, 'Frank');
       final person2 = Person(2, 'Peter');
       final queryResult = Future(() => [
-            <String, dynamic>{'id': person.id, 'name': person.name},
-            <String, dynamic>{'id': person2.id, 'name': person2.name},
+            {'id': person.id, 'name': person.name},
+            {'id': person2.id, 'name': person2.name},
           ]);
       when(mockDatabaseExecutor.rawQuery(sql)).thenAnswer((_) => queryResult);
 
@@ -281,8 +295,8 @@ void main() {
         ]),
       );
 
-      streamController.add(entityName);
-      streamController.add('otherEntity');
+      streamController!.add(entityName);
+      streamController!.add('otherEntity');
     });
   });
 }

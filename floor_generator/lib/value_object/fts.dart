@@ -36,7 +36,7 @@ class Fts3 extends Fts {
   String tableCreateOption() {
     final StringBuffer stringBuffer = StringBuffer();
     stringBuffer.write('tokenize=$tokenizer ');
-    if (tokenizerArgs != null && tokenizerArgs.isNotEmpty) {
+    if (tokenizerArgs.isNotEmpty) {
       stringBuffer.write(tokenizerArgs.join(' '));
     }
 
@@ -60,7 +60,7 @@ class Fts4 extends Fts {
   String tableCreateOption() {
     final StringBuffer stringBuffer = StringBuffer();
     stringBuffer.write('tokenize=$tokenizer ');
-    if (tokenizerArgs != null && tokenizerArgs.isNotEmpty) {
+    if (tokenizerArgs.isNotEmpty) {
       stringBuffer.write(tokenizerArgs.join(' '));
     }
     return stringBuffer.toString();

@@ -1,3 +1,4 @@
+// ignore_for_file: import_of_legacy_library_into_null_safe
 import 'package:analyzer/dart/element/element.dart';
 import 'package:build_test/build_test.dart';
 import 'package:floor_annotation/floor_annotation.dart' as annotations;
@@ -40,7 +41,7 @@ void main() {
     const foreignKeys = <ForeignKey>[];
     const indices = <Index>[];
     const constructor = "Person(row['id'] as int, row['name'] as String)";
-    const valueMapping = "<String, dynamic>{'id': item.id, 'name': item.name}";
+    const valueMapping = "<String, Object?>{'id': item.id, 'name': item.name}";
     final expected = Entity(
       classElement,
       name,
@@ -78,7 +79,7 @@ void main() {
     const foreignKeys = <ForeignKey>[];
     const indices = <Index>[];
     const constructor = "Person(row['id'] as int, row['name'] as String)";
-    const valueMapping = "<String, dynamic>{'id': item.id, 'name': item.name}";
+    const valueMapping = "<String, Object?>{'id': item.id, 'name': item.name}";
     final expected = Entity(
       classElement,
       name,
@@ -271,7 +272,7 @@ void main() {
       indices,
       true,
       constructor,
-      "<String, dynamic>{'id': item.id, 'name': item.name}",
+      "<String, Object?>{'id': item.id, 'name': item.name}",
       null,
     );
     expect(actual, equals(expected));
@@ -285,7 +286,6 @@ void main() {
         @primaryKey
         final int id;
       
-        @ColumnInfo(nullable: false)
         final bool isSomething;
       
         Person(this.id, this.isSomething);
@@ -294,7 +294,7 @@ void main() {
 
       final actual = EntityProcessor(classElement, {}).process().valueMapping;
 
-      const expected = '<String, dynamic>{'
+      const expected = '<String, Object?>{'
           "'id': item.id, "
           "'isSomething': item.isSomething ? 1 : 0"
           '}';
@@ -308,8 +308,7 @@ void main() {
         @primaryKey
         final int id;
       
-        @ColumnInfo(nullable: true)
-        final bool isSomething;
+        final bool? isSomething;
       
         Person(this.id, this.isSomething);
       }
@@ -317,9 +316,9 @@ void main() {
 
       final actual = EntityProcessor(classElement, {}).process().valueMapping;
 
-      const expected = '<String, dynamic>{'
+      const expected = '<String, Object?>{'
           "'id': item.id, "
-          "'isSomething': item.isSomething == null ? null : (item.isSomething ? 1 : 0)"
+          "'isSomething': item.isSomething == null ? null : (item.isSomething! ? 1 : 0)"
           '}';
       expect(actual, equals(expected));
     });

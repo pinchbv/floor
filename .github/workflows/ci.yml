@@ -54,9 +54,9 @@ jobs:
         run: dartfmt -n --set-exit-if-changed .
 
       - name: Run tests
-        if:
         working-directory: floor_generator
-        run: pub run test_cov
+        # TODO #504 remove --no-sound-null-safety once all dependencies have been migrated
+        run: pub run test_cov --no-sound-null-safety
 
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v1
@@ -86,7 +86,7 @@ jobs:
         working-directory: floor
 
       - name: Run generator
-        run: flutter packages pub run build_runner build
+        run: flutter packages pub run build_runner build --delete-conflicting-outputs
         working-directory: floor
 
       - name: Analyze

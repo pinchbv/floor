@@ -1,6 +1,5 @@
 import 'package:analyzer/dart/element/element.dart';
 import 'package:collection/collection.dart';
-import 'package:floor_generator/misc/annotations.dart';
 import 'package:floor_generator/value_object/field.dart';
 import 'package:floor_generator/value_object/queryable.dart';
 
@@ -15,7 +14,6 @@ class View extends Queryable {
     String constructor,
   ) : super(classElement, name, fields, constructor);
 
-  @nonNull
   String getCreateViewStatement() {
     return 'CREATE VIEW IF NOT EXISTS `$name` AS $query';
   }

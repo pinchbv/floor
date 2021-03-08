@@ -16,8 +16,8 @@ import 'entity/person.dart';
 
 void main() {
   group('database tests', () {
-    TestDatabase database;
-    PersonDao personDao;
+    late TestDatabase database;
+    late PersonDao personDao;
 
     setUp(() async {
       database = await $FloorTestDatabase

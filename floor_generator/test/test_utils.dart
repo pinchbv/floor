@@ -1,3 +1,4 @@
+// ignore_for_file: import_of_legacy_library_into_null_safe
 import 'dart:io';
 
 import 'package:analyzer/dart/element/element.dart';
@@ -10,6 +11,7 @@ import 'package:floor_annotation/floor_annotation.dart' as annotations;
 import 'package:floor_generator/misc/type_utils.dart';
 import 'package:floor_generator/processor/dao_processor.dart';
 import 'package:floor_generator/processor/entity_processor.dart';
+import 'package:floor_generator/processor/error/processor_error.dart';
 import 'package:floor_generator/processor/view_processor.dart';
 import 'package:floor_generator/value_object/dao.dart';
 import 'package:floor_generator/value_object/entity.dart';
@@ -33,16 +35,7 @@ Future<LibraryReader> resolveCompilationUnit(final String sourceFile) async {
 }
 
 Future<DartType> getDartType(final dynamic value) async {
-  final source = '''
-  library test;
-  import 'dart:typed_data';
-  
-  final value = $value;
-  ''';
-  return resolveSource(source, (item) async {
-    final libraryReader = LibraryReader(await item.findLibraryByName('test'));
-    return (libraryReader.allElements.elementAt(1) as VariableElement).type;
-  });
+  return getDartTypeFromDeclaration('final value = $value');
 }
 
 Future<DartType> getDartTypeFromString(final String value) {
@@ -98,6 +91,19 @@ Future<DartType> getDartTypeWithName(String value) async {
   });
 }
 
+Future<DartType> getDartTypeFromDeclaration(final String declaration) async {
+  final source = '''
+  library test;
+  import 'dart:typed_data';
+  
+  $declaration;
+  ''';
+  return resolveSource(source, (item) async {
+    final libraryReader = LibraryReader(await item.findLibraryByName('test'));
+    return (libraryReader.allElements.elementAt(1) as VariableElement).type;
+  });
+}
+
 final _dartfmt = DartFormatter();
 
 String _format(final String source) {
@@ -112,9 +118,25 @@ String _format(final String source) {
 void useDartfmt() => EqualsDart.format = _format;
 
 Matcher throwsInvalidGenerationSourceError([
-  final InvalidGenerationSourceError error,
+  final InvalidGenerationSourceError? error,
 ]) {
   const typeMatcher = TypeMatcher<InvalidGenerationSourceError>();
+  if (error == null) {
+    return throwsA(typeMatcher);
+  } else {
+    return throwsA(
+      typeMatcher
+          .having((e) => e.message, 'message', error.message)
+          .having((e) => e.todo, 'todo', error.todo)
+          .having((e) => e.element, 'element', error.element),
+    );
+  }
+}
+
+Matcher throwsProcessorError([
+  final ProcessorError? error,
+]) {
+  const typeMatcher = TypeMatcher<ProcessorError>();
   if (error == null) {
     return throwsA(typeMatcher);
   } else {
@@ -166,6 +188,7 @@ Future<ClassElement> createClassElement(final String clazz) async {
   final library = await resolveSource('''
       library test;
       
+      import 'dart:typed_data';
       import 'package:floor_annotation/floor_annotation.dart';
       
       $clazz

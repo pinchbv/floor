@@ -1,8 +1,8 @@
+// ignore_for_file: import_of_legacy_library_into_null_safe
 import 'package:analyzer/dart/element/element.dart';
 import 'package:analyzer/dart/element/type.dart';
 import 'package:floor_annotation/floor_annotation.dart' as annotations
     show Insert, OnConflictStrategy;
-import 'package:floor_generator/misc/annotations.dart';
 import 'package:floor_generator/misc/change_method_processor_helper.dart';
 import 'package:floor_generator/misc/constants.dart';
 import 'package:floor_generator/misc/extension/dart_object_extension.dart';
@@ -19,14 +19,11 @@ class InsertionMethodProcessor implements Processor<InsertionMethod> {
   InsertionMethodProcessor(
     final MethodElement methodElement,
     final List<Entity> entities, [
-    final ChangeMethodProcessorHelper changeMethodProcessorHelper,
-  ])  : assert(methodElement != null),
-        assert(entities != null),
-        _methodElement = methodElement,
+    final ChangeMethodProcessorHelper? changeMethodProcessorHelper,
+  ])  : _methodElement = methodElement,
         _helper = changeMethodProcessorHelper ??
             ChangeMethodProcessorHelper(methodElement, entities);
 
-  @nonNull
   @override
   InsertionMethod process() {
     final name = _methodElement.name;
@@ -67,13 +64,11 @@ class InsertionMethodProcessor implements Processor<InsertionMethod> {
     );
   }
 
-  @nonNull
   bool _getReturnsList(final DartType returnType) {
     final type = _methodElement.library.typeSystem.flatten(returnType);
     return type.isDartCoreList;
   }
 
-  @nonNull
   DartType _getFlattenedReturnType(
     final DartType returnType,
     final bool returnsList,
@@ -82,16 +77,20 @@ class InsertionMethodProcessor implements Processor<InsertionMethod> {
     return returnsList ? type.flatten() : type;
   }
 
-  @nonNull
   String _getOnConflictStrategy() {
-    return _methodElement
+    final onConflictStrategy = _methodElement
         .getAnnotation(annotations.Insert)
         .getField(AnnotationField.onConflict)
-        .toEnumValueString(
-            orElse: () => throw InvalidGenerationSourceError(
-                  'Value of ${AnnotationField.onConflict} must be one of ${annotations.OnConflictStrategy.values.map((e) => e.toString()).join(',')}',
-                  element: _methodElement,
-                ));
+        ?.toEnumValueString();
+
+    if (onConflictStrategy == null) {
+      throw InvalidGenerationSourceError(
+        'Value of ${AnnotationField.onConflict} must be one of ${annotations.OnConflictStrategy.values.map((e) => e.toString()).join(',')}',
+        element: _methodElement,
+      );
+    } else {
+      return onConflictStrategy;
+    }
   }
 
   void _assertMethodReturnsFuture(final DartType returnType) {

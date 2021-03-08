@@ -1,5 +1,5 @@
+// ignore_for_file: import_of_legacy_library_into_null_safe
 import 'package:code_builder/code_builder.dart';
-import 'package:floor_generator/misc/annotations.dart';
 import 'package:floor_generator/writer/writer.dart';
 
 class DatabaseBuilderWriter extends Writer {
@@ -8,14 +8,13 @@ class DatabaseBuilderWriter extends Writer {
   DatabaseBuilderWriter(final String databaseName)
       : _databaseName = databaseName;
 
-  @nonNull
   @override
   Class write() {
     final databaseBuilderName = '_\$${_databaseName}Builder';
 
     final nameField = Field((builder) => builder
       ..name = 'name'
-      ..type = refer('String')
+      ..type = refer('String?')
       ..modifier = FieldModifier.final$);
 
     final migrationsField = Field((builder) => builder
@@ -26,7 +25,7 @@ class DatabaseBuilderWriter extends Writer {
 
     final callbackField = Field((builder) => builder
       ..name = '_callback'
-      ..type = refer('Callback'));
+      ..type = refer('Callback?'));
 
     final constructor = Constructor((builder) => builder
       ..requiredParameters.add(Parameter((builder) => builder
@@ -64,7 +63,7 @@ class DatabaseBuilderWriter extends Writer {
       ..docs.add('/// Creates the database and initializes it.')
       ..body = Code('''
         final path = name != null
-          ? await sqfliteDatabaseFactory.getDatabasePath(name)
+          ? await sqfliteDatabaseFactory.getDatabasePath(name!)
           : ':memory:';
         final database = _\$$_databaseName();
         database.database = await database.open(

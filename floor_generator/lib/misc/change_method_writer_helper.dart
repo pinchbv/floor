@@ -1,14 +1,13 @@
+// ignore_for_file: import_of_legacy_library_into_null_safe
 import 'package:code_builder/code_builder.dart';
 import 'package:floor_generator/misc/annotation_expression.dart';
-import 'package:floor_generator/misc/annotations.dart';
 import 'package:floor_generator/value_object/change_method.dart';
 
 class ChangeMethodWriterHelper {
   final ChangeMethod _changeMethod;
 
   ChangeMethodWriterHelper(final ChangeMethod changeMethod)
-      : assert(changeMethod != null),
-        _changeMethod = changeMethod;
+      : _changeMethod = changeMethod;
 
   /// Adds the change method signature to the [MethodBuilder].
   void addChangeMethodSignature(final MethodBuilder methodBuilder) {
@@ -25,7 +24,6 @@ class ChangeMethodWriterHelper {
     }
   }
 
-  @nonNull
   Parameter _generateParameter() {
     final parameter = _changeMethod.parameterElement;
 

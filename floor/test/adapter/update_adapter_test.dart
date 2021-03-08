@@ -9,12 +9,11 @@ import '../test_util/person.dart';
 
 void main() {
   final mockDatabaseExecutor = MockDatabaseExecutor();
-  final mockDatabaseBatch = MockDatabaseBatch();
+  final mockDatabaseBatch = MockBatch();
 
   const entityName = 'person';
   const primaryKeyColumnName = 'id';
-  final valueMapper = (Person person) =>
-      <String, dynamic>{'id': person.id, 'name': person.name};
+  final valueMapper = (Person person) => {'id': person.id, 'name': person.name};
   const onConflictStrategy = OnConflictStrategy.ignore;
   const conflictAlgorithm = ConflictAlgorithm.ignore;
 
@@ -35,15 +34,22 @@ void main() {
   group('update without return', () {
     test('update item', () async {
       final person = Person(1, 'Simon');
+      final values = {'id': person.id, 'name': person.name};
+      when(mockDatabaseExecutor.update(
+        entityName,
+        values,
+        where: '$primaryKeyColumnName = ?',
+        whereArgs: [person.id],
+        conflictAlgorithm: conflictAlgorithm,
+      )).thenAnswer((_) => Future(() => 1));
 
       await underTest.update(person, onConflictStrategy);
 
-      final values = <String, dynamic>{'id': person.id, 'name': person.name};
       verify(mockDatabaseExecutor.update(
         entityName,
         values,
         where: '$primaryKeyColumnName = ?',
-        whereArgs: <dynamic>[person.id],
+        whereArgs: [person.id],
         conflictAlgorithm: conflictAlgorithm,
       ));
     });
@@ -58,22 +64,22 @@ void main() {
 
       await underTest.updateList(persons, onConflictStrategy);
 
-      final values1 = <String, dynamic>{'id': person1.id, 'name': person1.name};
-      final values2 = <String, dynamic>{'id': person2.id, 'name': person2.name};
+      final values1 = {'id': person1.id, 'name': person1.name};
+      final values2 = {'id': person2.id, 'name': person2.name};
       verifyInOrder([
         mockDatabaseExecutor.batch(),
         mockDatabaseBatch.update(
           entityName,
           values1,
           where: '$primaryKeyColumnName = ?',
-          whereArgs: <dynamic>[person1.id],
+          whereArgs: [person1.id],
           conflictAlgorithm: conflictAlgorithm,
         ),
         mockDatabaseBatch.update(
           entityName,
           values2,
           where: '$primaryKeyColumnName = ?',
-          whereArgs: <dynamic>[person2.id],
+          whereArgs: [person2.id],
           conflictAlgorithm: conflictAlgorithm,
         ),
         mockDatabaseBatch.commit(noResult: false),
@@ -90,12 +96,12 @@ void main() {
   group('update with return', () {
     test('update item and return changed rows (1)', () async {
       final person = Person(1, 'Simon');
-      final values = <String, dynamic>{'id': person.id, 'name': person.name};
+      final values = {'id': person.id, 'name': person.name};
       when(mockDatabaseExecutor.update(
         entityName,
         values,
         where: '$primaryKeyColumnName = ?',
-        whereArgs: <dynamic>[person.id],
+        whereArgs: [person.id],
         conflictAlgorithm: conflictAlgorithm,
       )).thenAnswer((_) => Future(() => 1));
 
@@ -108,7 +114,7 @@ void main() {
         entityName,
         values,
         where: '$primaryKeyColumnName = ?',
-        whereArgs: <dynamic>[person.id],
+        whereArgs: [person.id],
         conflictAlgorithm: conflictAlgorithm,
       ));
       expect(actual, equals(1));
@@ -127,22 +133,22 @@ void main() {
         onConflictStrategy,
       );
 
-      final values1 = <String, dynamic>{'id': person1.id, 'name': person1.name};
-      final values2 = <String, dynamic>{'id': person2.id, 'name': person2.name};
+      final values1 = {'id': person1.id, 'name': person1.name};
+      final values2 = {'id': person2.id, 'name': person2.name};
       verifyInOrder([
         mockDatabaseExecutor.batch(),
         mockDatabaseBatch.update(
           entityName,
           values1,
           where: '$primaryKeyColumnName = ?',
-          whereArgs: <dynamic>[person1.id],
+          whereArgs: [person1.id],
           conflictAlgorithm: conflictAlgorithm,
         ),
         mockDatabaseBatch.update(
           entityName,
           values2,
           where: '$primaryKeyColumnName = ?',
-          whereArgs: <dynamic>[person2.id],
+          whereArgs: [person2.id],
           conflictAlgorithm: conflictAlgorithm,
         ),
         mockDatabaseBatch.commit(noResult: false),

@@ -1,5 +1,3 @@
-import 'package:meta/meta.dart';
-
 /// Declares a foreign key on another [Entity].
 class ForeignKey {
   /// The list of column names in the current [Entity].
@@ -25,9 +23,9 @@ class ForeignKey {
 
   /// Declares a foreign key on another [Entity].
   const ForeignKey({
-    @required this.childColumns,
-    @required this.parentColumns,
-    @required this.entity,
+    required this.childColumns,
+    required this.parentColumns,
+    required this.entity,
     this.onUpdate = ForeignKeyAction.noAction,
     this.onDelete = ForeignKeyAction.noAction,
   });

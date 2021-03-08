@@ -4,7 +4,7 @@ import 'package:floor_annotation/src/index.dart';
 /// Marks a class as a database entity (table).
 class Entity {
   /// The table name of the SQLite table.
-  final String tableName;
+  final String? tableName;
 
   /// List of indices on the table.
   final List<Index> indices;

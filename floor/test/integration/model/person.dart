@@ -8,9 +8,9 @@ import 'package:floor/floor.dart';
 )
 class Person {
   @primaryKey
-  final int id;
+  final int? id;
 
-  @ColumnInfo(name: 'custom_name', nullable: false)
+  @ColumnInfo(name: 'custom_name')
   final String name;
 
   Person(this.id, this.name);

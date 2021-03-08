@@ -40,6 +40,7 @@ nav:
     - Database Views: database-views.md
     - Data Access Objects: daos.md
     - Type Converters: type-converters.md
+    - Null Safety: null-safety.md
     - Migrations: migrations.md
     - In Memory Database: in-memory-database.md
     - Initialization Callback: initialization-callback.md

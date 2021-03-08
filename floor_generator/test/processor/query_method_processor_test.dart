@@ -1,3 +1,4 @@
+// ignore_for_file: import_of_legacy_library_into_null_safe
 import 'package:analyzer/dart/element/element.dart';
 import 'package:build_test/build_test.dart';
 import 'package:floor_annotation/floor_annotation.dart' as annotations;
@@ -15,11 +16,13 @@ import 'package:test/test.dart';
 import '../test_utils.dart';
 
 void main() {
-  List<Entity> entities;
-  List<View> views;
+  late List<Entity> entities;
+  late List<View> views;
 
-  setUpAll(() async => entities = await _getEntities());
-  setUpAll(() async => views = await _getViews());
+  setUpAll(() async {
+    entities = await _getEntities();
+    views = await _getViews();
+  });
 
   test('create query method', () async {
     final methodElement = await _createQueryMethodElement('''
@@ -79,7 +82,7 @@ void main() {
     test('parse query', () async {
       final methodElement = await _createQueryMethodElement('''
       @Query('SELECT * FROM Person WHERE id = :id')
-      Future<Person> findPerson(int id);
+      Future<Person?> findPerson(int id);
     ''');
 
       final actual =
@@ -94,7 +97,7 @@ void main() {
           SELECT * FROM person
           WHERE id = :id AND custom_name = :name
         ''')
-        Future<Person> findPersonByIdAndName(int id, String name);
+        Future<Person?> findPersonByIdAndName(int id, String name);
       """);
 
       final actual =
@@ -110,7 +113,7 @@ void main() {
       final methodElement = await _createQueryMethodElement('''
         @Query('SELECT * FROM person '
             'WHERE id = :id AND custom_name = :name')
-        Future<Person> findPersonByIdAndName(int id, String name);    
+        Future<Person?> findPersonByIdAndName(int id, String name);    
       ''');
 
       final actual =
@@ -232,7 +235,7 @@ void main() {
     test('exception when method does not return future', () async {
       final methodElement = await _createQueryMethodElement('''
       @Query('SELECT * FROM Person')
-      List<Person> findAllPersons();
+      List<Person?> findAllPersons();
     ''');
 
       final actual = () =>
@@ -276,7 +279,7 @@ void main() {
         () async {
       final methodElement = await _createQueryMethodElement('''
       @Query('SELECT * FROM Person WHERE id = :id AND name = :name')
-      Future<Person> findPersonByIdAndName(int id);
+      Future<Person?> findPersonByIdAndName(int id);
     ''');
 
       final actual = () =>
@@ -288,11 +291,28 @@ void main() {
       expect(actual, throwsInvalidGenerationSourceError(error));
     });
 
+    test('exception when passing nullable method parameter to query method',
+        () async {
+      final methodElement = await _createQueryMethodElement('''
+      @Query('SELECT * FROM Person WHERE id = :id')
+      Future<Person?> findPersonByIdAndName(int? id);
+    ''');
+
+      final actual = () =>
+          QueryMethodProcessor(methodElement, [...entities, ...views], {})
+              .process();
+
+      final parameterElement = methodElement.parameters.first;
+      final error = QueryMethodProcessorError(methodElement)
+          .queryMethodParameterIsNullable(parameterElement);
+      expect(actual, throwsProcessorError(error));
+    });
+
     test('exception when query arguments do not match method parameters',
         () async {
       final methodElement = await _createQueryMethodElement('''
       @Query('SELECT * FROM Person WHERE id = :id')
-      Future<Person> findPersonByIdAndName(int id, String name);
+      Future<Person?> findPersonByIdAndName(int id, String name);
     ''');
 
       final actual = () =>
@@ -302,6 +322,36 @@ void main() {
       final error = QueryMethodProcessorError(methodElement)
           .queryArgumentsAndMethodParametersDoNotMatch;
       expect(actual, throwsInvalidGenerationSourceError(error));
+    });
+
+    test(
+        'throws when method returns Future of non-nullable type for single item query',
+        () async {
+      final methodElement = await _createQueryMethodElement('''
+      @Query('SELECT * FROM Person WHERE id = :id')
+      Future<Person> findPersonById(int id);      
+    ''');
+
+      final actual = () =>
+          QueryMethodProcessor(methodElement, [...entities, ...views], {})
+              .process();
+
+      expect(actual, throwsProcessorError());
+    });
+
+    test(
+        'throws when method returns Stream of non-nullable type for single item query',
+        () async {
+      final methodElement = await _createQueryMethodElement('''
+      @Query('SELECT * FROM Person WHERE id = :id')
+      Stream<Person> findPersonById(int id);      
+    ''');
+
+      final actual = () =>
+          QueryMethodProcessor(methodElement, [...entities, ...views], {})
+              .process();
+
+      expect(actual, throwsProcessorError());
     });
   });
 }

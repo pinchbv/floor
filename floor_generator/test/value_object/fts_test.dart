@@ -6,7 +6,7 @@ void main() {
     test('Fts3 Definition', () {
       final Fts fts = Fts3(
         'simple',
-        null,
+        [],
       );
 
       final usingOptionActual = fts.usingOption;

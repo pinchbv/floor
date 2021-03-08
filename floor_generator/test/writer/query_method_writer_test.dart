@@ -1,3 +1,4 @@
+// ignore_for_file: import_of_legacy_library_into_null_safe
 import 'package:build_test/build_test.dart';
 import 'package:code_builder/code_builder.dart';
 import 'package:floor_annotation/floor_annotation.dart' as annotations;
@@ -44,7 +45,7 @@ void main() {
     expect(actual, equalsDart(r'''
       @override
       Future<void> deletePersonById(int id) async {
-        await _queryAdapter.queryNoReturn('DELETE FROM Person WHERE id = ?', arguments: <dynamic>[id]);
+        await _queryAdapter.queryNoReturn('DELETE FROM Person WHERE id = ?', arguments: [id]);
       }
     '''));
   });
@@ -52,15 +53,15 @@ void main() {
   test('query item', () async {
     final queryMethod = await _createQueryMethod('''
       @Query('SELECT * FROM Person WHERE id = :id')
-      Future<Person> findById(int id);
+      Future<Person?> findById(int id);
     ''');
 
     final actual = QueryMethodWriter(queryMethod).write();
 
     expect(actual, equalsDart(r'''
       @override
-      Future<Person> findById(int id) async {
-        return _queryAdapter.query('SELECT * FROM Person WHERE id = ?', arguments: <dynamic>[id], mapper: (Map<String, dynamic> row) => Person(row['id'] as int, row['name'] as String));
+      Future<Person?> findById(int id) async {
+        return _queryAdapter.query('SELECT * FROM Person WHERE id = ?', arguments: [id], mapper: (Map<String, Object?> row) => Person(row['id'] as int, row['name'] as String));
       }
     '''));
   });
@@ -75,7 +76,7 @@ void main() {
       );
       final queryMethod = await '''
       @Query('SELECT * FROM Order WHERE id = :id')
-      Future<Order> findById(int id);
+      Future<Order?> findById(int id);
     '''
           .asOrderQueryMethod({typeConverter});
 
@@ -83,8 +84,8 @@ void main() {
 
       expect(actual, equalsDart(r'''
       @override
-      Future<Order> findById(int id) async {
-        return _queryAdapter.query('SELECT * FROM Order WHERE id = ?', arguments: <dynamic>[id], mapper: (Map<String, dynamic> row) => Order(row['id'] as int, _dateTimeConverter.decode(row['dateTime'] as int)));
+      Future<Order?> findById(int id) async {
+        return _queryAdapter.query('SELECT * FROM Order WHERE id = ?', arguments: [id], mapper: (Map<String, Object?> row) => Order(row['id'] as int, _dateTimeConverter.decode(row['dateTime'] as int)));
       }
     '''));
     });
@@ -99,7 +100,7 @@ void main() {
       final queryMethod = await '''
       @TypeConverters([DateTimeConverter])
       @Query('SELECT * FROM Order WHERE dateTime = :dateTime')
-      Future<Order> findByDateTime(DateTime dateTime);
+      Future<Order?> findByDateTime(DateTime dateTime);
     '''
           .asOrderQueryMethod({typeConverter});
 
@@ -107,8 +108,8 @@ void main() {
 
       expect(actual, equalsDart(r'''
       @override
-      Future<Order> findByDateTime(DateTime dateTime) async {
-        return _queryAdapter.query('SELECT * FROM Order WHERE dateTime = ?', arguments: <dynamic>[_dateTimeConverter.encode(dateTime)], mapper: (Map<String, dynamic> row) => Order(row['id'] as int, _externalTypeConverter.decode(row['dateTime'] as int)));
+      Future<Order?> findByDateTime(DateTime dateTime) async {
+        return _queryAdapter.query('SELECT * FROM Order WHERE dateTime = ?', arguments: [_dateTimeConverter.encode(dateTime)], mapper: (Map<String, Object?> row) => Order(row['id'] as int, _externalTypeConverter.decode(row['dateTime'] as int)));
       }
     '''));
     });
@@ -123,7 +124,7 @@ void main() {
       );
       final queryMethod = await '''
       @Query('SELECT * FROM Order WHERE dateTime = :dateTime')
-      Future<Order> findByDateTime(@TypeConverters([DateTimeConverter]) DateTime dateTime);
+      Future<Order?> findByDateTime(@TypeConverters([DateTimeConverter]) DateTime dateTime);
     '''
           .asOrderQueryMethod({typeConverter});
 
@@ -131,8 +132,8 @@ void main() {
 
       expect(actual, equalsDart(r'''
       @override
-      Future<Order> findByDateTime(DateTime dateTime) async {
-        return _queryAdapter.query('SELECT * FROM Order WHERE dateTime = ?', arguments: <dynamic>[_dateTimeConverter.encode(dateTime)], mapper: (Map<String, dynamic> row) => Order(row['id'] as int, _externalTypeConverter.decode(row['dateTime'] as int)));
+      Future<Order?> findByDateTime(DateTime dateTime) async {
+        return _queryAdapter.query('SELECT * FROM Order WHERE dateTime = ?', arguments: [_dateTimeConverter.encode(dateTime)], mapper: (Map<String, Object?> row) => Order(row['id'] as int, _externalTypeConverter.decode(row['dateTime'] as int)));
       }
     '''));
     });
@@ -157,7 +158,7 @@ void main() {
       @override
       Future<List<Order>> findByDates(List<DateTime> dates) async {
         final valueList0 = dates.map((value) => "'${_dateTimeConverter.encode(value)}'").join(', ');
-        return _queryAdapter.queryList('SELECT * FROM Order WHERE date IN ($valueList0)', mapper: (Map<String, dynamic> row) => Order(row['id'] as int, _dateTimeConverter.decode(row['dateTime'] as int)));
+        return _queryAdapter.queryList('SELECT * FROM Order WHERE date IN ($valueList0)', mapper: (Map<String, Object?> row) => Order(row['id'] as int, _dateTimeConverter.decode(row['dateTime'] as int)));
       }
     '''));
     });
@@ -174,7 +175,7 @@ void main() {
     expect(actual, equalsDart(r'''
       @override
       Future<List<Person>> findWithFlag(bool flag) async {
-        return _queryAdapter.queryList('SELECT * FROM Person WHERE flag = ?', arguments: <dynamic>[flag == null ? null : (flag ? 1 : 0)], mapper: (Map<String, dynamic> row) => Person(row['id'] as int, row['name'] as String));
+        return _queryAdapter.queryList('SELECT * FROM Person WHERE flag = ?', arguments: [flag ? 1 : 0], mapper: (Map<String, Object?> row) => Person(row['id'] as int, row['name'] as String));
       }
     '''));
   });
@@ -182,15 +183,15 @@ void main() {
   test('query item multiple parameters', () async {
     final queryMethod = await _createQueryMethod('''
       @Query('SELECT * FROM Person WHERE id = :id AND name = :name')
-      Future<Person> findById(int id, String name);
+      Future<Person?> findById(int id, String name);
     ''');
 
     final actual = QueryMethodWriter(queryMethod).write();
 
     expect(actual, equalsDart(r'''
       @override
-      Future<Person> findById(int id, String name) async {
-        return _queryAdapter.query('SELECT * FROM Person WHERE id = ? AND name = ?', arguments: <dynamic>[id, name], mapper: (Map<String, dynamic> row) => Person(row['id'] as int, row['name'] as String));
+      Future<Person?> findById(int id, String name) async {
+        return _queryAdapter.query('SELECT * FROM Person WHERE id = ? AND name = ?', arguments: [id, name], mapper: (Map<String, Object?> row) => Person(row['id'] as int, row['name'] as String));
       }
     '''));
   });
@@ -206,7 +207,7 @@ void main() {
     expect(actual, equalsDart('''
       @override
       Future<List<Person>> findAll() async {
-        return _queryAdapter.queryList('SELECT * FROM Person', mapper: (Map<String, dynamic> row) => Person(row['id'] as int, row['name'] as String));
+        return _queryAdapter.queryList('SELECT * FROM Person', mapper: (Map<String, Object?> row) => Person(row['id'] as int, row['name'] as String));
       }
     '''));
   });
@@ -214,15 +215,15 @@ void main() {
   test('query item stream', () async {
     final queryMethod = await _createQueryMethod('''
       @Query('SELECT * FROM Person WHERE id = :id')
-      Stream<Person> findByIdAsStream(int id);
+      Stream<Person?> findByIdAsStream(int id);
     ''');
 
     final actual = QueryMethodWriter(queryMethod).write();
 
     expect(actual, equalsDart(r'''
       @override
-      Stream<Person> findByIdAsStream(int id) {
-        return _queryAdapter.queryStream('SELECT * FROM Person WHERE id = ?', arguments: <dynamic>[id], queryableName: 'Person', isView: false, mapper: (Map<String, dynamic> row) => Person(row['id'] as int, row['name'] as String));
+      Stream<Person?> findByIdAsStream(int id) {
+        return _queryAdapter.queryStream('SELECT * FROM Person WHERE id = ?', arguments: [id], queryableName: 'Person', isView: false, mapper: (Map<String, Object?> row) => Person(row['id'] as int, row['name'] as String));
       }
     '''));
   });
@@ -238,7 +239,7 @@ void main() {
     expect(actual, equalsDart(r'''
       @override
       Stream<List<Person>> findAllAsStream() {
-        return _queryAdapter.queryListStream('SELECT * FROM Person', queryableName: 'Person', isView: false, mapper: (Map<String, dynamic> row) => Person(row['id'] as int, row['name'] as String));
+        return _queryAdapter.queryListStream('SELECT * FROM Person', queryableName: 'Person', isView: false, mapper: (Map<String, Object?> row) => Person(row['id'] as int, row['name'] as String));
       }
     '''));
   });
@@ -254,7 +255,7 @@ void main() {
     expect(actual, equalsDart(r'''
       @override
       Stream<List<Name>> findAllAsStream() {
-        return _queryAdapter.queryListStream('SELECT * FROM Name', queryableName: 'Name', isView: true, mapper: (Map<String, dynamic> row) => Name(row['name'] as String));
+        return _queryAdapter.queryListStream('SELECT * FROM Name', queryableName: 'Name', isView: true, mapper: (Map<String, Object?> row) => Name(row['name'] as String));
       }
     '''));
   });
@@ -271,7 +272,7 @@ void main() {
       @override
       Future<List<Person>> findWithIds(List<int> ids) async {
         final valueList0 = ids.map((value) => "'$value'").join(', ');
-        return _queryAdapter.queryList('SELECT * FROM Person WHERE id IN ($valueList0)', mapper: (Map<String, dynamic> row) => Person(row['id'] as int, row['name'] as String));
+        return _queryAdapter.queryList('SELECT * FROM Person WHERE id IN ($valueList0)', mapper: (Map<String, Object?> row) => Person(row['id'] as int, row['name'] as String));
       }
     '''));
   });
@@ -288,7 +289,7 @@ void main() {
       @override
       Future<List<Person>> findWithIds(List<int> ids) async {
         final valueList0 = ids.map((value) => "'$value'").join(', ');
-        return _queryAdapter.queryList('SELECT * FROM Person WHERE id IN($valueList0)', mapper: (Map<String, dynamic> row) => Person(row['id'] as int, row['name'] as String));
+        return _queryAdapter.queryList('SELECT * FROM Person WHERE id IN($valueList0)', mapper: (Map<String, Object?> row) => Person(row['id'] as int, row['name'] as String));
       }
     '''));
   });
@@ -306,7 +307,7 @@ void main() {
       Future<List<Person>> findWithIds(List<int> ids, List<int> idx) async {
         final valueList0 = ids.map((value) => "'$value'").join(', ');
         final valueList1 = idx.map((value) => "'$value'").join(', ');
-        return _queryAdapter.queryList('SELECT * FROM Person WHERE id IN ($valueList0) AND id IN ($valueList1)', mapper: (Map<String, dynamic> row) => Person(row['id'] as int, row['name'] as String));
+        return _queryAdapter.queryList('SELECT * FROM Person WHERE id IN ($valueList0) AND id IN ($valueList1)', mapper: (Map<String, Object?> row) => Person(row['id'] as int, row['name'] as String));
       }
     '''));
   });
@@ -314,7 +315,7 @@ void main() {
   test('query with unsupported type throws', () async {
     final queryMethod = await _createQueryMethod('''
       @Query('SELECT * FROM Person WHERE id = :person')
-      Future<Person> findById(Person person);
+      Future<Person?> findById(Person person);
     ''');
 
     final actual = () => QueryMethodWriter(queryMethod).write();

@@ -1,3 +1,4 @@
+// ignore_for_file: import_of_legacy_library_into_null_safe
 import 'package:analyzer/dart/element/element.dart';
 import 'package:build_test/build_test.dart';
 import 'package:floor_annotation/floor_annotation.dart' as annotations;
@@ -12,11 +13,13 @@ import 'package:source_gen/source_gen.dart';
 import 'package:test/test.dart';
 
 void main() {
-  List<Entity> entities;
-  List<View> views;
+  late List<Entity> entities;
+  late List<View> views;
 
-  setUpAll(() async => entities = await _getEntities());
-  setUpAll(() async => views = await _getViews());
+  setUpAll(() async {
+    entities = await _getEntities();
+    views = await _getViews();
+  });
 
   test('Includes methods from abstract parent class', () async {
     final classElement = await _createDao('''

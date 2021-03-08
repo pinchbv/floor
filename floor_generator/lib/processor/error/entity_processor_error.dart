@@ -1,3 +1,4 @@
+// ignore_for_file: import_of_legacy_library_into_null_safe
 import 'package:analyzer/dart/constant/value.dart';
 import 'package:analyzer/dart/element/element.dart';
 import 'package:source_gen/source_gen.dart';
@@ -6,8 +7,7 @@ class EntityProcessorError {
   final ClassElement _classElement;
 
   EntityProcessorError(final ClassElement classElement)
-      : assert(classElement != null),
-        _classElement = classElement;
+      : _classElement = classElement;
 
   InvalidGenerationSourceError get missingPrimaryKey {
     return InvalidGenerationSourceError(

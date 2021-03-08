@@ -13,7 +13,6 @@ extension OnConflictStrategyExtensions on OnConflictStrategy {
       case OnConflictStrategy.ignore:
         return ConflictAlgorithm.ignore;
       case OnConflictStrategy.abort:
-      default:
         return ConflictAlgorithm.abort;
     }
   }

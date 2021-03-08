@@ -1,3 +1,4 @@
+// ignore_for_file: import_of_legacy_library_into_null_safe
 import 'package:analyzer/dart/element/element.dart';
 import 'package:build_test/build_test.dart';
 import 'package:floor_generator/misc/constants.dart';
@@ -13,6 +14,28 @@ void main() {
   test('Process field', () async {
     final fieldElement = await _generateFieldElement('''
       final int id;
+    ''');
+
+    final actual = FieldProcessor(fieldElement, null).process();
+
+    const name = 'id';
+    const columnName = 'id';
+    const isNullable = false;
+    const sqlType = SqlType.integer;
+    final expected = Field(
+      fieldElement,
+      name,
+      columnName,
+      isNullable,
+      sqlType,
+      null,
+    );
+    expect(actual, equals(expected));
+  });
+
+  test('Process field with nullable Dart type', () async {
+    final fieldElement = await _generateFieldElement('''
+      final int? id;
     ''');
 
     final actual = FieldProcessor(fieldElement, null).process();
@@ -70,7 +93,7 @@ void main() {
 
     const name = 'dateTime';
     const columnName = 'dateTime';
-    const isNullable = true;
+    const isNullable = false;
     const sqlType = SqlType.integer; // converted from DateTime
     final expected = Field(
       fieldElement,
@@ -93,7 +116,7 @@ void main() {
 
     const name = 'dateTime';
     const columnName = 'dateTime';
-    const isNullable = true;
+    const isNullable = false;
     const sqlType = SqlType.integer; // converted from DateTime
     final typeConverter = TypeConverter(
       'DateTimeConverter',
@@ -129,7 +152,7 @@ void main() {
 
     const name = 'dateTime';
     const columnName = 'dateTime';
-    const isNullable = true;
+    const isNullable = false;
     const sqlType = SqlType.integer; // converted from DateTime
     final typeConverter = TypeConverter(
       'DateTimeConverter',

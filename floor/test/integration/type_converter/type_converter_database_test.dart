@@ -5,8 +5,8 @@ import 'order_dao.dart';
 import 'order_database.dart';
 
 void main() {
-  OrderDatabase database;
-  OrderDao orderDao;
+  late OrderDatabase database;
+  late OrderDao orderDao;
 
   setUp(() async {
     database = await $FloorOrderDatabase.inMemoryDatabaseBuilder().build();

@@ -8,17 +8,17 @@ class Callback {
   final FutureOr<void> Function(
     Database database,
     int version,
-  ) onCreate;
+  )? onCreate;
 
   /// Fired when the [database] has successfully been opened.
-  final FutureOr<void> Function(Database database) onOpen;
+  final FutureOr<void> Function(Database database)? onOpen;
 
   /// Fired when the [database] has finished upgrading from [startVersion] to [endVersion].
   final FutureOr<void> Function(
     Database database,
     int startVersion,
     int endVersion,
-  ) onUpgrade;
+  )? onUpgrade;
 
   /// Constructor.
   const Callback({this.onCreate, this.onOpen, this.onUpgrade});
