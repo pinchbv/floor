@@ -5,7 +5,7 @@ import 'package:sqflite/sqflite.dart';
 import 'package:sqflite/sqlite_api.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 
-// TODO #375 type inference seems to fail here
+// infers factory as nullable without explicit type definition
 final DatabaseFactory sqfliteDatabaseFactory = () {
   if (Platform.isAndroid || Platform.isIOS) {
     return databaseFactory;
