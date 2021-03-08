@@ -55,7 +55,7 @@ jobs:
 
       - name: Run tests
         working-directory: floor_generator
-        # TODO #375 remove --no-sound-null-safety once all dependencies have migrated
+        # TODO #504 remove --no-sound-null-safety once all dependencies have been migrated
         run: pub run test_cov --no-sound-null-safety
 
       - name: Upload coverage to Codecov
