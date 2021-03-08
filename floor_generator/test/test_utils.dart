@@ -35,15 +35,11 @@ Future<LibraryReader> resolveCompilationUnit(final String sourceFile) async {
 }
 
 Future<DartType> getDartType(final dynamic value) async {
-  return _getDartType('final value = $value');
+  return getDartTypeFromDeclaration('final value = $value');
 }
 
 Future<DartType> getDartTypeFromString(final String value) {
   return getDartType(value);
-}
-
-Future<DartType> getDartTypeFromDeclaration(final String declaration) {
-  return _getDartType(declaration);
 }
 
 Future<DartType> getDartTypeWithPerson(String value) async {
@@ -95,7 +91,7 @@ Future<DartType> getDartTypeWithName(String value) async {
   });
 }
 
-Future<DartType> _getDartType(final String declaration) async {
+Future<DartType> getDartTypeFromDeclaration(final String declaration) async {
   final source = '''
   library test;
   import 'dart:typed_data';
