@@ -312,8 +312,6 @@ class EntityProcessor extends QueryableProcessor<Entity> {
     String triggerName,
   ) {
     final field = foreignKeyObject.getField(triggerName);
-    // TODO #375 remove suppress when getField is null aware
-    // ignore: unnecessary_null_comparison
     if (field == null) {
       // field was not defined, return default value
       return annotations.ForeignKeyAction.noAction;
