@@ -35,20 +35,15 @@ Future<LibraryReader> resolveCompilationUnit(final String sourceFile) async {
 }
 
 Future<DartType> getDartType(final dynamic value) async {
-  final source = '''
-  library test;
-  import 'dart:typed_data';
-  
-  final value = $value;
-  ''';
-  return resolveSource(source, (item) async {
-    final libraryReader = LibraryReader(await item.findLibraryByName('test'));
-    return (libraryReader.allElements.elementAt(1) as VariableElement).type;
-  });
+  return _getDartType('final value = $value');
 }
 
 Future<DartType> getDartTypeFromString(final String value) {
   return getDartType(value);
+}
+
+Future<DartType> getDartTypeFromDeclaration(final String declaration) {
+  return _getDartType(declaration);
 }
 
 Future<DartType> getDartTypeWithPerson(String value) async {
@@ -97,6 +92,19 @@ Future<DartType> getDartTypeWithName(String value) async {
     return (libraryReader.allElements.first as PropertyAccessorElement)
         .type
         .returnType;
+  });
+}
+
+Future<DartType> _getDartType(final String declaration) async {
+  final source = '''
+  library test;
+  import 'dart:typed_data';
+  
+  $declaration;
+  ''';
+  return resolveSource(source, (item) async {
+    final libraryReader = LibraryReader(await item.findLibraryByName('test'));
+    return (libraryReader.allElements.elementAt(1) as VariableElement).type;
   });
 }
 

@@ -2,7 +2,7 @@ import 'package:analyzer/dart/element/nullability_suffix.dart';
 import 'package:analyzer/dart/element/type.dart';
 
 extension DartTypeExtension on DartType {
-  // TODO #375 test
+  /// Whether this [DartType] is nullable
   bool get isNullable {
     switch (nullabilitySuffix) {
       case NullabilitySuffix.question:
