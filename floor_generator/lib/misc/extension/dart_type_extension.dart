@@ -4,7 +4,6 @@ import 'package:analyzer/dart/element/type.dart';
 extension DartTypeExtension on DartType {
   // TODO #375 test
   bool get isNullable {
-    final nullabilitySuffix = this.nullabilitySuffix;
     switch (nullabilitySuffix) {
       case NullabilitySuffix.question:
       case NullabilitySuffix.star: // support legacy code without non-nullables
