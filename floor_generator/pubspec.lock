@@ -168,7 +168,7 @@ packages:
       path: "../floor_annotation"
       relative: true
     source: path
-    version: "1.0.0-nullsafety.1"
+    version: "1.0.0"
   glob:
     dependency: transitive
     description:
