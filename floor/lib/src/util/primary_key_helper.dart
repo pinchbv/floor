@@ -10,11 +10,15 @@ class PrimaryKeyHelper {
     final List<String> primaryKeys,
     final Map<String, Object?> values,
   ) {
-    return primaryKeys
-        .map((key) => values[key])
-        // TODO #375 extract
-        .where((element) => element != null)
-        .map((element) => element!)
-        .toList();
+    return primaryKeys.mapNotNull((key) => values[key]).toList();
+  }
+}
+
+extension<T> on Iterable<T> {
+  Iterable<R> mapNotNull<R>(R? Function(T element) transform) sync* {
+    for (final element in this) {
+      final transformed = transform(element);
+      if (transformed != null) yield transformed;
+    }
   }
 }
