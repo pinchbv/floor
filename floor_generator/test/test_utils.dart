@@ -133,8 +133,20 @@ Matcher throwsInvalidGenerationSourceError([
   }
 }
 
-Matcher throwsProcessorError() {
-  return throwsA(const TypeMatcher<ProcessorError>());
+Matcher throwsProcessorError([
+  final ProcessorError? error,
+]) {
+  const typeMatcher = TypeMatcher<ProcessorError>();
+  if (error == null) {
+    return throwsA(typeMatcher);
+  } else {
+    return throwsA(
+      typeMatcher
+          .having((e) => e.message, 'message', error.message)
+          .having((e) => e.todo, 'todo', error.todo)
+          .having((e) => e.element, 'element', error.element),
+    );
+  }
 }
 
 Future<Dao> createDao(final String methodSignature) async {

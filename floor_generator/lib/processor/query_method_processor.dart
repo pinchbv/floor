@@ -147,12 +147,9 @@ class QueryMethodProcessor extends Processor<QueryMethod> {
     final String query,
     final List<ParameterElement> parameterElements,
   ) {
-    // TODO #375 test
-    // TODO #375 should we allow nullable parameters
-    //  instead of passing `null` to sqflite, map Dart `null` to SQL `NULL`?
     for (final parameter in parameterElements) {
       if (parameter.type.isNullable) {
-        throw _processorError.queryMethodParameterIsNull(parameter);
+        throw _processorError.queryMethodParameterIsNullable(parameter);
       }
     }
 

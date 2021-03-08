@@ -291,6 +291,23 @@ void main() {
       expect(actual, throwsInvalidGenerationSourceError(error));
     });
 
+    test('exception when passing nullable method parameter to query method',
+        () async {
+      final methodElement = await _createQueryMethodElement('''
+      @Query('SELECT * FROM Person WHERE id = :id')
+      Future<Person?> findPersonByIdAndName(int? id);
+    ''');
+
+      final actual = () =>
+          QueryMethodProcessor(methodElement, [...entities, ...views], {})
+              .process();
+
+      final parameterElement = methodElement.parameters.first;
+      final error = QueryMethodProcessorError(methodElement)
+          .queryMethodParameterIsNullable(parameterElement);
+      expect(actual, throwsProcessorError(error));
+    });
+
     test('exception when query arguments do not match method parameters',
         () async {
       final methodElement = await _createQueryMethodElement('''
