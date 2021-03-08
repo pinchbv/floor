@@ -335,4 +335,101 @@ class MockDatabase extends _i1.Mock implements _i2.Database {
       (super.noSuchMethod(
           Invocation.method(#devInvokeSqlMethod, [method, sql, arguments]),
           returnValue: Future.value(null)) as _i3.Future<T>);
+
+  @override
+  _i3.Future<void> execute(String? sql, [List<Object?>? arguments]) =>
+      (super.noSuchMethod(Invocation.method(#execute, [sql, arguments]),
+          returnValue: Future.value(null),
+          returnValueForMissingStub: Future<void>.value()) as _i3.Future<void>);
+
+  @override
+  _i3.Future<int> rawInsert(String? sql, [List<Object?>? arguments]) =>
+      (super.noSuchMethod(Invocation.method(#rawInsert, [sql, arguments]),
+          returnValue: Future.value(0)) as _i3.Future<int>);
+
+  @override
+  _i3.Future<int> insert(String? table, Map<String, Object?>? values,
+          {String? nullColumnHack, _i4.ConflictAlgorithm? conflictAlgorithm}) =>
+      (super.noSuchMethod(
+          Invocation.method(#insert, [
+            table,
+            values
+          ], {
+            #nullColumnHack: nullColumnHack,
+            #conflictAlgorithm: conflictAlgorithm
+          }),
+          returnValue: Future.value(0)) as _i3.Future<int>);
+
+  @override
+  _i3.Future<List<Map<String, Object?>>> query(String? table,
+          {bool? distinct,
+          List<String>? columns,
+          String? where,
+          List<Object?>? whereArgs,
+          String? groupBy,
+          String? having,
+          String? orderBy,
+          int? limit,
+          int? offset}) =>
+      (super.noSuchMethod(
+              Invocation.method(#query, [
+                table
+              ], {
+                #distinct: distinct,
+                #columns: columns,
+                #where: where,
+                #whereArgs: whereArgs,
+                #groupBy: groupBy,
+                #having: having,
+                #orderBy: orderBy,
+                #limit: limit,
+                #offset: offset
+              }),
+              returnValue: Future.value(<Map<String, Object?>>[]))
+          as _i3.Future<List<Map<String, Object?>>>);
+
+  @override
+  _i3.Future<List<Map<String, Object?>>> rawQuery(String? sql,
+          [List<Object?>? arguments]) =>
+      (super.noSuchMethod(Invocation.method(#rawQuery, [sql, arguments]),
+              returnValue: Future.value(<Map<String, Object?>>[]))
+          as _i3.Future<List<Map<String, Object?>>>);
+
+  @override
+  _i3.Future<int> rawUpdate(String? sql, [List<Object?>? arguments]) =>
+      (super.noSuchMethod(Invocation.method(#rawUpdate, [sql, arguments]),
+          returnValue: Future.value(0)) as _i3.Future<int>);
+
+  @override
+  _i3.Future<int> update(String? table, Map<String, Object?>? values,
+          {String? where,
+          List<Object?>? whereArgs,
+          _i4.ConflictAlgorithm? conflictAlgorithm}) =>
+      (super.noSuchMethod(
+          Invocation.method(#update, [
+            table,
+            values
+          ], {
+            #where: where,
+            #whereArgs: whereArgs,
+            #conflictAlgorithm: conflictAlgorithm
+          }),
+          returnValue: Future.value(0)) as _i3.Future<int>);
+
+  @override
+  _i3.Future<int> rawDelete(String? sql, [List<Object?>? arguments]) =>
+      (super.noSuchMethod(Invocation.method(#rawDelete, [sql, arguments]),
+          returnValue: Future.value(0)) as _i3.Future<int>);
+
+  @override
+  _i3.Future<int> delete(String? table,
+          {String? where, List<Object?>? whereArgs}) =>
+      (super.noSuchMethod(
+          Invocation.method(
+              #delete, [table], {#where: where, #whereArgs: whereArgs}),
+          returnValue: Future.value(0)) as _i3.Future<int>);
+
+  @override
+  _i2.Batch batch() => (super.noSuchMethod(Invocation.method(#batch, []),
+      returnValue: _FakeBatch()) as _i2.Batch);
 }

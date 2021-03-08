@@ -6,13 +6,12 @@ import 'package:mockito/mockito.dart';
 import '../test_util/mocks.dart';
 
 void main() {
-  final mockMigrationDatabase = MockDatabase();
+  final mockDatabase = MockDatabase();
 
   tearDown(() {
-    clearInteractions(mockMigrationDatabase);
+    clearInteractions(mockDatabase);
   });
 
-  // TODO #375 fix skipped tests
   test('run single migration', () async {
     const startVersion = 1;
     const endVersion = 2;
@@ -22,18 +21,17 @@ void main() {
         await database.execute(sql);
       })
     ];
-    Future<void> someAsync() async {}
-    when(mockMigrationDatabase.execute(sql)).thenAnswer((_) => someAsync());
+    when(mockDatabase.execute(sql)).thenAnswer((_) => Future(() {}));
 
     await MigrationAdapter.runMigrations(
-      mockMigrationDatabase,
+      mockDatabase,
       startVersion,
       endVersion,
       migrations,
     );
 
-    verify(mockMigrationDatabase.execute(sql));
-  }, skip: true);
+    verify(mockDatabase.execute(sql));
+  });
 
   test('run multiple migrations in order', () async {
     const startVersion = 1;
@@ -52,24 +50,24 @@ void main() {
         await database.execute(sql2);
       }),
     ];
-    final Future<void> future = Future(() {});
-    when(mockMigrationDatabase.execute(sql1)).thenAnswer((_) => future);
-    when(mockMigrationDatabase.execute(sql2)).thenAnswer((_) => future);
-    when(mockMigrationDatabase.execute(sql3)).thenAnswer((_) => future);
+    final future = Future(() {});
+    when(mockDatabase.execute(sql1)).thenAnswer((_) => future);
+    when(mockDatabase.execute(sql2)).thenAnswer((_) => future);
+    when(mockDatabase.execute(sql3)).thenAnswer((_) => future);
 
     await MigrationAdapter.runMigrations(
-      mockMigrationDatabase,
+      mockDatabase,
       startVersion,
       endVersion,
       migrations,
     );
 
     verifyInOrder([
-      mockMigrationDatabase.execute(sql1),
-      mockMigrationDatabase.execute(sql2),
-      mockMigrationDatabase.execute(sql3),
+      mockDatabase.execute(sql1),
+      mockDatabase.execute(sql2),
+      mockDatabase.execute(sql3),
     ]);
-  }, skip: true);
+  });
 
   test('exception when no matching start version found', () {
     const startVersion = 10;
@@ -82,14 +80,14 @@ void main() {
     ];
 
     final actual = () => MigrationAdapter.runMigrations(
-          mockMigrationDatabase,
+          mockDatabase,
           startVersion,
           endVersion,
           migrations,
         );
 
     expect(actual, throwsStateError);
-    verifyZeroInteractions(mockMigrationDatabase);
+    verifyZeroInteractions(mockDatabase);
   });
 
   test('exception when no matching end version found', () {
@@ -103,13 +101,13 @@ void main() {
     ];
 
     final actual = () => MigrationAdapter.runMigrations(
-          mockMigrationDatabase,
+          mockDatabase,
           startVersion,
           endVersion,
           migrations,
         );
 
     expect(actual, throwsStateError);
-    verifyZeroInteractions(mockMigrationDatabase);
+    verifyZeroInteractions(mockDatabase);
   });
 }
