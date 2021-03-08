@@ -35,7 +35,6 @@ void main() {
     group('insertion without return', () {
       test('insert item', () async {
         final person = Person(1, 'Simon');
-        // TODO #375 let's get rid of all dynamics!
         final values = {'id': person.id, 'name': person.name};
         when(mockDatabaseExecutor.insert(
           entityName,

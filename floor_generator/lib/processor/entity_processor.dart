@@ -274,7 +274,7 @@ class EntityProcessor extends QueryableProcessor<Entity> {
       return "'$columnName': $attributeValue";
     }).toList();
 
-    return '<String, dynamic>{${keyValueList.join(', ')}}';
+    return '<String, Object?>{${keyValueList.join(', ')}}';
   }
 
   String _getAttributeValue(final Field field) {

@@ -11,7 +11,8 @@ void main() {
   final mockDatabaseExecutor = MockDatabaseExecutor();
 
   const sql = 'abcd';
-  final mapper = (Map<String, dynamic> row) => Person(row['id'], row['name']);
+  final mapper = (Map<String, Object?> row) =>
+      Person(row['id'] as int, row['name'] as String);
 
   tearDown(() {
     clearInteractions(mockDatabaseExecutor);
@@ -51,7 +52,7 @@ void main() {
       });
 
       test('null when query returns nothing', () async {
-        final queryResult = Future(() => <Map<String, dynamic>>[]);
+        final queryResult = Future(() => <Map<String, Object?>>[]);
         when(mockDatabaseExecutor.rawQuery(sql)).thenAnswer((_) => queryResult);
 
         final actual = await underTest.query(sql, mapper: mapper);
@@ -110,7 +111,7 @@ void main() {
       });
 
       test('returns empty list when query returns nothing', () async {
-        final queryResult = Future(() => <Map<String, dynamic>>[]);
+        final queryResult = Future(() => <Map<String, Object?>>[]);
         when(mockDatabaseExecutor.rawQuery(sql)).thenAnswer((_) => queryResult);
 
         final actual = await underTest.queryList(sql, mapper: mapper);
@@ -129,7 +130,7 @@ void main() {
 
       test('executes query with argument', () async {
         final arguments = [123];
-        final queryResult = Future(() => <Map<String, dynamic>>[]);
+        final queryResult = Future(() => <Map<String, Object?>>[]);
         when(mockDatabaseExecutor.rawQuery(sql, arguments))
             .thenAnswer((_) => queryResult);
 

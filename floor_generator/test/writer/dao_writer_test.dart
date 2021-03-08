@@ -50,19 +50,19 @@ void main() {
                     database,
                     'Person',
                     (Person item) =>
-                        <String, dynamic>{'id': item.id, 'name': item.name}),
+                        <String, Object?>{'id': item.id, 'name': item.name}),
                 _personUpdateAdapter = UpdateAdapter(
                     database,
                     'Person',
                     ['id'],
                     (Person item) =>
-                        <String, dynamic>{'id': item.id, 'name': item.name}),
+                        <String, Object?>{'id': item.id, 'name': item.name}),
                 _personDeletionAdapter = DeletionAdapter(
                     database,
                     'Person',
                     ['id'],
                     (Person item) =>
-                        <String, dynamic>{'id': item.id, 'name': item.name});
+                        <String, Object?>{'id': item.id, 'name': item.name});
         
           final sqflite.DatabaseExecutor database;
         
@@ -78,7 +78,7 @@ void main() {
         
           @override
           Future<List<Person>> findAllPersons() async {
-            return _queryAdapter.queryList('SELECT * FROM person', mapper: (Map<String, dynamic> row) => Person(row['id'] as int, row['name'] as String));
+            return _queryAdapter.queryList('SELECT * FROM person', mapper: (Map<String, Object?> row) => Person(row['id'] as int, row['name'] as String));
           }
           
           @override
@@ -129,21 +129,21 @@ void main() {
                     database,
                     'Person',
                     (Person item) =>
-                        <String, dynamic>{'id': item.id, 'name': item.name},
+                        <String, Object?>{'id': item.id, 'name': item.name},
                     changeListener),
                 _personUpdateAdapter = UpdateAdapter(
                     database,
                     'Person',
                     ['id'],
                     (Person item) =>
-                        <String, dynamic>{'id': item.id, 'name': item.name},
+                        <String, Object?>{'id': item.id, 'name': item.name},
                     changeListener),
                 _personDeletionAdapter = DeletionAdapter(
                     database,
                     'Person',
                     ['id'],
                     (Person item) =>
-                        <String, dynamic>{'id': item.id, 'name': item.name},
+                        <String, Object?>{'id': item.id, 'name': item.name},
                     changeListener);
         
           final sqflite.DatabaseExecutor database;
@@ -160,7 +160,7 @@ void main() {
         
           @override
           Stream<List<Person>> findAllPersonsAsStream() {
-            return _queryAdapter.queryListStream('SELECT * FROM person', queryableName: 'Person', isView: false, mapper: (Map<String, dynamic> row) => Person(row['id'] as int, row['name'] as String));
+            return _queryAdapter.queryListStream('SELECT * FROM person', queryableName: 'Person', isView: false, mapper: (Map<String, Object?> row) => Person(row['id'] as int, row['name'] as String));
           }
           
           @override
@@ -206,21 +206,21 @@ void main() {
                     database,
                     'Person',
                     (Person item) =>
-                        <String, dynamic>{'id': item.id, 'name': item.name},
+                        <String, Object?>{'id': item.id, 'name': item.name},
                     changeListener),
                 _personUpdateAdapter = UpdateAdapter(
                     database,
                     'Person',
                     ['id'],
                     (Person item) =>
-                        <String, dynamic>{'id': item.id, 'name': item.name},
+                        <String, Object?>{'id': item.id, 'name': item.name},
                     changeListener),
                 _personDeletionAdapter = DeletionAdapter(
                     database,
                     'Person',
                     ['id'],
                     (Person item) =>
-                        <String, dynamic>{'id': item.id, 'name': item.name},
+                        <String, Object?>{'id': item.id, 'name': item.name},
                     changeListener);
         
           final sqflite.DatabaseExecutor database;
@@ -287,19 +287,19 @@ void main() {
                   database,
                   'Person',
                   (Person item) =>
-                      <String, dynamic>{'id': item.id, 'name': item.name}),
+                      <String, Object?>{'id': item.id, 'name': item.name}),
               _personUpdateAdapter = UpdateAdapter(
                   database,
                   'Person',
                   ['id'],
                   (Person item) =>
-                      <String, dynamic>{'id': item.id, 'name': item.name}),
+                      <String, Object?>{'id': item.id, 'name': item.name}),
               _personDeletionAdapter = DeletionAdapter(
                   database,
                   'Person',
                   ['id'],
                   (Person item) =>
-                      <String, dynamic>{'id': item.id, 'name': item.name});
+                      <String, Object?>{'id': item.id, 'name': item.name});
       
         final sqflite.DatabaseExecutor database;
       
@@ -353,21 +353,21 @@ void main() {
                     database,
                     'Person',
                     (Person item) =>
-                        <String, dynamic>{'id': item.id, 'name': item.name},
+                        <String, Object?>{'id': item.id, 'name': item.name},
                     changeListener),
                 _personUpdateAdapter = UpdateAdapter(
                     database,
                     'Person',
                     ['id'],
                     (Person item) =>
-                        <String, dynamic>{'id': item.id, 'name': item.name},
+                        <String, Object?>{'id': item.id, 'name': item.name},
                     changeListener),
                 _personDeletionAdapter = DeletionAdapter(
                     database,
                     'Person',
                     ['id'],
                     (Person item) =>
-                        <String, dynamic>{'id': item.id, 'name': item.name},
+                        <String, Object?>{'id': item.id, 'name': item.name},
                     changeListener);
         
           final sqflite.DatabaseExecutor database;

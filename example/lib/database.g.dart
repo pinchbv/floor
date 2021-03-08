@@ -101,21 +101,21 @@ class _$TaskDao extends TaskDao {
             database,
             'Task',
             (Task item) =>
-                <String, dynamic>{'id': item.id, 'message': item.message},
+                <String, Object?>{'id': item.id, 'message': item.message},
             changeListener),
         _taskUpdateAdapter = UpdateAdapter(
             database,
             'Task',
             ['id'],
             (Task item) =>
-                <String, dynamic>{'id': item.id, 'message': item.message},
+                <String, Object?>{'id': item.id, 'message': item.message},
             changeListener),
         _taskDeletionAdapter = DeletionAdapter(
             database,
             'Task',
             ['id'],
             (Task item) =>
-                <String, dynamic>{'id': item.id, 'message': item.message},
+                <String, Object?>{'id': item.id, 'message': item.message},
             changeListener);
 
   final sqflite.DatabaseExecutor database;
@@ -134,14 +134,14 @@ class _$TaskDao extends TaskDao {
   Future<Task?> findTaskById(int id) async {
     return _queryAdapter.query('SELECT * FROM task WHERE id = ?',
         arguments: [id],
-        mapper: (Map<String, dynamic> row) =>
+        mapper: (Map<String, Object?> row) =>
             Task(row['id'] as int?, row['message'] as String));
   }
 
   @override
   Future<List<Task>> findAllTasks() async {
     return _queryAdapter.queryList('SELECT * FROM task',
-        mapper: (Map<String, dynamic> row) =>
+        mapper: (Map<String, Object?> row) =>
             Task(row['id'] as int?, row['message'] as String));
   }
 
@@ -150,7 +150,7 @@ class _$TaskDao extends TaskDao {
     return _queryAdapter.queryListStream('SELECT * FROM task',
         queryableName: 'Task',
         isView: false,
-        mapper: (Map<String, dynamic> row) =>
+        mapper: (Map<String, Object?> row) =>
             Task(row['id'] as int?, row['message'] as String));
   }
 

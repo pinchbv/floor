@@ -42,7 +42,7 @@ void main() {
     const foreignKeys = <ForeignKey>[];
     const indices = <Index>[];
     const constructor = "Person(row['id'] as int, row['name'] as String)";
-    const valueMapping = "<String, dynamic>{'id': item.id, 'name': item.name}";
+    const valueMapping = "<String, Object?>{'id': item.id, 'name': item.name}";
     final expected = Entity(
       classElement,
       name,
@@ -80,7 +80,7 @@ void main() {
     const foreignKeys = <ForeignKey>[];
     const indices = <Index>[];
     const constructor = "Person(row['id'] as int, row['name'] as String)";
-    const valueMapping = "<String, dynamic>{'id': item.id, 'name': item.name}";
+    const valueMapping = "<String, Object?>{'id': item.id, 'name': item.name}";
     final expected = Entity(
       classElement,
       name,
@@ -273,7 +273,7 @@ void main() {
       indices,
       true,
       constructor,
-      "<String, dynamic>{'id': item.id, 'name': item.name}",
+      "<String, Object?>{'id': item.id, 'name': item.name}",
       null,
     );
     expect(actual, equals(expected));
@@ -295,7 +295,7 @@ void main() {
 
       final actual = EntityProcessor(classElement, {}).process().valueMapping;
 
-      const expected = '<String, dynamic>{'
+      const expected = '<String, Object?>{'
           "'id': item.id, "
           "'isSomething': item.isSomething ? 1 : 0"
           '}';
@@ -317,7 +317,7 @@ void main() {
 
       final actual = EntityProcessor(classElement, {}).process().valueMapping;
 
-      const expected = '<String, dynamic>{'
+      const expected = '<String, Object?>{'
           "'id': item.id, "
           "'isSomething': item.isSomething == null ? null : (item.isSomething! ? 1 : 0)"
           '}';
