@@ -1,6 +1,7 @@
 // ignore_for_file: import_of_legacy_library_into_null_safe
 import 'dart:typed_data';
 
+import 'package:analyzer/dart/analysis/features.dart';
 import 'package:analyzer/dart/constant/value.dart';
 import 'package:analyzer/dart/element/element.dart';
 import 'package:analyzer/dart/element/type.dart';
@@ -42,6 +43,13 @@ extension FlattenUtil on DartType {
 extension AnnotationChecker on Element {
   bool hasAnnotation(final Type type) {
     return _typeChecker(type).hasAnnotationOfExact(this);
+  }
+
+  bool containsAnnotation(final List<Type> types) {
+    return types.firstWhere(
+            (type) => _typeChecker(type).hasAnnotationOfExact(this),
+            orElse: () => null.runtimeType) !=
+        null.runtimeType;
   }
 
   /// Returns the first annotation object found on [type]

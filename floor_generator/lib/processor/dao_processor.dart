@@ -7,6 +7,7 @@ import 'package:floor_generator/processor/deletion_method_processor.dart';
 import 'package:floor_generator/processor/insertion_method_processor.dart';
 import 'package:floor_generator/processor/processor.dart';
 import 'package:floor_generator/processor/query_method_processor.dart';
+import 'package:floor_generator/processor/raw_query_method_processor.dart';
 import 'package:floor_generator/processor/transaction_method_processor.dart';
 import 'package:floor_generator/processor/update_method_processor.dart';
 import 'package:floor_generator/value_object/dao.dart';
@@ -83,13 +84,25 @@ class DaoProcessor extends Processor<Dao> {
     final Set<TypeConverter> typeConverters,
   ) {
     return methods
-        .where((method) => method.hasAnnotation(annotations.Query))
-        .map((method) => QueryMethodProcessor(
-              method,
-              [..._entities, ..._views],
-              typeConverters,
-            ).process())
-        .toList();
+        .where((method) => method.containsAnnotation([
+              annotations.Query,
+              annotations.RawQuery,
+            ]))
+        .map((method) {
+      if (method.hasAnnotation(annotations.Query)) {
+        return QueryMethodProcessor(
+          method,
+          [..._entities, ..._views],
+          typeConverters,
+        ).process();
+      } else {
+        return RawQueryMethodProcessor(
+          method,
+          [..._entities, ..._views],
+          typeConverters,
+        ).process();
+      }
+    }).toList();
   }
 
   List<InsertionMethod> _getInsertionMethods(
