@@ -5,6 +5,7 @@ import 'package:floor_annotation/floor_annotation.dart' as annotations;
 import 'package:floor_generator/misc/type_utils.dart';
 import 'package:floor_generator/processor/entity_processor.dart';
 import 'package:floor_generator/processor/error/query_method_processor_error.dart';
+import 'package:floor_generator/processor/error/query_processor_error.dart';
 import 'package:floor_generator/processor/query_method_processor.dart';
 import 'package:floor_generator/processor/view_processor.dart';
 import 'package:floor_generator/value_object/entity.dart';
@@ -87,9 +88,37 @@ void main() {
     ''');
 
       final actual =
+          QueryMethodProcessor(methodElement, [], {}).process().query;
+
+      expect(actual.sql, equals('SELECT * FROM Person WHERE id = ?1'));
+      expect(actual.listParameters, equals(<ListParameter>[]));
+    });
+
+    test('parse query reusing a single parameter', () async {
+      final methodElement = await _createQueryMethodElement('''
+      @Query('SELECT * FROM Person WHERE id = :id AND id = :id')
+      Future<Person?> findPerson(int id);
+    ''');
+
+      final actual =
           QueryMethodProcessor(methodElement, [], {}).process().query.sql;
 
-      expect(actual, equals('SELECT * FROM Person WHERE id = ?1'));
+      expect(actual, equals('SELECT * FROM Person WHERE id = ?1 AND id = ?1'));
+    });
+
+    test('parse query with multiple unordered parameters', () async {
+      final methodElement = await _createQueryMethodElement('''
+      @Query('SELECT * FROM Person WHERE name = :name AND id = :id AND id = :id AND name = :name')
+      Future<Person?> findPerson(int id, String name);
+    ''');
+
+      final actual =
+          QueryMethodProcessor(methodElement, [], {}).process().query.sql;
+
+      expect(
+          actual,
+          equals('SELECT * FROM Person WHERE name = ?2'
+              ' AND id = ?1 AND id = ?1 AND name = ?2'));
     });
 
     test('parse multiline query', () async {
@@ -134,12 +163,13 @@ void main() {
     ''');
 
       final actual =
-          QueryMethodProcessor(methodElement, [], {}).process().query.sql;
+          QueryMethodProcessor(methodElement, [], {}).process().query;
 
       expect(
-        actual,
+        actual.sql,
         equals(r'update sports set rated = 1 where id in (:varlist)'),
       );
+      expect(actual.listParameters, equals([ListParameter(41, 'ids')]));
     });
 
     test('parses IN clause without space after IN', () async {
@@ -149,12 +179,13 @@ void main() {
     ''');
 
       final actual =
-          QueryMethodProcessor(methodElement, [], {}).process().query.sql;
+          QueryMethodProcessor(methodElement, [], {}).process().query;
 
       expect(
-        actual,
+        actual.sql,
         equals(r'update sports set rated = 1 where id in(:varlist)'),
       );
+      expect(actual.listParameters, equals([ListParameter(40, 'ids')]));
     });
 
     test('parses IN clause with multiple spaces after IN', () async {
@@ -164,12 +195,13 @@ void main() {
     ''');
 
       final actual =
-          QueryMethodProcessor(methodElement, [], {}).process().query.sql;
+          QueryMethodProcessor(methodElement, [], {}).process().query;
 
       expect(
-        actual,
+        actual.sql,
         equals(r'update sports set rated = 1 where id in      (:varlist)'),
       );
+      expect(actual.listParameters, equals([ListParameter(46, 'ids')]));
     });
 
     test('Parse query with multiple IN clauses', () async {
@@ -179,15 +211,17 @@ void main() {
     ''');
 
       final actual =
-          QueryMethodProcessor(methodElement, [], {}).process().query.sql;
+          QueryMethodProcessor(methodElement, [], {}).process().query;
 
       expect(
-        actual,
+        actual.sql,
         equals(
           r'update sports set rated = 1 where id in (:varlist) '
           r'and where foo in (:varlist)',
         ),
       );
+      expect(actual.listParameters,
+          equals([ListParameter(41, 'ids'), ListParameter(69, 'bar')]));
     });
 
     test('Parse query with IN clause and other parameter', () async {
@@ -197,15 +231,36 @@ void main() {
     ''');
 
       final actual =
-          QueryMethodProcessor(methodElement, [], {}).process().query.sql;
+          QueryMethodProcessor(methodElement, [], {}).process().query;
 
       expect(
-        actual,
+        actual.sql,
         equals(
           r'update sports set rated = 1 where id in (:varlist) '
           r'AND foo = ?1',
         ),
       );
+      expect(actual.listParameters, equals([ListParameter(41, 'ids')]));
+    });
+
+    test('Parse query with mixed IN clauses and other parameters', () async {
+      final methodElement = await _createQueryMethodElement('''
+      @Query('update sports set rated = 1 where id in (:ids) AND foo = :bar AND name in (:names) and :bar = :foo')
+      Future<void> setRated(String foo, List<String> names, List<int> ids, int bar);
+    ''');
+
+      final actual =
+          QueryMethodProcessor(methodElement, [], {}).process().query;
+
+      expect(
+        actual.sql,
+        equals(
+          r'update sports set rated = 1 where id in (:varlist) AND foo = ?2 '
+          r'AND name in (:varlist) and ?2 = ?1',
+        ),
+      );
+      expect(actual.listParameters,
+          equals([ListParameter(41, 'ids'), ListParameter(77, 'names')]));
     });
 
     test('Parse query with LIKE operator', () async {
@@ -279,6 +334,40 @@ void main() {
       expect(actual, throwsInvalidGenerationSourceError(error));
     });
 
+    test(
+        'exception when query arguments do not match method parameters, no list vs list',
+        () async {
+      final methodElement = await _createQueryMethodElement('''
+      @Query('SELECT * FROM Person WHERE id = :id')
+      Future<Person?> findPersonByIdAndName(List<int> id);
+    ''');
+
+      final actual = () =>
+          QueryMethodProcessor(methodElement, [...entities, ...views], {})
+              .process();
+
+      final error = QueryProcessorError(methodElement)
+          .queryArgumentsAndMethodParametersDoNotMatch;
+      expect(actual, throwsInvalidGenerationSourceError(error));
+    });
+
+    test(
+        'exception when query arguments do not match method parameters, list vs no list',
+        () async {
+      final methodElement = await _createQueryMethodElement('''
+      @Query('SELECT * FROM Person WHERE id IN (:id)')
+      Future<Person?> findPersonByIdAndName(int id);
+    ''');
+
+      final actual = () =>
+          QueryMethodProcessor(methodElement, [...entities, ...views], {})
+              .process();
+
+      final error = QueryProcessorError(methodElement)
+          .queryArgumentsAndMethodParametersDoNotMatch;
+      expect(actual, throwsInvalidGenerationSourceError(error));
+    });
+
     test('exception when query arguments do not match method parameters',
         () async {
       final methodElement = await _createQueryMethodElement('''
@@ -290,9 +379,9 @@ void main() {
           QueryMethodProcessor(methodElement, [...entities, ...views], {})
               .process();
 
-      final error = QueryMethodProcessorError(methodElement)
-          .queryArgumentsAndMethodParametersDoNotMatch;
-      expect(actual, throwsInvalidGenerationSourceError(error));
+      final error =
+          QueryProcessorError(methodElement).unknownQueryVariable(':name');
+      expect(actual, throwsProcessorError(error));
     });
 
     test('exception when passing nullable method parameter to query method',
@@ -307,7 +396,7 @@ void main() {
               .process();
 
       final parameterElement = methodElement.parameters.first;
-      final error = QueryMethodProcessorError(methodElement)
+      final error = QueryProcessorError(methodElement)
           .queryMethodParameterIsNullable(parameterElement);
       expect(actual, throwsProcessorError(error));
     });
@@ -323,9 +412,9 @@ void main() {
           QueryMethodProcessor(methodElement, [...entities, ...views], {})
               .process();
 
-      final error = QueryMethodProcessorError(methodElement)
-          .queryArgumentsAndMethodParametersDoNotMatch;
-      expect(actual, throwsInvalidGenerationSourceError(error));
+      final error = QueryProcessorError(methodElement)
+          .unusedQueryMethodParameter(methodElement.parameters[1]);
+      expect(actual, throwsProcessorError(error));
     });
 
     test(

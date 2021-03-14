@@ -1,11 +1,11 @@
 import 'package:floor_generator/misc/extension/dart_type_extension.dart';
 import 'package:analyzer/dart/element/element.dart';
-import 'package:floor_generator/processor/error/query_method_processor_error.dart';
+import 'package:floor_generator/processor/error/query_processor_error.dart';
 import 'package:floor_generator/processor/processor.dart';
 import 'package:floor_generator/value_object/query.dart';
 
 class QueryProcessor extends Processor<Query> {
-  final QueryMethodProcessorError _processorError;
+  final QueryProcessorError _processorError;
 
   final String _query;
 
@@ -13,7 +13,7 @@ class QueryProcessor extends Processor<Query> {
 
   QueryProcessor(MethodElement methodElement, this._query)
       : _parameters = methodElement.parameters,
-        _processorError = QueryMethodProcessorError(methodElement);
+        _processorError = QueryProcessorError(methodElement);
 
   @override
   Query process() {
@@ -53,7 +53,7 @@ class QueryProcessor extends Processor<Query> {
           .replaceAll('\n', ' '));
       final varIndexInMethod = indices[varToken.name];
       if (varIndexInMethod == null) {
-        throw _processorError.queryArgumentsAndMethodParametersDoNotMatch;
+        throw _processorError.unknownQueryVariable(varToken.name);
       } else if (varIndexInMethod > 0) {
         //normal variable/parameter
         if (varToken.isListVar)
@@ -86,7 +86,7 @@ class QueryProcessor extends Processor<Query> {
     final queryVariables = variables.map((e) => e.name.substring(1)).toSet();
     for (final param in _parameters) {
       if (!queryVariables.contains(param.displayName)) {
-        throw _processorError.queryArgumentsAndMethodParametersDoNotMatch;
+        throw _processorError.unusedQueryMethodParameter(param);
       }
     }
   }
@@ -129,4 +129,17 @@ class VariableToken {
   final bool isListVar;
 
   VariableToken(this.name, this.startPosition, this.isListVar);
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is VariableToken &&
+          runtimeType == other.runtimeType &&
+          name == other.name &&
+          startPosition == other.startPosition &&
+          isListVar == other.isListVar;
+
+  @override
+  int get hashCode =>
+      name.hashCode ^ startPosition.hashCode ^ isListVar.hashCode;
 }

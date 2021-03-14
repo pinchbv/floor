@@ -322,6 +322,35 @@ void main() {
 
           expect(actual, equals([person1, person2]));
         });
+
+        test('Find persons with names (complex query)', () async {
+          final person1 = Person(1, 'Sylvie');
+          final person2 = Person(2, 'Simon');
+          final person3 = Person(3, 'Paul');
+          final person4 = Person(4, 'Albert');
+          final person5 = Person(5, 'Louis');
+          final person6 = Person(6, 'Chris');
+          final person7 = Person(7, 'Maria');
+          await personDao.insertPersons(
+              [person1, person2, person3, person4, person5, person6, person7]);
+          final names1 = [
+            person1.name,
+            person3.name,
+            person5.name,
+            person7.name
+          ];
+          final names2 = [
+            person2.name,
+            person4.name,
+            person6.name,
+            person7.name
+          ];
+
+          final actual =
+              await personDao.findPersonsWithNamesComplex(4, names1, names2);
+
+          expect(actual, equals([person5, person7, person4, person2]));
+        });
       });
 
       group('LIKE operator', () {
