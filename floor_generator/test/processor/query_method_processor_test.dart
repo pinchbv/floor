@@ -8,6 +8,7 @@ import 'package:floor_generator/processor/error/query_method_processor_error.dar
 import 'package:floor_generator/processor/query_method_processor.dart';
 import 'package:floor_generator/processor/view_processor.dart';
 import 'package:floor_generator/value_object/entity.dart';
+import 'package:floor_generator/value_object/query.dart';
 import 'package:floor_generator/value_object/query_method.dart';
 import 'package:floor_generator/value_object/view.dart';
 import 'package:source_gen/source_gen.dart';
@@ -40,7 +41,7 @@ void main() {
         QueryMethod(
           methodElement,
           'findAllPersons',
-          'SELECT * FROM Person',
+          Query('SELECT * FROM Person', []),
           await getDartTypeWithPerson('Future<List<Person>>'),
           await getDartTypeWithPerson('Person'),
           [],
@@ -67,7 +68,7 @@ void main() {
         QueryMethod(
           methodElement,
           'findAllNames',
-          'SELECT * FROM name',
+          Query('SELECT * FROM name', []),
           await getDartTypeWithName('Future<List<Name>>'),
           await getDartTypeWithName('Name'),
           [],
@@ -86,7 +87,7 @@ void main() {
     ''');
 
       final actual =
-          QueryMethodProcessor(methodElement, [], {}).process().query;
+          QueryMethodProcessor(methodElement, [], {}).process().query.sql;
 
       expect(actual, equals('SELECT * FROM Person WHERE id = ?'));
     });
@@ -101,7 +102,7 @@ void main() {
       """);
 
       final actual =
-          QueryMethodProcessor(methodElement, [], {}).process().query;
+          QueryMethodProcessor(methodElement, [], {}).process().query.sql;
 
       expect(
         actual,
@@ -117,7 +118,7 @@ void main() {
       ''');
 
       final actual =
-          QueryMethodProcessor(methodElement, [], {}).process().query;
+          QueryMethodProcessor(methodElement, [], {}).process().query.sql;
 
       expect(
         actual,
@@ -132,7 +133,7 @@ void main() {
     ''');
 
       final actual =
-          QueryMethodProcessor(methodElement, [], {}).process().query;
+          QueryMethodProcessor(methodElement, [], {}).process().query.sql;
 
       expect(
         actual,
@@ -147,7 +148,7 @@ void main() {
     ''');
 
       final actual =
-          QueryMethodProcessor(methodElement, [], {}).process().query;
+          QueryMethodProcessor(methodElement, [], {}).process().query.sql;
 
       expect(
         actual,
@@ -162,7 +163,7 @@ void main() {
     ''');
 
       final actual =
-          QueryMethodProcessor(methodElement, [], {}).process().query;
+          QueryMethodProcessor(methodElement, [], {}).process().query.sql;
 
       expect(
         actual,
@@ -177,7 +178,7 @@ void main() {
     ''');
 
       final actual =
-          QueryMethodProcessor(methodElement, [], {}).process().query;
+          QueryMethodProcessor(methodElement, [], {}).process().query.sql;
 
       expect(
         actual,
@@ -195,7 +196,7 @@ void main() {
     ''');
 
       final actual =
-          QueryMethodProcessor(methodElement, [], {}).process().query;
+          QueryMethodProcessor(methodElement, [], {}).process().query.sql;
 
       expect(
         actual,
@@ -213,7 +214,7 @@ void main() {
     ''');
 
       final actual =
-          QueryMethodProcessor(methodElement, [], {}).process().query;
+          QueryMethodProcessor(methodElement, [], {}).process().query.sql;
 
       expect(actual, equals('SELECT * FROM Persons WHERE name LIKE ?'));
     });
@@ -225,7 +226,7 @@ void main() {
     ''');
 
       final actual =
-          QueryMethodProcessor(methodElement, [], {}).process().query;
+          QueryMethodProcessor(methodElement, [], {}).process().query.sql;
 
       expect(actual, equals('SELECT * FROM ?, ?'));
     });

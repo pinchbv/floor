@@ -112,7 +112,7 @@ class QueryMethodWriter implements Writer {
 
   String _generateQueryString() {
     //TODO insert better parameter mappings
-    return "'${_queryMethod.query}'";
+    return "'${_queryMethod.query.sql}'";
   }
 
   String _generateNoReturnQuery(final String query, final String? arguments) {
