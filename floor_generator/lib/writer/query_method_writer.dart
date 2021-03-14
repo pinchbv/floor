@@ -8,6 +8,7 @@ import 'package:floor_generator/misc/extension/string_extension.dart';
 import 'package:floor_generator/misc/extension/type_converters_extension.dart';
 import 'package:floor_generator/misc/type_utils.dart';
 import 'package:floor_generator/value_object/query_method.dart';
+import 'package:floor_generator/value_object/queryable.dart';
 import 'package:floor_generator/value_object/view.dart';
 import 'package:floor_generator/writer/writer.dart';
 
@@ -54,20 +55,14 @@ class QueryMethodWriter implements Writer {
     }
 
     final arguments = _generateArguments();
+    final query = _generateQueryString();
+
     final queryable = _queryMethod.queryable;
     // null queryable implies void-returning query method
     if (_queryMethod.returnsVoid || queryable == null) {
-      _methodBody.write(_generateNoReturnQuery(arguments));
-      return _methodBody.toString();
-    }
-
-    final constructor = queryable.constructor;
-    final mapper = '(Map<String, Object?> row) => $constructor';
-
-    if (_queryMethod.returnsStream) {
-      _methodBody.write(_generateStreamQuery(arguments, mapper));
+      _methodBody.write(_generateNoReturnQuery(query, arguments));
     } else {
-      _methodBody.write(_generateQuery(arguments, mapper));
+      _methodBody.write(_generateQuery(query, arguments, queryable));
     }
 
     return _methodBody.toString();
@@ -115,48 +110,42 @@ class QueryMethodWriter implements Writer {
     return parameters.isNotEmpty ? '[${parameters.join(', ')}]' : null;
   }
 
-  String _generateNoReturnQuery(final String? arguments) {
-    final parameters = StringBuffer()..write("'${_queryMethod.query}'");
+  String _generateQueryString() {
+    //TODO insert better parameter mappings
+    return "'${_queryMethod.query}'";
+  }
+
+  String _generateNoReturnQuery(final String query, final String? arguments) {
+    final parameters = StringBuffer(query);
     if (arguments != null) parameters.write(', arguments: $arguments');
     return 'await _queryAdapter.queryNoReturn($parameters);';
   }
 
   String _generateQuery(
+    final String query,
     final String? arguments,
-    final String mapper,
+    final Queryable queryable,
   ) {
-    final parameters = StringBuffer()..write("'${_queryMethod.query}', ");
-    if (arguments != null) parameters.write('arguments: $arguments, ');
-    parameters.write('mapper: $mapper');
+    final mapper = _generateMapper(queryable);
+    final parameters = StringBuffer(query)..write(', mapper: $mapper');
+    if (arguments != null) parameters.write(', arguments: $arguments');
 
-    if (_queryMethod.returnsList) {
-      return 'return _queryAdapter.queryList($parameters);';
-    } else {
-      return 'return _queryAdapter.query($parameters);';
+    if (_queryMethod.returnsStream) {
+      // for streamed queries, we need to provide the queryable to know which
+      // entity to monitor. For views, we monitor all entities.
+      parameters
+        ..write(", queryableName: '${queryable.name}'")
+        ..write(', isView: ${queryable is View}');
     }
+
+    final list = _queryMethod.returnsList ? 'List' : '';
+    final stream = _queryMethod.returnsStream ? 'Stream' : '';
+
+    return 'return _queryAdapter.query$list$stream($parameters);';
   }
+}
 
-  String _generateStreamQuery(
-    final String? arguments,
-    final String mapper,
-  ) {
-    final queryable = _queryMethod.queryable;
-    // can't be null as validated before
-    if (queryable == null) throw ArgumentError.notNull();
-
-    final queryableName = queryable.name;
-    final isView = queryable is View;
-    final parameters = StringBuffer()..write("'${_queryMethod.query}', ");
-    if (arguments != null) parameters.write('arguments: $arguments, ');
-    parameters
-      ..write("queryableName: '$queryableName', ")
-      ..write('isView: $isView, ')
-      ..write('mapper: $mapper');
-
-    if (_queryMethod.returnsList) {
-      return 'return _queryAdapter.queryListStream($parameters);';
-    } else {
-      return 'return _queryAdapter.queryStream($parameters);';
-    }
-  }
+String _generateMapper(Queryable queryable) {
+  final constructor = queryable.constructor;
+  return '(Map<String, Object?> row) => $constructor';
 }
