@@ -89,7 +89,7 @@ void main() {
       final actual =
           QueryMethodProcessor(methodElement, [], {}).process().query.sql;
 
-      expect(actual, equals('SELECT * FROM Person WHERE id = ?'));
+      expect(actual, equals('SELECT * FROM Person WHERE id = ?1'));
     });
 
     test('parse multiline query', () async {
@@ -106,7 +106,8 @@ void main() {
 
       expect(
         actual,
-        equals('SELECT * FROM person WHERE id = ? AND custom_name = ?'),
+        equals(
+            'SELECT * FROM person           WHERE id = ?1 AND custom_name = ?2'),
       );
     });
 
@@ -122,7 +123,7 @@ void main() {
 
       expect(
         actual,
-        equals('SELECT * FROM person WHERE id = ? AND custom_name = ?'),
+        equals('SELECT * FROM person WHERE id = ?1 AND custom_name = ?2'),
       );
     });
 
@@ -137,7 +138,7 @@ void main() {
 
       expect(
         actual,
-        equals(r'update sports set rated = 1 where id in ($valueList0)'),
+        equals(r'update sports set rated = 1 where id in (:varlist)'),
       );
     });
 
@@ -152,7 +153,7 @@ void main() {
 
       expect(
         actual,
-        equals(r'update sports set rated = 1 where id in($valueList0)'),
+        equals(r'update sports set rated = 1 where id in(:varlist)'),
       );
     });
 
@@ -167,7 +168,7 @@ void main() {
 
       expect(
         actual,
-        equals(r'update sports set rated = 1 where id in ($valueList0)'),
+        equals(r'update sports set rated = 1 where id in      (:varlist)'),
       );
     });
 
@@ -183,8 +184,8 @@ void main() {
       expect(
         actual,
         equals(
-          r'update sports set rated = 1 where id in ($valueList0) '
-          r'and where foo in ($valueList1)',
+          r'update sports set rated = 1 where id in (:varlist) '
+          r'and where foo in (:varlist)',
         ),
       );
     });
@@ -201,8 +202,8 @@ void main() {
       expect(
         actual,
         equals(
-          r'update sports set rated = 1 where id in ($valueList0) '
-          r'AND foo = ?',
+          r'update sports set rated = 1 where id in (:varlist) '
+          r'AND foo = ?1',
         ),
       );
     });
@@ -216,7 +217,7 @@ void main() {
       final actual =
           QueryMethodProcessor(methodElement, [], {}).process().query.sql;
 
-      expect(actual, equals('SELECT * FROM Persons WHERE name LIKE ?'));
+      expect(actual, equals('SELECT * FROM Persons WHERE name LIKE ?1'));
     });
 
     test('Parse query with commas', () async {
@@ -227,8 +228,10 @@ void main() {
 
       final actual =
           QueryMethodProcessor(methodElement, [], {}).process().query.sql;
-
-      expect(actual, equals('SELECT * FROM ?, ?'));
+      // note: this will throw an error at runtime, because
+      // sqlite variables can not be used in place of table
+      // names. But the Processor is not aware of this.
+      expect(actual, equals('SELECT * FROM ?1, ?2'));
     });
   });
 

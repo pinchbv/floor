@@ -1,5 +1,7 @@
 import 'package:collection/collection.dart';
 
+const String varlistPlaceholder = ':varlist';
+
 class Query {
   final String sql;
   final List<ListParameter> listParameters;

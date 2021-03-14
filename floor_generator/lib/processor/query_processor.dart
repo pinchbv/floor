@@ -17,12 +17,10 @@ class QueryProcessor extends Processor<Query> {
 
   @override
   Query process() {
+    _assertNoNullableParameters();
+
     final listParameters = <ListParameter>[];
-
     final newQuery = _processParameters(listParameters);
-
-    //TODO
-    //_assertNoNamedVarsLeft(newQuery);
 
     return Query(
       newQuery,
@@ -31,41 +29,104 @@ class QueryProcessor extends Processor<Query> {
   }
 
   String _processParameters(List<ListParameter> listParametersOutput) {
-    final substitutedQuery = _query
-        .replaceAll('\n', ' ')
-        .replaceAll(RegExp(r'[ ]{2,}'), ' ')
-        .replaceAll(RegExp(r':[.\w]+'), '?');
-    _assertQueryParameters(substitutedQuery, _parameters);
-    return _replaceInClauseArguments(substitutedQuery);
+    final indices = <String, int>{};
+    final fixedParameters = <String>{};
+    //map parameters to index (1-based) or 0 (if its a list)
+    int currentIndex = 1;
+    for (final parameter in _parameters) {
+      if (parameter.type.isDartCoreList) {
+        indices[':${parameter.name}'] = 0;
+      } else {
+        fixedParameters.add(parameter.name);
+        indices[':${parameter.name}'] = currentIndex++;
+      }
+    }
+
+    //get List of query variables
+    final variables = findVariables(_query);
+    _assertAllParametersAreUsed(variables);
+    final newQuery = StringBuffer();
+    int currentLast = 0;
+    for (final varToken in variables) {
+      newQuery.write(_query
+          .substring(currentLast, varToken.startPosition)
+          .replaceAll('\n', ' '));
+      final varIndexInMethod = indices[varToken.name];
+      if (varIndexInMethod == null) {
+        throw _processorError.queryArgumentsAndMethodParametersDoNotMatch;
+      } else if (varIndexInMethod > 0) {
+        //normal variable/parameter
+        if (varToken.isListVar)
+          throw _processorError.queryArgumentsAndMethodParametersDoNotMatch;
+        newQuery.write('?');
+        newQuery.write(varIndexInMethod);
+      } else {
+        //list variable/parameter
+        if (!varToken.isListVar)
+          throw _processorError.queryArgumentsAndMethodParametersDoNotMatch;
+        listParametersOutput
+            .add(ListParameter(newQuery.length, varToken.name.substring(1)));
+        newQuery.write(varlistPlaceholder);
+      }
+      currentLast = varToken.endPosition;
+    }
+    newQuery.write(_query.substring(currentLast).replaceAll('\n', ' '));
+    return newQuery.toString();
   }
 
-  void _assertQueryParameters(
-    final String query,
-    final List<ParameterElement> parameterElements,
-  ) {
-    for (final parameter in parameterElements) {
+  void _assertNoNullableParameters() {
+    for (final parameter in _parameters) {
       if (parameter.type.isNullable) {
         throw _processorError.queryMethodParameterIsNullable(parameter);
       }
     }
+  }
 
-    final queryParameterCount = RegExp(r'\?').allMatches(query).length;
-    if (queryParameterCount != parameterElements.length) {
-      throw _processorError.queryArgumentsAndMethodParametersDoNotMatch;
+  void _assertAllParametersAreUsed(List<VariableToken> variables) {
+    final queryVariables = variables.map((e) => e.name.substring(1)).toSet();
+    for (final param in _parameters) {
+      if (!queryVariables.contains(param.displayName)) {
+        throw _processorError.queryArgumentsAndMethodParametersDoNotMatch;
+      }
     }
   }
+}
 
-  String _replaceInClauseArguments(final String query) {
-    var index = 0;
-    return query.replaceAllMapped(
-      RegExp(r'( in\s*)\([?]\)', caseSensitive: false),
-      (match) {
-        final matched = match.input.substring(match.start, match.end);
-        final replaced =
-            matched.replaceFirst(RegExp(r'(\?)'), '\$valueList$index');
-        index++;
-        return replaced;
-      },
-    );
+/// Treats the incoming String as an Sqlite query and tries to find all used
+/// sqlite variables. Also try do identify List variables by looking at their
+/// context.
+List<VariableToken> findVariables(final String query) {
+  final output = <VariableToken>[];
+  for (final match
+      in RegExp(r':[\w]+| [iI][nN]\s*\((:[\w]+)\)').allMatches(query)) {
+    final content = match.group(0)!;
+    final expectsList = content.toLowerCase().startsWith(' in');
+    if (expectsList) {
+      final varname = match.group(1)!;
+      output.add(
+          VariableToken(varname, query.indexOf(varname, match.start), true));
+    } else {
+      output.add(VariableToken(content, match.start, false));
+    }
   }
+  return output;
+}
+
+/// Represents a variable within an sqlite query.
+class VariableToken {
+  /// the variable name including `:` (e.g. `:foo`)
+  final String name;
+
+  /// the offset within the query, where the variable name starts. Useful for
+  /// splitting the query here.
+  final int startPosition;
+
+  /// the offset within the query, where the variable name ends. Useful for
+  /// splitting the query here.
+  int get endPosition => startPosition + name.length;
+
+  /// denotes if the variable was determined to contain a list
+  final bool isListVar;
+
+  VariableToken(this.name, this.startPosition, this.isListVar);
 }

@@ -1,12 +1,13 @@
 // ignore_for_file: import_of_legacy_library_into_null_safe
 import 'dart:core';
 
+import 'package:analyzer/dart/element/type.dart';
 import 'package:code_builder/code_builder.dart';
-import 'package:collection/collection.dart';
 import 'package:floor_generator/misc/annotation_expression.dart';
 import 'package:floor_generator/misc/extension/string_extension.dart';
 import 'package:floor_generator/misc/extension/type_converters_extension.dart';
 import 'package:floor_generator/misc/type_utils.dart';
+import 'package:floor_generator/value_object/query.dart';
 import 'package:floor_generator/value_object/query_method.dart';
 import 'package:floor_generator/value_object/queryable.dart';
 import 'package:floor_generator/value_object/view.dart';
@@ -49,10 +50,13 @@ class QueryMethodWriter implements Writer {
   String _generateMethodBody() {
     final _methodBody = StringBuffer();
 
-    final valueLists = _generateInClauseValueLists();
-    if (valueLists.isNotEmpty) {
-      _methodBody.write(valueLists.join(''));
-    }
+    // generate the variable definitions which will store the sqlite argument
+    // lists, e.g. '?5,?6,?7,?8'. These have to be generated for each call to
+    // the querymethod to accommodate for different list sizes. This is
+    // necessary to guarantee that each single value is inserted at the right
+    // place and only via SQLite's escape-mechanism.
+    // If no [List] parameters are present, Nothing will be written.
+    _methodBody.write(_generateListConvertersForQuery());
 
     final arguments = _generateArguments();
     final query = _generateQueryString();
@@ -68,41 +72,73 @@ class QueryMethodWriter implements Writer {
     return _methodBody.toString();
   }
 
-  List<String> _generateInClauseValueLists() {
-    return _queryMethod.parameters
-        .where((parameter) => parameter.type.isDartCoreList)
-        .mapIndexed((index, parameter) {
-      // TODO #403 what about type converters that map between e.g. string and list?
-      final flattenedParameterType = parameter.type.flatten();
-      String value;
-      if (flattenedParameterType.isDefaultSqlType) {
-        value = '\$value';
+  String _generateListConvertersForQuery() {
+    final code = StringBuffer();
+    // because we ultimately want to give a query with numbered variables to sqflite, we have to compute them dynamically when working with lists.
+    // We establish the conventions that we provide the fixed parameters first and then append the list parameters one by one.
+    // parameters 1,2,... start-1 are already used by fixed (non-list) parameters.
+    final start = _queryMethod.parameters
+            .where((param) => !param.type.isDartCoreList)
+            .length +
+        1;
+
+    String? lastParam;
+    for (final listParam in _queryMethod.parameters
+        .where((param) => param.type.isDartCoreList)) {
+      if (lastParam == null) {
+        //make start final if it is only used once, fixes a lint
+        final constInt =
+            (start == _queryMethod.parameters.length) ? 'const' : 'int';
+        code.writeln('$constInt offset = $start;');
       } else {
-        final typeConverter =
-            _queryMethod.typeConverters.getClosest(flattenedParameterType);
-        value = '\${_${typeConverter.name.decapitalize()}.encode(value)}';
+        code.writeln('offset += $lastParam.length;');
       }
-      return '''final valueList$index = ${parameter.displayName}.map((value) => "'$value'").join(', ');''';
-    }).toList();
+      final currentParamName = listParam.displayName;
+      // dynamically generate strings of the form '?4,?5,?6,?7,?8' which we can
+      // later insert into the query at the marked locations.
+      code.write('final _sqliteVariablesFor${currentParamName.capitalize()}=');
+      code.write('Iterable<String>.generate(');
+      code.write("$currentParamName.length, (i)=>'?\${i+offset}'");
+      code.writeln(").join(',');");
+
+      lastParam = currentParamName;
+    }
+    return code.toString();
   }
 
   List<String> _generateParameters() {
-    return _queryMethod.parameters
-        .where((parameter) => !parameter.type.isDartCoreList)
-        .map((parameter) {
-      if (parameter.type.isDefaultSqlType) {
-        if (parameter.type.isDartCoreBool) {
-          // query method parameters can't be null
-          return '${parameter.displayName} ? 1 : 0';
+    //first, take fixed parameters, then insert list parameters.
+    return [
+      ..._queryMethod.parameters
+          .where((parameter) => !parameter.type.isDartCoreList)
+          .map((parameter) {
+        if (parameter.type.isDefaultSqlType) {
+          if (parameter.type.isDartCoreBool) {
+            // query method parameters can't be null
+            return '${parameter.displayName} ? 1 : 0';
+          } else {
+            return parameter.displayName;
+          }
         } else {
-          return parameter.displayName;
+          final typeConverter =
+              _queryMethod.typeConverters.getClosest(parameter.type);
+          return '_${typeConverter.name.decapitalize()}.encode(${parameter.displayName})';
         }
-      } else {
-        final typeConverter =
-            _queryMethod.typeConverters.getClosest(parameter.type);
-        return '_${typeConverter.name.decapitalize()}.encode(${parameter.displayName})';
-      }
-    }).toList();
+      }),
+      ..._queryMethod.parameters
+          .where((parameter) => parameter.type.isDartCoreList)
+          .map((parameter) {
+        // TODO #403 what about type converters that map between e.g. string and list?
+        final DartType flatType = parameter.type.flatten();
+        if (flatType.isDefaultSqlType) {
+          return '...${parameter.displayName}';
+        } else {
+          final typeConverter =
+              _queryMethod.typeConverters.getClosest(flatType);
+          return '...${parameter.displayName}.map((element) => _${typeConverter.name.decapitalize()}.encode(element))';
+        }
+      })
+    ];
   }
 
   String? _generateArguments() {
@@ -111,8 +147,18 @@ class QueryMethodWriter implements Writer {
   }
 
   String _generateQueryString() {
-    //TODO insert better parameter mappings
-    return "'${_queryMethod.query.sql}'";
+    final code = StringBuffer();
+    int start = 0;
+    final originalQuery = _queryMethod.query.sql;
+    for (final listParameter in _queryMethod.query.listParameters) {
+      code.write(
+          originalQuery.substring(start, listParameter.position).toLiteral());
+      code.write(' + _sqliteVariablesFor${listParameter.name.capitalize()} + ');
+      start = listParameter.position + varlistPlaceholder.length;
+    }
+    code.write(originalQuery.substring(start).toLiteral());
+
+    return code.toString();
   }
 
   String _generateNoReturnQuery(final String query, final String? arguments) {
