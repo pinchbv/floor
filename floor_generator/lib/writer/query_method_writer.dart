@@ -52,7 +52,7 @@ class QueryMethodWriter implements Writer {
 
     // generate the variable definitions which will store the sqlite argument
     // lists, e.g. '?5,?6,?7,?8'. These have to be generated for each call to
-    // the querymethod to accommodate for different list sizes. This is
+    // the query method to accommodate for different list sizes. This is
     // necessary to guarantee that each single value is inserted at the right
     // place and only via SQLite's escape-mechanism.
     // If no [List] parameters are present, Nothing will be written.

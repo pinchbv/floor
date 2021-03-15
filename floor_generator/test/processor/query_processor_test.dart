@@ -43,7 +43,7 @@ void main() {
   });
 }
 
-void testVarFind(
+void _testVarFind(
     String testName, String query, List<VariableToken> expectedOutput) {
   test(testName, () {
     expect(
