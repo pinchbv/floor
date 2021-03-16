@@ -19,16 +19,6 @@ class QueryProcessor extends Processor<Query> {
   Query process() {
     _assertNoNullableParameters();
 
-    final listParameters = <ListParameter>[];
-    final newQuery = _processParameters(listParameters);
-
-    return Query(
-      newQuery,
-      listParameters,
-    );
-  }
-
-  String _processParameters(List<ListParameter> listParametersOutput) {
     final indices = <String, int>{};
     final fixedParameters = <String>{};
     //map parameters to index (1-based) or 0 (if its a list)
@@ -45,7 +35,13 @@ class QueryProcessor extends Processor<Query> {
     //get List of query variables
     final variables = findVariables(_query);
     _assertAllParametersAreUsed(variables);
+
     final newQuery = StringBuffer();
+    final listParameters = <ListParameter>[];
+    // iterate over all found variables, replace them with their assigned
+    // numbered variable (?1,?2,...) or a placeholder if the variable is a list.
+    // the list variables have to be handled in the writer, so write down their
+    // positions and names.
     int currentLast = 0;
     for (final varToken in variables) {
       newQuery.write(_query
@@ -57,21 +53,27 @@ class QueryProcessor extends Processor<Query> {
       } else if (varIndexInMethod > 0) {
         //normal variable/parameter
         if (varToken.isListVar)
-          throw _processorError.queryArgumentsAndMethodParametersDoNotMatch;
+          throw _processorError
+              .queryMethodParameterIsNormalButVariableIsList(varToken.name);
         newQuery.write('?');
         newQuery.write(varIndexInMethod);
       } else {
         //list variable/parameter
         if (!varToken.isListVar)
-          throw _processorError.queryArgumentsAndMethodParametersDoNotMatch;
-        listParametersOutput
+          throw _processorError
+              .queryMethodParameterIsListButVariableIsNot(varToken.name);
+        listParameters
             .add(ListParameter(newQuery.length, varToken.name.substring(1)));
         newQuery.write(varlistPlaceholder);
       }
       currentLast = varToken.endPosition;
     }
     newQuery.write(_query.substring(currentLast).replaceAll('\n', ' '));
-    return newQuery.toString();
+
+    return Query(
+      newQuery.toString(),
+      listParameters,
+    );
   }
 
   void _assertNoNullableParameters() {

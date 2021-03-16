@@ -347,8 +347,8 @@ void main() {
               .process();
 
       final error = QueryProcessorError(methodElement)
-          .queryArgumentsAndMethodParametersDoNotMatch;
-      expect(actual, throwsInvalidGenerationSourceError(error));
+          .queryMethodParameterIsListButVariableIsNot(':id');
+      expect(actual, throwsProcessorError(error));
     });
 
     test(
@@ -364,8 +364,8 @@ void main() {
               .process();
 
       final error = QueryProcessorError(methodElement)
-          .queryArgumentsAndMethodParametersDoNotMatch;
-      expect(actual, throwsInvalidGenerationSourceError(error));
+          .queryMethodParameterIsNormalButVariableIsList(':id');
+      expect(actual, throwsProcessorError(error));
     });
 
     test('exception when query arguments do not match method parameters',

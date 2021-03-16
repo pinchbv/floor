@@ -1,7 +1,6 @@
 // ignore_for_file: import_of_legacy_library_into_null_safe
 import 'package:analyzer/dart/element/element.dart';
 import 'package:floor_generator/processor/error/processor_error.dart';
-import 'package:source_gen/source_gen.dart';
 
 class QueryProcessorError {
   final MethodElement _methodElement;
@@ -31,10 +30,27 @@ class QueryProcessorError {
     );
   }
 
-  InvalidGenerationSourceError get queryArgumentsAndMethodParametersDoNotMatch {
-    return InvalidGenerationSourceError(
-      'SQL query arguments and method parameters have to match.',
-      todo: 'Make sure to supply one parameter per SQL query argument.',
+  ProcessorError queryMethodParameterIsListButVariableIsNot(
+    final String varName,
+  ) {
+    final name = varName.substring(1);
+    return ProcessorError(
+      message:
+          'The parameter $name should be referenced like a list (`x IN ($varName)`)',
+      todo: 'Change the type of $name to not be a List<> or'
+          'reference it with ` IN ($varName)` (including the parentheses).',
+      element: _methodElement,
+    );
+  }
+
+  ProcessorError queryMethodParameterIsNormalButVariableIsList(
+    final String varName,
+  ) {
+    final name = varName.substring(1);
+    return ProcessorError(
+      message: 'The parameter $name should be referenced without `IN`',
+      todo: 'Change the type of $name to be a List<> or'
+          'reference it without `IN`, e.g. `IS $varName`.',
       element: _methodElement,
     );
   }
