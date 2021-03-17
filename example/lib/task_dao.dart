@@ -12,6 +12,9 @@ abstract class TaskDao {
   @Query('SELECT * FROM task')
   Stream<List<Task>> findAllTasksAsStream();
 
+  @rawQuery
+  Stream<List<Task>> rawFindAllTasksAsStream(SQLiteQuery query);
+
   @insert
   Future<void> insertTask(Task task);
 

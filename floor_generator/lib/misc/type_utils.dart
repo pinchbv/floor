@@ -1,10 +1,10 @@
 // ignore_for_file: import_of_legacy_library_into_null_safe
 import 'dart:typed_data';
 
-import 'package:analyzer/dart/analysis/features.dart';
 import 'package:analyzer/dart/constant/value.dart';
 import 'package:analyzer/dart/element/element.dart';
 import 'package:analyzer/dart/element/type.dart';
+import 'package:floor_generator/value_object/sqlite_query.dart';
 import 'package:source_gen/source_gen.dart';
 
 extension SupportedTypeChecker on DartType {
@@ -21,6 +21,7 @@ extension SupportedTypeChecker on DartType {
       _intTypeChecker,
       _doubleTypeChecker,
       _uint8ListTypeChecker,
+      _sqliteQueryTypeChecker,
     ]).isExactlyType(this);
   }
 }
@@ -28,6 +29,11 @@ extension SupportedTypeChecker on DartType {
 extension Uint8ListTypeChecker on DartType {
   bool get isUint8List =>
       getDisplayString(withNullability: false) == 'Uint8List';
+}
+
+extension SQLiteQueryTypeChecker on DartType {
+  bool get isSQLiteQuery =>
+      getDisplayString(withNullability: false) == 'SQLiteQuery';
 }
 
 extension StreamTypeChecker on DartType {
@@ -71,3 +77,5 @@ final _doubleTypeChecker = _typeChecker(double);
 final _uint8ListTypeChecker = _typeChecker(Uint8List);
 
 final _streamTypeChecker = _typeChecker(Stream);
+
+final _sqliteQueryTypeChecker = _typeChecker(SQLiteQuery);

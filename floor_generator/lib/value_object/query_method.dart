@@ -1,7 +1,5 @@
 import 'package:analyzer/dart/element/element.dart';
 import 'package:analyzer/dart/element/type.dart';
-import 'package:collection/collection.dart';
-import 'package:floor_generator/misc/extension/set_equality_extension.dart';
 import 'package:floor_generator/misc/type_utils.dart';
 import 'package:floor_generator/value_object/queryable.dart';
 import 'package:floor_generator/value_object/type_converter.dart';
@@ -14,7 +12,7 @@ class QueryMethod {
   final String name;
 
   /// Query where ':' got replaced with '$'.
-  final String query;
+  final String? query;
 
   final DartType rawReturnType;
 
@@ -33,6 +31,8 @@ class QueryMethod {
   final Queryable? queryable;
 
   final Set<TypeConverter> typeConverters;
+
+  // final bool isRawQuery;
 
   QueryMethod(
     this.methodElement,
@@ -56,31 +56,6 @@ class QueryMethod {
   bool get returnsStream => rawReturnType.isStream;
 
   bool get returnsVoid => flattenedReturnType.isVoid;
-
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      other is QueryMethod &&
-          runtimeType == other.runtimeType &&
-          methodElement == other.methodElement &&
-          name == other.name &&
-          query == other.query &&
-          rawReturnType == other.rawReturnType &&
-          flattenedReturnType == other.flattenedReturnType &&
-          parameters.equals(other.parameters) &&
-          queryable == other.queryable &&
-          typeConverters.equals(other.typeConverters);
-
-  @override
-  int get hashCode =>
-      methodElement.hashCode ^
-      name.hashCode ^
-      query.hashCode ^
-      rawReturnType.hashCode ^
-      flattenedReturnType.hashCode ^
-      parameters.hashCode ^
-      queryable.hashCode ^
-      typeConverters.hashCode;
 
   @override
   String toString() {

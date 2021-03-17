@@ -155,6 +155,16 @@ class _$TaskDao extends TaskDao {
   }
 
   @override
+  Stream<List<Task>> rawFindAllTasksAsStream(SQLiteQuery query) {
+    return _queryAdapter.queryListStream(query.query,
+        arguments: query.arguments,
+        queryableName: 'Task',
+        isView: false,
+        mapper: (Map<String, Object?> row) =>
+            Task(row['id'] as int?, row['message'] as String));
+  }
+
+  @override
   Future<void> insertTask(Task task) async {
     await _taskInsertionAdapter.insert(task, OnConflictStrategy.abort);
   }

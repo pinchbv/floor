@@ -75,6 +75,8 @@ extension on DartType {
       return SqlType.integer;
     } else if (isDartCoreString) {
       return SqlType.text;
+    } else if (isSQLiteQuery) {
+      return SqlType.blob;
     } else if (isDartCoreBool) {
       return SqlType.integer;
     } else if (isDartCoreDouble) {

@@ -1,6 +1,7 @@
 // ignore_for_file: import_of_legacy_library_into_null_safe
 import 'dart:core';
 
+import 'package:analyzer/dart/element/element.dart';
 import 'package:code_builder/code_builder.dart';
 import 'package:collection/collection.dart';
 import 'package:floor_generator/misc/annotation_expression.dart';
@@ -54,6 +55,7 @@ class QueryMethodWriter implements Writer {
     }
 
     final arguments = _generateArguments();
+
     final queryable = _queryMethod.queryable;
     // null queryable implies void-returning query method
     if (_queryMethod.returnsVoid || queryable == null) {
@@ -69,7 +71,6 @@ class QueryMethodWriter implements Writer {
     } else {
       _methodBody.write(_generateQuery(arguments, mapper));
     }
-
     return _methodBody.toString();
   }
 
@@ -115,19 +116,13 @@ class QueryMethodWriter implements Writer {
     return parameters.isNotEmpty ? '[${parameters.join(', ')}]' : null;
   }
 
-  String _generateNoReturnQuery(final String? arguments) {
-    final parameters = StringBuffer()..write("'${_queryMethod.query}'");
-    if (arguments != null) parameters.write(', arguments: $arguments');
-    return 'await _queryAdapter.queryNoReturn($parameters);';
-  }
-
   String _generateQuery(
     final String? arguments,
     final String mapper,
   ) {
-    final parameters = StringBuffer()..write("'${_queryMethod.query}', ");
-    if (arguments != null) parameters.write('arguments: $arguments, ');
-    parameters.write('mapper: $mapper');
+    final parameters = _generateQueryStringBuffer(arguments)
+      ..write(', ')
+      ..write('mapper: $mapper');
 
     if (_queryMethod.returnsList) {
       return 'return _queryAdapter.queryList($parameters);';
@@ -146,9 +141,9 @@ class QueryMethodWriter implements Writer {
 
     final queryableName = queryable.name;
     final isView = queryable is View;
-    final parameters = StringBuffer()..write("'${_queryMethod.query}', ");
-    if (arguments != null) parameters.write('arguments: $arguments, ');
+    final parameters = _generateQueryStringBuffer(arguments);
     parameters
+      ..write(', ')
       ..write("queryableName: '$queryableName', ")
       ..write('isView: $isView, ')
       ..write('mapper: $mapper');
@@ -158,5 +153,33 @@ class QueryMethodWriter implements Writer {
     } else {
       return 'return _queryAdapter.queryStream($parameters);';
     }
+  }
+
+  String _generateNoReturnQuery(final String? arguments) {
+    return 'await _queryAdapter.queryNoReturn(${_generateQueryStringBuffer(arguments)});';
+  }
+
+  StringBuffer _generateQueryStringBuffer(final String? arguments) {
+    final result = StringBuffer();
+    final sqliteQuery = _queryMethod.query;
+    ParameterElement? parameter;
+    if (_queryMethod.parameters.isNotEmpty) {
+      parameter = _queryMethod.parameters[0];
+    }
+
+    if (sqliteQuery != null) {
+      result..write('\'')..write(sqliteQuery)..write('\'');
+      if (arguments != null) result.write(', arguments: $arguments');
+    } else if (parameter?.type.isSQLiteQuery == true) {
+      result
+        ..write('${parameter!.name}.query, ')
+        ..write('arguments: ${parameter.name}.arguments');
+    } else if (parameter?.type.isDartCoreString == true) {
+      result.write('${parameter!.name}');
+    } else {
+      throw ArgumentError(
+          '@Query annotation parameter @RawQuery parameter shouldn\'t be empty.');
+    }
+    return result;
   }
 }
