@@ -244,7 +244,7 @@ void main() {
                   'CREATE TABLE IF NOT EXISTS `Person` (`id` INTEGER NOT NULL, `name` TEXT NOT NULL, PRIMARY KEY (`id`))');
                   
               await database.execute(
-                  '''CREATE VIEW IF NOT EXISTS `names` AS SELECT custom_name as name FROM person''');
+                  'CREATE VIEW IF NOT EXISTS `names` AS SELECT custom_name as name FROM person');
 
               await callback?.onCreate?.call(database, version);
             },

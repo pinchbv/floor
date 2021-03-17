@@ -1,3 +1,5 @@
+import 'package:strings/strings.dart';
+
 extension StringExtension on String {
   /// Returns a copy of this string having its first letter lowercased, or the
   /// original string, if it's empty or already starts with a lower case letter.
@@ -48,8 +50,7 @@ extension NullableStringExtension on String? {
     if (this == null) {
       return 'null';
     } else {
-      //TODO escape correctly
-      return "'$this'";
+      return "'${escape(this!)}'";
     }
   }
 }

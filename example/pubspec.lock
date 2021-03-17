@@ -270,6 +270,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "4.0.1"
+  lists:
+    dependency: transitive
+    description:
+      name: lists
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "1.0.0"
   logging:
     dependency: transitive
     description:
@@ -429,6 +436,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "1.1.0"
+  strings:
+    dependency: transitive
+    description:
+      name: strings
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.2.1"
   synchronized:
     dependency: transitive
     description:
@@ -464,6 +478,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "1.3.0"
+  unicode:
+    dependency: transitive
+    description:
+      name: unicode
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.3.0"
   vector_math:
     dependency: transitive
     description:
