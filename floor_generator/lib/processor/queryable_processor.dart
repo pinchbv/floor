@@ -53,6 +53,61 @@ abstract class QueryableProcessor<T extends Queryable> extends Processor<T> {
   }
 
   @protected
+  List<FieldElement> getFieldsOutsideConstructor() {
+    if (classElement.mixins.isNotEmpty) {
+      throw _queryableProcessorError.prohibitedMixinUsage;
+    }
+    final fields = [
+      ...classElement.fields,
+      ...classElement.allSupertypes.expand((type) => type.element.fields),
+    ];
+
+    final constructorParameters = classElement.constructors.first.parameters.where((e) => e.isInitializingFormal);
+
+    return fields
+        .where((fieldElement) => fieldElement.shouldBeIncluded() && constructorParameters.every((e) => e.name != fieldElement.name))
+        .toList();
+  }
+
+  String _getValueMappingOutsideConstructor(final List<Field> fields, List<FieldElement> fieldsOutsideConstructor) {
+    final keyValueList = fieldsOutsideConstructor.map((fieldElement) {
+      final parameterName = fieldElement.displayName;
+      final field = fields.firstWhere((field) => field.name == parameterName);
+      final columnName = field.columnName;
+      final attributeValue = _getAttributeValue(fieldElement, field);
+      return '..$columnName = $attributeValue';
+    }).toList();
+
+    return keyValueList.join('\n');
+  }
+  String _getAttributeValue(FieldElement parameterElement, Field field) {
+      final databaseValue = "row['${field.columnName}']";
+
+      String parameterValue;
+
+      if (parameterElement.type.isDefaultSqlType) {
+        parameterValue = databaseValue.cast(
+          parameterElement.type,
+          field.isNullable,
+          parameterElement,
+        );
+      } else {
+        final typeConverter = [...queryableTypeConverters, field.typeConverter]
+            .whereNotNull()
+            .getClosest(parameterElement.type);
+        final castedDatabaseValue = databaseValue.cast(
+          typeConverter.databaseType,
+          field.isNullable,
+          parameterElement,
+        );
+
+        parameterValue =
+        '_${typeConverter.name.decapitalize()}.decode($castedDatabaseValue)';
+      }
+      return parameterValue; // also covers positional parameter
+  }
+
+  @protected
   String getConstructor(final List<Field> fields) {
     final constructorParameters = classElement.constructors.first.parameters;
     final parameterValues = constructorParameters
@@ -60,7 +115,10 @@ abstract class QueryableProcessor<T extends Queryable> extends Processor<T> {
         .where((parameterValue) => parameterValue != null)
         .join(', ');
 
-    return '${classElement.displayName}($parameterValues)';
+    final fieldsOutsideConstructor = getFieldsOutsideConstructor();
+    final valueMappingOutsideConstructor = _getValueMappingOutsideConstructor(fields, fieldsOutsideConstructor);
+
+    return '${classElement.displayName}($parameterValues)$valueMappingOutsideConstructor';
   }
 
   /// Returns `null` whenever field is @ignored
@@ -111,7 +169,7 @@ extension on String {
   String cast(
     DartType dartType,
     bool isNullable,
-    ParameterElement parameterElement,
+      VariableElement parameterElement,
   ) {
     if (dartType.isDartCoreBool) {
       if (isNullable) {
