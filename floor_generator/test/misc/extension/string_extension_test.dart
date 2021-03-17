@@ -21,4 +21,41 @@ void main() {
       expect(actual, equals('fOO'));
     });
   });
+
+  group('capitalize', () {
+    test('returns empty string for empty string', () {
+      expect(''.capitalize(), equals(''));
+    });
+
+    test('capitalizes first character for single character string', () {
+      expect('a'.capitalize(), equals('A'));
+    });
+
+    test('does nothing for single capitalized character string', () {
+      expect('A'.capitalize(), equals('A'));
+    });
+
+    test('capitalize word (first letter to lowercase)', () {
+      expect('fOO'.capitalize(), equals('FOO'));
+    });
+  });
+
+  group('toLiteral', () {
+    test('null', () {
+      expect(null.toLiteral(), equals('null'));
+    });
+
+    test('empty string', () {
+      expect(''.toLiteral(), equals("''"));
+    });
+
+    test('Single-character-string', () {
+      expect('A'.toLiteral(), equals("'A'"));
+    });
+
+    test('long-string', () {
+      final actual = 'The quick brown fox jumps over the lazy dog'.toLiteral();
+      expect(actual, equals("'The quick brown fox jumps over the lazy dog'"));
+    });
+  });
 }
