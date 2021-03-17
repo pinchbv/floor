@@ -20,7 +20,6 @@ extension SupportedTypeChecker on DartType {
       _intTypeChecker,
       _doubleTypeChecker,
       _uint8ListTypeChecker,
-      _dateTimeTypeChecker
     ]).isExactlyType(this);
   }
 }
@@ -28,11 +27,6 @@ extension SupportedTypeChecker on DartType {
 extension Uint8ListTypeChecker on DartType {
   bool get isUint8List =>
       getDisplayString(withNullability: false) == 'Uint8List';
-}
-
-extension DateTimeTypeChecker on DartType {
-  bool get isDateTime =>
-      getDisplayString(withNullability: false) == 'DateTime';
 }
 
 extension StreamTypeChecker on DartType {
@@ -67,7 +61,5 @@ final _intTypeChecker = _typeChecker(int);
 final _doubleTypeChecker = _typeChecker(double);
 
 final _uint8ListTypeChecker = _typeChecker(Uint8List);
-
-final _dateTimeTypeChecker = _typeChecker(DateTime);
 
 final _streamTypeChecker = _typeChecker(Stream);

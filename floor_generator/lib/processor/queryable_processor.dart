@@ -187,8 +187,6 @@ extension on String {
       return '$this as Uint8List${isNullable ? '?' : ''}';
     } else if (dartType.isDartCoreDouble) {
       return '$this as double${isNullable ? '?' : ''}';
-    }  else if (dartType.isDateTime) {
-      return '$this as DateTime${isNullable ? '?' : ''}';
     } else {
       throw InvalidGenerationSourceError(
         'Trying to convert unsupported type $dartType.',

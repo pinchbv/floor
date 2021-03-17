@@ -81,8 +81,6 @@ extension on DartType {
       return SqlType.real;
     } else if (isUint8List) {
       return SqlType.blob;
-    } else if (isDateTime) {
-      return SqlType.text;
     }
     throw StateError('This should really be unreachable');
   }
