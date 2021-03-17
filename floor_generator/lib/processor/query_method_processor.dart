@@ -10,6 +10,7 @@ import 'package:floor_generator/misc/extension/type_converter_element_extension.
 import 'package:floor_generator/misc/type_utils.dart';
 import 'package:floor_generator/processor/error/query_method_processor_error.dart';
 import 'package:floor_generator/processor/processor.dart';
+import 'package:floor_generator/processor/query_processor.dart';
 import 'package:floor_generator/value_object/query_method.dart';
 import 'package:floor_generator/value_object/queryable.dart';
 import 'package:floor_generator/value_object/type_converter.dart';
@@ -36,7 +37,9 @@ class QueryMethodProcessor extends Processor<QueryMethod> {
     final parameters = _methodElement.parameters;
     final rawReturnType = _methodElement.returnType;
 
-    final query = _getQuery();
+    final query = QueryProcessor(_methodElement, _getQuery()).process();
+
+    _getQuery();
     final returnsStream = rawReturnType.isStream;
 
     _assertReturnsFutureOrStream(rawReturnType, returnsStream);
@@ -90,29 +93,10 @@ class QueryMethodProcessor extends Processor<QueryMethod> {
         .getAnnotation(annotations.Query)
         .getField(AnnotationField.queryValue)
         ?.toStringValue()
-        ?.replaceAll('\n', ' ')
-        .replaceAll(RegExp(r'[ ]{2,}'), ' ')
-        .trim();
+        ?.trim();
 
     if (query == null || query.isEmpty) throw _processorError.noQueryDefined;
-
-    final substitutedQuery = query.replaceAll(RegExp(r':[.\w]+'), '?');
-    _assertQueryParameters(substitutedQuery, _methodElement.parameters);
-    return _replaceInClauseArguments(substitutedQuery);
-  }
-
-  String _replaceInClauseArguments(final String query) {
-    var index = 0;
-    return query.replaceAllMapped(
-      RegExp(r'( in\s*)\([?]\)', caseSensitive: false),
-      (match) {
-        final matched = match.input.substring(match.start, match.end);
-        final replaced =
-            matched.replaceFirst(RegExp(r'(\?)'), '\$valueList$index');
-        index++;
-        return replaced;
-      },
-    );
+    return query;
   }
 
   DartType _getFlattenedReturnType(
@@ -140,22 +124,6 @@ class QueryMethodProcessor extends Processor<QueryMethod> {
   ) {
     if (!rawReturnType.isDartAsyncFuture && !returnsStream) {
       throw _processorError.doesNotReturnFutureNorStream;
-    }
-  }
-
-  void _assertQueryParameters(
-    final String query,
-    final List<ParameterElement> parameterElements,
-  ) {
-    for (final parameter in parameterElements) {
-      if (parameter.type.isNullable) {
-        throw _processorError.queryMethodParameterIsNullable(parameter);
-      }
-    }
-
-    final queryParameterCount = RegExp(r'\?').allMatches(query).length;
-    if (queryParameterCount != parameterElements.length) {
-      throw _processorError.queryArgumentsAndMethodParametersDoNotMatch;
     }
   }
 

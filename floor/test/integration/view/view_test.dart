@@ -70,6 +70,19 @@ void main() {
         expect(actual, equals(expected));
       });
 
+      test('query view with double LIKE (reordered query params)', () async {
+        final persons = [Person(1, 'Leo'), Person(2, 'Frank')];
+        await personDao.insertPersons(persons);
+
+        final dog = Dog(1, 'Romeo', 'Rome', 1);
+        await dogDao.insertDog(dog);
+
+        final actual = await nameDao.findNamesMatchingBoth('L%', '%eo');
+
+        final expected = [Name('Leo')];
+        expect(actual, equals(expected));
+      });
+
       test('query view with all values', () async {
         final persons = [Person(1, 'Leo'), Person(2, 'Frank')];
         await personDao.insertPersons(persons);
