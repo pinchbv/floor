@@ -1,12 +1,14 @@
 // ignore_for_file: import_of_legacy_library_into_null_safe
 import 'dart:core';
 
+import 'package:analyzer/dart/element/element.dart';
 import 'package:analyzer/dart/element/type.dart';
 import 'package:code_builder/code_builder.dart';
 import 'package:floor_generator/misc/annotation_expression.dart';
 import 'package:floor_generator/misc/extension/string_extension.dart';
 import 'package:floor_generator/misc/extension/type_converters_extension.dart';
 import 'package:floor_generator/misc/type_utils.dart';
+import 'package:floor_generator/processor/error/processor_error.dart';
 import 'package:floor_generator/value_object/query.dart';
 import 'package:floor_generator/value_object/query_method.dart';
 import 'package:floor_generator/value_object/queryable.dart';
@@ -158,7 +160,24 @@ class QueryMethodWriter implements Writer {
     }
     code.write(originalQuery.substring(start).toLiteral());
 
-    return code.toString();
+    var sql = code.toString();
+
+    final flattenedReturnTypeElement = _queryMethod.flattenedReturnType.element;
+    if (flattenedReturnTypeElement is ClassElement) {
+      final tableName = flattenedReturnTypeElement.tableName();
+      sql = sql.replaceAll(r'$table_name_of_return_type', tableName);
+    } else {
+      if (sql.contains(r'$table_name_of_return_type')) {
+        throw ProcessorError(
+          message:
+          r'The $table_name_of_return_type variable in the query string cannot be used when the method return is not an entity',
+          todo:
+          r'Make the de value return one entity or remove $table_name_of_return_type in query string.',
+          element: flattenedReturnTypeElement ?? _queryMethod.rawReturnType.element!,
+        );
+      }
+    }
+    return sql;
   }
 
   String _generateNoReturnQuery(final String query, final String? arguments) {

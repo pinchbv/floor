@@ -29,7 +29,7 @@ class EntityProcessor extends QueryableProcessor<Entity> {
 
   @override
   Entity process() {
-    final name = _getName();
+    final name = classElement.tableName();
     final fields = getFields();
     final primaryKey = _getPrimaryKey(fields);
     final withoutRowid = _getWithoutRowid();
@@ -50,14 +50,6 @@ class EntityProcessor extends QueryableProcessor<Entity> {
       _getValueMapping(fields),
       _getFts(),
     );
-  }
-
-  String _getName() {
-    return classElement
-            .getAnnotation(annotations.Entity)
-            .getField(AnnotationField.entityTableName)
-            ?.toStringValue() ??
-        classElement.displayName;
   }
 
   List<ForeignKey> _getForeignKeys() {
