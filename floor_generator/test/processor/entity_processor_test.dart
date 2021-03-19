@@ -46,11 +46,15 @@ void main() {
       classElement,
       name,
       fields,
+      fields,
+      fields,
       primaryKey,
       foreignKeys,
       indices,
       false,
       constructor,
+      valueMapping,
+      valueMapping,
       valueMapping,
       null,
     );
@@ -84,11 +88,15 @@ void main() {
       classElement,
       name,
       fields,
+      fields,
+      fields,
       primaryKey,
       foreignKeys,
       indices,
       false,
       constructor,
+      valueMapping,
+      valueMapping,
       valueMapping,
       null,
     );
@@ -267,11 +275,15 @@ void main() {
       classElement,
       name,
       fields,
+      fields,
+      fields,
       primaryKey,
       foreignKeys,
       indices,
       true,
       constructor,
+      "<String, Object?>{'id': item.id, 'name': item.name}",
+      "<String, Object?>{'id': item.id, 'name': item.name}",
       "<String, Object?>{'id': item.id, 'name': item.name}",
       null,
     );
@@ -292,7 +304,7 @@ void main() {
       }
     ''');
 
-      final actual = EntityProcessor(classElement, {}).process().valueMapping;
+      final actual = EntityProcessor(classElement, {}).process().valueMappingForInsert;
 
       const expected = '<String, Object?>{'
           "'id': item.id, "
@@ -314,7 +326,7 @@ void main() {
       }
     ''');
 
-      final actual = EntityProcessor(classElement, {}).process().valueMapping;
+      final actual = EntityProcessor(classElement, {}).process().valueMappingForInsert;
 
       const expected = '<String, Object?>{'
           "'id': item.id, "

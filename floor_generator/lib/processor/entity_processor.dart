@@ -30,8 +30,15 @@ class EntityProcessor extends QueryableProcessor<Entity> {
   @override
   Entity process() {
     final name = classElement.tableName();
-    final fields = getFields();
-    final primaryKey = _getPrimaryKey(fields);
+    final fieldsAll = getFieldsWithOutCheckIgnore();
+    final fieldsDataBase = fieldsAll.where((e) => shouldBeIncludedForDataBase(e.fieldElement)).toList();
+    final fieldsQuery = fieldsAll.where((e) => shouldBeIncludedForQuery(e.fieldElement)).toList();
+
+    final fieldsInsert = fieldsAll.where((e) => shouldBeIncludedForInsert(e.fieldElement)).toList();
+    final fieldsUpdate = fieldsAll.where((e) => shouldBeIncludedForUpdate(e.fieldElement)).toList();
+    final fieldsDelete = fieldsAll.where((e) => shouldBeIncludedForDelete(e.fieldElement)).toList();
+
+    final primaryKey = _getPrimaryKey(fieldsDataBase);
     final withoutRowid = _getWithoutRowid();
 
     if (primaryKey.autoGenerateId && withoutRowid) {
@@ -41,13 +48,17 @@ class EntityProcessor extends QueryableProcessor<Entity> {
     return Entity(
       classElement,
       name,
-      fields,
-      _getPrimaryKey(fields),
+      fieldsAll,
+      fieldsDataBase,
+      fieldsQuery,
+      _getPrimaryKey(fieldsDataBase),
       _getForeignKeys(),
-      _getIndices(fields, name),
+      _getIndices(fieldsDataBase, name),
       _getWithoutRowid(),
-      getConstructor(fields),
-      _getValueMapping(fields),
+      getConstructor(fieldsQuery),
+      _getValueMapping(fieldsInsert),
+      _getValueMapping(fieldsUpdate),
+      _getValueMapping(fieldsDelete),
       _getFts(),
     );
   }

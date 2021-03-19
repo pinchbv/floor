@@ -30,6 +30,8 @@ void main() {
       classElement,
       name,
       fields,
+      fields,
+      fields,
       query,
       constructor,
     );
@@ -60,6 +62,8 @@ void main() {
     final expected = View(
       classElement,
       name,
+      fields,
+      fields,
       fields,
       query,
       constructor,
@@ -186,6 +190,8 @@ void main() {
     final expected = View(
       classElement,
       name,
+      fields,
+      fields,
       fields,
       query,
       constructor,

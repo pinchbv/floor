@@ -160,7 +160,7 @@ class DatabaseProcessor extends Processor<Database> {
         daoGetters.expand((daoGetter) => daoGetter.dao.typeConverters).toSet();
 
     final fieldTypeConverters = queryables
-        .expand((queryable) => queryable.fields)
+        .expand((queryable) => queryable.fieldsAll)
         .mapNotNull((field) => field.typeConverter)
         .toSet();
 

@@ -13,24 +13,30 @@ class Entity extends Queryable {
   final List<ForeignKey> foreignKeys;
   final List<Index> indices;
   final bool withoutRowid;
-  final String valueMapping;
+  final String valueMappingForInsert;
+  final String valueMappingForUpdate;
+  final String valueMappingForDelete;
   final Fts? fts;
 
   Entity(
     ClassElement classElement,
     String name,
-    List<Field> fields,
+    List<Field> fieldsAll,
+    List<Field> fieldsDataBase,
+    List<Field> fieldsQuery,
     this.primaryKey,
     this.foreignKeys,
     this.indices,
     this.withoutRowid,
     String constructor,
-    this.valueMapping,
+      this.valueMappingForInsert,
+      this.valueMappingForUpdate,
+      this.valueMappingForDelete,
     this.fts,
-  ) : super(classElement, name, fields, constructor);
+  ) : super(name: name, classElement: classElement, constructor: constructor, fieldsAll: fieldsAll, fieldsDataBase: fieldsDataBase, fieldsQuery: fieldsQuery);
 
   String getCreateTableStatement() {
-    final databaseDefinition = fields.map((field) {
+    final databaseDefinition = fieldsDataBase.map((field) {
       final autoIncrement =
           primaryKey.fields.contains(field) && primaryKey.autoGenerateId;
       return field.getDatabaseDefinition(autoIncrement);
@@ -74,29 +80,37 @@ class Entity extends Queryable {
           runtimeType == other.runtimeType &&
           classElement == other.classElement &&
           name == other.name &&
-          fields.equals(other.fields) &&
+          fieldsDataBase.equals(other.fieldsDataBase) &&
+          fieldsQuery.equals(other.fieldsQuery) &&
+          fieldsAll.equals(other.fieldsAll) &&
           primaryKey == other.primaryKey &&
           foreignKeys.equals(other.foreignKeys) &&
           indices.equals(other.indices) &&
           withoutRowid == other.withoutRowid &&
           constructor == other.constructor &&
-          valueMapping == other.valueMapping;
+          valueMappingForDelete == other.valueMappingForDelete &&
+          valueMappingForInsert == other.valueMappingForInsert &&
+          valueMappingForUpdate == other.valueMappingForUpdate;
 
   @override
   int get hashCode =>
       classElement.hashCode ^
       name.hashCode ^
-      fields.hashCode ^
+      fieldsDataBase.hashCode ^
+      fieldsQuery.hashCode ^
+      fieldsAll.hashCode ^
       primaryKey.hashCode ^
       foreignKeys.hashCode ^
       indices.hashCode ^
       constructor.hashCode ^
       withoutRowid.hashCode ^
       fts.hashCode ^
-      valueMapping.hashCode;
+      valueMappingForDelete.hashCode ^
+      valueMappingForInsert.hashCode ^
+      valueMappingForUpdate.hashCode ;
 
   @override
   String toString() {
-    return 'Entity{classElement: $classElement, name: $name, fields: $fields, primaryKey: $primaryKey, foreignKeys: $foreignKeys, indices: $indices, constructor: $constructor, withoutRowid: $withoutRowid, valueMapping: $valueMapping, fts: $fts}';
+    return 'Entity{classElement: $classElement, name: $name, fieldsDataBase: $fieldsDataBase, fieldsQuery: $fieldsQuery, fieldsAll: $fieldsAll, primaryKey: $primaryKey, foreignKeys: $foreignKeys, indices: $indices, constructor: $constructor, withoutRowid: $withoutRowid, valueMappingForUpdate: $valueMappingForUpdate, valueMappingForInsert: $valueMappingForInsert, valueMappingForDelete: $valueMappingForDelete, fts: $fts}';
   }
 }

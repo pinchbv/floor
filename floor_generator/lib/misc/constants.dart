@@ -51,3 +51,10 @@ abstract class SqlType {
   static const real = 'REAL';
   static const blob = 'BLOB';
 }
+
+abstract class IgnoreField {
+  static const forQuery = 'forQuery';
+  static const forInsert = 'forInsert';
+  static const forUpdate = 'forUpdate';
+  static const forDelete = 'forDelete';
+}

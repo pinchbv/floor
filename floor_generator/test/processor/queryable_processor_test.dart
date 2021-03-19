@@ -190,7 +190,7 @@ void main() {
     ''');
 
       final actual = TestProcessor(classElement).process();
-      final fieldNames = actual.fields.map((field) => field.name).toList();
+      final fieldNames = actual.fieldsQuery.map((field) => field.name).toList();
 
       final expectedFieldNames = ['id', 'name'];
       const expectedConstructor =
@@ -222,7 +222,7 @@ void main() {
     ''');
 
       final actual = TestProcessor(classElement).process();
-      final fieldNames = actual.fields.map((field) => field.name).toList();
+      final fieldNames = actual.fieldsQuery.map((field) => field.name).toList();
 
       final expectedFieldNames = ['id', 'foo', 'name'];
       const expectedConstructor =
@@ -248,7 +248,7 @@ void main() {
     ''');
 
       final actual = TestProcessor(classElement).process();
-      final fieldNames = actual.fields.map((field) => field.name).toList();
+      final fieldNames = actual.fieldsQuery.map((field) => field.name).toList();
 
       final expectedFieldNames = ['id', 'name'];
       const expectedConstructor =
@@ -276,7 +276,7 @@ void main() {
     ''');
 
       final actual = TestProcessor(classElement).process();
-      final fieldNames = actual.fields.map((field) => field.name).toList();
+      final fieldNames = actual.fieldsQuery.map((field) => field.name).toList();
 
       final expectedFieldNames = ['id', 'name'];
       const expectedConstructor =
@@ -321,7 +321,7 @@ void main() {
 
       final actual = TestProcessor(classElement).process();
 
-      expect(actual.fields.length, equals(2));
+      expect(actual.fieldsQuery.length, equals(2));
     });
 
     test('Ignore hashCode field', () async {
@@ -340,7 +340,7 @@ void main() {
 
       final actual = TestProcessor(classElement).process();
 
-      expect(actual.fields.length, equals(2));
+      expect(actual.fieldsQuery.length, equals(2));
     });
 
     test('Ignore getter', () async {
@@ -358,7 +358,7 @@ void main() {
 
       final actual = TestProcessor(classElement)
           .process()
-          .fields
+          .fieldsQuery
           .map((field) => field.name)
           .toList();
 
@@ -383,7 +383,7 @@ void main() {
 
       final actual = TestProcessor(classElement)
           .process()
-          .fields
+          .fieldsQuery
           .map((field) => field.name)
           .toList();
 
@@ -579,7 +579,7 @@ void main() {
 
       final actual = TestProcessor(classElement)
           .process()
-          .fields
+          .fieldsQuery
           .map((field) => field.name);
 
       const expected = 'foo';
@@ -613,24 +613,29 @@ class TestQueryable extends Queryable {
     ClassElement classElement,
     List<Field> fields,
     String constructor,
-  ) : super(classElement, '', fields, constructor);
-
+  ) : super(constructor: constructor, name: '', classElement: classElement, fieldsAll: fields, fieldsDataBase: fields, fieldsQuery: fields, );
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
       other is TestQueryable &&
           runtimeType == other.runtimeType &&
           classElement == other.classElement &&
-          const ListEquality<Field>().equals(fields, other.fields) &&
+          const ListEquality<Field>().equals(fieldsAll, other.fieldsAll) &&
+          const ListEquality<Field>().equals(fieldsDataBase, other.fieldsDataBase) &&
+          const ListEquality<Field>().equals(fieldsQuery, other.fieldsQuery) &&
           constructor == other.constructor;
 
   @override
   int get hashCode =>
-      classElement.hashCode ^ fields.hashCode ^ constructor.hashCode;
+      classElement.hashCode ^
+      fieldsAll.hashCode ^
+      fieldsDataBase.hashCode ^
+      fieldsDataBase.hashCode ^
+      constructor.hashCode;
 
   @override
   String toString() {
-    return 'TestQueryable{classElement: $classElement, name: $name, fields: $fields, constructor: $constructor}';
+    return 'TestQueryable{classElement: $classElement, name: $name, fieldsAll: $fieldsAll, fieldsDataBase: $fieldsDataBase, fieldsQuery: $fieldsQuery, constructor: $constructor}';
   }
 }
 
@@ -642,7 +647,7 @@ class TestProcessor extends QueryableProcessor<TestQueryable> {
 
   @override
   TestQueryable process() {
-    final fields = getFields();
+    final fields = getFieldsWithOutCheckIgnore().where((e) => shouldBeIncludedForQuery(e.fieldElement)).toList();
     return TestQueryable(
       classElement,
       fields,

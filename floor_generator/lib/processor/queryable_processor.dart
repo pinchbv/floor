@@ -3,6 +3,7 @@ import 'package:analyzer/dart/element/element.dart';
 import 'package:analyzer/dart/element/type.dart';
 import 'package:collection/collection.dart';
 import 'package:floor_annotation/floor_annotation.dart' as annotations;
+import 'package:floor_generator/misc/constants.dart';
 import 'package:floor_generator/misc/extension/set_extension.dart';
 import 'package:floor_generator/misc/extension/string_extension.dart';
 import 'package:floor_generator/misc/extension/type_converter_element_extension.dart';
@@ -34,7 +35,7 @@ abstract class QueryableProcessor<T extends Queryable> extends Processor<T> {
             classElement.getTypeConverters(TypeConverterScope.queryable);
 
   @protected
-  List<Field> getFields() {
+  List<Field> getFieldsWithOutCheckIgnore() {
     if (classElement.mixins.isNotEmpty) {
       throw _queryableProcessorError.prohibitedMixinUsage;
     }
@@ -44,7 +45,7 @@ abstract class QueryableProcessor<T extends Queryable> extends Processor<T> {
     ];
 
     return fields
-        .where((fieldElement) => fieldElement.shouldBeIncluded())
+        .where((fieldElement) => fieldElement.shouldBeIncludedWithOutCheckIgnore())
         .map((field) {
       final typeConverter =
           queryableTypeConverters.getClosestOrNull(field.type);
@@ -65,7 +66,7 @@ abstract class QueryableProcessor<T extends Queryable> extends Processor<T> {
     final constructorParameters = classElement.constructors.first.parameters.where((e) => fields.any((f) => e.displayName == f.displayName) );
 
     return fields
-        .where((fieldElement) => fieldElement.shouldBeIncluded() && constructorParameters.every((e) => e.name != fieldElement.name))
+        .where((fieldElement) => fieldElement.shouldBeIncludedForQuery() && constructorParameters.every((e) => e.name != fieldElement.name))
         .toList();
   }
 
@@ -163,6 +164,36 @@ abstract class QueryableProcessor<T extends Queryable> extends Processor<T> {
       return null;
     }
   }
+
+  @protected
+  bool shouldBeIncludedWithOutCheckIgnore(FieldElement fieldElement) {
+    return fieldElement.shouldBeIncludedWithOutCheckIgnore();
+  }
+
+  @protected
+  bool shouldBeIncludedForDataBase(FieldElement fieldElement) {
+    return fieldElement.shouldBeIncludedForDataBase();
+  }
+
+  @protected
+  bool shouldBeIncludedForQuery(FieldElement fieldElement) {
+    return fieldElement.shouldBeIncludedForQuery();
+  }
+
+  @protected
+  bool shouldBeIncludedForInsert(FieldElement fieldElement) {
+    return fieldElement.shouldBeIncludedForInsert();
+  }
+
+  @protected
+  bool shouldBeIncludedForUpdate(FieldElement fieldElement) {
+    return fieldElement.shouldBeIncludedForUpdate();
+  }
+
+  @protected
+  bool shouldBeIncludedForDelete(FieldElement fieldElement) {
+    return fieldElement.shouldBeIncludedForDelete();
+  }
 }
 
 extension on String {
@@ -198,8 +229,70 @@ extension on String {
 }
 
 extension on FieldElement {
-  bool shouldBeIncluded() {
-    final isIgnored = hasAnnotation(annotations.ignore.runtimeType);
-    return !(isStatic || isSynthetic || isIgnored);
+  bool shouldBeIncludedWithOutCheckIgnore() {
+    return !(isStatic || isSynthetic);
+  }
+
+  bool shouldBeIncludedForQuery() {
+    if (isStatic || isSynthetic) {
+      return false;
+    }
+    final isIgnored = hasAnnotation(annotations.Ignore);
+    if (!isIgnored) {
+      return true;
+    }
+    final ignoreAnnotation = getAnnotation(annotations.Ignore);
+    return !ignoreAnnotation.getField(IgnoreField.forQuery)!.toBoolValue()!;
+  }
+
+  bool shouldBeIncludedForInsert() {
+    if (isStatic || isSynthetic) {
+      return false;
+    }
+    final isIgnored = hasAnnotation(annotations.Ignore);
+    if (!isIgnored) {
+      return true;
+    }
+    final ignoreAnnotation = getAnnotation(annotations.Ignore);
+    return !ignoreAnnotation.getField(IgnoreField.forInsert)!.toBoolValue()!;
+  }
+
+  bool shouldBeIncludedForUpdate() {
+    if (isStatic || isSynthetic) {
+      return false;
+    }
+    final isIgnored = hasAnnotation(annotations.Ignore);
+    if (!isIgnored) {
+      return true;
+    }
+    final ignoreAnnotation = getAnnotation(annotations.Ignore);
+    return !ignoreAnnotation.getField(IgnoreField.forUpdate)!.toBoolValue()!;
+  }
+
+  bool shouldBeIncludedForDelete() {
+    if (isStatic || isSynthetic) {
+      return false;
+    }
+    final isIgnored = hasAnnotation(annotations.Ignore);
+    if (!isIgnored) {
+      return true;
+    }
+    final ignoreAnnotation = getAnnotation(annotations.Ignore);
+    return !ignoreAnnotation.getField(IgnoreField.forDelete)!.toBoolValue()!;
+  }
+
+  bool shouldBeIncludedForDataBase() {
+    if (isStatic || isSynthetic) {
+      return false;
+    }
+    final isIgnored = hasAnnotation(annotations.Ignore);
+    if (!isIgnored) {
+      return true;
+    }
+    final ignoreAnnotation = getAnnotation(annotations.Ignore);
+    return !ignoreAnnotation.getField(IgnoreField.forInsert)!.toBoolValue()! ||
+        !ignoreAnnotation.getField(IgnoreField.forUpdate)!.toBoolValue()! ||
+        !ignoreAnnotation.getField(IgnoreField.forDelete)!.toBoolValue()!
+    ;
   }
 }

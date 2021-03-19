@@ -72,7 +72,7 @@ class QueryMethodProcessor extends Processor<QueryMethod> {
 
     if (queryable != null) {
       final fieldTypeConverters =
-          queryable.fields.mapNotNull((field) => field.typeConverter);
+          queryable.fieldsAll.mapNotNull((field) => field.typeConverter);
       allTypeConverters.addAll(fieldTypeConverters);
     }
 

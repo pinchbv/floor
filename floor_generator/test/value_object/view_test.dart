@@ -43,6 +43,8 @@ void main() {
       mockClassElement,
       'entityName',
       allFields,
+      allFields,
+      allFields,
       'SELECT * FROM x',
       '',
     );
