@@ -62,7 +62,7 @@ abstract class QueryableProcessor<T extends Queryable> extends Processor<T> {
       ...classElement.allSupertypes.expand((type) => type.element.fields),
     ];
 
-    final constructorParameters = classElement.constructors.first.parameters.where((e) => e.isInitializingFormal);
+    final constructorParameters = classElement.constructors.first.parameters.where((e) => fields.any((f) => e.displayName == f.displayName) );
 
     return fields
         .where((fieldElement) => fieldElement.shouldBeIncluded() && constructorParameters.every((e) => e.name != fieldElement.name))
