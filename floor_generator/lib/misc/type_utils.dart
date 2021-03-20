@@ -7,7 +7,6 @@ import 'package:analyzer/dart/element/type.dart';
 import 'package:floor_generator/misc/constants.dart';
 import 'package:source_gen/source_gen.dart';
 import 'package:floor_annotation/floor_annotation.dart' as annotations;
-import 'package:json_annotation/json_annotation.dart';
 
 extension SupportedTypeChecker on DartType {
   /// Whether this [DartType] is either
@@ -68,11 +67,11 @@ extension ClassElementExtension on ClassElement {
 
   DartType? typeOfEnum(){
     final types = fields.where((e) => e.isEnumConstant).map((e) {
-      if (!e.hasAnnotation(JsonValue)) {
+      if (!e.hasAnnotation(annotations.EnumValue)) {
         return null;
       }
-      final annotation = e.getAnnotation(JsonValue);
-      return annotation.getField(JsonValueField.value)?.toTypeValue();
+      final annotation = e.getAnnotation(annotations.EnumValue);
+      return annotation.getField(EnumValueField.value)?.type;
     }).where((e) => e != null);
     if (types.isEmpty) {
       return null;

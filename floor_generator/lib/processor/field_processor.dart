@@ -64,8 +64,8 @@ class FieldProcessor extends Processor<Field> {
       final typeOfEnum = classElement.typeOfEnum();
       if (typeOfEnum == null) {
         throw InvalidGenerationSourceError(
-          'Enum type $type must be defined the values through the @JsonValue annotation, it cannot have different data types for the same enum.',
-          todo: 'Put @JsonValue in all enums for type $type, all values must be of the same type.',
+          'Enum type $type must be defined the values through the @EnumValue annotation, it cannot have different data types for the same enum.',
+          todo: 'Put @EnumValue in all enums for type $type, all values must be of the same type.',
           element: _fieldElement,
         );
       }

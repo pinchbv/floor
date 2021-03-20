@@ -7,6 +7,7 @@ export 'src/database_view.dart';
 export 'src/delete.dart';
 export 'src/description.dart';
 export 'src/entity.dart';
+export 'src/enum_value.dart';
 export 'src/foreign_key.dart';
 export 'src/fts.dart';
 export 'src/ignore.dart';

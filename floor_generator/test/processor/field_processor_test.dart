@@ -170,28 +170,6 @@ void main() {
     );
     expect(actual, equals(expected));
   });
-
-  test('Process enum field', () async {
-    final fieldElement = await _generateFieldElement('''
-      final EnumWithValue enumWithValue;
-    ''');
-
-    final actual = FieldProcessor(fieldElement, null).process();
-
-    const name = 'enumWithValue';
-    const columnName = 'enumWithValue';
-    const isNullable = false;
-    const sqlType = SqlType.integer;
-    final expected = Field(
-      fieldElement,
-      name,
-      columnName,
-      isNullable,
-      sqlType,
-      null,
-    );
-    expect(actual, equals(expected));
-  });
 }
 
 Future<FieldElement> _generateFieldElement(final String field) async {
@@ -200,15 +178,7 @@ Future<FieldElement> _generateFieldElement(final String field) async {
       
       import 'package:floor_annotation/floor_annotation.dart';
       import 'dart:typed_data';
-      
-      enum EnumWithValue {
-        @JsonValue(1)
-        valueOne,
-      
-        @JsonValue(2)
-        valueTwo,
-      }
-      
+
       class Foo {
         $field
       }

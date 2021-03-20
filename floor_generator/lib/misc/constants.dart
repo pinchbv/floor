@@ -59,7 +59,7 @@ abstract class IgnoreField {
   static const forDelete = 'forDelete';
 }
 
-abstract class JsonValueField {
+abstract class EnumValueField {
   static const value = 'value';
 }
 
