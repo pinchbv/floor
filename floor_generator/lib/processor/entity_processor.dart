@@ -31,14 +31,14 @@ class EntityProcessor extends QueryableProcessor<Entity> {
   Entity process() {
     final name = classElement.tableName();
     final fieldsAll = getFieldsWithOutCheckIgnore();
-    final fieldsDataBase = fieldsAll.where((e) => shouldBeIncludedForDataBase(e.fieldElement)).toList();
+    final fieldsDataBaseSchema = fieldsAll.where((e) => shouldBeIncludedForDataBaseSchema(e.fieldElement)).toList();
     final fieldsQuery = fieldsAll.where((e) => shouldBeIncludedForQuery(e.fieldElement)).toList();
 
     final fieldsInsert = fieldsAll.where((e) => shouldBeIncludedForInsert(e.fieldElement)).toList();
     final fieldsUpdate = fieldsAll.where((e) => shouldBeIncludedForUpdate(e.fieldElement)).toList();
     final fieldsDelete = fieldsAll.where((e) => shouldBeIncludedForDelete(e.fieldElement)).toList();
 
-    final primaryKey = _getPrimaryKey(fieldsDataBase);
+    final primaryKey = _getPrimaryKey(fieldsDataBaseSchema);
     final withoutRowid = _getWithoutRowid();
 
     if (primaryKey.autoGenerateId && withoutRowid) {
@@ -49,11 +49,11 @@ class EntityProcessor extends QueryableProcessor<Entity> {
       classElement,
       name,
       fieldsAll,
-      fieldsDataBase,
+      fieldsDataBaseSchema,
       fieldsQuery,
-      _getPrimaryKey(fieldsDataBase),
+      _getPrimaryKey(fieldsDataBaseSchema),
       _getForeignKeys(),
-      _getIndices(fieldsDataBase, name),
+      _getIndices(fieldsDataBaseSchema, name),
       _getWithoutRowid(),
       getConstructor(fieldsQuery),
       _getValueMapping(fieldsInsert),

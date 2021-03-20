@@ -6,9 +6,9 @@ abstract class Queryable {
   final String name;
 
   final List<Field> fieldsAll;
-  final List<Field> fieldsDataBase;
+  final List<Field> fieldsDataBaseSchema;
   final List<Field> fieldsQuery;
   final String constructor;
 
-  Queryable({required this.classElement, required this.name, required this.fieldsAll, required this.fieldsDataBase,required  this.fieldsQuery,required  this.constructor});
+  Queryable({required this.classElement, required this.name, required this.fieldsAll, required this.fieldsDataBaseSchema, required this.fieldsQuery, required this.constructor});
 }

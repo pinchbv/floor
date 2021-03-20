@@ -613,7 +613,7 @@ class TestQueryable extends Queryable {
     ClassElement classElement,
     List<Field> fields,
     String constructor,
-  ) : super(constructor: constructor, name: '', classElement: classElement, fieldsAll: fields, fieldsDataBase: fields, fieldsQuery: fields, );
+  ) : super(constructor: constructor, name: '', classElement: classElement, fieldsAll: fields, fieldsDataBaseSchema: fields, fieldsQuery: fields, );
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -621,7 +621,7 @@ class TestQueryable extends Queryable {
           runtimeType == other.runtimeType &&
           classElement == other.classElement &&
           const ListEquality<Field>().equals(fieldsAll, other.fieldsAll) &&
-          const ListEquality<Field>().equals(fieldsDataBase, other.fieldsDataBase) &&
+          const ListEquality<Field>().equals(fieldsDataBaseSchema, other.fieldsDataBaseSchema) &&
           const ListEquality<Field>().equals(fieldsQuery, other.fieldsQuery) &&
           constructor == other.constructor;
 
@@ -629,13 +629,13 @@ class TestQueryable extends Queryable {
   int get hashCode =>
       classElement.hashCode ^
       fieldsAll.hashCode ^
-      fieldsDataBase.hashCode ^
-      fieldsDataBase.hashCode ^
+      fieldsDataBaseSchema.hashCode ^
+      fieldsDataBaseSchema.hashCode ^
       constructor.hashCode;
 
   @override
   String toString() {
-    return 'TestQueryable{classElement: $classElement, name: $name, fieldsAll: $fieldsAll, fieldsDataBase: $fieldsDataBase, fieldsQuery: $fieldsQuery, constructor: $constructor}';
+    return 'TestQueryable{classElement: $classElement, name: $name, fieldsAll: $fieldsAll, fieldsDataBaseSchema: $fieldsDataBaseSchema, fieldsQuery: $fieldsQuery, constructor: $constructor}';
   }
 }
 

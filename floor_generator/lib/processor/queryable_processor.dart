@@ -45,7 +45,7 @@ abstract class QueryableProcessor<T extends Queryable> extends Processor<T> {
     ];
 
     return fields
-        .where((fieldElement) => fieldElement.shouldBeIncludedWithOutCheckIgnore())
+        .where((fieldElement) => fieldElement.shouldBeIncludedAnyOperation())
         .map((field) {
       final typeConverter =
           queryableTypeConverters.getClosestOrNull(field.type);
@@ -166,13 +166,13 @@ abstract class QueryableProcessor<T extends Queryable> extends Processor<T> {
   }
 
   @protected
-  bool shouldBeIncludedWithOutCheckIgnore(FieldElement fieldElement) {
-    return fieldElement.shouldBeIncludedWithOutCheckIgnore();
+  bool shouldBeIncludedAnyOperation(FieldElement fieldElement) {
+    return fieldElement.shouldBeIncludedAnyOperation();
   }
 
   @protected
-  bool shouldBeIncludedForDataBase(FieldElement fieldElement) {
-    return fieldElement.shouldBeIncludedForDataBase();
+  bool shouldBeIncludedForDataBaseSchema(FieldElement fieldElement) {
+    return fieldElement.shouldBeIncludedForDataBaseSchema();
   }
 
   @protected
@@ -229,8 +229,19 @@ extension on String {
 }
 
 extension on FieldElement {
-  bool shouldBeIncludedWithOutCheckIgnore() {
-    return !(isStatic || isSynthetic);
+  bool shouldBeIncludedAnyOperation() {
+    if (isStatic || isSynthetic) {
+      return false;
+    }
+    final isIgnored = hasAnnotation(annotations.Ignore);
+    if (!isIgnored) {
+      return true;
+    }
+    final ignoreAnnotation = getAnnotation(annotations.Ignore);
+    return !ignoreAnnotation.getField(IgnoreField.forQuery)!.toBoolValue()! ||
+        !ignoreAnnotation.getField(IgnoreField.forInsert)!.toBoolValue()! ||
+        !ignoreAnnotation.getField(IgnoreField.forUpdate)!.toBoolValue()! ||
+        !ignoreAnnotation.getField(IgnoreField.forDelete)!.toBoolValue()!;
   }
 
   bool shouldBeIncludedForQuery() {
@@ -281,7 +292,7 @@ extension on FieldElement {
     return !ignoreAnnotation.getField(IgnoreField.forDelete)!.toBoolValue()!;
   }
 
-  bool shouldBeIncludedForDataBase() {
+  bool shouldBeIncludedForDataBaseSchema() {
     if (isStatic || isSynthetic) {
       return false;
     }

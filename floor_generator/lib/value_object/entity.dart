@@ -22,7 +22,7 @@ class Entity extends Queryable {
     ClassElement classElement,
     String name,
     List<Field> fieldsAll,
-    List<Field> fieldsDataBase,
+    List<Field> fieldsDataBaseSchema,
     List<Field> fieldsQuery,
     this.primaryKey,
     this.foreignKeys,
@@ -33,10 +33,10 @@ class Entity extends Queryable {
       this.valueMappingForUpdate,
       this.valueMappingForDelete,
     this.fts,
-  ) : super(name: name, classElement: classElement, constructor: constructor, fieldsAll: fieldsAll, fieldsDataBase: fieldsDataBase, fieldsQuery: fieldsQuery);
+  ) : super(name: name, classElement: classElement, constructor: constructor, fieldsAll: fieldsAll, fieldsDataBaseSchema: fieldsDataBaseSchema, fieldsQuery: fieldsQuery);
 
   String getCreateTableStatement() {
-    final databaseDefinition = fieldsDataBase.map((field) {
+    final databaseDefinition = fieldsDataBaseSchema.map((field) {
       final autoIncrement =
           primaryKey.fields.contains(field) && primaryKey.autoGenerateId;
       return field.getDatabaseDefinition(autoIncrement);
@@ -80,7 +80,7 @@ class Entity extends Queryable {
           runtimeType == other.runtimeType &&
           classElement == other.classElement &&
           name == other.name &&
-          fieldsDataBase.equals(other.fieldsDataBase) &&
+          fieldsDataBaseSchema.equals(other.fieldsDataBaseSchema) &&
           fieldsQuery.equals(other.fieldsQuery) &&
           fieldsAll.equals(other.fieldsAll) &&
           primaryKey == other.primaryKey &&
@@ -96,7 +96,7 @@ class Entity extends Queryable {
   int get hashCode =>
       classElement.hashCode ^
       name.hashCode ^
-      fieldsDataBase.hashCode ^
+      fieldsDataBaseSchema.hashCode ^
       fieldsQuery.hashCode ^
       fieldsAll.hashCode ^
       primaryKey.hashCode ^
@@ -111,6 +111,6 @@ class Entity extends Queryable {
 
   @override
   String toString() {
-    return 'Entity{classElement: $classElement, name: $name, fieldsDataBase: $fieldsDataBase, fieldsQuery: $fieldsQuery, fieldsAll: $fieldsAll, primaryKey: $primaryKey, foreignKeys: $foreignKeys, indices: $indices, constructor: $constructor, withoutRowid: $withoutRowid, valueMappingForUpdate: $valueMappingForUpdate, valueMappingForInsert: $valueMappingForInsert, valueMappingForDelete: $valueMappingForDelete, fts: $fts}';
+    return 'Entity{classElement: $classElement, name: $name, fieldsDataBaseSchema: $fieldsDataBaseSchema, fieldsQuery: $fieldsQuery, fieldsAll: $fieldsAll, primaryKey: $primaryKey, foreignKeys: $foreignKeys, indices: $indices, constructor: $constructor, withoutRowid: $withoutRowid, valueMappingForUpdate: $valueMappingForUpdate, valueMappingForInsert: $valueMappingForInsert, valueMappingForDelete: $valueMappingForDelete, fts: $fts}';
   }
 }

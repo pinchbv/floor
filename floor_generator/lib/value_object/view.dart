@@ -10,11 +10,11 @@ class View extends Queryable {
     ClassElement classElement,
     String name,
     List<Field> fieldsQuery,
-    List<Field> fieldsDataBase,
+    List<Field> fieldsDataBaseSchema,
     List<Field> fieldsAll,
     this.query,
     String constructor,
-  ) : super(classElement: classElement, name: name, fieldsQuery: fieldsQuery, fieldsDataBase: fieldsDataBase, fieldsAll: fieldsAll, constructor: constructor);
+  ) : super(classElement: classElement, name: name, fieldsQuery: fieldsQuery, fieldsDataBaseSchema: fieldsDataBaseSchema, fieldsAll: fieldsAll, constructor: constructor);
 
   String getCreateViewStatement() {
     return 'CREATE VIEW IF NOT EXISTS `$name` AS $query';
@@ -29,7 +29,7 @@ class View extends Queryable {
           name == other.name &&
           const ListEquality<Field>().equals(fieldsAll, other.fieldsAll) &&
           const ListEquality<Field>().equals(fieldsQuery, other.fieldsQuery) &&
-          const ListEquality<Field>().equals(fieldsDataBase, other.fieldsDataBase) &&
+          const ListEquality<Field>().equals(fieldsDataBaseSchema, other.fieldsDataBaseSchema) &&
           query == other.query &&
           constructor == other.constructor;
 
@@ -39,12 +39,12 @@ class View extends Queryable {
       name.hashCode ^
       fieldsAll.hashCode ^
       fieldsQuery.hashCode ^
-      fieldsDataBase.hashCode ^
+      fieldsDataBaseSchema.hashCode ^
       query.hashCode ^
       constructor.hashCode;
 
   @override
   String toString() {
-    return 'View{classElement: $classElement, name: $name, fieldsAll: $fieldsAll, fieldsQuery: $fieldsQuery, fieldsDataBase: $fieldsDataBase, query: $query, constructor: $constructor}';
+    return 'View{classElement: $classElement, name: $name, fieldsAll: $fieldsAll, fieldsQuery: $fieldsQuery, fieldsDataBaseSchema: $fieldsDataBaseSchema, query: $query, constructor: $constructor}';
   }
 }

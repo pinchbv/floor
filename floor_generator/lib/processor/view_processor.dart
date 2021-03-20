@@ -20,12 +20,12 @@ class ViewProcessor extends QueryableProcessor<View> {
   View process() {
     final fieldsAll = getFieldsWithOutCheckIgnore();
     final fieldsQuery = fieldsAll.where((e) => shouldBeIncludedForQuery(e.fieldElement)).toList();
-    final fieldsDataBase = fieldsAll.where((e) => shouldBeIncludedForDataBase(e.fieldElement)).toList();
+    final fieldsDataBaseSchema = fieldsAll.where((e) => shouldBeIncludedForDataBaseSchema(e.fieldElement)).toList();
     return View(
       classElement,
       _getName(),
       fieldsQuery,
-      fieldsDataBase,
+      fieldsDataBaseSchema,
       fieldsAll,
       _getQuery(),
       getConstructor(fieldsQuery),
