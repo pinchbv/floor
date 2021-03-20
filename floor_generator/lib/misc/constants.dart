@@ -58,3 +58,11 @@ abstract class IgnoreField {
   static const forUpdate = 'forUpdate';
   static const forDelete = 'forDelete';
 }
+
+abstract class JsonValueField {
+  static const value = 'value';
+}
+
+abstract class DescriptionField {
+  static const description = 'description';
+}

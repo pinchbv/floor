@@ -59,6 +59,17 @@ class FieldProcessor extends Processor<Field> {
       return type.asSqlType();
     } else if (typeConverter != null) {
       return typeConverter.databaseType.asSqlType();
+    } else if (type.element is ClassElement && (type.element as ClassElement).isEnum) {
+      final classElement = type.element as ClassElement;
+      final typeOfEnum = classElement.typeOfEnum();
+      if (typeOfEnum == null) {
+        throw InvalidGenerationSourceError(
+          'Enum type $type must be defined the values through the @JsonValue annotation, it cannot have different data types for the same enum.',
+          todo: 'Put @JsonValue in all enums for type $type, all values must be of the same type.',
+          element: _fieldElement,
+        );
+      }
+      return typeOfEnum.asSqlType();
     } else {
       throw InvalidGenerationSourceError(
         'Column type is not supported for $type.',
