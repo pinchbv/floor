@@ -6,7 +6,6 @@ import 'package:floor_generator/value_object/field.dart';
 import 'package:floor_generator/value_object/foreign_key.dart';
 import 'package:floor_generator/value_object/fts.dart';
 import 'package:floor_generator/value_object/primary_key.dart';
-import 'package:mockito/mockito.dart';
 import 'package:test/test.dart';
 
 import '../mocks.dart';
@@ -14,7 +13,6 @@ import '../mocks.dart';
 void main() {
   final mockClassElement = MockClassElement();
   final mockFieldElement = MockFieldElement();
-  final mockDartType = MockDartType();
 
   final field = Field(
     mockFieldElement,
@@ -33,15 +31,6 @@ void main() {
     null,
   );
   final allFields = [field, nullableField];
-
-  tearDown(() {
-    clearInteractions(mockClassElement);
-    clearInteractions(mockFieldElement);
-    clearInteractions(mockDartType);
-    reset(mockClassElement);
-    reset(mockFieldElement);
-    reset(mockDartType);
-  });
 
   group('Primary key', () {
     test('Create table statement with single primary key auto increment', () {

@@ -458,7 +458,7 @@ Future<Dao> createOrderDao(
         }
       }
       ''', (resolver) async {
-    return LibraryReader(await resolver.findLibraryByName('test'));
+    return LibraryReader((await resolver.findLibraryByName('test'))!);
   });
 
   final daoClass = library.classes.firstWhere((classElement) =>

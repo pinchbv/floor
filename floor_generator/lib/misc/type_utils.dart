@@ -1,4 +1,3 @@
-// ignore_for_file: import_of_legacy_library_into_null_safe
 import 'dart:typed_data';
 
 import 'package:analyzer/dart/constant/value.dart';
@@ -46,7 +45,8 @@ extension AnnotationChecker on Element {
 
   /// Returns the first annotation object found on [type]
   DartObject getAnnotation(final Type type) {
-    return _typeChecker(type).firstAnnotationOfExact(this);
+    return _typeChecker(type)
+        .firstAnnotationOfExact(this)!; // TODO return nullable?
   }
 }
 
