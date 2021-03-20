@@ -44,7 +44,7 @@ class EnumHelperGenerator extends Generator {
     }
 
     final str = StringBuffer();
-    str.writeln('    extension ${enumElement.name}ValueExtension on ${enumElement.name} {');
+    str.writeln('    extension ${enumElement.name}Extension on ${enumElement.name} {');
 
     if (enumValueAnnotations.isNotEmpty) {
       final extension = """
@@ -71,6 +71,35 @@ class EnumHelperGenerator extends Generator {
     }
 
     str.writeln('    }');
+
+
+    str.writeln('    extension ${enumElement.name}NullableExtension on ${enumElement.name}? {');
+
+    if (enumValueAnnotations.isNotEmpty) {
+      final extension = '''
+      $typeReturn? get value {
+        if (this == null) {
+          return null;
+        }
+        return this!.value;
+      }''';
+      str.writeln(extension);
+    }
+
+    if (descriptionAnnotations.isNotEmpty) {
+      const extension = '''
+      String? get description {
+        if (this == null) {
+          return null;
+        }
+        return this!.description;
+      }''';
+      str.writeln(extension);
+    }
+
+    str.writeln('    }');
+
+
     return str.toString();
   }
 }

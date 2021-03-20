@@ -352,8 +352,8 @@ void main() {
     final primaryKey = PrimaryKey([fields[0]], false);
     const foreignKeys = <ForeignKey>[];
     const indices = <Index>[];
-    const constructor = "Person(row['id'] as int, row['name'] as String)";
-    const valueMapping = "<String, Object?>{'id': item.id, 'name': item.name}";
+    const constructor = "Person(row['id'] as int, row['name'] as String, EnumWithValue.values.firstWhere((e) => e.value == row['enumWithValue']))";
+    const valueMapping = "<String, Object?>{'id': item.id, 'name': item.name, 'enumWithValue': item.enumWithValue.value}";
     final expected = Entity(
       classElement,
       name,

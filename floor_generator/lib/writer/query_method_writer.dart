@@ -121,6 +121,8 @@ class QueryMethodWriter implements Writer {
           } else {
             return parameter.displayName;
           }
+        } else if (parameter.type.element is ClassElement && (parameter.type.element as ClassElement).isEnum) {
+          return parameter.displayName + '.value';
         } else {
           final typeConverter =
               _queryMethod.typeConverters.getClosest(parameter.type);

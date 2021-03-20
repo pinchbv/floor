@@ -92,6 +92,12 @@ abstract class QueryableProcessor<T extends Queryable> extends Processor<T> {
           field.isNullable,
           parameterElement,
         );
+      } else if (parameterElement.type.element is ClassElement && (parameterElement.type.element as ClassElement).isEnum) {
+        if (field.isNullable) {
+          parameterValue = '$databaseValue == null ? null : ${parameterElement.type.element?.displayName}.values.firstWhere((e) => e.value == $databaseValue)';
+        } else{
+          parameterValue = '${parameterElement.type.element?.displayName}.values.firstWhere((e) => e.value == $databaseValue)';
+        }
       } else {
         final typeConverter = [...queryableTypeConverters, field.typeConverter]
             .whereNotNull()
@@ -142,6 +148,12 @@ abstract class QueryableProcessor<T extends Queryable> extends Processor<T> {
           field.isNullable,
           parameterElement,
         );
+      } else if (parameterElement.type.element is ClassElement && (parameterElement.type.element as ClassElement).isEnum) {
+        if (field.isNullable) {
+          parameterValue = '$databaseValue == null ? null : ${parameterElement.type.element?.displayName}.values.firstWhere((e) => e.value == $databaseValue)';
+        } else{
+          parameterValue = '${parameterElement.type.element?.displayName}.values.firstWhere((e) => e.value == $databaseValue)';
+        }
       } else {
         final typeConverter = [...queryableTypeConverters, field.typeConverter]
             .whereNotNull()

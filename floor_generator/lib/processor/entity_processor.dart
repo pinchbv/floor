@@ -287,6 +287,8 @@ class EntityProcessor extends QueryableProcessor<Entity> {
 
     if (fieldType.isDefaultSqlType) {
       attributeValue = 'item.$parameterName';
+    } else if (fieldType.element is ClassElement && (fieldType.element as ClassElement).isEnum) {
+      attributeValue = 'item.$parameterName.value';
     } else {
       final typeConverter = [
         ...queryableTypeConverters,
