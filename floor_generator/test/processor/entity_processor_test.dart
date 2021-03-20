@@ -13,7 +13,7 @@ import 'package:floor_generator/value_object/primary_key.dart';
 import 'package:source_gen/source_gen.dart';
 import 'package:test/test.dart';
 
-import '../mocks.dart';
+import '../fakes.dart';
 import '../test_utils.dart';
 
 void main() {
@@ -185,7 +185,7 @@ void main() {
           processor.process,
           throwsInvalidGenerationSourceError(
               EntityProcessorError(classElements[1]).wrongForeignKeyAction(
-                  MockDartObject(), ForeignKeyField.onUpdate)));
+                  FakeDartObject(), ForeignKeyField.onUpdate)));
     });
   });
 
