@@ -84,9 +84,16 @@ class DaoWriter extends Writer {
         final requiresChangeListener =
             dbHasViewStreams || streamEntities.contains(entity);
 
+        String insertedCode = '';
+        if (entity.primaryKey.fields.length == 1) {
+          final primaryKeyField = entity.primaryKey.fields[0];
+          if (entity.primaryKey.autoGenerateId && primaryKeyField.fieldElement.type.isDartCoreInt) {
+            insertedCode = ', inserted: (id, item) { item.${primaryKeyField.name} = id; }';
+          }
+        }
         constructorBuilder
           ..initializers.add(Code(
-              "$fieldName = InsertionAdapter(database, '${entity.name}', $valueMapper${requiresChangeListener ? ', changeListener' : ''})"));
+              "$fieldName = InsertionAdapter(database, '${entity.name}', $valueMapper$insertedCode${requiresChangeListener ? ', changeListener: changeListener' : ''})"));
       }
     }
 

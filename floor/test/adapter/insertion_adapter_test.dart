@@ -186,7 +186,7 @@ void main() {
       mockDatabaseExecutor,
       entityName,
       valueMapper,
-      mockStreamController,
+      changeListener: mockStreamController,
     );
 
     tearDown(() {

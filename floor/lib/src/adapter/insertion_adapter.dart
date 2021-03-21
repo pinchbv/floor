@@ -9,17 +9,21 @@ class InsertionAdapter<T> {
   final String _entityName;
   final Map<String, Object?> Function(T) _valueMapper;
   final StreamController<String>? _changeListener;
+  final void Function(int id, T entity)? _inserted;
 
   InsertionAdapter(
     final DatabaseExecutor database,
     final String entityName,
-    final Map<String, Object?> Function(T) valueMapper, [
-    final StreamController<String>? changeListener,
-  ])  : assert(entityName.isNotEmpty),
+    final Map<String, Object?> Function(T) valueMapper,
+      {
+        final void Function(int id, T entity)? inserted,
+        final StreamController<String>? changeListener,
+      })  : assert(entityName.isNotEmpty),
         _database = database,
         _entityName = entityName,
         _valueMapper = valueMapper,
-        _changeListener = changeListener;
+        _changeListener = changeListener,
+        _inserted = inserted;
 
   Future<void> insert(
     final T item,
@@ -41,7 +45,12 @@ class InsertionAdapter<T> {
         conflictAlgorithm: onConflictStrategy.asSqfliteConflictAlgorithm(),
       );
     }
-    await batch.commit(noResult: true);
+    final result = (await batch.commit(noResult: false)).cast<int>();
+    if (_inserted != null) {
+      for (var i = 0; i < result.length; i++) {
+        _inserted!(result[i], items[i]);
+      }
+    }
     _changeListener?.add(_entityName);
   }
 
@@ -66,7 +75,14 @@ class InsertionAdapter<T> {
       );
     }
     final result = (await batch.commit(noResult: false)).cast<int>();
-    if (result.isNotEmpty) _changeListener?.add(_entityName);
+    if (result.isNotEmpty) {
+      _changeListener?.add(_entityName);
+      if (_inserted != null) {
+        for (var i = 0; i < result.length; i++) {
+          _inserted!(result[i], items[i]);
+        }
+      }
+    }
     return result;
   }
 
@@ -79,7 +95,12 @@ class InsertionAdapter<T> {
       _valueMapper(item),
       conflictAlgorithm: onConflictStrategy.asSqfliteConflictAlgorithm(),
     );
-    if (result != 0) _changeListener?.add(_entityName);
+    if (result != 0) {
+      if (_inserted != null) {
+        _inserted!(result, item);
+      }
+      _changeListener?.add(_entityName);
+    }
     return result;
   }
 }
