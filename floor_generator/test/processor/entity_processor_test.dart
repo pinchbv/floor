@@ -1,4 +1,3 @@
-// ignore_for_file: import_of_legacy_library_into_null_safe
 import 'package:analyzer/dart/element/element.dart';
 import 'package:build_test/build_test.dart';
 import 'package:floor_annotation/floor_annotation.dart' as annotations;
@@ -14,7 +13,7 @@ import 'package:floor_generator/value_object/primary_key.dart';
 import 'package:source_gen/source_gen.dart';
 import 'package:test/test.dart';
 
-import '../mocks.dart';
+import '../fakes.dart';
 import '../test_utils.dart';
 
 void main() {
@@ -186,7 +185,7 @@ void main() {
           processor.process,
           throwsInvalidGenerationSourceError(
               EntityProcessorError(classElements[1]).wrongForeignKeyAction(
-                  MockDartObject(), ForeignKeyField.onUpdate)));
+                  FakeDartObject(), ForeignKeyField.onUpdate)));
     });
   });
 
@@ -333,7 +332,7 @@ Future<List<ClassElement>> _createClassElements(final String classes) async {
       
       $classes
       ''', (resolver) async {
-    return LibraryReader(await resolver.findLibraryByName('test'));
+    return LibraryReader((await resolver.findLibraryByName('test'))!);
   });
 
   return library.classes.toList();

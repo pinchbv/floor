@@ -60,7 +60,7 @@ class DatabaseProcessor extends Processor<Database> {
   int _getDatabaseVersion() {
     final version = _classElement
         .getAnnotation(annotations.Database)
-        .getField(AnnotationField.databaseVersion)
+        ?.getField(AnnotationField.databaseVersion)
         ?.toIntValue();
 
     if (version == null) throw _processorError.versionIsMissing;
@@ -108,7 +108,7 @@ class DatabaseProcessor extends Processor<Database> {
   ) {
     final entities = _classElement
         .getAnnotation(annotations.Database)
-        .getField(AnnotationField.databaseEntities)
+        ?.getField(AnnotationField.databaseEntities)
         ?.toListValue()
         ?.mapNotNull((object) => object.toTypeValue()?.element)
         .whereType<ClassElement>()
@@ -132,7 +132,7 @@ class DatabaseProcessor extends Processor<Database> {
   ) {
     return _classElement
             .getAnnotation(annotations.Database)
-            .getField(AnnotationField.databaseViews)
+            ?.getField(AnnotationField.databaseViews)
             ?.toListValue()
             ?.mapNotNull((object) => object.toTypeValue()?.element)
             .whereType<ClassElement>()

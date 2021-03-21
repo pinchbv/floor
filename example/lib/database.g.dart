@@ -132,10 +132,10 @@ class _$TaskDao extends TaskDao {
 
   @override
   Future<Task?> findTaskById(int id) async {
-    return _queryAdapter.query('SELECT * FROM task WHERE id = ?',
-        arguments: [id],
+    return _queryAdapter.query('SELECT * FROM task WHERE id = ?1',
         mapper: (Map<String, Object?> row) =>
-            Task(row['id'] as int?, row['message'] as String));
+            Task(row['id'] as int?, row['message'] as String),
+        arguments: [id]);
   }
 
   @override
@@ -148,10 +148,10 @@ class _$TaskDao extends TaskDao {
   @override
   Stream<List<Task>> findAllTasksAsStream() {
     return _queryAdapter.queryListStream('SELECT * FROM task',
-        queryableName: 'Task',
-        isView: false,
         mapper: (Map<String, Object?> row) =>
-            Task(row['id'] as int?, row['message'] as String));
+            Task(row['id'] as int?, row['message'] as String),
+        queryableName: 'Task',
+        isView: false);
   }
 
   @override
