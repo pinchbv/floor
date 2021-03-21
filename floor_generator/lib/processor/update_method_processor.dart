@@ -63,7 +63,7 @@ class UpdateMethodProcessor implements Processor<UpdateMethod> {
   String _getOnConflictStrategy() {
     final onConflictStrategy = _methodElement
         .getAnnotation(annotations.Update)
-        .getField(AnnotationField.onConflict)
+        ?.getField(AnnotationField.onConflict)
         ?.toEnumValueString();
 
     if (onConflictStrategy == null) {

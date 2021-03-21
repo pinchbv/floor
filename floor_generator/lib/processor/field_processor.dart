@@ -46,7 +46,7 @@ class FieldProcessor extends Processor<Field> {
     return _fieldElement.hasAnnotation(annotations.ColumnInfo)
         ? _fieldElement
                 .getAnnotation(annotations.ColumnInfo)
-                .getField(AnnotationField.columnInfoName)
+                ?.getField(AnnotationField.columnInfoName)
                 ?.toStringValue() ??
             name
         : name;

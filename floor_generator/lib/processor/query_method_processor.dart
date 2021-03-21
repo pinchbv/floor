@@ -91,7 +91,7 @@ class QueryMethodProcessor extends Processor<QueryMethod> {
   String _getQuery() {
     final query = _methodElement
         .getAnnotation(annotations.Query)
-        .getField(AnnotationField.queryValue)
+        ?.getField(AnnotationField.queryValue)
         ?.toStringValue()
         ?.trim();
 

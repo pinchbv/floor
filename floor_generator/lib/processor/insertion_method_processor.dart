@@ -79,7 +79,7 @@ class InsertionMethodProcessor implements Processor<InsertionMethod> {
   String _getOnConflictStrategy() {
     final onConflictStrategy = _methodElement
         .getAnnotation(annotations.Insert)
-        .getField(AnnotationField.onConflict)
+        ?.getField(AnnotationField.onConflict)
         ?.toEnumValueString();
 
     if (onConflictStrategy == null) {

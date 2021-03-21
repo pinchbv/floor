@@ -13,7 +13,7 @@ extension TypeConverterElementExtension on Element {
   Set<TypeConverter> getTypeConverters(final TypeConverterScope scope) {
     if (hasAnnotation(annotations.TypeConverters)) {
       final typeConverterElements = getAnnotation(annotations.TypeConverters)
-          .getField(AnnotationField.typeConverterValue)
+          ?.getField(AnnotationField.typeConverterValue)
           ?.toListValue()
           ?.mapNotNull((object) => object.toTypeValue()?.element);
 

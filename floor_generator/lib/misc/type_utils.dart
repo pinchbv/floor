@@ -43,10 +43,10 @@ extension AnnotationChecker on Element {
     return _typeChecker(type).hasAnnotationOfExact(this);
   }
 
-  /// Returns the first annotation object found on [type]
-  DartObject getAnnotation(final Type type) {
-    return _typeChecker(type)
-        .firstAnnotationOfExact(this)!; // TODO return nullable?
+  /// Returns the first annotation object found of [type]
+  /// or `null` if annotation of [type] not found
+  DartObject? getAnnotation(final Type type) {
+    return _typeChecker(type).firstAnnotationOfExact(this);
   }
 }
 
