@@ -17,6 +17,7 @@ class Entity extends Queryable {
   final String valueMappingForUpdate;
   final String valueMappingForDelete;
   final Fts? fts;
+  final String saveSub;
 
   Entity(
     ClassElement classElement,
@@ -32,7 +33,8 @@ class Entity extends Queryable {
       this.valueMappingForInsert,
       this.valueMappingForUpdate,
       this.valueMappingForDelete,
-    this.fts,
+      this.fts,
+      [this.saveSub = '']
   ) : super(name: name, classElement: classElement, constructor: constructor, fieldsAll: fieldsAll, fieldsDataBaseSchema: fieldsDataBaseSchema, fieldsQuery: fieldsQuery);
 
   String getCreateTableStatement() {

@@ -53,6 +53,32 @@ extension AnnotationChecker on Element {
 }
 
 extension ClassElementExtension on ClassElement {
+  List<MethodElement> _removeDuplicate(List<MethodElement> list) {
+    for (int i = 0; i < list.length; i++) {
+      final method = list[i];
+      int index = i + 2;
+      do {
+        index = list.indexWhere((sub) => sub.name == method.name, index - 1);
+        if (index != -1) {
+          list.removeAt(index);
+        }
+      } while (index != -1 && index < list.length);
+    }
+    return list;
+  }
+
+  List<MethodElement> getAllMethods(){
+    final classElementMethods = this.methods;
+    final methodsNotOverlaid = _removeDuplicate(allSupertypes
+        .expand((type) => type.methods).toList())
+        .where((e) => classElementMethods.every((eb) => e.name != eb.name));
+    final methods = [
+      ...classElementMethods,
+      ...methodsNotOverlaid,
+    ];
+    return methods.toList();
+  }
+
   String tableName() {
     final DartObject? annotation = getAnnotation(annotations.Entity);
     // ignore: unnecessary_null_comparison

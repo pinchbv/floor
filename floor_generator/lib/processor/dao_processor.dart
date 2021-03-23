@@ -44,14 +44,8 @@ class DaoProcessor extends Processor<Dao> {
   @override
   Dao process() {
     final name = _classElement.displayName;
-    final classElementMethods = _classElement.methods;
-    final methodsNotOverlaid = _classElement.allSupertypes
-        .expand((type) => type.methods)
-        .where((e) => classElementMethods.every((eb) => e.displayName != eb.displayName));
-    final methods = [
-      ...classElementMethods,
-      ...methodsNotOverlaid,
-    ];
+
+    final methods = _classElement.getAllMethods();
 
     final typeConverters = _typeConverters + _classElement.getTypeConverters(TypeConverterScope.dao);
 

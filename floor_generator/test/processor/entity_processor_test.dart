@@ -339,7 +339,7 @@ void main() {
 
   test('Process entity enum', () async {
     LibraryReader _library;
-    final path = testFilePath('processor', 'source', 'entity_processor_test_source.dart');
+    final path = testFilePath('processor', 'source', 'entity_processor_test_enum.dart');
     _library = await resolveCompilationUnit(path);
     final classElement = _library.classes.first;
 
@@ -372,6 +372,43 @@ void main() {
     );
     expect(actual, equals(expected));
   });
+
+  test('Process entity sub', () async {
+    LibraryReader _library;
+    final path = testFilePath('processor', 'source', 'entity_processor_test_sub.dart');
+    _library = await resolveCompilationUnit(path);
+    final classElement = _library.classes.first;
+
+    final actual = EntityProcessor(classElement, {}).process();
+
+    const name = 'Person';
+    final fields = classElement.fields
+        .where((element) => !element.hasAnnotation(annotations.sub.runtimeType))
+        .map((fieldElement) => FieldProcessor(fieldElement, null).process())
+        .toList();
+    final primaryKey = PrimaryKey([fields[0]], false);
+    const foreignKeys = <ForeignKey>[];
+    const indices = <Index>[];
+    const constructor = "Person(row['id'] as int, row['name'] as String)";
+    const valueMapping = "<String, Object?>{'id': item.id, 'name': item.name}";
+    final expected = Entity(
+      classElement,
+      name,
+      fields,
+      fields,
+      fields,
+      primaryKey,
+      foreignKeys,
+      indices,
+      false,
+      constructor,
+      valueMapping,
+      valueMapping,
+      valueMapping,
+      null,
+    );
+    expect(actual, equals(expected));
+  });
 }
 
 Future<List<ClassElement>> _createClassElements(final String classes) async {
@@ -386,4 +423,11 @@ Future<List<ClassElement>> _createClassElements(final String classes) async {
   });
 
   return library.classes.toList();
+}
+
+TypeChecker _typeChecker(final Type type) => TypeChecker.fromRuntime(type);
+extension AnnotationChecker on Element {
+  bool hasAnnotation(final Type type) {
+    return _typeChecker(type).hasAnnotationOfExact(this);
+  }
 }

@@ -54,6 +54,21 @@ abstract class QueryableProcessor<T extends Queryable> extends Processor<T> {
   }
 
   @protected
+  List<FieldElement> getFieldsSub() {
+    if (classElement.mixins.isNotEmpty) {
+      throw _queryableProcessorError.prohibitedMixinUsage;
+    }
+    final fields = [
+      ...classElement.fields,
+      ...classElement.allSupertypes.expand((type) => type.element.fields),
+    ];
+
+    return fields
+        .where((fieldElement) => fieldElement.shouldBeIncludedSub())
+        .toList();
+  }
+
+  @protected
   List<FieldElement> getFieldsOutsideConstructor() {
     if (classElement.mixins.isNotEmpty) {
       throw _queryableProcessorError.prohibitedMixinUsage;
@@ -245,6 +260,11 @@ extension on FieldElement {
     if (isStatic || isSynthetic) {
       return false;
     }
+    final isSub = hasAnnotation(annotations.sub.runtimeType);
+    if (isSub) {
+      return false;
+    }
+
     final isIgnored = hasAnnotation(annotations.Ignore);
     if (!isIgnored) {
       return true;
@@ -260,6 +280,11 @@ extension on FieldElement {
     if (isStatic || isSynthetic) {
       return false;
     }
+    final isSub = hasAnnotation(annotations.sub.runtimeType);
+    if (isSub) {
+      return false;
+    }
+
     final isIgnored = hasAnnotation(annotations.Ignore);
     if (!isIgnored) {
       return true;
@@ -272,6 +297,11 @@ extension on FieldElement {
     if (isStatic || isSynthetic) {
       return false;
     }
+    final isSub = hasAnnotation(annotations.sub.runtimeType);
+    if (isSub) {
+      return false;
+    }
+
     final isIgnored = hasAnnotation(annotations.Ignore);
     if (!isIgnored) {
       return true;
@@ -284,6 +314,11 @@ extension on FieldElement {
     if (isStatic || isSynthetic) {
       return false;
     }
+    final isSub = hasAnnotation(annotations.sub.runtimeType);
+    if (isSub) {
+      return false;
+    }
+
     final isIgnored = hasAnnotation(annotations.Ignore);
     if (!isIgnored) {
       return true;
@@ -296,6 +331,11 @@ extension on FieldElement {
     if (isStatic || isSynthetic) {
       return false;
     }
+    final isSub = hasAnnotation(annotations.sub.runtimeType);
+    if (isSub) {
+      return false;
+    }
+
     final isIgnored = hasAnnotation(annotations.Ignore);
     if (!isIgnored) {
       return true;
@@ -308,6 +348,11 @@ extension on FieldElement {
     if (isStatic || isSynthetic) {
       return false;
     }
+    final isSub = hasAnnotation(annotations.sub.runtimeType);
+    if (isSub) {
+      return false;
+    }
+
     final isIgnored = hasAnnotation(annotations.Ignore);
     if (!isIgnored) {
       return true;
@@ -317,5 +362,25 @@ extension on FieldElement {
         !ignoreAnnotation.getField(IgnoreField.forUpdate)!.toBoolValue()! ||
         !ignoreAnnotation.getField(IgnoreField.forDelete)!.toBoolValue()!
     ;
+  }
+
+  bool shouldBeIncludedSub() {
+    if (isStatic || isSynthetic) {
+      return false;
+    }
+    final isSub = hasAnnotation(annotations.sub.runtimeType);
+    if (!isSub) {
+      return false;
+    }
+
+    final isIgnored = hasAnnotation(annotations.Ignore);
+    if (isIgnored) {
+      throw InvalidGenerationSourceError(
+        'Skip element and sub feature cannot be used in the same field.',
+        todo: 'Consider remove @ignore.',
+        element: this,
+      );
+    }
+    return true;
   }
 }

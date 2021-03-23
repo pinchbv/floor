@@ -4,10 +4,12 @@ import 'package:collection/collection.dart';
 import 'package:floor_annotation/floor_annotation.dart' as annotations;
 import 'package:floor_generator/misc/constants.dart';
 import 'package:floor_generator/misc/extension/dart_object_extension.dart';
+import 'package:floor_generator/misc/extension/dart_type_extension.dart';
 import 'package:floor_generator/misc/extension/iterable_extension.dart';
 import 'package:floor_generator/misc/extension/string_extension.dart';
 import 'package:floor_generator/misc/extension/type_converters_extension.dart';
 import 'package:floor_generator/misc/type_utils.dart';
+import 'package:floor_generator/processor/database_processor.dart';
 import 'package:floor_generator/processor/error/entity_processor_error.dart';
 import 'package:floor_generator/processor/queryable_processor.dart';
 import 'package:floor_generator/value_object/entity.dart';
@@ -20,11 +22,12 @@ import 'package:floor_generator/value_object/type_converter.dart';
 
 class EntityProcessor extends QueryableProcessor<Entity> {
   final EntityProcessorError _processorError;
+  final List<FieldOfDaoWithAllMethods> _allFieldOfDaoWithAllMethods;
 
-  EntityProcessor(
-    final ClassElement classElement,
-    final Set<TypeConverter> typeConverters,
-  )   : _processorError = EntityProcessorError(classElement),
+  EntityProcessor(final ClassElement classElement, final Set<TypeConverter> typeConverters,
+      [final List<FieldOfDaoWithAllMethods> allFieldOfDaoWithAllMethods = const []])
+      : _processorError = EntityProcessorError(classElement),
+        _allFieldOfDaoWithAllMethods = allFieldOfDaoWithAllMethods,
         super(classElement, typeConverters);
 
   @override
@@ -45,6 +48,10 @@ class EntityProcessor extends QueryableProcessor<Entity> {
       throw _processorError.autoIncrementInWithoutRowid;
     }
 
+    final fieldsSub = getFieldsSub();
+
+    final saveSub =  fieldsSub.map((e) => _getSaveSub(e, name)).join('\n');
+
     return Entity(
       classElement,
       name,
@@ -52,7 +59,7 @@ class EntityProcessor extends QueryableProcessor<Entity> {
       fieldsDataBaseSchema,
       fieldsQuery,
       _getPrimaryKey(fieldsDataBaseSchema),
-      _getForeignKeys(),
+      _getForeignKeys(classElement),
       _getIndices(fieldsDataBaseSchema, name),
       _getWithoutRowid(),
       getConstructor(fieldsQuery),
@@ -60,12 +67,12 @@ class EntityProcessor extends QueryableProcessor<Entity> {
       _getValueMapping(fieldsUpdate),
       _getValueMapping(fieldsDelete),
       _getFts(),
+      saveSub,
     );
   }
 
-  List<ForeignKey> _getForeignKeys() {
-    return classElement
-            .getAnnotation(annotations.Entity)
+  List<ForeignKey> _getForeignKeys(ClassElement classElement) {
+    return classElement.getAnnotation(annotations.Entity)
             .getField(AnnotationField.entityForeignKeys)
             ?.toListValue()
             ?.map((foreignKeyObject) {
@@ -81,7 +88,7 @@ class EntityProcessor extends QueryableProcessor<Entity> {
                       .getField(AnnotationField.entityTableName)
                       ?.toStringValue() ??
                   parentType.getDisplayString(withNullability: false)
-              : throw _processorError.foreignKeyDoesNotReferenceEntity;
+              : throw _processorError.foreignKeyDoesNotReferenceEntity(classElement);
 
           final childColumns =
               _getColumns(foreignKeyObject, ForeignKeyField.childColumns);
@@ -326,5 +333,79 @@ class EntityProcessor extends QueryableProcessor<Entity> {
     } else {
       return foreignKeyAction;
     }
+  }
+
+  String _getSaveSub(final FieldElement field, String tableName) {
+    final String code;
+
+    final fieldType = field.type.flatten();
+
+    final fieldTypeElement = fieldType.element;
+    if (!(fieldTypeElement is ClassElement)) {
+      throw _processorError.noMethodWithSaveAnnotation(field);
+    }
+
+
+    final fieldOfDaoWithAllMethods = _allFieldOfDaoWithAllMethods.firstWhereOrNull((e) {
+      if (!e.method.hasAnnotation(annotations.save.runtimeType)) {
+        return false;
+      }
+      if (e.method.parameters.length != 1) {
+        throw _processorError.saveMethodParameterHaveMoreOne(e.method);
+      }
+      final parameter = e.method.parameters[0];
+      if (parameter.type.isNullable) {
+        throw _processorError.saveMethodParameterIsNullable(parameter);
+      }
+      if (parameter.type != fieldType) {
+        return false;
+      }
+      return true;
+    });
+
+    if (fieldOfDaoWithAllMethods == null) {
+      throw _processorError.noMethodWithSaveAnnotation(field);
+    }
+
+    final foreignKeys = _getForeignKeys(fieldTypeElement);
+    final foreignKeysRelation = foreignKeys.where((e) => e.parentName == tableName);
+    if (foreignKeysRelation.isEmpty) {
+      throw _processorError.foreignKeyDoesNotReferenceEntity(fieldTypeElement);
+    }
+    if (foreignKeysRelation.length > 1) {
+      throw _processorError.twoForeignKeysForTheSameParentTable(fieldTypeElement);
+    }
+
+    final setFields = StringBuffer();
+    final foreignKey = foreignKeysRelation.first;
+
+    if (field.type.isDartCoreList) {
+      for(var i = 0; i < foreignKey.parentColumns.length; i++){
+        setFields.writeln('sub.${foreignKey.childColumns[i]} = entity.${foreignKey.parentColumns[i]};');
+      }
+    } else {
+      for(var i = 0; i < foreignKey.parentColumns.length; i++){
+        setFields.writeln('entity.${field.name}.${foreignKey.childColumns[i]} = entity.${foreignKey.parentColumns[i]};');
+      }
+    }
+    if (field.type.isNullable && field.type.isDartCoreList) {
+      code = '''          if (entity.${field.name} != null) {
+            for(final sub in entity.${field.name}) {
+              ${setFields}floorDatabase.${fieldOfDaoWithAllMethods.field.name}.save(sub);
+            }
+          }''';
+    } else if (field.type.isDartCoreList) {
+      code = '''          for(final sub in entity.${field.name}) {
+            ${setFields}floorDatabase.${fieldOfDaoWithAllMethods.field.name}.save(sub);
+          }''';
+    } else if(field.type.isNullable) {
+      code = '''          if (entity.${field.name} != null) {
+            ${setFields}floorDatabase.${fieldOfDaoWithAllMethods.field.name}.save(entity.${field.name});
+          }''';
+    } else{
+      code = '''                ${setFields}floorDatabase.${fieldOfDaoWithAllMethods.field.name}.save(entity.${field.name});''';
+    }
+
+    return code;
   }
 }

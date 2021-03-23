@@ -20,12 +20,13 @@ class DaoWriter extends Writer {
   final Dao dao;
   final Set<Entity> streamEntities;
   final bool dbHasViewStreams;
+  final String databaseNameType;
 
-  DaoWriter(this.dao, this.streamEntities, this.dbHasViewStreams);
+  DaoWriter(this.dao, this.streamEntities, this.dbHasViewStreams, this.databaseNameType);
 
   @override
   Class write() {
-    const databaseFieldName = 'database';
+    const databaseFieldName = 'floorDatabase';
     const changeListenerFieldName = 'changeListener';
 
     final daoName = dao.name;
@@ -59,7 +60,7 @@ class DaoWriter extends Writer {
 
       constructorBuilder
         ..initializers.add(Code(
-            "_queryAdapter = QueryAdapter(database${queriesRequireChangeListener ? ', changeListener' : ''})"));
+            "_queryAdapter = QueryAdapter(floorDatabase.database${queriesRequireChangeListener ? ', changeListener: changeListener' : ''})"));
     }
 
     final insertionMethods = dao.insertionMethods;
@@ -84,16 +85,20 @@ class DaoWriter extends Writer {
         final requiresChangeListener =
             dbHasViewStreams || streamEntities.contains(entity);
 
-        String insertedCode = '';
+        final insertedBody = StringBuffer();
         if (entity.primaryKey.fields.length == 1) {
           final primaryKeyField = entity.primaryKey.fields[0];
           if (entity.primaryKey.autoGenerateId && primaryKeyField.fieldElement.type.isDartCoreInt) {
-            insertedCode = ', inserted: (id, item) { item.${primaryKeyField.name} = id; }';
+            insertedBody.writeln('entity.${primaryKeyField.name} = id;');
           }
         }
+        if (entity.saveSub.isNotEmpty) {
+          insertedBody.writeln(entity.saveSub);
+        }
+        final insertedCode = insertedBody.isEmpty ? '' : ', inserted: (id, entity) { $insertedBody }';
         constructorBuilder
           ..initializers.add(Code(
-              "$fieldName = InsertionAdapter(database, '${entity.name}', $valueMapper$insertedCode${requiresChangeListener ? ', changeListener: changeListener' : ''})"));
+              "$fieldName = InsertionAdapter(floorDatabase.database, '${entity.name}', $valueMapper$insertedCode${requiresChangeListener ? ', changeListener: changeListener' : ''})"));
       }
     }
 
@@ -119,9 +124,16 @@ class DaoWriter extends Writer {
         final requiresChangeListener =
             dbHasViewStreams || streamEntities.contains(entity);
 
+        final String updatedCode;
+        if (entity.saveSub.isNotEmpty) {
+          updatedCode = ', updated: (entity) { ${entity.saveSub} }';
+        } else{
+          updatedCode = '';
+        }
+
         constructorBuilder
           ..initializers.add(Code(
-              "$fieldName = UpdateAdapter(database, '${entity.name}', ${entity.primaryKey.fields.map((field) => '\'${field.columnName}\'').toList()}, $valueMapper${requiresChangeListener ? ', changeListener' : ''})"));
+              "$fieldName = UpdateAdapter(floorDatabase.database, '${entity.name}', ${entity.primaryKey.fields.map((field) => '\'${field.columnName}\'').toList()}, $valueMapper$updatedCode${requiresChangeListener ? ', changeListener: changeListener' : ''})"));
       }
     }
 
@@ -147,9 +159,16 @@ class DaoWriter extends Writer {
         final requiresChangeListener =
             dbHasViewStreams || streamEntities.contains(entity);
 
+        final String deletedCode;
+        if (entity.saveSub.isNotEmpty) {
+          deletedCode = '';
+        } else{
+          deletedCode = '';
+        }
+
         constructorBuilder
           ..initializers.add(Code(
-              "$fieldName = DeletionAdapter(database, '${entity.name}', ${entity.primaryKey.fields.map((field) => '\'${field.columnName}\'').toList()}, $valueMapper${requiresChangeListener ? ', changeListener' : ''})"));
+              "$fieldName = DeletionAdapter(floorDatabase.database, '${entity.name}', ${entity.primaryKey.fields.map((field) => '\'${field.columnName}\'').toList()}, $valueMapper$deletedCode${requiresChangeListener ? ', changeListener: changeListener' : ''})"));
       }
     }
 
@@ -170,7 +189,7 @@ class DaoWriter extends Writer {
   ) {
     final databaseField = Field((builder) => builder
       ..name = databaseName
-      ..type = refer('sqflite.DatabaseExecutor')
+      ..type = refer('_\$${databaseNameType}')
       ..modifier = FieldModifier.final$);
 
     final changeListenerField = Field((builder) => builder

@@ -53,7 +53,7 @@ class DatabaseWriter implements Writer {
         ..returns = refer(daoTypeName)
         ..name = daoGetterName
         ..body = Code(
-            'return _${daoGetterName}Instance ??= _\$$daoTypeName(database, changeListener);'));
+            'return _${daoGetterName}Instance ??= _\$$daoTypeName(this, changeListener);'));
     }).toList();
   }
 

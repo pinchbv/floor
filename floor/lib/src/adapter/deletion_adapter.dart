@@ -9,20 +9,25 @@ class DeletionAdapter<T> {
   final List<String> _primaryKeyColumnNames;
   final Map<String, Object?> Function(T) _valueMapper;
   final StreamController<String>? _changeListener;
+  final void Function(T entity)? _deleted;
 
   DeletionAdapter(
     final DatabaseExecutor database,
     final String entityName,
     final List<String> primaryKeyColumnName,
-    final Map<String, Object?> Function(T) valueMapper, [
-    final StreamController<String>? changeListener,
-  ])  : assert(entityName.isNotEmpty),
+    final Map<String, Object?> Function(T) valueMapper,
+      {
+        final StreamController<String>? changeListener,
+        void Function(T entity)? deleted,
+      }
+    )  : assert(entityName.isNotEmpty),
         assert(primaryKeyColumnName.isNotEmpty),
         _database = database,
         _entityName = entityName,
         _primaryKeyColumnNames = primaryKeyColumnName,
         _valueMapper = valueMapper,
-        _changeListener = changeListener;
+        _changeListener = changeListener,
+        _deleted = deleted;
 
   Future<void> delete(final T item) async {
     await _delete(item);
@@ -51,7 +56,12 @@ class DeletionAdapter<T> {
         _valueMapper(item),
       ),
     );
-    if (result != 0) _changeListener?.add(_entityName);
+    if (result != 0) {
+      _changeListener?.add(_entityName);
+      if (_deleted != null) {
+        _deleted!(item);
+      }
+    }
     return result;
   }
 
@@ -68,7 +78,12 @@ class DeletionAdapter<T> {
       );
     }
     final result = (await batch.commit(noResult: false)).cast<int>();
-    if (result.isNotEmpty) _changeListener?.add(_entityName);
+    if (result.isNotEmpty) {
+      _changeListener?.add(_entityName);
+      if (_deleted != null) {
+        items.forEach(_deleted!);
+      }
+    }
     return result.isNotEmpty
         ? result.reduce((sum, element) => sum + element)
         : 0;

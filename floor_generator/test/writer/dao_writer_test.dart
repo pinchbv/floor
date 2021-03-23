@@ -38,7 +38,7 @@ void main() {
       ''');
 
     final actual =
-        DaoWriter(dao, dao.streamEntities.toSet(), dao.streamViews.isNotEmpty)
+        DaoWriter(dao, dao.streamEntities.toSet(), dao.streamViews.isNotEmpty, 'DataBase')
             .write();
 
     expect(actual, equalsDart(r'''
@@ -117,7 +117,7 @@ void main() {
       ''');
 
     final actual =
-        DaoWriter(dao, dao.streamEntities.toSet(), dao.streamViews.isNotEmpty)
+        DaoWriter(dao, dao.streamEntities.toSet(), dao.streamViews.isNotEmpty, 'DataBase')
             .write();
 
     expect(actual, equalsDart(r'''
@@ -196,7 +196,7 @@ void main() {
       ''');
     // simulate DB is aware of streamed Person and no View
     final actual =
-        DaoWriter(dao, {dao.deletionMethods[0].entity}, false).write();
+        DaoWriter(dao, {dao.deletionMethods[0].entity}, false, 'DataBase').write();
 
     expect(actual, equalsDart(r'''
         class _$PersonDao extends PersonDao {
@@ -281,7 +281,7 @@ void main() {
       '',
       null,
     );
-    final actual = DaoWriter(dao, {otherEntity}, false).write();
+    final actual = DaoWriter(dao, {otherEntity}, false, 'DataBase').write();
 
     expect(actual, equalsDart(r'''
       class _$PersonDao extends PersonDao {
@@ -347,7 +347,7 @@ void main() {
         }
       ''');
     // simulate DB is aware of no streamed entity but at least a single View
-    final actual = DaoWriter(dao, {}, true).write();
+    final actual = DaoWriter(dao, {}, true, 'DataBase').write();
 
     expect(actual, equalsDart(r'''
         class _$PersonDao extends PersonDao {

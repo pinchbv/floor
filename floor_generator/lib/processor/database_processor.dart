@@ -31,13 +31,25 @@ class DatabaseProcessor extends Processor<Database> {
     final databaseName = _classElement.displayName;
     final databaseTypeConverters =
         _classElement.getTypeConverters(TypeConverterScope.database);
-    final entities = _getEntities(_classElement, databaseTypeConverters);
+
+    final fieldsDataBaseDao = _classElement.fields.where(_isDao).toList();
+
+    final allFieldOfDaoWithAllMethods = fieldsDataBaseDao.expand((e) {
+      final classElement = e.type.element;
+      if (classElement is ClassElement) {
+        return classElement.getAllMethods().map((method) => FieldOfDaoWithAllMethods(e, method));
+      }
+      return <FieldOfDaoWithAllMethods>[];
+    });
+
+    final entities = _getEntities(_classElement, databaseTypeConverters, allFieldOfDaoWithAllMethods.toList());
     final views = _getViews(_classElement, databaseTypeConverters);
     final daoGetters = _getDaoGetters(
       databaseName,
       entities,
       views,
       databaseTypeConverters,
+      fieldsDataBaseDao
     );
     final version = _getDatabaseVersion();
     final allTypeConverters = _getAllTypeConverters(
@@ -74,8 +86,9 @@ class DatabaseProcessor extends Processor<Database> {
     final List<Entity> entities,
     final List<View> views,
     final Set<TypeConverter> typeConverters,
+    final List<FieldElement> fieldsDataBaseDao,
   ) {
-    return _classElement.fields.where(_isDao).map((field) {
+    return fieldsDataBaseDao.map((field) {
       final classElement = field.type.element as ClassElement;
       final name = field.displayName;
 
@@ -105,6 +118,7 @@ class DatabaseProcessor extends Processor<Database> {
   List<Entity> _getEntities(
     final ClassElement databaseClassElement,
     final Set<TypeConverter> typeConverters,
+    List<FieldOfDaoWithAllMethods> allFieldOfDaoWithAllMethods,
   ) {
     final entities = _classElement
         .getAnnotation(annotations.Database)
@@ -116,6 +130,7 @@ class DatabaseProcessor extends Processor<Database> {
         .map((classElement) => EntityProcessor(
               classElement,
               typeConverters,
+              allFieldOfDaoWithAllMethods,
             ).process())
         .toList();
 
@@ -178,4 +193,11 @@ class DatabaseProcessor extends Processor<Database> {
     return classElement.hasAnnotation(annotations.DatabaseView) &&
         !classElement.isAbstract;
   }
+}
+
+class FieldOfDaoWithAllMethods {
+  final FieldElement field;
+  final MethodElement method;
+
+  FieldOfDaoWithAllMethods(this.field, this.method);
 }

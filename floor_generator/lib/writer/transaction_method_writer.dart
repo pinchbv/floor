@@ -32,10 +32,10 @@ class TransactionMethodWriter implements Writer {
     final finalExpression = innerType.isVoid ? 'await' : 'return';
 
     return '''
-    if (database is sqflite.Transaction) {
+    if (floorDatabase.database is sqflite.Transaction) {
       $finalExpression super.$methodCall;
     } else {
-      $finalExpression (database as sqflite.Database).transaction<$innerTypeName>((transaction) async {
+      $finalExpression (floorDatabase.database as sqflite.Database).transaction<$innerTypeName>((transaction) async {
         final transactionDatabase = _\$${method.databaseName}(changeListener)..database = transaction;
         $finalExpression transactionDatabase.${method.daoFieldName}.$methodCall;
       });
