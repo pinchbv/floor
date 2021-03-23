@@ -1,4 +1,3 @@
-// ignore_for_file: import_of_legacy_library_into_null_safe
 import 'package:analyzer/dart/element/element.dart';
 import 'package:analyzer/dart/element/type.dart';
 import 'package:collection/collection.dart';
@@ -269,7 +268,7 @@ extension on FieldElement {
     if (!isIgnored) {
       return true;
     }
-    final ignoreAnnotation = getAnnotation(annotations.Ignore);
+    final ignoreAnnotation = getAnnotation(annotations.Ignore)!;
     return !ignoreAnnotation.getField(IgnoreField.forQuery)!.toBoolValue()! ||
         !ignoreAnnotation.getField(IgnoreField.forInsert)!.toBoolValue()! ||
         !ignoreAnnotation.getField(IgnoreField.forUpdate)!.toBoolValue()! ||
@@ -289,7 +288,7 @@ extension on FieldElement {
     if (!isIgnored) {
       return true;
     }
-    final ignoreAnnotation = getAnnotation(annotations.Ignore);
+    final ignoreAnnotation = getAnnotation(annotations.Ignore)!;
     return !ignoreAnnotation.getField(IgnoreField.forQuery)!.toBoolValue()!;
   }
 
@@ -306,7 +305,7 @@ extension on FieldElement {
     if (!isIgnored) {
       return true;
     }
-    final ignoreAnnotation = getAnnotation(annotations.Ignore);
+    final ignoreAnnotation = getAnnotation(annotations.Ignore)!;
     return !ignoreAnnotation.getField(IgnoreField.forInsert)!.toBoolValue()!;
   }
 
@@ -323,7 +322,7 @@ extension on FieldElement {
     if (!isIgnored) {
       return true;
     }
-    final ignoreAnnotation = getAnnotation(annotations.Ignore);
+    final ignoreAnnotation = getAnnotation(annotations.Ignore)!;
     return !ignoreAnnotation.getField(IgnoreField.forUpdate)!.toBoolValue()!;
   }
 
@@ -340,7 +339,7 @@ extension on FieldElement {
     if (!isIgnored) {
       return true;
     }
-    final ignoreAnnotation = getAnnotation(annotations.Ignore);
+    final ignoreAnnotation = getAnnotation(annotations.Ignore)!;
     return !ignoreAnnotation.getField(IgnoreField.forDelete)!.toBoolValue()!;
   }
 
@@ -357,7 +356,7 @@ extension on FieldElement {
     if (!isIgnored) {
       return true;
     }
-    final ignoreAnnotation = getAnnotation(annotations.Ignore);
+    final ignoreAnnotation = getAnnotation(annotations.Ignore)!;
     return !ignoreAnnotation.getField(IgnoreField.forInsert)!.toBoolValue()! ||
         !ignoreAnnotation.getField(IgnoreField.forUpdate)!.toBoolValue()! ||
         !ignoreAnnotation.getField(IgnoreField.forDelete)!.toBoolValue()!

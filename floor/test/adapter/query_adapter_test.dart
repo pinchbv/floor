@@ -150,7 +150,7 @@ void main() {
 
     setUp(() {
       streamController = StreamController<String>();
-      underTest = QueryAdapter(mockDatabaseExecutor, streamController);
+      underTest = QueryAdapter(mockDatabaseExecutor, changeListener: streamController);
     });
 
     tearDown(() {

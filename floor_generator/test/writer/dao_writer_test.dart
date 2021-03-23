@@ -13,7 +13,7 @@ import 'package:floor_generator/writer/dao_writer.dart';
 import 'package:source_gen/source_gen.dart';
 import 'package:test/test.dart';
 
-import '../mocks.dart';
+import '../fakes.dart';
 import '../test_utils.dart';
 
 void main() {
@@ -266,7 +266,7 @@ void main() {
     ''');
     // simulate DB is aware of another streamed Entity and no View
     final otherEntity = Entity(
-      MockClassElement(),
+      FakeClassElement(),
       'Dog',
       [],
       [],
@@ -427,7 +427,7 @@ Future<Dao> _createDao(final String dao) async {
         Name(this.name);
       }
       ''', (resolver) async {
-    return LibraryReader(await resolver.findLibraryByName('test'));
+    return LibraryReader((await resolver.findLibraryByName('test'))!);
   });
 
   final daoClass = library.classes.firstWhere((classElement) =>

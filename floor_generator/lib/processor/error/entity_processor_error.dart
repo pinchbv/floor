@@ -1,4 +1,3 @@
-// ignore_for_file: import_of_legacy_library_into_null_safe
 import 'package:analyzer/dart/constant/value.dart';
 import 'package:analyzer/dart/element/element.dart';
 import 'package:floor_generator/processor/error/processor_error.dart';
@@ -125,7 +124,7 @@ class EntityProcessorError {
       ) {
     final type = field.type.isDartCoreList ? field.type.flatten() : field.type;
     return ProcessorError(
-      message: 'The type of fields with the @save annotation must be an entity.',
+      message: 'The type ${type.getDisplayString(withNullability: false)} of fields with the @save annotation must be an entity.',
       todo: 'Remove the @save annotation or change the property type to an entity.',
       element: field,
     );

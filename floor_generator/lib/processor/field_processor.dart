@@ -1,4 +1,3 @@
-// ignore_for_file: import_of_legacy_library_into_null_safe
 import 'package:analyzer/dart/element/element.dart';
 import 'package:analyzer/dart/element/type.dart';
 import 'package:collection/collection.dart';
@@ -47,7 +46,7 @@ class FieldProcessor extends Processor<Field> {
     return _fieldElement.hasAnnotation(annotations.ColumnInfo)
         ? _fieldElement
                 .getAnnotation(annotations.ColumnInfo)
-                .getField(AnnotationField.columnInfoName)
+                ?.getField(AnnotationField.columnInfoName)
                 ?.toStringValue() ??
             name
         : name;

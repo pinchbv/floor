@@ -1,4 +1,3 @@
-// ignore_for_file: import_of_legacy_library_into_null_safe
 import 'dart:typed_data';
 
 import 'package:analyzer/dart/constant/value.dart';
@@ -46,8 +45,9 @@ extension AnnotationChecker on Element {
     return _typeChecker(type).hasAnnotationOfExact(this);
   }
 
-  /// Returns the first annotation object found on [type]
-  DartObject getAnnotation(final Type type) {
+  /// Returns the first annotation object found of [type]
+  /// or `null` if annotation of [type] not found
+  DartObject? getAnnotation(final Type type) {
     return _typeChecker(type).firstAnnotationOfExact(this);
   }
 }
@@ -97,7 +97,7 @@ extension ClassElementExtension on ClassElement {
         return null;
       }
       final annotation = e.getAnnotation(annotations.EnumValue);
-      return annotation.getField(EnumValueField.value)?.type;
+      return annotation?.getField(EnumValueField.value)?.type;
     }).where((e) => e != null);
     if (types.isEmpty) {
       return null;

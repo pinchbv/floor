@@ -24,7 +24,7 @@ Future<LibraryReader> resolveCompilationUnit(String sourceDirectory) async {
 
   final library = await resolveSources(fileMap, (item) async {
     final assetId = AssetId.parse(fileMap.keys.first);
-    return await item.libraryFor(assetId);
+    return item.libraryFor(assetId);
   });
 
   return LibraryReader(library);

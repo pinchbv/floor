@@ -90,35 +90,39 @@ class _$FlutterDatabase extends FlutterDatabase {
 
   @override
   TaskDao get taskDao {
-    return _taskDaoInstance ??= _$TaskDao(database, changeListener);
+    return _taskDaoInstance ??= _$TaskDao(this, changeListener);
   }
 }
 
 class _$TaskDao extends TaskDao {
-  _$TaskDao(this.database, this.changeListener)
-      : _queryAdapter = QueryAdapter(database, changeListener),
+  _$TaskDao(this.floorDatabase, this.changeListener)
+      : _queryAdapter = QueryAdapter(floorDatabase.database,
+            changeListener: changeListener),
         _taskInsertionAdapter = InsertionAdapter(
-            database,
+            floorDatabase.database,
             'Task',
+            (Task item) => <String, Object?>{
+                  'id': item.id,
+                  'message': item.message
+                }, inserted: (id, entity) {
+          entity.id = id;
+        }, changeListener: changeListener),
+        _taskUpdateAdapter = UpdateAdapter(
+            floorDatabase.database,
+            'Task',
+            ['id'],
             (Task item) =>
                 <String, Object?>{'id': item.id, 'message': item.message},
             changeListener: changeListener),
-        _taskUpdateAdapter = UpdateAdapter(
-            database,
-            'Task',
-            ['id'],
-            (Task item) =>
-                <String, Object?>{'id': item.id, 'message': item.message},
-            changeListener),
         _taskDeletionAdapter = DeletionAdapter(
-            database,
+            floorDatabase.database,
             'Task',
             ['id'],
             (Task item) =>
                 <String, Object?>{'id': item.id, 'message': item.message},
-            changeListener);
+            changeListener: changeListener);
 
-  final sqflite.DatabaseExecutor database;
+  final _$FlutterDatabase floorDatabase;
 
   final StreamController<String> changeListener;
 

@@ -193,7 +193,7 @@ Future<Database> _createDatabase(final String definition) async {
       
       $definition
       ''', (resolver) async {
-    return LibraryReader(await resolver.findLibraryByName('test'));
+    return LibraryReader((await resolver.findLibraryByName('test'))!);
   });
 
   return DatabaseProcessor(library.classes.first).process();

@@ -1,4 +1,3 @@
-// @dart=2.9
 import 'package:analyzer/dart/element/element.dart';
 import 'package:build_test/build_test.dart';
 import 'package:floor_generator/misc/constants.dart';
@@ -195,7 +194,7 @@ Future<FieldElement> _generateFieldElement(final String field) async {
         }
       }
       ''', (resolver) async {
-    return LibraryReader(await resolver.findLibraryByName('test'));
+    return LibraryReader((await resolver.findLibraryByName('test'))!);
   });
 
   return library.classes.first.fields.first;

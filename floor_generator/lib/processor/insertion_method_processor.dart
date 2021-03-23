@@ -1,4 +1,3 @@
-// ignore_for_file: import_of_legacy_library_into_null_safe
 import 'package:analyzer/dart/element/element.dart';
 import 'package:analyzer/dart/element/type.dart';
 import 'package:floor_annotation/floor_annotation.dart' as annotations
@@ -80,7 +79,7 @@ class InsertionMethodProcessor implements Processor<InsertionMethod> {
   String _getOnConflictStrategy() {
     final onConflictStrategy = _methodElement
         .getAnnotation(annotations.Insert)
-        .getField(AnnotationField.onConflict)
+        ?.getField(AnnotationField.onConflict)
         ?.toEnumValueString();
 
     if (onConflictStrategy == null) {

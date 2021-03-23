@@ -189,7 +189,7 @@ class DaoWriter extends Writer {
   ) {
     final databaseField = Field((builder) => builder
       ..name = databaseName
-      ..type = refer('_\$${databaseNameType}')
+      ..type = refer('_\$$databaseNameType')
       ..modifier = FieldModifier.final$);
 
     final changeListenerField = Field((builder) => builder

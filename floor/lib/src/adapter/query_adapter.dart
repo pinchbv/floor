@@ -8,9 +8,10 @@ class QueryAdapter {
   final StreamController<String>? _changeListener;
 
   QueryAdapter(
-    final DatabaseExecutor database, [
-    final StreamController<String>? changeListener,
-  ])  : _database = database,
+    final DatabaseExecutor database,
+    {
+      final StreamController<String>? changeListener,
+    })  : _database = database,
         _changeListener = changeListener;
 
   /// Executes a SQLite query that may return a single value.
