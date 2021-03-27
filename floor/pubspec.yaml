@@ -28,9 +28,4 @@ dev_dependencies:
   flutter_test:
     sdk: flutter
   matcher: ^0.12.10
-  mockito: ^5.0.2
-
-dependency_overrides:
-  # necessary for mockito 5.0.2 as its source_gen dependency is constrained to be below 1.0.0
-  # as this override only affects test dependencies, there is not too much to worry about
-  source_gen: '1.0.0'
+  mockito: ^5.0.3
