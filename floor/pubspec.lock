@@ -297,7 +297,7 @@ packages:
       name: mockito
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "5.0.2"
+    version: "5.0.3"
   package_config:
     dependency: transitive
     description:
@@ -360,7 +360,7 @@ packages:
     source: sdk
     version: "0.0.99"
   source_gen:
-    dependency: "direct overridden"
+    dependency: transitive
     description:
       name: source_gen
       url: "https://pub.dartlang.org"
