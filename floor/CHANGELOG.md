@@ -1,5 +1,16 @@
 # Changelog
 
+# 1.0.1
+
+### Changes
+
+* Bump mockito to 5.0.3
+* Update dependencies to null-safe versions
+
+### 🚀 Features
+
+* Improved Parameter mapping for query methods
+
 # 1.0.0
 
 ### Changes
@@ -94,8 +105,8 @@
 
 ### ⚠️ Breaking Changes
 
-**You need to migrate the explicit usages of `OnConflictStrategy` and `ForeignKeyAction` from snake case to camel
-case.**
+**You need to migrate the explicit usages of `OnConflictStrategy` and `ForeignKeyAction` from snake
+case to camel case.**
 
 * Apply camel case to constants
 
