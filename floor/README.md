@@ -40,7 +40,7 @@ dependencies:
   floor: ^1.0.1
 
 dev_dependencies:
-  floor_generator: ^1.0.0
+  floor_generator: ^1.0.1
   build_runner: ^1.12.2
 ```
 
