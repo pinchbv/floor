@@ -115,6 +115,18 @@ void main() {
 
           expect(actual, equals(person));
         });
+
+        test("query with ''", () async {
+          final person = Person(1, 'Frank');
+          final personNoName = Person(2, '');
+          await personDao.insertPerson(person);
+          await personDao.insertPerson(personNoName);
+
+          final actual = await personDao.findPersonsWithEmptyName();
+
+          // find (only) personNoName
+          expect(actual, equals([personNoName]));
+        });
       });
 
       group('transaction', () {

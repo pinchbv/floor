@@ -34,6 +34,9 @@ abstract class PersonDao {
   @Query('SELECT * FROM person WHERE custom_name LIKE :name')
   Future<List<Person>> findPersonsWithNamesLike(String name);
 
+  @Query("SELECT * FROM person WHERE custom_name == ''")
+  Future<List<Person>> findPersonsWithEmptyName();
+
   @Insert(onConflict: OnConflictStrategy.replace)
   Future<void> insertPerson(Person person);
 
