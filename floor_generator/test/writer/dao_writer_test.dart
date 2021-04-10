@@ -64,7 +64,7 @@ void main() {
         
           final sqflite.DatabaseExecutor database;
         
-          final StreamController<String> changeListener;
+          final StreamController<Set<String>> changeListener;
         
           final QueryAdapter _queryAdapter;
         
@@ -146,7 +146,7 @@ void main() {
         
           final sqflite.DatabaseExecutor database;
         
-          final StreamController<String> changeListener;
+          final StreamController<Set<String>> changeListener;
         
           final QueryAdapter _queryAdapter;
         
@@ -223,7 +223,7 @@ void main() {
         
           final sqflite.DatabaseExecutor database;
         
-          final StreamController<String> changeListener;
+          final StreamController<Set<String>> changeListener;
         
           final InsertionAdapter<Person> _personInsertionAdapter;
         
@@ -301,7 +301,7 @@ void main() {
       
         final sqflite.DatabaseExecutor database;
       
-        final StreamController<String> changeListener;
+        final StreamController<Set<String>> changeListener;
       
         final InsertionAdapter<Person> _personInsertionAdapter;
       
@@ -370,7 +370,7 @@ void main() {
         
           final sqflite.DatabaseExecutor database;
         
-          final StreamController<String> changeListener;
+          final StreamController<Set<String>> changeListener;
         
           final InsertionAdapter<Person> _personInsertionAdapter;
         

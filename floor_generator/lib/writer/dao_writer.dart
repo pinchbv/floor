@@ -167,7 +167,7 @@ class DaoWriter extends Writer {
 
     final changeListenerField = Field((builder) => builder
       ..name = changeListenerName
-      ..type = refer('StreamController<String>')
+      ..type = refer('StreamController<Set<String>>')
       ..modifier = FieldModifier.final$);
 
     return [databaseField, changeListenerField];

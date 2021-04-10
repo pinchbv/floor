@@ -56,8 +56,8 @@ class _$FlutterDatabaseBuilder {
 }
 
 class _$FlutterDatabase extends FlutterDatabase {
-  _$FlutterDatabase([StreamController<String>? listener]) {
-    changeListener = listener ?? StreamController<String>.broadcast();
+  _$FlutterDatabase([StreamController<Set<String>>? listener]) {
+    changeListener = listener ?? StreamController<Set<String>>.broadcast();
   }
 
   TaskDao? _taskDaoInstance;
@@ -121,7 +121,7 @@ class _$TaskDao extends TaskDao {
 
   final sqflite.DatabaseExecutor database;
 
-  final StreamController<String> changeListener;
+  final StreamController<Set<String>> changeListener;
 
   final QueryAdapter _queryAdapter;
 
