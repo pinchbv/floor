@@ -139,8 +139,7 @@ void main() {
             [], // initial state,
             [dog1], // after inserting dog1
             [dog1], // after inserting dog2
-            //[], // after removing person1. Does not work because
-            // ForeignKey-relations are not considered yet (#321)
+            [], // after removing person1, which triggers cascade remove
           ]));
 
       await personDao.insertPerson(person1);

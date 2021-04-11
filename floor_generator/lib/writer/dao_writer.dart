@@ -3,6 +3,7 @@ import 'package:floor_generator/misc/extension/string_extension.dart';
 import 'package:floor_generator/value_object/dao.dart';
 import 'package:floor_generator/value_object/deletion_method.dart';
 import 'package:floor_generator/value_object/entity.dart';
+import 'package:floor_generator/misc/foreign_key_map.dart';
 import 'package:floor_generator/value_object/insertion_method.dart';
 import 'package:floor_generator/value_object/query_method.dart';
 import 'package:floor_generator/value_object/transaction_method.dart';
@@ -19,8 +20,10 @@ class DaoWriter extends Writer {
   final Dao dao;
   final Set<Entity> streamEntities;
   final bool dbHasViewStreams;
+  final ForeignKeyMap foreignKeyRelationships;
 
-  DaoWriter(this.dao, this.streamEntities, this.dbHasViewStreams);
+  DaoWriter(this.dao, this.streamEntities, this.dbHasViewStreams,
+      this.foreignKeyRelationships);
 
   @override
   Class write() {
@@ -108,12 +111,12 @@ class DaoWriter extends Writer {
         final valueMapper =
             '(${entity.classElement.displayName} item) => ${entity.valueMapping}';
 
-        final requiresChangeListener =
-            dbHasViewStreams || streamEntities.contains(entity);
+        final changeHandler = _generateChangeHandler(
+            foreignKeyRelationships.getAffectedByUpdate(entity));
 
         constructorBuilder
           ..initializers.add(Code(
-              "$fieldName = UpdateAdapter(database, '${entity.name}', ${entity.primaryKey.fields.map((field) => '\'${field.columnName}\'').toList()}, $valueMapper${requiresChangeListener ? ', changeListener' : ''})"));
+              "$fieldName = UpdateAdapter(database, '${entity.name}', ${entity.primaryKey.fields.map((field) => field.columnName.toLiteral()).toList()}, $valueMapper$changeHandler)"));
       }
     }
 
@@ -136,12 +139,12 @@ class DaoWriter extends Writer {
         final valueMapper =
             '(${entity.classElement.displayName} item) => ${entity.valueMapping}';
 
-        final requiresChangeListener =
-            dbHasViewStreams || streamEntities.contains(entity);
+        final changeHandler = _generateChangeHandler(
+            foreignKeyRelationships.getAffectedByDelete(entity));
 
         constructorBuilder
           ..initializers.add(Code(
-              "$fieldName = DeletionAdapter(database, '${entity.name}', ${entity.primaryKey.fields.map((field) => '\'${field.columnName}\'').toList()}, $valueMapper${requiresChangeListener ? ', changeListener' : ''})"));
+              "$fieldName = DeletionAdapter(database, '${entity.name}', ${entity.primaryKey.fields.map((field) => '\'${field.columnName}\'').toList()}, $valueMapper$changeHandler)"));
       }
     }
 
@@ -209,5 +212,24 @@ class DaoWriter extends Writer {
     return transactionMethods
         .map((method) => TransactionMethodWriter(method).write())
         .toList();
+  }
+
+  /// Generate the code for an optional change handler parameter.
+  ///
+  /// The generated lambda notifies all affected entities that
+  /// are also the contributing to a streamed result of a query.
+  ///
+  /// The affected set can be generated with [getAffectedByUpdateEntities]
+  /// and [getAffectedByDeleteEntities]
+  String _generateChangeHandler(final Set<Entity> affected) {
+    final toNotify = streamEntities.intersection(affected);
+
+    if (toNotify.isNotEmpty || dbHasViewStreams)
+      // if there are streaming views, create a new handler even if the set
+      // is empty. This will only trigger a reload of the views.
+      return ', () => changeListener.add(const {${toNotify.map((e) => e.name.toLiteral()).join(', ')}})';
+    else
+      // do not generate a Handler if the listener doesn't have to be updated
+      return '';
   }
 }

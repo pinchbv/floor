@@ -110,14 +110,14 @@ class _$TaskDao extends TaskDao {
             ['id'],
             (Task item) =>
                 <String, Object?>{'id': item.id, 'message': item.message},
-            changeListener),
+            () => changeListener.add(const {'Task'})),
         _taskDeletionAdapter = DeletionAdapter(
             database,
             'Task',
             ['id'],
             (Task item) =>
                 <String, Object?>{'id': item.id, 'message': item.message},
-            changeListener);
+            () => changeListener.add(const {'Task'}));
 
   final sqflite.DatabaseExecutor database;
 
