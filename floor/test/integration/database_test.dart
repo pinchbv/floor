@@ -371,6 +371,22 @@ void main() {
       });
     });
   });
+  test('callback test', () async {
+    final database = await $FloorTestDatabase
+        .inMemoryDatabaseBuilder()
+        .addCallback(Callback(
+          onConfigure: (database) =>
+              database.execute('PRAGMA foreign_keys = OFF'),
+          onCreate: (database, version) async {
+            //insert element with missing person (should not fail since foreign key checks are off)
+            await database.execute(
+                "INSERT INTO dog (id,name,nick_name,owner_id) VALUES (1,'doggo','d',4);");
+          },
+          onOpen: (database) => database.execute('PRAGMA foreign_keys = ON'),
+        ))
+        .build();
+    await database.close();
+  });
 }
 
 final _throwsDatabaseException =
