@@ -1,25 +1,27 @@
 import 'package:analyzer/dart/element/element.dart';
 import 'package:analyzer/dart/element/type.dart';
 import 'package:floor_annotation/floor_annotation.dart' as annotations
-    show Insert, OnConflictStrategy;
+    show Insert;
 import 'package:floor_generator/misc/change_method_processor_helper.dart';
 import 'package:floor_generator/misc/constants.dart';
 import 'package:floor_generator/misc/extension/dart_object_extension.dart';
 import 'package:floor_generator/misc/type_utils.dart';
+import 'package:floor_generator/processor/error/change_method_processor_error.dart';
 import 'package:floor_generator/processor/processor.dart';
 import 'package:floor_generator/value_object/entity.dart';
 import 'package:floor_generator/value_object/insertion_method.dart';
-import 'package:source_gen/source_gen.dart';
 
 class InsertionMethodProcessor implements Processor<InsertionMethod> {
   final MethodElement _methodElement;
   final ChangeMethodProcessorHelper _helper;
+  final ChangeMethodProcessorError _errors;
 
   InsertionMethodProcessor(
     final MethodElement methodElement,
     final List<Entity> entities, [
     final ChangeMethodProcessorHelper? changeMethodProcessorHelper,
   ])  : _methodElement = methodElement,
+        _errors = ChangeMethodProcessorError(methodElement, 'Insertion'),
         _helper = changeMethodProcessorHelper ??
             ChangeMethodProcessorHelper(methodElement, entities);
 
@@ -39,10 +41,7 @@ class InsertionMethodProcessor implements Processor<InsertionMethod> {
     final returnsIntList = returnsList && flattenedReturnType.isDartCoreInt;
 
     if (!returnsVoid && !returnsIntList && !returnsInt) {
-      throw InvalidGenerationSourceError(
-        'Insertion methods have to return a Future of either void, int or List<int>.',
-        element: _methodElement,
-      );
+      throw _errors.doesNotReturnVoidNorIntNorListInt;
     }
 
     final parameterElement = _helper.getParameterElement();
@@ -83,10 +82,7 @@ class InsertionMethodProcessor implements Processor<InsertionMethod> {
         ?.toEnumValueString();
 
     if (onConflictStrategy == null) {
-      throw InvalidGenerationSourceError(
-        'Value of ${AnnotationField.onConflict} must be one of ${annotations.OnConflictStrategy.values.map((e) => e.toString()).join(',')}',
-        element: _methodElement,
-      );
+      throw _errors.wrongOnConflictValue;
     } else {
       return onConflictStrategy;
     }
@@ -94,10 +90,7 @@ class InsertionMethodProcessor implements Processor<InsertionMethod> {
 
   void _assertMethodReturnsFuture(final DartType returnType) {
     if (!returnType.isDartAsyncFuture) {
-      throw InvalidGenerationSourceError(
-        'Insertion methods have to return a Future.',
-        element: _methodElement,
-      );
+      throw _errors.doesNotReturnFuture;
     }
   }
 }

@@ -322,6 +322,226 @@ void main() {
       expect(actual, equals(expected));
     });
   });
+
+  group('expected errors', () {
+    test('missing primary key', () async {
+      final classElements = await createClassElement('''
+          @entity
+          class Person {
+            final int id;
+            
+            final String name;
+          
+            Person(this.id, this.name);
+          }
+      ''');
+
+      final processor = EntityProcessor(classElements, {});
+      expect(
+          processor.process,
+          throwsInvalidGenerationSourceError(
+              EntityProcessorError(classElements).missingPrimaryKey));
+    });
+    test('missing parent columns', () async {
+      final classElements = await _createClassElements('''
+          @entity
+          class Person {
+            @primaryKey
+            final int id;
+            
+            final String name;
+          
+            Person(this.id, this.name);
+          }
+          
+          @Entity(
+            foreignKeys: [
+              ForeignKey(
+                childColumns: ['owner_id'],
+                parentColumns: [],
+                entity: Person,
+                onUpdate: null
+                onDelete: ForeignKeyAction.setNull,
+              )
+            ],
+          )
+          class Dog {
+            @primaryKey
+            final int id;
+          
+            final String name;
+          
+            @ColumnInfo(name: 'owner_id')
+            final int ownerId;
+          
+            Dog(this.id, this.name, this.ownerId);
+          }
+      ''');
+
+      final processor = EntityProcessor(classElements[1], {});
+      expect(
+          processor.process,
+          throwsInvalidGenerationSourceError(
+              EntityProcessorError(classElements[1]).missingParentColumns));
+    });
+    test('missing child columns', () async {
+      final classElements = await _createClassElements('''
+          @entity
+          class Person {
+            @primaryKey
+            final int id;
+            
+            final String name;
+          
+            Person(this.id, this.name);
+          }
+          
+          @Entity(
+            foreignKeys: [
+              ForeignKey(
+                childColumns: [],
+                parentColumns: ['id'],
+                entity: Person,
+                onUpdate: null
+                onDelete: ForeignKeyAction.setNull,
+              )
+            ],
+          )
+          class Dog {
+            @primaryKey
+            final int id;
+          
+            final String name;
+          
+            @ColumnInfo(name: 'owner_id')
+            final int ownerId;
+          
+            Dog(this.id, this.name, this.ownerId);
+          }
+      ''');
+
+      final processor = EntityProcessor(classElements[1], {});
+      expect(
+          processor.process,
+          throwsInvalidGenerationSourceError(
+              EntityProcessorError(classElements[1]).missingChildColumns));
+    });
+    test('foreignKey does not reference entity', () async {
+      final classElements = await _createClassElements('''
+          final Person = ()=>2;
+          
+          @Entity(
+            foreignKeys: [
+              ForeignKey(
+                childColumns: ['owner_id'],
+                parentColumns: ['id'],
+                entity: Entity(),
+                onUpdate: ForeignKeyAction.setNull
+                onDelete: ForeignKeyAction.setNull,
+              )
+            ],
+          )
+          class Dog {
+            @primaryKey
+            final int id;
+          
+            final String name;
+          
+            @ColumnInfo(name: 'owner_id')
+            final int ownerId;
+          
+            Dog(this.id, this.name, this.ownerId);
+          }
+      ''');
+
+      final processor = EntityProcessor(classElements[0], {});
+      expect(
+          processor.process,
+          throwsInvalidGenerationSourceError(
+              EntityProcessorError(classElements[0])
+                  .foreignKeyDoesNotReferenceEntity));
+    }, skip: 'Can not reproduce error case');
+    test('foreign key reference does not exist', () async {
+      final classElements = await createClassElement('''
+          @Entity(
+            foreignKeys: [
+              ForeignKey(
+                childColumns: ['owner_id'],
+                parentColumns: ['id'],
+                entity: Person,
+                onUpdate: null
+                onDelete: ForeignKeyAction.setNull,
+              )
+            ],
+          )
+          class Dog {
+            @primaryKey
+            final int id;
+          
+            final String name;
+          
+            @ColumnInfo(name: 'owner_id')
+            final int ownerId;
+          
+            Dog(this.id, this.name, this.ownerId);
+          }
+      ''');
+
+      final processor = EntityProcessor(classElements, {});
+      expect(
+          processor.process,
+          throwsInvalidGenerationSourceError(
+              EntityProcessorError(classElements).foreignKeyNoEntity));
+    });
+    test('missing index column name', () async {
+      final classElement = await createClassElement('''
+          @Entity(
+            indices:[Index(value=[])]
+          )
+          class Dog {
+            @primaryKey
+            final int id;
+          
+            final String name;
+          
+            @ColumnInfo(name: 'owner_id')
+            final int ownerId;
+          
+            Dog(this.id, this.name, this.ownerId);
+          }
+      ''');
+
+      final processor = EntityProcessor(classElement, {});
+      expect(
+          processor.process,
+          throwsInvalidGenerationSourceError(
+              EntityProcessorError(classElement).missingIndexColumnName));
+    });
+    test('auto-increment not usable with `WITHOUT ROWID`', () async {
+      final classElement = await createClassElement('''
+          @Entity(
+            withoutRowid:true
+          )
+          class Dog {
+            @PrimaryKey(autoGenerate:true)
+            final int id;
+          
+            final String name;
+          
+            @ColumnInfo(name: 'owner_id')
+            final int ownerId;
+          
+            Dog(this.id, this.name, this.ownerId);
+          }
+      ''');
+
+      final processor = EntityProcessor(classElement, {});
+      expect(
+          processor.process,
+          throwsInvalidGenerationSourceError(
+              EntityProcessorError(classElement).autoIncrementInWithoutRowid));
+    });
+  });
 }
 
 Future<List<ClassElement>> _createClassElements(final String classes) async {
