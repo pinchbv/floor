@@ -56,6 +56,54 @@ void main() {
     expect(actual, equals(expected));
   });
 
+  test(
+      'Process entity with null fields falls back to defaults (should be prevented by non-nullable types)',
+      () async {
+    final classElement = await createClassElement('''
+      @Entity(
+      tableName:null,
+      foreignKeys:null,
+      indices:null,
+      primaryKeys:null,
+      withoutRowid:null,
+      )
+      @Fts3(tokenizerArgs:null)
+      class Person {
+        @primaryKey
+        final int id;
+      
+        final String name;
+      
+        Person(this.id, this.name);
+      }
+    ''');
+
+    final actual = EntityProcessor(classElement, {}).process();
+
+    const name = 'Person';
+    final fields = classElement.fields
+        .map((fieldElement) => FieldProcessor(fieldElement, null).process())
+        .toList();
+    final primaryKey = PrimaryKey([fields[0]], false);
+    const foreignKeys = <ForeignKey>[];
+    const indices = <Index>[];
+    const constructor = "Person(row['id'] as int, row['name'] as String)";
+    const valueMapping = "<String, Object?>{'id': item.id, 'name': item.name}";
+    final expected = Entity(
+      classElement,
+      name,
+      fields,
+      primaryKey,
+      foreignKeys,
+      indices,
+      false,
+      constructor,
+      valueMapping,
+      Fts3(annotations.FtsTokenizer.simple, []),
+    );
+    expect(actual, equals(expected));
+  });
+
   test('Process entity with compound primary key', () async {
     final classElement = await createClassElement('''
       @Entity(primaryKeys: ['id', 'name'])
@@ -77,6 +125,48 @@ void main() {
     final primaryKey = PrimaryKey(fields, false);
     const foreignKeys = <ForeignKey>[];
     const indices = <Index>[];
+    const constructor = "Person(row['id'] as int, row['name'] as String)";
+    const valueMapping = "<String, Object?>{'id': item.id, 'name': item.name}";
+    final expected = Entity(
+      classElement,
+      name,
+      fields,
+      primaryKey,
+      foreignKeys,
+      indices,
+      false,
+      constructor,
+      valueMapping,
+      null,
+    );
+    expect(actual, equals(expected));
+  });
+
+  test('Process entity with index', () async {
+    final classElement = await createClassElement('''
+      @Entity(indices: [Index(name:'i1', unique: true, value:['id']),Index(unique: false, value:['id','name'])])
+      class Person {
+        @primaryKey
+        final int id;
+      
+        final String name;
+      
+        Person(this.id, this.name);
+      }
+    ''');
+
+    final actual = EntityProcessor(classElement, {}).process();
+
+    const name = 'Person';
+    final fields = classElement.fields
+        .map((fieldElement) => FieldProcessor(fieldElement, null).process())
+        .toList();
+    final primaryKey = PrimaryKey(fields.sublist(0, 1), false);
+    const foreignKeys = <ForeignKey>[];
+    final indices = [
+      Index('i1', 'Person', true, ['id']),
+      Index('index_Person_id_name', 'Person', false, ['id', 'name'])
+    ];
     const constructor = "Person(row['id'] as int, row['name'] as String)";
     const valueMapping = "<String, Object?>{'id': item.id, 'name': item.name}";
     final expected = Entity(
@@ -342,6 +432,26 @@ void main() {
           throwsInvalidGenerationSourceError(
               EntityProcessorError(classElements).missingPrimaryKey));
     });
+    test('compound primary key mismatch', () async {
+      final classElements = await createClassElement('''
+          @Entity(
+            primaryKeys:['notAField']
+          )
+          class Person {
+            final int id;
+            
+            final String name;
+          
+            Person(this.id, this.name);
+          }
+      ''');
+
+      final processor = EntityProcessor(classElements, {});
+      expect(
+          processor.process,
+          throwsInvalidGenerationSourceError(
+              EntityProcessorError(classElements).missingPrimaryKey));
+    });
     test('missing parent columns', () async {
       final classElements = await _createClassElements('''
           @entity
@@ -496,7 +606,7 @@ void main() {
     test('missing index column name', () async {
       final classElement = await createClassElement('''
           @Entity(
-            indices:[Index(value=[])]
+            indices:[Index(value:[])]
           )
           class Dog {
             @primaryKey
@@ -516,6 +626,30 @@ void main() {
           processor.process,
           throwsInvalidGenerationSourceError(
               EntityProcessorError(classElement).missingIndexColumnName));
+    });
+    test('no matching index column', () async {
+      final classElement = await createClassElement('''
+          @Entity(
+            indices:[Index(value:['notAColumn'])]
+          )
+          class Dog {
+            @primaryKey
+            final int id;
+          
+            final String name;
+          
+            @ColumnInfo(name: 'owner_id')
+            final int ownerId;
+          
+            Dog(this.id, this.name, this.ownerId);
+          }
+      ''');
+
+      final processor = EntityProcessor(classElement, {});
+      expect(
+          processor.process,
+          throwsInvalidGenerationSourceError(EntityProcessorError(classElement)
+              .noMatchingColumn(['notAColumn'])));
     });
     test('auto-increment not usable with `WITHOUT ROWID`', () async {
       final classElement = await createClassElement('''
