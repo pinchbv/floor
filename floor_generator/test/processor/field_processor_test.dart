@@ -8,6 +8,7 @@ import 'package:source_gen/source_gen.dart';
 import 'package:test/test.dart';
 
 import '../dart_type.dart';
+import '../test_utils.dart';
 
 void main() {
   test('Process field', () async {
@@ -168,6 +169,20 @@ void main() {
       typeConverter,
     );
     expect(actual, equals(expected));
+  });
+  test('Field with unsupported type throws error', () async {
+    final fieldElement = await _generateFieldElement('''
+      final List<int> id;
+    ''');
+
+    expect(
+        FieldProcessor(fieldElement, null).process,
+        throwsInvalidGenerationSourceError(InvalidGenerationSourceError(
+          'Column type is not supported for List<int>.',
+          todo:
+              'Either make to use a supported type or supply a type converter.',
+          element: fieldElement,
+        )));
   });
 }
 

@@ -1,20 +1,22 @@
 import 'package:analyzer/dart/element/element.dart';
 import 'package:analyzer/dart/element/type.dart';
 import 'package:floor_generator/misc/change_method_processor_helper.dart';
+import 'package:floor_generator/processor/error/change_method_processor_error.dart';
 import 'package:floor_generator/processor/processor.dart';
 import 'package:floor_generator/value_object/deletion_method.dart';
 import 'package:floor_generator/value_object/entity.dart';
-import 'package:source_gen/source_gen.dart';
 
 class DeletionMethodProcessor implements Processor<DeletionMethod> {
   final MethodElement _methodElement;
   final ChangeMethodProcessorHelper _helper;
+  final ChangeMethodProcessorError _errors;
 
   DeletionMethodProcessor(
     final MethodElement methodElement,
     final List<Entity> entities, [
     final ChangeMethodProcessorHelper? changeMethodProcessorHelper,
   ])  : _methodElement = methodElement,
+        _errors = ChangeMethodProcessorError(methodElement, 'Deletion'),
         _helper = changeMethodProcessorHelper ??
             ChangeMethodProcessorHelper(methodElement, entities);
 
@@ -32,10 +34,7 @@ class DeletionMethodProcessor implements Processor<DeletionMethod> {
     final returnsInt = flattenedReturnType.isDartCoreInt;
 
     if (!returnsVoid && !returnsInt) {
-      throw InvalidGenerationSourceError(
-        'Deletion methods have to return a Future of either void or int.',
-        element: _methodElement,
-      );
+      throw _errors.doesNotReturnVoidNorInt;
     }
 
     final parameterElement = _helper.getParameterElement();
@@ -60,19 +59,13 @@ class DeletionMethodProcessor implements Processor<DeletionMethod> {
 
   void _assertMethodReturnsNoList(final DartType flattenedReturnType) {
     if (flattenedReturnType.isDartCoreList) {
-      throw InvalidGenerationSourceError(
-        'Deletion methods have to return a Future of either void or int but not a list.',
-        element: _methodElement,
-      );
+      throw _errors.shouldNotReturnList;
     }
   }
 
   void _assertMethodReturnsFuture(final DartType returnType) {
     if (!returnType.isDartAsyncFuture) {
-      throw InvalidGenerationSourceError(
-        'Deletion methods have to return a Future.',
-        element: _methodElement,
-      );
+      throw _errors.doesNotReturnFuture;
     }
   }
 }
