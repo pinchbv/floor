@@ -163,23 +163,20 @@ class EntityProcessor extends QueryableProcessor<Entity> {
           // can't happen as Index.unique is non-nullable
           if (unique == null) throw ArgumentError.notNull();
 
-          final values = indexObject
+          final indexColumnNames = indexObject
               .getField(IndexField.value)
               ?.toListValue()
               ?.mapNotNull((valueObject) => valueObject.toStringValue())
               .toList();
 
-          if (values == null || values.isEmpty) {
+          if (indexColumnNames == null || indexColumnNames.isEmpty) {
             throw _processorError.missingIndexColumnName;
           }
 
-          final indexColumnNames = fields
-              .map((field) => field.columnName)
-              .where((columnName) => values.any((value) => value == columnName))
-              .toList();
-
-          if (indexColumnNames.isEmpty) {
-            throw _processorError.noMatchingColumn(values);
+          for (final indexColumnName in indexColumnNames) {
+            if (!fields.any((field) => field.columnName == indexColumnName)) {
+              throw _processorError.noMatchingColumn(indexColumnName);
+            }
           }
 
           final name = indexObject.getField(IndexField.name)?.toStringValue() ??
