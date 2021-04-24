@@ -1,4 +1,3 @@
-// ignore_for_file: import_of_legacy_library_into_null_safe
 import 'dart:core';
 
 import 'package:analyzer/dart/element/type.dart';
