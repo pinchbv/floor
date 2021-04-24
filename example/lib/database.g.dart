@@ -103,7 +103,7 @@ class _$TaskDao extends TaskDao {
             'Task',
             (Task item) =>
                 <String, Object?>{'id': item.id, 'message': item.message},
-            changeListener),
+            (isReplace) => changeListener.add(const {'Task'})),
         _taskUpdateAdapter = UpdateAdapter(
             database,
             'Task',

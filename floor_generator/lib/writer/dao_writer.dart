@@ -1,5 +1,6 @@
 import 'package:code_builder/code_builder.dart';
 import 'package:floor_generator/misc/extension/string_extension.dart';
+import 'package:floor_generator/misc/extension/iterable_extension.dart';
 import 'package:floor_generator/value_object/dao.dart';
 import 'package:floor_generator/value_object/deletion_method.dart';
 import 'package:floor_generator/value_object/entity.dart';
@@ -83,12 +84,15 @@ class DaoWriter extends Writer {
         final valueMapper =
             '(${entity.classElement.displayName} item) => ${entity.valueMapping}';
 
-        final requiresChangeListener =
-            dbHasViewStreams || streamEntities.contains(entity);
+        // create a special change handler which decides case-by-case:
+        // if the insertion happens with onConflict:replace, consider the insertion like a deletion.
+        // if it will not replace (e.g. abort or ignore), only output the single entity at most.
+        final changeHandler = _generateChangeHandler(
+            foreignKeyRelationships.getAffectedByDelete(entity), entity);
 
         constructorBuilder
           ..initializers.add(Code(
-              "$fieldName = InsertionAdapter(database, '${entity.name}', $valueMapper${requiresChangeListener ? ', changeListener' : ''})"));
+              "$fieldName = InsertionAdapter(database, '${entity.name}', $valueMapper$changeHandler)"));
       }
     }
 
@@ -221,15 +225,30 @@ class DaoWriter extends Writer {
   ///
   /// The affected set can be generated with [getAffectedByUpdateEntities]
   /// and [getAffectedByDeleteEntities]
-  String _generateChangeHandler(final Set<Entity> affected) {
+  String _generateChangeHandler(final Set<Entity> affected,
+      [Entity? insertionEntity]) {
     final toNotify = streamEntities.intersection(affected);
 
-    if (toNotify.isNotEmpty || dbHasViewStreams)
+    if (toNotify.isNotEmpty || dbHasViewStreams) {
       // if there are streaming views, create a new handler even if the set
       // is empty. This will only trigger a reload of the views.
-      return ', () => changeListener.add(const {${toNotify.map((e) => e.name.toLiteral()).join(', ')}})';
-    else
+      final set = toNotify.map((e) => e.name).toSetLiteral();
+      if (insertionEntity == null) {
+        return ', () => changeListener.add($set)';
+      } else {
+        final singleSet = (streamEntities.contains(insertionEntity)
+                ? {insertionEntity.name}
+                : <String>{})
+            .toSetLiteral();
+        if (singleSet == set) {
+          return ', (isReplace) => changeListener.add($set)';
+        } else {
+          return ', (isReplace) => changeListener.add(isReplace?$set:$singleSet)';
+        }
+      }
+    } else {
       // do not generate a Handler if the listener doesn't have to be updated
       return '';
+    }
   }
 }

@@ -137,13 +137,20 @@ void main() {
           actual,
           emitsInOrder(<List<Dog>>[
             [], // initial state,
+            [], // after inserting person1, [1]
+            [], // after inserting person2, [1]
             [dog1], // after inserting dog1
             [dog1], // after inserting dog2
             [], // after removing person1, which triggers cascade remove
           ]));
+      // [1] due to insert method having onConflict:replace, dog entries could be affected by this query, so a stream event is triggered.
 
       await personDao.insertPerson(person1);
+      // avoid that delete happens before the re-execution of
+      // the select query for the stream
+      await Future<void>.delayed(const Duration(milliseconds: 100));
       await personDao.insertPerson(person2);
+      await Future<void>.delayed(const Duration(milliseconds: 100));
 
       await database.dogDao.insertDog(dog1);
 

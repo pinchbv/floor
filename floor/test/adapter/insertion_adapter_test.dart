@@ -182,11 +182,14 @@ void main() {
     // ignore: close_sinks
     final mockStreamController = MockStreamController<Set<String>>();
 
+    final changeHandler = (bool isReplace) {
+      mockStreamController.add({entityName});
+    };
     final underTest = InsertionAdapter(
       mockDatabaseExecutor,
       entityName,
       valueMapper,
-      mockStreamController,
+      changeHandler,
     );
 
     tearDown(() {

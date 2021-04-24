@@ -8,6 +8,7 @@ import 'package:floor_generator/processor/entity_processor.dart';
 import 'package:floor_generator/processor/view_processor.dart';
 import 'package:floor_generator/value_object/dao.dart';
 import 'package:floor_generator/value_object/entity.dart';
+import 'package:floor_generator/value_object/foreign_key.dart';
 import 'package:floor_generator/value_object/primary_key.dart';
 import 'package:floor_generator/writer/dao_writer.dart';
 import 'package:source_gen/source_gen.dart';
@@ -129,7 +130,7 @@ void main() {
                     'Person',
                     (Person item) =>
                         <String, Object?>{'id': item.id, 'name': item.name},
-                    changeListener),
+                    (isReplace) => changeListener.add(const {'Person'})),
                 _personUpdateAdapter = UpdateAdapter(
                     database,
                     'Person',
@@ -180,6 +181,76 @@ void main() {
       '''));
   });
 
+  test('create DAO stream query with onconflict:replace insert', () async {
+    // add a simulated entity which should be affected if a Person is replaced
+    final dogEntity = Entity(
+        FakeClassElement(),
+        'Dog',
+        [],
+        PrimaryKey([], false),
+        [
+          ForeignKey(
+              'Person',
+              ['id'],
+              ['owner_id'],
+              annotations.ForeignKeyAction.noAction,
+              annotations.ForeignKeyAction.setDefault)
+        ],
+        [],
+        false,
+        '',
+        '',
+        null);
+
+    final dao = await _createDao('''
+        @dao
+        abstract class PersonDao {
+          @Query('SELECT * FROM person')
+          Stream<List<Person>> findAllPersonsAsStream();
+          
+          @Insert(onConflict: OnConflictStrategy.replace)
+          Future<void> insertPerson(Person person);
+        }
+      ''', dogEntity);
+
+    final streamEntities = {...dao.streamEntities, dogEntity};
+
+    final actual = DaoWriter(dao, streamEntities, dao.streamViews.isNotEmpty,
+            ForeignKeyMap.fromEntities(streamEntities))
+        .write();
+
+    expect(actual, equalsDart(r'''
+        class _$PersonDao extends PersonDao {
+          _$PersonDao(this.database, this.changeListener)
+              : _queryAdapter = QueryAdapter(database, changeListener),
+                _personInsertionAdapter = InsertionAdapter(
+                    database,
+                    'Person',
+                    (Person item) =>
+                        <String, Object?>{'id': item.id, 'name': item.name},
+                    (isReplace) => changeListener.add(isReplace ? const {'Person','Dog'}: const {'Person'}));
+        
+          final sqflite.DatabaseExecutor database;
+        
+          final StreamController<Set<String>> changeListener;
+        
+          final QueryAdapter _queryAdapter;
+        
+          final InsertionAdapter<Person> _personInsertionAdapter;
+        
+          @override
+          Stream<List<Person>> findAllPersonsAsStream() {
+            return _queryAdapter.queryListStream('SELECT * FROM person', mapper: (Map<String, Object?> row) => Person(row['id'] as int, row['name'] as String), queryableName: 'Person', isView: false);
+          }
+          
+          @override
+          Future<void> insertPerson(Person person) async {
+            await _personInsertionAdapter.insert(person, OnConflictStrategy.replace);
+          }
+        }
+      '''));
+  });
+
   test('create DAO aware of other entity stream query', () async {
     final dao = await _createDao('''
         @dao
@@ -207,7 +278,7 @@ void main() {
                     'Person',
                     (Person item) =>
                         <String, Object?>{'id': item.id, 'name': item.name},
-                    changeListener),
+                    (isReplace) => changeListener.add(const {'Person'})),
                 _personUpdateAdapter = UpdateAdapter(
                     database,
                     'Person',
@@ -355,7 +426,7 @@ void main() {
                     'Person',
                     (Person item) =>
                         <String, Object?>{'id': item.id, 'name': item.name},
-                    changeListener),
+                    (isReplace) => changeListener.add(const {})),                
                 _personUpdateAdapter = UpdateAdapter(
                     database,
                     'Person',
@@ -400,7 +471,8 @@ void main() {
   });
 }
 
-Future<Dao> _createDao(final String dao) async {
+Future<Dao> _createDao(final String dao,
+    [final Entity? additionalEntity]) async {
   final library = await resolveSource('''
       library test;
       
@@ -435,6 +507,10 @@ Future<Dao> _createDao(final String dao) async {
       .where((classElement) => classElement.hasAnnotation(annotations.Entity))
       .map((classElement) => EntityProcessor(classElement, {}).process())
       .toList();
+
+  if (additionalEntity != null) {
+    entities.add(additionalEntity);
+  }
 
   final views = library.classes
       .where((classElement) =>
