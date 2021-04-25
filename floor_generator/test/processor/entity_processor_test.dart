@@ -144,7 +144,7 @@ void main() {
 
   test('Process entity with index', () async {
     final classElement = await createClassElement('''
-      @Entity(indices: [Index(name:'i1', unique: true, value:['id']),Index(unique: false, value:['id','name'])])
+      @Entity(indices: [Index(name:'i1', unique: true, value:['id']),Index(unique: false, value:['name', 'id'])])
       class Person {
         @primaryKey
         final int id;
@@ -165,7 +165,7 @@ void main() {
     const foreignKeys = <ForeignKey>[];
     final indices = [
       Index('i1', 'Person', true, ['id']),
-      Index('index_Person_id_name', 'Person', false, ['id', 'name'])
+      Index('index_Person_name_id', 'Person', false, ['name', 'id'])
     ];
     const constructor = "Person(row['id'] as int, row['name'] as String)";
     const valueMapping = "<String, Object?>{'id': item.id, 'name': item.name}";
@@ -630,7 +630,7 @@ void main() {
     test('no matching index column', () async {
       final classElement = await createClassElement('''
           @Entity(
-            indices:[Index(value:['notAColumn'])]
+            indices:[Index(value:['id', 'notAColumn'])]
           )
           class Dog {
             @primaryKey
@@ -649,7 +649,7 @@ void main() {
       expect(
           processor.process,
           throwsInvalidGenerationSourceError(EntityProcessorError(classElement)
-              .noMatchingColumn(['notAColumn'])));
+              .noMatchingColumn('notAColumn')));
     });
     test('auto-increment not usable with `WITHOUT ROWID`', () async {
       final classElement = await createClassElement('''
