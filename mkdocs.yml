@@ -15,8 +15,20 @@ markdown_extensions:
 theme:
   name: material
   palette:
-    primary: blue grey
-    accent: purple
+    - scheme: default
+      media: "(prefers-color-scheme: light)"
+      primary: purple
+      accent: cyan
+      toggle:
+        icon: material/weather-sunny
+        name: Switch to dark mode
+    - scheme: slate
+      media: "(prefers-color-scheme: dark)"
+      primary: purple
+      accent: cyan
+      toggle:
+        icon: material/weather-night
+        name: Switch to light mode
   font:
     text: Inter
     code: Jetbrains Mono
