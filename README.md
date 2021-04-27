@@ -1,6 +1,7 @@
 ![Floor](https://raw.githubusercontent.com/vitusortner/floor/develop/img/floor.png)
 
 **See the [project's website](https://vitusortner.github.io/floor/) for the full documentation.**
+**[Vote for our domain name 🗳](https://github.com/vitusortner/floor/discussions/546)**
 
 Floor provides a neat SQLite abstraction for your Flutter applications inspired by the [Room persistence library](https://developer.android.com/topic/libraries/architecture/room).
 It comes with automatic mapping between in-memory objects and database rows while still offering full control of the database with the use of SQL.
@@ -37,10 +38,10 @@ The third dependency is `build_runner` which has to be included as a dev depende
 dependencies:
   flutter:
     sdk: flutter
-  floor: ^1.0.1
+  floor: ^1.1.0
 
 dev_dependencies:
-  floor_generator: ^1.0.1
+  floor_generator: ^1.1.0
   build_runner: ^2.0.0
 ```
 

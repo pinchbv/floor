@@ -1,5 +1,23 @@
 # Changelog
 
+## 1.1.0
+
+All credits for this release go to mqus.
+
+### Changes
+
+* Update deps
+* Increase test coverage
+* Bump locked floor_generator version to 1.0.1
+
+### 🚀 Features
+
+* Add onConfigure callback
+
+### 🐛 Bug Fixes
+
+* Retain index ordering
+
 ## 1.0.1
 
 ### Changes
