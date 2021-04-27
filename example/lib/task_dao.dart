@@ -12,6 +12,12 @@ abstract class TaskDao {
   @Query('SELECT * FROM task')
   Stream<List<Task>> findAllTasksAsStream();
 
+  @Query("SELECT * FROM task WHERE message IS NULL OR message = ''")
+  Stream<List<Task>> findTasksWhereMessageIsEmpty();
+
+  @Query("SELECT * FROM task WHERE message = 'A'")
+  Stream<List<Task>> findTasksWhereMessageIsA();
+
   @insert
   Future<void> insertTask(Task task);
 

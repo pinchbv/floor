@@ -65,6 +65,36 @@ void main() {
     '''));
   });
 
+  test('query item with specify value', () async {
+    final queryMethod = await _createQueryMethod('''
+      @Query("SELECT * FROM Person WHERE name = 'LiMing'")
+      Future<Person?> findLiMing();
+    ''');
+    final actual = QueryMethodWriter(queryMethod).write();
+
+    expect(actual, equalsDart(r'''
+      @override
+      Future<Person?> findLiMing() async {
+        return _queryAdapter.query("SELECT * FROM Person WHERE name = 'LiMing'", mapper: (Map<String, Object?> row) => Person(row['id'] as int, row['name'] as String));
+      }
+    '''));
+  });
+
+  test('query item with empty value', () async {
+    final queryMethod = await _createQueryMethod('''
+      @Query("SELECT * FROM Person WHERE name IS NULL OR name = ''")
+      Future<Person?> findNullName();
+    ''');
+    final actual = QueryMethodWriter(queryMethod).write();
+
+    expect(actual, equalsDart(r'''
+      @override
+      Future<Person?> findNullName() async {
+        return _queryAdapter.query("SELECT * FROM Person WHERE name IS NULL OR name = ''", mapper: (Map<String, Object?> row) => Person(row['id'] as int, row['name'] as String));
+      }
+    '''));
+  });
+
   group('type converters', () {
     test('generates method with external type converter', () async {
       final typeConverter = TypeConverter(

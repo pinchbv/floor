@@ -156,6 +156,26 @@ class _$TaskDao extends TaskDao {
   }
 
   @override
+  Stream<List<Task>> findTasksWhereMessageIsEmpty() {
+    return _queryAdapter.queryListStream(
+        "SELECT * FROM task WHERE message IS NULL OR message = ''",
+        mapper: (Map<String, Object?> row) =>
+            Task(row['id'] as int?, row['message'] as String),
+        queryableName: 'Task',
+        isView: false);
+  }
+
+  @override
+  Stream<List<Task>> findTasksWhereMessageIsA() {
+    return _queryAdapter.queryListStream(
+        "SELECT * FROM task WHERE message = 'A'",
+        mapper: (Map<String, Object?> row) =>
+            Task(row['id'] as int?, row['message'] as String),
+        queryableName: 'Task',
+        isView: false);
+  }
+
+  @override
   Future<void> insertTask(Task task) async {
     await _taskInsertionAdapter.insert(task, OnConflictStrategy.abort);
   }

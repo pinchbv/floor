@@ -49,7 +49,11 @@ extension NullableStringExtension on String? {
       return 'null';
     } else {
       //TODO escape correctly
-      return "'$this'";
+      if(this!.contains('\'')) {
+        return '\"$this\"';
+      } else {
+        return "'$this'";
+      }
     }
   }
 }
