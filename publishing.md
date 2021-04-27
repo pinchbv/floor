@@ -42,8 +42,6 @@ This document describes step-by-step how to release a new version of the library
 
 1. Update docs/getting-started.md with updated library versions
 
-1. Update top-level CHANGELOG
-
 1. Update docs/changelog.md
   	
 1. Create pull request with changes

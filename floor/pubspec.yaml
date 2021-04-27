@@ -2,7 +2,7 @@ name: floor
 description: >
   The typesafe, reactive, and lightweight SQLite abstraction for your Flutter applications.
   This library is the runtime dependency.
-version: 1.0.1
+version: 1.1.0
 homepage: https://github.com/vitusortner/floor
 author: Vitus Ortner <vitusortner.dev@gmail.com>
 publish_to: none
