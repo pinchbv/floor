@@ -87,6 +87,33 @@ void main() {
       }
     '''));
   });
+
+  test('Generate transaction method with nullable object return', () async {
+    final transactionMethod = await _createTransactionMethod('''
+      @transaction
+      Future<Person>? replacePersons(List<Person> persons) async {
+        return null;
+      }
+    ''');
+
+    final actual = TransactionMethodWriter(transactionMethod).write();
+
+    expect(actual, equalsDart(r'''
+      @override
+      Future<Person>? replacePersons(List<Person> persons) async {
+        if (database is sqflite.Transaction) {
+          return super.replacePersons(persons);
+        } else {
+          return (database as sqflite.Database)
+              .transaction<Person>((transaction) async {
+            final transactionDatabase = _$TestDatabase(changeListener)
+              ..database = transaction;
+            return transactionDatabase.personDao.replacePersons(persons);
+          });
+        }
+      }
+    '''));
+  });
 }
 
 Future<TransactionMethod> _createTransactionMethod(
