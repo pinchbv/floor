@@ -88,7 +88,7 @@ void main() {
     '''));
   });
 
-  test('Generate transaction method with nullable object return', () async {
+  test('Generate transaction method with nullable future return', () async {
     final transactionMethod = await _createTransactionMethod('''
       @transaction
       Future<Person>? replacePersons(List<Person> persons) async {
@@ -115,7 +115,7 @@ void main() {
     '''));
   });
 
-  test('Generate transaction method with nullable type parameter return',
+  test('Generate transaction method with nullable return type parameter',
       () async {
     final transactionMethod = await _createTransactionMethod('''
       @transaction
@@ -137,6 +137,33 @@ void main() {
             final transactionDatabase = _$TestDatabase(changeListener)
               ..database = transaction;
             return transactionDatabase.personDao.replacePersons(persons);
+          });
+        }
+      }
+    '''));
+  });
+
+  test('Generate transaction method with nullable parameter', () async {
+    final transactionMethod = await _createTransactionMethod('''
+      @transaction
+      Future<Person>? replacePersons(Person? person) async {
+        return null;
+      }
+    ''');
+
+    final actual = TransactionMethodWriter(transactionMethod).write();
+
+    expect(actual, equalsDart(r'''
+      @override
+      Future<Person>? replacePersons(Person? person) async {
+        if (database is sqflite.Transaction) {
+          return super.replacePersons(person);
+        } else {
+          return (database as sqflite.Database)
+              .transaction<Person>((transaction) async {
+            final transactionDatabase = _$TestDatabase(changeListener)
+              ..database = transaction;
+            return transactionDatabase.personDao.replacePersons(person);
           });
         }
       }
