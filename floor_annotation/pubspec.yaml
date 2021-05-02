@@ -4,7 +4,6 @@ description: >
   Don't use this package directly. Import the floor package instead.
 version: 1.0.0
 homepage: https://floor.codes
-author: Vitus Ortner <vitusortner.dev@gmail.com>
 
 environment:
   sdk: '>=2.12.0 <3.0.0'
