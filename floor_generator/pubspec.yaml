@@ -3,8 +3,7 @@ description: >
   The typesafe, reactive, and lightweight SQLite abstraction for your Flutter applications.
   This library is the dev dependency.
 version: 1.1.0
-homepage: https://github.com/vitusortner/floor
-author: Vitus Ortner <vitusortner.dev@gmail.com>
+homepage: https://floor.codes
 publish_to: none
 
 environment:
