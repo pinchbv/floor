@@ -14,7 +14,7 @@ class TransactionMethodWriter implements Writer {
     return Method((builder) => builder
       ..annotations.add(overrideAnnotationExpression)
       ..returns = refer(method.returnType.getDisplayString(
-        withNullability: false,
+        withNullability: true,
       ))
       ..name = method.name
       ..requiredParameters.addAll(_generateParameters())
@@ -47,7 +47,7 @@ class TransactionMethodWriter implements Writer {
       return Parameter((builder) => builder
         ..name = parameter.name
         ..type = refer(parameter.type.getDisplayString(
-          withNullability: false,
+          withNullability: true,
         )));
     }).toList();
   }
