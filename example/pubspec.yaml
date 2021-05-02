@@ -4,7 +4,6 @@ description: >
   This is an example on how to use the library.
 version: 1.0.0
 homepage: https://floor.codes
-author: vitusortner
 publish_to: none
 
 environment:
