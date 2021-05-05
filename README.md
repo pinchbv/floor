@@ -1,7 +1,6 @@
 ![Floor](https://raw.githubusercontent.com/vitusortner/floor/develop/img/floor.png)
 
-**See the [project's website](https://vitusortner.github.io/floor/) for the full documentation.**
-**[Vote for our domain name 🗳](https://github.com/vitusortner/floor/discussions/546)**
+**See the [project's website](https://floor.codes) for the full documentation.**
 
 Floor provides a neat SQLite abstraction for your Flutter applications inspired by the [Room persistence library](https://developer.android.com/topic/libraries/architecture/room).
 It comes with automatic mapping between in-memory objects and database rows while still offering full control of the database with the use of SQL.
