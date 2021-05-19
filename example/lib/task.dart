@@ -1,3 +1,4 @@
+import 'package:example/timestamp.dart';
 import 'package:floor/floor.dart';
 
 @entity
@@ -7,7 +8,9 @@ class Task {
 
   final String message;
 
-  Task(this.id, this.message);
+  final Timestamp timestamp;
+
+  Task(this.id, this.message, this.timestamp);
 
   @override
   bool operator ==(Object other) =>

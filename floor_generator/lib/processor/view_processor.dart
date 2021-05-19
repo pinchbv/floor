@@ -4,6 +4,7 @@ import 'package:floor_generator/misc/constants.dart';
 import 'package:floor_generator/misc/type_utils.dart';
 import 'package:floor_generator/processor/error/view_processor_error.dart';
 import 'package:floor_generator/processor/queryable_processor.dart';
+import 'package:floor_generator/value_object/embed.dart';
 import 'package:floor_generator/value_object/type_converter.dart';
 import 'package:floor_generator/value_object/view.dart';
 
@@ -13,8 +14,9 @@ class ViewProcessor extends QueryableProcessor<View> {
   ViewProcessor(
     final ClassElement classElement,
     final Set<TypeConverter> typeConverters,
+    final Set<Embed> embedConverters,
   )   : _processorError = ViewProcessorError(classElement),
-        super(classElement, typeConverters);
+        super(classElement, typeConverters, embedConverters);
 
   @override
   View process() {
