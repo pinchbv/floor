@@ -10,6 +10,7 @@ import 'package:floor_generator/misc/extension/type_converters_extension.dart';
 import 'package:floor_generator/misc/type_utils.dart';
 import 'package:floor_generator/processor/error/entity_processor_error.dart';
 import 'package:floor_generator/processor/queryable_processor.dart';
+import 'package:floor_generator/value_object/embed.dart';
 import 'package:floor_generator/value_object/entity.dart';
 import 'package:floor_generator/value_object/field.dart';
 import 'package:floor_generator/value_object/foreign_key.dart';
@@ -24,8 +25,9 @@ class EntityProcessor extends QueryableProcessor<Entity> {
   EntityProcessor(
     final ClassElement classElement,
     final Set<TypeConverter> typeConverters,
-  )   : _processorError = EntityProcessorError(classElement),
-        super(classElement, typeConverters);
+    final Set<Embed> embedConverters,
+  ) : _processorError = EntityProcessorError(classElement),
+      super(classElement, typeConverters, embedConverters);
 
   @override
   Entity process() {
@@ -262,17 +264,35 @@ class EntityProcessor extends QueryableProcessor<Entity> {
         false;
   }
 
-  String _getValueMapping(final List<Field> fields) {
-    final keyValueList = fields.map((field) {
-      final columnName = field.columnName;
-      final attributeValue = _getAttributeValue(field);
-      return "'$columnName': $attributeValue";
-    }).toList();
+  void _processFields(final Map map, final List<Field> fields, {
+    String columnNamePrefix = '',
+    String parameterPrefix = '',
+  }) {
+    for (final field in fields) {
+      if (field.embedConverter != null) {
+        final embedVar = field.columnName.isEmpty ? '' : '${field.columnName}_';
+        _processFields(
+          map, field.embedConverter?.fields ?? [],
+          columnNamePrefix: '$columnNamePrefix$embedVar',
+          parameterPrefix: '$parameterPrefix${field.fieldElement.name}.',
+        );
+      } else {
+        map['$columnNamePrefix${field.columnName}'] = _getAttributeValue(field, parameterPrefix);
+      }
+    }
+  }
 
+  String _getValueMapping(final List<Field> fields) {
+    final Map<String, String> map = {};
+    _processFields(map, fields);
+
+    final keyValueList = map.entries
+        .map((entry) => "'${entry.key}': ${entry.value}")
+        .toList();
     return '<String, Object?>{${keyValueList.join(', ')}}';
   }
 
-  String _getAttributeValue(final Field field) {
+  String _getAttributeValue(final Field field, String parameterPrefix) {
     final fieldElement = field.fieldElement;
     final parameterName = fieldElement.displayName;
     final fieldType = fieldElement.type;
@@ -280,14 +300,14 @@ class EntityProcessor extends QueryableProcessor<Entity> {
     String attributeValue;
 
     if (fieldType.isDefaultSqlType) {
-      attributeValue = 'item.$parameterName';
+      attributeValue = 'item.$parameterPrefix$parameterName';
     } else {
       final typeConverter = [
         ...queryableTypeConverters,
         field.typeConverter,
       ].whereNotNull().getClosest(fieldType);
       attributeValue =
-          '_${typeConverter.name.decapitalize()}.encode(item.$parameterName)';
+          '_${typeConverter.name.decapitalize()}.encode(item.$parameterPrefix$parameterName)';
     }
 
     if (fieldType.isDartCoreBool) {

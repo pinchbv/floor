@@ -5,6 +5,7 @@ export 'src/dao.dart';
 export 'src/database.dart';
 export 'src/database_view.dart';
 export 'src/delete.dart';
+export 'src/embed.dart';
 export 'src/entity.dart';
 export 'src/foreign_key.dart';
 export 'src/fts.dart';
