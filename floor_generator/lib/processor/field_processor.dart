@@ -50,8 +50,7 @@ class FieldProcessor extends Processor<Field> {
         ? _fieldElement
                 .getAnnotation(annotations.ColumnInfo)
                 ?.getField(AnnotationField.columnInfoName)
-                ?.toStringValue() ??
-            name
+                ?.toStringValue() ?? name
         : name;
   }
 

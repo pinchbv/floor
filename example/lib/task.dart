@@ -8,6 +8,7 @@ class Task {
 
   final String message;
 
+  // @ColumnInfo(name: '')
   final Timestamp timestamp;
 
   Task(this.id, this.message, this.timestamp);

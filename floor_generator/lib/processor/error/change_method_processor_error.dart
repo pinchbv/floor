@@ -1,7 +1,7 @@
 import 'package:analyzer/dart/element/element.dart';
-import 'package:floor_generator/misc/constants.dart';
 import 'package:floor_annotation/floor_annotation.dart' as annotations
     show OnConflictStrategy;
+import 'package:floor_generator/misc/constants.dart';
 import 'package:source_gen/source_gen.dart';
 
 class ChangeMethodProcessorError {

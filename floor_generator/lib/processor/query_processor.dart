@@ -1,5 +1,5 @@
-import 'package:floor_generator/misc/extension/dart_type_extension.dart';
 import 'package:analyzer/dart/element/element.dart';
+import 'package:floor_generator/misc/extension/dart_type_extension.dart';
 import 'package:floor_generator/processor/error/query_processor_error.dart';
 import 'package:floor_generator/processor/processor.dart';
 import 'package:floor_generator/value_object/query.dart';

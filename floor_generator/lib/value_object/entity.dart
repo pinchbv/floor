@@ -30,7 +30,7 @@ class Entity extends Queryable {
   ) : super(classElement, name, fields, constructor);
 
   String getCreateTableStatement() {
-    final databaseDefinition = fields.map((field) {
+    final databaseDefinition = _getFields(fields).map((field) {
       final autoIncrement =
           primaryKey.fields.contains(field) && primaryKey.autoGenerateId;
       return field.getDatabaseDefinition(autoIncrement);
@@ -55,6 +55,18 @@ class Entity extends Queryable {
       }
       return 'CREATE VIRTUAL TABLE IF NOT EXISTS `$name` ${fts!.usingOption}(${databaseDefinition.join(', ')})';
     }
+  }
+
+  List<Field> _getFields(List<Field> fields, {String columnNamePrefix = ''}) {
+    return fields.map((field) {
+      final embedConverter = field.embedConverter;
+      if (embedConverter != null) {
+        final embedVar = field.columnName.isEmpty ? '' : '${field.columnName}_';
+        return _getFields(embedConverter.fields, columnNamePrefix: embedVar);
+      } else {
+        return [field.copyWith(columnNamePrefix: columnNamePrefix)];
+      }
+    }).reduce((value, element) => value + element);
   }
 
   String? _createPrimaryKeyDefinition() {

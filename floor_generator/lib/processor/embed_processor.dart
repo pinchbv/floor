@@ -9,7 +9,7 @@ import 'package:floor_generator/value_object/type_converter.dart';
 
 class EmbedProcessor extends Processor<Embed> {
   final ClassElement _classElement;
-  Set<TypeConverter> typeConverters;
+  final Set<TypeConverter> typeConverters;
 
   EmbedProcessor(this._classElement, this.typeConverters);
 

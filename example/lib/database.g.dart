@@ -81,7 +81,7 @@ class _$FlutterDatabase extends FlutterDatabase {
       },
       onCreate: (database, version) async {
         await database.execute(
-            'CREATE TABLE IF NOT EXISTS `Task` (`id` INTEGER PRIMARY KEY AUTOINCREMENT, `message` TEXT NOT NULL, `timestamp`  NOT NULL)');
+            'CREATE TABLE IF NOT EXISTS `Task` (`id` INTEGER PRIMARY KEY AUTOINCREMENT, `message` TEXT NOT NULL, `timestamp_created_at` INTEGER NOT NULL, `timestamp_updated_at` INTEGER NOT NULL)');
 
         await callback?.onCreate?.call(database, version);
       },

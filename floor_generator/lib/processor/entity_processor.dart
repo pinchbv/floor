@@ -4,7 +4,6 @@ import 'package:collection/collection.dart';
 import 'package:floor_annotation/floor_annotation.dart' as annotations;
 import 'package:floor_generator/misc/constants.dart';
 import 'package:floor_generator/misc/extension/dart_object_extension.dart';
-import 'package:floor_generator/misc/extension/field_element_extension.dart';
 import 'package:floor_generator/misc/extension/iterable_extension.dart';
 import 'package:floor_generator/misc/extension/string_extension.dart';
 import 'package:floor_generator/misc/extension/type_converters_extension.dart';
@@ -266,18 +265,19 @@ class EntityProcessor extends QueryableProcessor<Entity> {
   }
 
   void _processFields(final Map map, final List<Field> fields, {
-    String prefix1 = '',
-    String prefix = '',
+    String columnNamePrefix = '',
+    String parameterPrefix = '',
   }) {
     for (final field in fields) {
       if (field.embedConverter != null) {
+        final embedVar = field.columnName.isEmpty ? '' : '${field.columnName}_';
         _processFields(
           map, field.embedConverter?.fields ?? [],
-          prefix1: '$prefix1${field.name}_',
-          prefix: '$prefix${field.fieldElement.name}.',
+          columnNamePrefix: '$columnNamePrefix$embedVar',
+          parameterPrefix: '$parameterPrefix${field.fieldElement.name}.',
         );
       } else {
-        map['$prefix1${field.columnName}'] = _getAttributeValue(field, prefix: prefix);
+        map['$columnNamePrefix${field.columnName}'] = _getAttributeValue(field, parameterPrefix);
       }
     }
   }
@@ -292,7 +292,7 @@ class EntityProcessor extends QueryableProcessor<Entity> {
     return '<String, Object?>{${keyValueList.join(', ')}}';
   }
 
-  String _getAttributeValue(final Field field, {String prefix = ''}) {
+  String _getAttributeValue(final Field field, String parameterPrefix) {
     final fieldElement = field.fieldElement;
     final parameterName = fieldElement.displayName;
     final fieldType = fieldElement.type;
@@ -300,14 +300,14 @@ class EntityProcessor extends QueryableProcessor<Entity> {
     String attributeValue;
 
     if (fieldType.isDefaultSqlType) {
-      attributeValue = 'item.$prefix$parameterName';
+      attributeValue = 'item.$parameterPrefix$parameterName';
     } else {
       final typeConverter = [
         ...queryableTypeConverters,
         field.typeConverter,
       ].whereNotNull().getClosest(fieldType);
       attributeValue =
-          '_${typeConverter.name.decapitalize()}.encode(item.$prefix$parameterName)';
+          '_${typeConverter.name.decapitalize()}.encode(item.$parameterPrefix$parameterName)';
     }
 
     if (fieldType.isDartCoreBool) {

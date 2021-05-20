@@ -77,7 +77,8 @@ abstract class QueryableProcessor<T extends Queryable> extends Processor<T> {
     final ParameterElement parameterElement,
     final List<Field> fields, {
       final String prefix = '',
-  }) {
+    }
+  ) {
     final parameterName = parameterElement.displayName;
 
     // null whenever field is @ignored
@@ -93,7 +94,8 @@ abstract class QueryableProcessor<T extends Queryable> extends Processor<T> {
             parameterElement,
           );
         } else if (field.embedConverter != null) {
-          parameterValue = _getConstructor(field.embedConverter!.classElement, field.embedConverter!.fields, prefix: '$prefix${field.name}_');
+          final embedVar = field.columnName.isEmpty ? '' : '${field.columnName}_';
+          parameterValue = _getConstructor(field.embedConverter!.classElement, field.embedConverter!.fields, prefix: '$prefix$embedVar');
         } else {
           final typeConverter = [
             ...queryableTypeConverters,
