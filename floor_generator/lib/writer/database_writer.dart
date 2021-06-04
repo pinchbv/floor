@@ -23,6 +23,10 @@ class DatabaseWriter implements Writer {
       ..name = '_\$$databaseName'
       ..extend = refer(databaseName)
       ..methods.add(_generateOpenMethod(database))
+      ..methods.add(_generateCreateMethod(database))
+      ..methods.add(_generateDropAll(database))
+      ..methods.add(_generateDrop(database))
+      ..methods.add(_generateMigrate(database))
       ..methods.addAll(_generateDaoGetters(database))
       ..fields.addAll(_generateDaoInstances(database))
       ..constructors.add(_generateConstructor()));
@@ -68,21 +72,130 @@ class DatabaseWriter implements Writer {
     }).toList();
   }
 
-  Method _generateOpenMethod(final Database database) {
+  Method _generateCreateMethod(final Database database) {
     final createTableStatements = _generateCreateTableSqlStatements(
             database.entities)
         .map((statement) => 'await database.execute(${statement.toLiteral()});')
         .join('\n');
+
     final createIndexStatements = database.entities
         .map((entity) => entity.indices.map((index) => index.createQuery()))
         .expand((statements) => statements)
         .map((statement) => 'await database.execute(${statement.toLiteral()});')
         .join('\n');
+
     final createViewStatements = database.views
         .map((view) => view.getCreateViewStatement().toLiteral())
         .map((statement) => 'await database.execute($statement);')
         .join('\n');
 
+    return Method((builder) => builder
+      ..name = '_create'
+      ..returns = refer('Future<void>')
+      ..modifier = MethodModifier.async
+      ..body = Code('''
+          $createTableStatements
+          $createIndexStatements
+          $createViewStatements
+          '''));
+  }
+
+  Method _generateMigrate(final Database database) {
+    final databaseParameter = Parameter((builder) => builder
+      ..name = 'database'
+      ..type = refer('sqflite.Database'));
+
+    final migrationsParameter = Parameter((builder) => builder
+      ..name = 'migrations'
+      ..type = refer('List<Migration>'));
+
+    final startVersionParameter = Parameter((builder) => builder
+      ..name = 'startVersion'
+      ..type = refer('int'));
+
+    final endVersionParameter = Parameter((builder) => builder
+      ..name = 'endVersion'
+      ..type = refer('int'));
+
+    final String code;
+
+    if (database.fallbackToDestructiveMigration) {
+      code = '''
+          try {
+            await MigrationAdapter.runMigrations(
+              database, 
+              startVersion,
+              endVersion,
+              migrations,
+            );
+          } on Exception catch (_) {
+            await _dropAll();
+            await _create();
+          }
+          ''';
+    } else {
+      code = '''
+          try {
+            await MigrationAdapter.runMigrations(
+              database, 
+              startVersion,
+              endVersion,
+              migrations,
+            );
+          } on MissingMigrationException catch (_) {
+            throw StateError(
+              'There is no migration supplied to update the database to the current version.'
+              ' Aborting the migration.',
+            );
+          }
+          ''';
+    }
+
+    return Method((builder) => builder
+      ..name = '_migrate'
+      ..returns = refer('Future<void>')
+      ..modifier = MethodModifier.async
+      ..requiredParameters.addAll([
+        databaseParameter,
+        migrationsParameter,
+        startVersionParameter,
+        endVersionParameter,
+      ])
+      ..body = Code(code));
+  }
+
+  Method _generateDropAll(final Database database) {
+    return Method((builder) => builder
+      ..name = '_dropAll'
+      ..returns = refer('Future<void>')
+      ..modifier = MethodModifier.async
+      ..body = const Code('''
+          await _drop('table');
+          await _drop('view');
+          '''));
+  }
+
+  Method _generateDrop(final Database database) {
+    final type = Parameter((builder) => builder
+      ..name = 'type'
+      ..type = refer('String'));
+
+    return Method((builder) => builder
+      ..name = '_drop'
+      ..returns = refer('Future<void>')
+      ..modifier = MethodModifier.async
+      ..requiredParameters.add(type)
+      ..body = const Code('''
+          final names = await database
+            .rawQuery('SELECT name FROM sqlite_master WHERE type = ?', [type]);
+
+          for (final name in names) {
+            await database.rawQuery('DROP ? ?', [type, name]);
+          }
+          '''));
+  }
+
+  Method _generateOpenMethod(final Database database) {
     final pathParameter = Parameter((builder) => builder
       ..name = 'path'
       ..type = refer('String'));
@@ -110,15 +223,11 @@ class DatabaseWriter implements Writer {
               await callback?.onOpen?.call(database);
             },
             onUpgrade: (database, startVersion, endVersion) async {
-              await MigrationAdapter.runMigrations(database, startVersion, endVersion, migrations);
-
+              await _migrate(database, migrations, startVersion, endVersion);
               await callback?.onUpgrade?.call(database, startVersion, endVersion);
             },
             onCreate: (database, version) async {
-              $createTableStatements
-              $createIndexStatements
-              $createViewStatements
-
+              await _create();
               await callback?.onCreate?.call(database, version);
             },
           );
