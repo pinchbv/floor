@@ -9,7 +9,7 @@ class Database {
   /// The views the database manages.
   final List<Type> views;
 
-  //Allow to recreate the databse if user does not want to write migration on upgradation
+  // Re-create the database if migration fails or is missing.
   final bool fallbackToDestructiveMigration;
 
   /// Marks a class as a FloorDatabase.
