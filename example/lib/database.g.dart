@@ -74,19 +74,51 @@ class _$FlutterDatabase extends FlutterDatabase {
         await callback?.onOpen?.call(database);
       },
       onUpgrade: (database, startVersion, endVersion) async {
-        await MigrationAdapter.runMigrations(
-            database, startVersion, endVersion, migrations);
-
+        await _migrate(database, migrations, startVersion, endVersion);
         await callback?.onUpgrade?.call(database, startVersion, endVersion);
       },
       onCreate: (database, version) async {
-        await database.execute(
-            'CREATE TABLE IF NOT EXISTS `Task` (`id` INTEGER PRIMARY KEY AUTOINCREMENT, `message` TEXT NOT NULL)');
-
+        await _create();
         await callback?.onCreate?.call(database, version);
       },
     );
     return sqfliteDatabaseFactory.openDatabase(path, options: databaseOptions);
+  }
+
+  Future<void> _create() async {
+    await database.execute(
+        'CREATE TABLE IF NOT EXISTS `Task` (`id` INTEGER PRIMARY KEY AUTOINCREMENT, `message` TEXT NOT NULL)');
+  }
+
+  Future<void> _dropAll() async {
+    await _drop('table');
+    await _drop('view');
+  }
+
+  Future<void> _drop(String type) async {
+    final names = await database
+        .rawQuery('SELECT name FROM sqlite_master WHERE type = ?', [type]);
+
+    for (final name in names) {
+      await database.rawQuery('DROP ? ?', [type, name]);
+    }
+  }
+
+  Future<void> _migrate(sqflite.Database database, List<Migration> migrations,
+      int startVersion, int endVersion) async {
+    try {
+      await MigrationAdapter.runMigrations(
+        database,
+        startVersion,
+        endVersion,
+        migrations,
+      );
+    } on MissingMigrationException catch (_) {
+      throw StateError(
+        'There is no migration supplied to update the database to the current version.'
+        ' Aborting the migration.',
+      );
+    }
   }
 
   @override
