@@ -24,8 +24,8 @@ class DatabaseWriter implements Writer {
       ..extend = refer(databaseName)
       ..methods.add(_generateOpenMethod(database))
       ..methods.add(_generateCreateMethod(database))
-      ..methods.add(_generateDropAll(database))
-      ..methods.add(_generateDrop(database))
+      ..methods.add(_generateDropAll())
+      ..methods.add(_generateDrop())
       ..methods.add(_generateMigrate(database))
       ..methods.addAll(_generateDaoGetters(database))
       ..fields.addAll(_generateDaoInstances(database))
@@ -164,18 +164,27 @@ class DatabaseWriter implements Writer {
       ..body = Code(code));
   }
 
-  Method _generateDropAll(final Database database) {
+  Method _generateDropAll() {
+    final databaseParameter = Parameter((builder) => builder
+      ..name = 'database'
+      ..type = refer('sqflite.Database'));
+
     return Method((builder) => builder
       ..name = '_dropAll'
       ..returns = refer('Future<void>')
+      ..requiredParameters.add(databaseParameter)
       ..modifier = MethodModifier.async
       ..body = const Code('''
-          await _drop('table');
-          await _drop('view');
+          await _drop(database, 'table');
+          await _drop(database, 'view');
           '''));
   }
 
-  Method _generateDrop(final Database database) {
+  Method _generateDrop() {
+    final databaseParameter = Parameter((builder) => builder
+      ..name = 'database'
+      ..type = refer('sqflite.Database'));
+
     final type = Parameter((builder) => builder
       ..name = 'type'
       ..type = refer('String'));
@@ -184,13 +193,14 @@ class DatabaseWriter implements Writer {
       ..name = '_drop'
       ..returns = refer('Future<void>')
       ..modifier = MethodModifier.async
+      ..requiredParameters.add(databaseParameter)
       ..requiredParameters.add(type)
       ..body = const Code('''
           final names = await database
             .rawQuery('SELECT name FROM sqlite_master WHERE type = ?', [type]);
 
           for (final name in names) {
-            await database.rawQuery('DROP ? ?', [type, name]);
+            await database.rawQuery('DROP \$name \$type');
           }
           '''));
   }
