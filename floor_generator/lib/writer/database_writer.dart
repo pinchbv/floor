@@ -73,6 +73,10 @@ class DatabaseWriter implements Writer {
   }
 
   Method _generateCreateMethod(final Database database) {
+    final databaseParameter = Parameter((builder) => builder
+      ..name = 'database'
+      ..type = refer('sqflite.Database'));
+
     final createTableStatements = _generateCreateTableSqlStatements(
             database.entities)
         .map((statement) => 'await database.execute(${statement.toLiteral()});')
@@ -92,6 +96,7 @@ class DatabaseWriter implements Writer {
     return Method((builder) => builder
       ..name = '_create'
       ..returns = refer('Future<void>')
+      ..requiredParameters.add(databaseParameter)
       ..modifier = MethodModifier.async
       ..body = Code('''
           $createTableStatements
@@ -130,7 +135,7 @@ class DatabaseWriter implements Writer {
             );
           } on Exception catch (_) {
             await _dropAll(database);
-            await _create();
+            await _create(database);
           }
           ''';
     } else {
@@ -200,7 +205,7 @@ class DatabaseWriter implements Writer {
             .rawQuery('SELECT name FROM sqlite_master WHERE type = ?', [type]);
 
           for (final name in names) {
-            await database.rawQuery('DROP ? ?, [type, name[name]]);
+            await database.rawQuery('DROP ? ?', [type, name[name]]);
           }
           '''));
   }
@@ -237,7 +242,7 @@ class DatabaseWriter implements Writer {
               await callback?.onUpgrade?.call(database, startVersion, endVersion);
             },
             onCreate: (database, version) async {
-              await _create();
+              await _create(database);
               await callback?.onCreate?.call(database, version);
             },
           );
