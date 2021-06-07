@@ -129,7 +129,7 @@ class DatabaseWriter implements Writer {
               migrations,
             );
           } on Exception catch (_) {
-            await _dropAll();
+            await _dropAll(database);
             await _create();
           }
           ''';
