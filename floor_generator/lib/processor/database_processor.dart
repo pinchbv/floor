@@ -186,8 +186,6 @@ class DatabaseProcessor extends Processor<Database> {
         ?.getField(AnnotationField.databaseFallbackToDestructiveMigration)
         ?.toBoolValue();
 
-    print(isDestructive);
-
     return isDestructive ?? false;
   }
 }
