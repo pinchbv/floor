@@ -200,7 +200,7 @@ class DatabaseWriter implements Writer {
             .rawQuery('SELECT name FROM sqlite_master WHERE type = ?', [type]);
 
           for (final name in names) {
-            await database.rawQuery('DROP \$name \$type');
+            await database.rawQuery('DROP ? ?, [type, name[name]]);
           }
           '''));
   }
