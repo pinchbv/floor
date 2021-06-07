@@ -122,6 +122,10 @@ class DatabaseWriter implements Writer {
       ..name = 'endVersion'
       ..type = refer('int'));
 
+    final callbackParameter = Parameter((builder) => builder
+      ..name = 'callback'
+      ..type = refer('Callback?'));
+
     final String code;
 
     if (database.fallbackToDestructiveMigration) {
@@ -133,7 +137,8 @@ class DatabaseWriter implements Writer {
               endVersion,
               migrations,
             );
-          } on Exception catch (_) {
+          } on Exception catch (exception) {
+            await callback?.onDestructiveUpgrade?.call(database, startVersion, endVersion, exception);
             await _dropAll(database);
             await _create(database);
           }
@@ -165,6 +170,7 @@ class DatabaseWriter implements Writer {
         migrationsParameter,
         startVersionParameter,
         endVersionParameter,
+        callbackParameter,
       ])
       ..body = Code(code));
   }
@@ -238,7 +244,7 @@ class DatabaseWriter implements Writer {
               await callback?.onOpen?.call(database);
             },
             onUpgrade: (database, startVersion, endVersion) async {
-              await _migrate(database, migrations, startVersion, endVersion);
+              await _migrate(database, migrations, startVersion, endVersion, callback);
               await callback?.onUpgrade?.call(database, startVersion, endVersion);
             },
             onCreate: (database, version) async {
