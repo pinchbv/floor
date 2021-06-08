@@ -91,20 +91,6 @@ class _$FlutterDatabase extends FlutterDatabase {
         'CREATE TABLE IF NOT EXISTS `Task` (`id` INTEGER PRIMARY KEY AUTOINCREMENT, `message` TEXT NOT NULL)');
   }
 
-  Future<void> _dropAll(sqflite.Database database) async {
-    await _drop(database, 'table');
-    await _drop(database, 'view');
-  }
-
-  Future<void> _drop(sqflite.Database database, String type) async {
-    final names = await database
-        .rawQuery('SELECT name FROM sqlite_master WHERE type = ?', [type]);
-
-    for (final name in names) {
-      await database.rawQuery('DROP $type ${name['name']}');
-    }
-  }
-
   Future<void> _migrate(sqflite.Database database, List<Migration> migrations,
       int startVersion, int endVersion, Callback? callback) async {
     try {

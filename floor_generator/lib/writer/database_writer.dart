@@ -19,17 +19,21 @@ class DatabaseWriter implements Writer {
   Class _generateDatabaseImplementation(final Database database) {
     final databaseName = database.name;
 
-    return Class((builder) => builder
-      ..name = '_\$$databaseName'
-      ..extend = refer(databaseName)
-      ..methods.add(_generateOpenMethod(database))
-      ..methods.add(_generateCreateMethod(database))
-      ..methods.add(_generateDropAll())
-      ..methods.add(_generateDrop())
-      ..methods.add(_generateMigrate(database))
-      ..methods.addAll(_generateDaoGetters(database))
-      ..fields.addAll(_generateDaoInstances(database))
-      ..constructors.add(_generateConstructor()));
+    return Class((builder) {
+      builder
+        ..name = '_\$$databaseName'
+        ..extend = refer(databaseName)
+        ..methods.add(_generateOpenMethod(database))
+        ..methods.add(_generateCreateMethod(database))
+        ..methods.add(_generateMigrate(database))
+        ..methods.addAll(_generateDaoGetters(database))
+        ..fields.addAll(_generateDaoInstances(database))
+        ..constructors.add(_generateConstructor());
+
+      if (database.fallbackToDestructiveMigration) {
+        builder..methods.add(_generateDropAll())..methods.add(_generateDrop());
+      }
+    });
   }
 
   Constructor _generateConstructor() {
