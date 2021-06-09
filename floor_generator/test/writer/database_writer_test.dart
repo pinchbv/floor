@@ -47,8 +47,19 @@ void main() {
               await callback?.onOpen?.call(database);
             },
             onUpgrade: (database, startVersion, endVersion) async {
-              await _migrate(
-                  database, migrations, startVersion, endVersion, callback);
+              try {
+                await MigrationAdapter.runMigrations(
+                  database,
+                  startVersion,
+                  endVersion,
+                  migrations,
+                );
+              } on MissingMigrationException catch (_) {
+                throw StateError(
+                  'There is no migration supplied to update the database to the current version.'
+                  ' Aborting the migration.',
+                );
+              }
               await callback?.onUpgrade?.call(database, startVersion, endVersion);
             },
             onCreate: (database, version) async {
@@ -62,23 +73,6 @@ void main() {
         Future<void> _create(sqflite.Database database) async {
           await database.execute(
             'CREATE TABLE IF NOT EXISTS `Person` (`id` INTEGER NOT NULL, `name` TEXT NOT NULL, PRIMARY KEY (`id`))');
-        }
-
-        Future<void> _migrate(sqflite.Database database, List<Migration> migrations,
-            int startVersion, int endVersion, Callback? callback) async {
-          try {
-            await MigrationAdapter.runMigrations(
-              database,
-              startVersion,
-              endVersion,
-              migrations,
-            );
-          } on MissingMigrationException catch (_) {
-            throw StateError(
-              'There is no migration supplied to update the database to the current version.'
-              ' Aborting the migration.',
-            );
-          }
         }
       }      
     '''));
@@ -110,6 +104,8 @@ void main() {
       
         Future<sqflite.Database> open(String path, List<Migration> migrations,
             [Callback? callback]) async {
+          bool shouldDeleteDatabase = false;
+
           final databaseOptions = sqflite.OpenDatabaseOptions(
             version: 1,
             onConfigure: (database) async {
@@ -120,52 +116,47 @@ void main() {
               await callback?.onOpen?.call(database);
             },
             onUpgrade: (database, startVersion, endVersion) async {
-              await _migrate(
-                  database, migrations, startVersion, endVersion, callback);
-              await callback?.onUpgrade?.call(database, startVersion, endVersion);
+              try {
+                await MigrationAdapter.runMigrations(
+                  database,
+                  startVersion,
+                  endVersion,
+                  migrations,
+                );
+                await callback?.onUpgrade?.call(database, startVersion, endVersion);
+              } on Exception catch (e) {
+                await callback?.onDestructiveUpgrade
+                    ?.call(database, startVersion, endVersion, e);
+                shouldDeleteDatabase = true;
+              }
+            },
+            onDowngrade: (database, startVersion, endVersion) async {
+              await callback?.onDestructiveDowngrade
+                  ?.call(database, startVersion, endVersion);
+              shouldDeleteDatabase = true;
             },
             onCreate: (database, version) async {
               await _create(database);
               await callback?.onCreate?.call(database, version);
             },
           );
-          return sqfliteDatabaseFactory.openDatabase(path, options: databaseOptions);
+
+          final database = await sqfliteDatabaseFactory.openDatabase(path,
+              options: databaseOptions);
+
+          if (shouldDeleteDatabase) {
+            await database.close();
+            await sqfliteDatabaseFactory.deleteDatabase(path);
+            return sqfliteDatabaseFactory.openDatabase(path,
+                options: databaseOptions);
+          } else {
+            return database;
+          }
         }
 
         Future<void> _create(sqflite.Database database) async {
           await database.execute(
             'CREATE TABLE IF NOT EXISTS `Person` (`id` INTEGER NOT NULL, `name` TEXT NOT NULL, PRIMARY KEY (`id`))');
-        }
-
-        Future<void> _migrate(sqflite.Database database, List<Migration> migrations,
-            int startVersion, int endVersion, Callback? callback) async {
-          try {
-            await MigrationAdapter.runMigrations(
-              database,
-              startVersion,
-              endVersion,
-              migrations,
-            );
-          } on Exception catch (exception) {
-            await callback?.onDestructiveUpgrade
-                ?.call(database, startVersion, endVersion, exception);
-            await _dropAll(database);
-            await _create(database);
-          }
-        }
-
-        Future<void> _dropAll(sqflite.Database database) async {
-          await _drop(database, 'table');
-          await _drop(database, 'view');
-        }
-
-        Future<void> _drop(sqflite.Database database, String type) async {
-          final names = await database
-              .rawQuery('SELECT name FROM sqlite_master WHERE type = ?', [type]);
-
-          for (final name in names) {
-            await database.rawQuery('DROP $type ${name['name']}');
-          }
         }
       }      
     '''));
@@ -217,8 +208,19 @@ void main() {
               await callback?.onOpen?.call(database);
             },
             onUpgrade: (database, startVersion, endVersion) async {
-              await _migrate(
-                  database, migrations, startVersion, endVersion, callback);
+              try {
+                await MigrationAdapter.runMigrations(
+                  database,
+                  startVersion,
+                  endVersion,
+                  migrations,
+                );
+              } on MissingMigrationException catch (_) {
+                throw StateError(
+                  'There is no migration supplied to update the database to the current version.'
+                  ' Aborting the migration.',
+                );
+              }
               await callback?.onUpgrade?.call(database, startVersion, endVersion);
             },
             onCreate: (database, version) async {
@@ -232,23 +234,6 @@ void main() {
         Future<void> _create(sqflite.Database database) async {
           await database.execute(
             'CREATE TABLE IF NOT EXISTS `Person` (`id` INTEGER NOT NULL, `name` TEXT NOT NULL, PRIMARY KEY (`id`))');
-        }
-
-        Future<void> _migrate(sqflite.Database database, List<Migration> migrations,
-            int startVersion, int endVersion, Callback? callback) async {
-          try {
-            await MigrationAdapter.runMigrations(
-              database,
-              startVersion,
-              endVersion,
-              migrations,
-            );
-          } on MissingMigrationException catch (_) {
-            throw StateError(
-              'There is no migration supplied to update the database to the current version.'
-              ' Aborting the migration.',
-            );
-          }
         }
 
         @override
@@ -296,8 +281,19 @@ void main() {
               await callback?.onOpen?.call(database);
             },
             onUpgrade: (database, startVersion, endVersion) async {
-              await _migrate(
-                  database, migrations, startVersion, endVersion, callback);
+              try {
+                await MigrationAdapter.runMigrations(
+                  database,
+                  startVersion,
+                  endVersion,
+                  migrations,
+                );
+              } on MissingMigrationException catch (_) {
+                throw StateError(
+                  'There is no migration supplied to update the database to the current version.'
+                  ' Aborting the migration.',
+                );
+              }
               await callback?.onUpgrade?.call(database, startVersion, endVersion);
             },
             onCreate: (database, version) async {
@@ -311,23 +307,6 @@ void main() {
         Future<void> _create(sqflite.Database database) async {
           await database.execute(
               'CREATE TABLE IF NOT EXISTS `custom_table_name` (`id` INTEGER PRIMARY KEY AUTOINCREMENT, `custom_name` TEXT NOT NULL)');
-        }
-
-        Future<void> _migrate(sqflite.Database database, List<Migration> migrations,
-            int startVersion, int endVersion, Callback? callback) async {
-          try {
-            await MigrationAdapter.runMigrations(
-              database,
-              startVersion,
-              endVersion,
-              migrations,
-            );
-          } on MissingMigrationException catch (_) {
-            throw StateError(
-              'There is no migration supplied to update the database to the current version.'
-              ' Aborting the migration.',
-            );
-          }
         }
       }
     '''));
@@ -378,8 +357,19 @@ void main() {
               await callback?.onOpen?.call(database);
             },
             onUpgrade: (database, startVersion, endVersion) async {
-              await _migrate(
-                  database, migrations, startVersion, endVersion, callback);
+              try {
+                await MigrationAdapter.runMigrations(
+                  database,
+                  startVersion,
+                  endVersion,
+                  migrations,
+                );
+              } on MissingMigrationException catch (_) {
+                throw StateError(
+                  'There is no migration supplied to update the database to the current version.'
+                  ' Aborting the migration.',
+                );
+              }
               await callback?.onUpgrade?.call(database, startVersion, endVersion);
             },
             onCreate: (database, version) async {
@@ -396,23 +386,6 @@ void main() {
 
           await database.execute(
               'CREATE VIEW IF NOT EXISTS `names` AS SELECT custom_name as name FROM person');
-        }
-
-        Future<void> _migrate(sqflite.Database database, List<Migration> migrations,
-            int startVersion, int endVersion, Callback? callback) async {
-          try {
-            await MigrationAdapter.runMigrations(
-              database,
-              startVersion,
-              endVersion,
-              migrations,
-            );
-          } on MissingMigrationException catch (_) {
-            throw StateError(
-              'There is no migration supplied to update the database to the current version.'
-              ' Aborting the migration.',
-            );
-          }
         }
       }
     """));
