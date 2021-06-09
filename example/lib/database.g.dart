@@ -74,19 +74,32 @@ class _$FlutterDatabase extends FlutterDatabase {
         await callback?.onOpen?.call(database);
       },
       onUpgrade: (database, startVersion, endVersion) async {
-        await MigrationAdapter.runMigrations(
-            database, startVersion, endVersion, migrations);
-
+        try {
+          await MigrationAdapter.runMigrations(
+            database,
+            startVersion,
+            endVersion,
+            migrations,
+          );
+        } on MissingMigrationException catch (_) {
+          throw StateError(
+            'There is no migration supplied to update the database to the current version.'
+            ' Aborting the migration.',
+          );
+        }
         await callback?.onUpgrade?.call(database, startVersion, endVersion);
       },
       onCreate: (database, version) async {
-        await database.execute(
-            'CREATE TABLE IF NOT EXISTS `Task` (`id` INTEGER PRIMARY KEY AUTOINCREMENT, `message` TEXT NOT NULL)');
-
+        await _create(database);
         await callback?.onCreate?.call(database, version);
       },
     );
     return sqfliteDatabaseFactory.openDatabase(path, options: databaseOptions);
+  }
+
+  Future<void> _create(sqflite.Database database) async {
+    await database.execute(
+        'CREATE TABLE IF NOT EXISTS `Task` (`id` INTEGER PRIMARY KEY AUTOINCREMENT, `message` TEXT NOT NULL)');
   }
 
   @override

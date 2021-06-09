@@ -86,7 +86,7 @@ void main() {
           migrations,
         );
 
-    expect(actual, throwsStateError);
+    expect(actual, throwsException);
     verifyZeroInteractions(mockDatabase);
   });
 
@@ -107,7 +107,7 @@ void main() {
           migrations,
         );
 
-    expect(actual, throwsStateError);
+    expect(actual, throwsException);
     verifyZeroInteractions(mockDatabase);
   });
 }

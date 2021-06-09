@@ -53,6 +53,7 @@ class DatabaseProcessor extends Processor<Database> {
       daoGetters,
       version,
       databaseTypeConverters,
+      _getFallBackToDestruction(),
       allTypeConverters,
     );
   }
@@ -177,5 +178,14 @@ class DatabaseProcessor extends Processor<Database> {
   bool _isView(final ClassElement classElement) {
     return classElement.hasAnnotation(annotations.DatabaseView) &&
         !classElement.isAbstract;
+  }
+
+  bool _getFallBackToDestruction() {
+    final isDestructive = _classElement
+        .getAnnotation(annotations.Database)
+        ?.getField(AnnotationField.databaseFallbackToDestructiveMigration)
+        ?.toBoolValue();
+
+    return isDestructive ?? false;
   }
 }

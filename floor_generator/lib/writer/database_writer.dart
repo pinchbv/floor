@@ -19,13 +19,16 @@ class DatabaseWriter implements Writer {
   Class _generateDatabaseImplementation(final Database database) {
     final databaseName = database.name;
 
-    return Class((builder) => builder
-      ..name = '_\$$databaseName'
-      ..extend = refer(databaseName)
-      ..methods.add(_generateOpenMethod(database))
-      ..methods.addAll(_generateDaoGetters(database))
-      ..fields.addAll(_generateDaoInstances(database))
-      ..constructors.add(_generateConstructor()));
+    return Class((builder) {
+      builder
+        ..name = '_\$$databaseName'
+        ..extend = refer(databaseName)
+        ..methods.add(_generateOpenMethod(database))
+        ..methods.add(_generateCreateMethod(database))
+        ..methods.addAll(_generateDaoGetters(database))
+        ..fields.addAll(_generateDaoInstances(database))
+        ..constructors.add(_generateConstructor());
+    });
   }
 
   Constructor _generateConstructor() {
@@ -68,21 +71,40 @@ class DatabaseWriter implements Writer {
     }).toList();
   }
 
-  Method _generateOpenMethod(final Database database) {
+  Method _generateCreateMethod(final Database database) {
+    final databaseParameter = Parameter((builder) => builder
+      ..name = 'database'
+      ..type = refer('sqflite.Database'));
+
     final createTableStatements = _generateCreateTableSqlStatements(
             database.entities)
         .map((statement) => 'await database.execute(${statement.toLiteral()});')
         .join('\n');
+
     final createIndexStatements = database.entities
         .map((entity) => entity.indices.map((index) => index.createQuery()))
         .expand((statements) => statements)
         .map((statement) => 'await database.execute(${statement.toLiteral()});')
         .join('\n');
+
     final createViewStatements = database.views
         .map((view) => view.getCreateViewStatement().toLiteral())
         .map((statement) => 'await database.execute($statement);')
         .join('\n');
 
+    return Method((builder) => builder
+      ..name = '_create'
+      ..returns = refer('Future<void>')
+      ..requiredParameters.add(databaseParameter)
+      ..modifier = MethodModifier.async
+      ..body = Code('''
+          $createTableStatements
+          $createIndexStatements
+          $createViewStatements
+          '''));
+  }
+
+  Method _generateOpenMethod(final Database database) {
     final pathParameter = Parameter((builder) => builder
       ..name = 'path'
       ..type = refer('String'));
@@ -93,13 +115,59 @@ class DatabaseWriter implements Writer {
       ..name = 'callback'
       ..type = refer('Callback?'));
 
-    return Method((builder) => builder
-      ..name = 'open'
-      ..returns = refer('Future<sqflite.Database>')
-      ..modifier = MethodModifier.async
-      ..requiredParameters.addAll([pathParameter, migrationsParameter])
-      ..optionalParameters.add(callbackParameter)
-      ..body = Code('''
+    String body;
+
+    if (database.fallbackToDestructiveMigration) {
+      body = '''
+        bool shouldDeleteDatabase = false;
+
+        final databaseOptions = sqflite.OpenDatabaseOptions(
+          version: ${database.version},
+          onConfigure: (database) async {
+            await database.execute('PRAGMA foreign_keys = ON');
+            await callback?.onConfigure?.call(database);
+          },
+          onOpen: (database) async {
+            await callback?.onOpen?.call(database);
+          },
+          onUpgrade: (database, startVersion, endVersion) async {
+            try {
+              await MigrationAdapter.runMigrations(
+                database,
+                startVersion,
+                endVersion,
+                migrations,
+              );
+              await callback?.onUpgrade?.call(database, startVersion, endVersion);
+            } on Exception catch (e) {
+              await callback?.onDestructiveUpgrade?.call(database, startVersion, endVersion, e);
+              shouldDeleteDatabase = true;
+            }
+          },
+          onDowngrade: (database, startVersion, endVersion) async {
+            await callback?.onDestructiveDowngrade?.call(database, startVersion, endVersion);
+            shouldDeleteDatabase = true;
+          },
+          onCreate: (database, version) async {
+            await _create(database);
+            await callback?.onCreate?.call(database, version);
+          },
+        );
+
+        final database = await sqfliteDatabaseFactory.openDatabase(path,
+            options: databaseOptions);
+
+        if (shouldDeleteDatabase) {
+          await database.close();
+          await sqfliteDatabaseFactory.deleteDatabase(path);
+          return sqfliteDatabaseFactory.openDatabase(path,
+              options: databaseOptions);
+        } else {
+          return database;
+        }
+      ''';
+    } else {
+      body = '''
           final databaseOptions = sqflite.OpenDatabaseOptions(
             version: ${database.version},
             onConfigure: (database) async {
@@ -110,20 +178,37 @@ class DatabaseWriter implements Writer {
               await callback?.onOpen?.call(database);
             },
             onUpgrade: (database, startVersion, endVersion) async {
-              await MigrationAdapter.runMigrations(database, startVersion, endVersion, migrations);
-
+              try {
+                await MigrationAdapter.runMigrations(
+                  database, 
+                  startVersion,
+                  endVersion,
+                  migrations,
+                );
+              } on MissingMigrationException catch (_) {
+                throw StateError(
+                  'There is no migration supplied to update the database to the current version.'
+                  ' Aborting the migration.',
+                );
+              }
               await callback?.onUpgrade?.call(database, startVersion, endVersion);
             },
             onCreate: (database, version) async {
-              $createTableStatements
-              $createIndexStatements
-              $createViewStatements
-
+              await _create(database);
               await callback?.onCreate?.call(database, version);
             },
           );
           return sqfliteDatabaseFactory.openDatabase(path, options: databaseOptions);
-          '''));
+          ''';
+    }
+
+    return Method((builder) => builder
+      ..name = 'open'
+      ..returns = refer('Future<sqflite.Database>')
+      ..modifier = MethodModifier.async
+      ..requiredParameters.addAll([pathParameter, migrationsParameter])
+      ..optionalParameters.add(callbackParameter)
+      ..body = Code(body));
   }
 
   List<String> _generateCreateTableSqlStatements(final List<Entity> entities) {

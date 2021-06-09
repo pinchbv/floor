@@ -9,10 +9,14 @@ class Database {
   /// The views the database manages.
   final List<Type> views;
 
+  // Re-create the database if migration fails or is missing.
+  final bool fallbackToDestructiveMigration;
+
   /// Marks a class as a FloorDatabase.
   const Database({
     required this.version,
     required this.entities,
+    this.fallbackToDestructiveMigration = false,
     this.views = const [],
   });
 }
