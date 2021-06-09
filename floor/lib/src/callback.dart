@@ -26,13 +26,21 @@ class Callback {
   )? onUpgrade;
 
   /// Fired when the [database] failed upgrading caused by [exception] from
-  /// [startVersion] to [endVersion], dropping all existing data and re-creating the schema.
+  /// [startVersion] to [endVersion], before dropping all existing data and re-creating the schema.
   final FutureOr<void> Function(
     Database database,
     int startVersion,
     int endVersion,
     Exception exception,
   )? onDestructiveUpgrade;
+
+  /// Fired when the [database] is downgrading from [startVersion] to
+  /// [endVersion], before dropping all existing data and re-creating the schema.
+  final FutureOr<void> Function(
+    Database database,
+    int startVersion,
+    int endVersion,
+  )? onDestructiveDowngrade;
 
   /// Constructor.
   const Callback({
@@ -41,5 +49,6 @@ class Callback {
     this.onOpen,
     this.onUpgrade,
     this.onDestructiveUpgrade,
+    this.onDestructiveDowngrade,
   });
 }
