@@ -16,11 +16,11 @@ void main() {
       class _$FooBarBuilder {
         _$FooBarBuilder(this.name);
       
-        final String name;
+        final String? name;
       
         final List<Migration> _migrations = [];
 
-        Callback _callback;
+        Callback? _callback;
       
         /// Adds migrations to the builder.
         _$FooBarBuilder addMigrations(List<Migration> migrations) {
@@ -37,7 +37,7 @@ void main() {
         /// Creates the database and initializes it.
         Future<FooBar> build() async {
           final path = name != null
-            ? await sqfliteDatabaseFactory.getDatabasePath(name)
+            ? await sqfliteDatabaseFactory.getDatabasePath(name!)
             : ':memory:'; 
           final database = _$FooBar();
           database.database = await database.open(

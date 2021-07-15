@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:floor/floor.dart';
 import 'package:floor/src/adapter/insertion_adapter.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -9,11 +11,10 @@ import '../test_util/person.dart';
 
 void main() {
   final mockDatabaseExecutor = MockDatabaseExecutor();
-  final mockDatabaseBatch = MockDatabaseBatch();
+  final mockDatabaseBatch = MockBatch();
 
   const entityName = 'person';
-  final valueMapper = (Person person) =>
-      <String, dynamic>{'id': person.id, 'name': person.name};
+  final valueMapper = (Person person) => {'id': person.id, 'name': person.name};
   const onConflictStrategy = OnConflictStrategy.ignore;
   const conflictAlgorithm = ConflictAlgorithm.ignore;
 
@@ -34,10 +35,15 @@ void main() {
     group('insertion without return', () {
       test('insert item', () async {
         final person = Person(1, 'Simon');
+        final values = {'id': person.id, 'name': person.name};
+        when(mockDatabaseExecutor.insert(
+          entityName,
+          values,
+          conflictAlgorithm: conflictAlgorithm,
+        )).thenAnswer((_) => Future(() => person.id));
 
         await underTest.insert(person, onConflictStrategy);
 
-        final values = <String, dynamic>{'id': person.id, 'name': person.name};
         verify(mockDatabaseExecutor.insert(
           entityName,
           values,
@@ -49,18 +55,24 @@ void main() {
         final person1 = Person(1, 'Simon');
         final person2 = Person(2, 'Frank');
         final persons = [person1, person2];
+        final values1 = {'id': person1.id, 'name': person1.name};
+        final values2 = {'id': person2.id, 'name': person2.name};
         when(mockDatabaseExecutor.batch()).thenReturn(mockDatabaseBatch);
+        when(mockDatabaseExecutor.insert(
+          entityName,
+          values1,
+          conflictAlgorithm: conflictAlgorithm,
+        )).thenAnswer((_) => Future(() => person1.id));
+        when(mockDatabaseExecutor.insert(
+          entityName,
+          values2,
+          conflictAlgorithm: conflictAlgorithm,
+        )).thenAnswer((_) => Future(() => person2.id));
+        when(mockDatabaseBatch.commit(noResult: true))
+            .thenAnswer((_) => Future(() => [null]));
 
         await underTest.insertList(persons, onConflictStrategy);
 
-        final values1 = <String, dynamic>{
-          'id': person1.id,
-          'name': person1.name
-        };
-        final values2 = <String, dynamic>{
-          'id': person2.id,
-          'name': person2.name
-        };
         verifyInOrder([
           mockDatabaseExecutor.batch(),
           mockDatabaseBatch.insert(
@@ -87,7 +99,7 @@ void main() {
     group('insertion with return', () {
       test('insert item and return primary key', () async {
         final person = Person(1, 'Simon');
-        final values = <String, dynamic>{'id': person.id, 'name': person.name};
+        final values = {'id': person.id, 'name': person.name};
         when(mockDatabaseExecutor.insert(
           entityName,
           values,
@@ -105,14 +117,14 @@ void main() {
         expect(actual, equals(person.id));
       });
 
-      test('insert item but transaction failed (returns null)', () async {
+      test('insert item but transaction failed (return 0)', () async {
         final person = Person(1, 'Simon');
-        final values = <String, dynamic>{'id': person.id, 'name': person.name};
+        final values = {'id': person.id, 'name': person.name};
         when(mockDatabaseExecutor.insert(
           entityName,
           values,
           conflictAlgorithm: conflictAlgorithm,
-        )).thenAnswer((_) => Future(() => null));
+        )).thenAnswer((_) => Future(() => 0));
 
         final actual =
             await underTest.insertAndReturnId(person, onConflictStrategy);
@@ -122,7 +134,7 @@ void main() {
           values,
           conflictAlgorithm: conflictAlgorithm,
         ));
-        expect(actual, isNull);
+        expect(actual, equals(0));
       });
 
       test('insert items and return primary keys', () async {
@@ -137,14 +149,8 @@ void main() {
         final actual =
             await underTest.insertListAndReturnIds(persons, onConflictStrategy);
 
-        final values1 = <String, dynamic>{
-          'id': person1.id,
-          'name': person1.name
-        };
-        final values2 = <String, dynamic>{
-          'id': person2.id,
-          'name': person2.name
-        };
+        final values1 = {'id': person1.id, 'name': person1.name};
+        final values2 = {'id': person2.id, 'name': person2.name};
         verifyInOrder([
           mockDatabaseExecutor.batch(),
           mockDatabaseBatch.insert(
@@ -191,8 +197,8 @@ void main() {
     test('insert item', () async {
       final person = Person(1, 'Simon');
       when(mockDatabaseExecutor.insert(
-        any,
-        any,
+        entityName,
+        valueMapper(person),
         conflictAlgorithm: conflictAlgorithm,
       )).thenAnswer((_) => Future(() => person.id));
 
@@ -201,13 +207,13 @@ void main() {
       verify(mockStreamController.add(entityName));
     });
 
-    test('insert item but transaction failed (returns null)', () async {
+    test('insert item but transaction failed (returns 0)', () async {
       final person = Person(1, 'Simon');
       when(mockDatabaseExecutor.insert(
-        any,
-        any,
+        entityName,
+        valueMapper(person),
         conflictAlgorithm: conflictAlgorithm,
-      )).thenAnswer((_) => Future(() => null));
+      )).thenAnswer((_) => Future(() => 0));
 
       await underTest.insert(person, onConflictStrategy);
 
@@ -220,7 +226,7 @@ void main() {
       final persons = [person1, person2];
       final primaryKeys = persons.map((person) => person.id).toList();
       when(mockDatabaseExecutor.batch()).thenReturn(mockDatabaseBatch);
-      when(mockDatabaseBatch.commit(noResult: false))
+      when(mockDatabaseBatch.commit(noResult: true))
           .thenAnswer((_) => Future(() => primaryKeys));
 
       await underTest.insertList(persons, onConflictStrategy);

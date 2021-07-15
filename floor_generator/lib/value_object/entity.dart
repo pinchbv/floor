@@ -1,11 +1,12 @@
 import 'package:analyzer/dart/element/element.dart';
-import 'package:floor_generator/misc/annotations.dart';
-import 'package:floor_generator/misc/extension/list_equality_extension.dart';
+import 'package:collection/collection.dart';
 import 'package:floor_generator/value_object/field.dart';
 import 'package:floor_generator/value_object/foreign_key.dart';
 import 'package:floor_generator/value_object/index.dart';
 import 'package:floor_generator/value_object/primary_key.dart';
 import 'package:floor_generator/value_object/queryable.dart';
+
+import 'fts.dart';
 
 class Entity extends Queryable {
   final PrimaryKey primaryKey;
@@ -13,6 +14,7 @@ class Entity extends Queryable {
   final List<Index> indices;
   final bool withoutRowid;
   final String valueMapping;
+  final Fts? fts;
 
   Entity(
     ClassElement classElement,
@@ -24,9 +26,9 @@ class Entity extends Queryable {
     this.withoutRowid,
     String constructor,
     this.valueMapping,
+    this.fts,
   ) : super(classElement, name, fields, constructor);
 
-  @nonNull
   String getCreateTableStatement() {
     final databaseDefinition = fields.map((field) {
       final autoIncrement =
@@ -45,11 +47,17 @@ class Entity extends Queryable {
 
     final withoutRowidClause = withoutRowid ? ' WITHOUT ROWID' : '';
 
-    return 'CREATE TABLE IF NOT EXISTS `$name` (${databaseDefinition.join(', ')})$withoutRowidClause';
+    if (fts == null) {
+      return 'CREATE TABLE IF NOT EXISTS `$name` (${databaseDefinition.join(', ')})$withoutRowidClause';
+    } else {
+      if (fts!.tableCreateOption().isNotEmpty) {
+        databaseDefinition.add('${fts!.tableCreateOption()}');
+      }
+      return 'CREATE VIRTUAL TABLE IF NOT EXISTS `$name` ${fts!.usingOption}(${databaseDefinition.join(', ')})';
+    }
   }
 
-  @nullable
-  String _createPrimaryKeyDefinition() {
+  String? _createPrimaryKeyDefinition() {
     if (primaryKey.autoGenerateId) {
       return null;
     } else {
@@ -84,10 +92,11 @@ class Entity extends Queryable {
       indices.hashCode ^
       constructor.hashCode ^
       withoutRowid.hashCode ^
+      fts.hashCode ^
       valueMapping.hashCode;
 
   @override
   String toString() {
-    return 'Entity{classElement: $classElement, name: $name, fields: $fields, primaryKey: $primaryKey, foreignKeys: $foreignKeys, indices: $indices, constructor: $constructor, withoutRowid: $withoutRowid, valueMapping: $valueMapping}';
+    return 'Entity{classElement: $classElement, name: $name, fields: $fields, primaryKey: $primaryKey, foreignKeys: $foreignKeys, indices: $indices, constructor: $constructor, withoutRowid: $withoutRowid, valueMapping: $valueMapping, fts: $fts}';
   }
 }

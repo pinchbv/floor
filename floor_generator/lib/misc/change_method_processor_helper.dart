@@ -1,6 +1,5 @@
 import 'package:analyzer/dart/element/element.dart';
 import 'package:analyzer/dart/element/type.dart';
-import 'package:floor_generator/misc/annotations.dart';
 import 'package:floor_generator/misc/type_utils.dart';
 import 'package:floor_generator/value_object/entity.dart';
 import 'package:source_gen/source_gen.dart';
@@ -13,12 +12,9 @@ class ChangeMethodProcessorHelper {
   const ChangeMethodProcessorHelper(
     final MethodElement methodElement,
     final List<Entity> entities,
-  )   : assert(methodElement != null),
-        assert(entities != null),
-        _methodElement = methodElement,
+  )   : _methodElement = methodElement,
         _entities = entities;
 
-  @nonNull
   ParameterElement getParameterElement() {
     final parameters = _methodElement.parameters;
     if (parameters.isEmpty) {
@@ -35,9 +31,8 @@ class ChangeMethodProcessorHelper {
     return parameters.first;
   }
 
-  @nonNull
   DartType getFlattenedParameterType(
-    @nonNull final ParameterElement parameterElement,
+    final ParameterElement parameterElement,
   ) {
     final changesMultipleItems = parameterElement.type.isDartCoreList;
 
@@ -46,8 +41,7 @@ class ChangeMethodProcessorHelper {
         : parameterElement.type;
   }
 
-  @nonNull
-  Entity getEntity(@nonNull final DartType flattenedParameterType) {
+  Entity getEntity(final DartType flattenedParameterType) {
     return _entities.firstWhere(
         (entity) =>
             entity.classElement.displayName ==

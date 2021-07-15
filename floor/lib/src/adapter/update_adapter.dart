@@ -9,21 +9,17 @@ class UpdateAdapter<T> {
   final DatabaseExecutor _database;
   final String _entityName;
   final List<String> _primaryKeyColumnName;
-  final Map<String, dynamic> Function(T) _valueMapper;
-  final StreamController<String> _changeListener;
+  final Map<String, Object?> Function(T) _valueMapper;
+  final StreamController<String>? _changeListener;
 
   UpdateAdapter(
     final DatabaseExecutor database,
     final String entityName,
     final List<String> primaryKeyColumnName,
-    final Map<String, dynamic> Function(T) valueMapper, [
-    final StreamController<String> changeListener,
-  ])  : assert(database != null),
-        assert(entityName != null),
-        assert(entityName.isNotEmpty),
-        assert(primaryKeyColumnName != null),
+    final Map<String, Object?> Function(T) valueMapper, [
+    final StreamController<String>? changeListener,
+  ])  : assert(entityName.isNotEmpty),
         assert(primaryKeyColumnName.isNotEmpty),
-        assert(valueMapper != null),
         _database = database,
         _entityName = entityName,
         _valueMapper = valueMapper,
@@ -76,9 +72,7 @@ class UpdateAdapter<T> {
       ),
       conflictAlgorithm: onConflictStrategy.asSqfliteConflictAlgorithm(),
     );
-    if (_changeListener != null && result != 0) {
-      _changeListener.add(_entityName);
-    }
+    if (result != 0) _changeListener?.add(_entityName);
     return result;
   }
 
@@ -102,9 +96,7 @@ class UpdateAdapter<T> {
       );
     }
     final result = (await batch.commit(noResult: false)).cast<int>();
-    if (_changeListener != null && result.isNotEmpty) {
-      _changeListener.add(_entityName);
-    }
+    if (result.isNotEmpty) _changeListener?.add(_entityName);
     return result.isNotEmpty
         ? result.reduce((sum, element) => sum + element)
         : 0;

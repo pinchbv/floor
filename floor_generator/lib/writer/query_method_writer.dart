@@ -1,28 +1,28 @@
 import 'dart:core';
 
+import 'package:analyzer/dart/element/type.dart';
 import 'package:code_builder/code_builder.dart';
-import 'package:dartx/dartx.dart';
 import 'package:floor_generator/misc/annotation_expression.dart';
-import 'package:floor_generator/misc/annotations.dart';
+import 'package:floor_generator/misc/extension/string_extension.dart';
 import 'package:floor_generator/misc/extension/type_converters_extension.dart';
 import 'package:floor_generator/misc/type_utils.dart';
+import 'package:floor_generator/value_object/query.dart';
 import 'package:floor_generator/value_object/query_method.dart';
+import 'package:floor_generator/value_object/queryable.dart';
 import 'package:floor_generator/value_object/view.dart';
 import 'package:floor_generator/writer/writer.dart';
 
 class QueryMethodWriter implements Writer {
   final QueryMethod _queryMethod;
 
-  QueryMethodWriter(final QueryMethod queryMethod)
-      : assert(queryMethod != null),
-        _queryMethod = queryMethod;
+  QueryMethodWriter(final QueryMethod queryMethod) : _queryMethod = queryMethod;
 
   @override
   Method write() {
     final builder = MethodBuilder()
       ..annotations.add(overrideAnnotationExpression)
       ..returns = refer(_queryMethod.rawReturnType.getDisplayString(
-        withNullability: false,
+        withNullability: true,
       ))
       ..name = _queryMethod.name
       ..requiredParameters.addAll(_generateMethodParameters())
@@ -39,7 +39,9 @@ class QueryMethodWriter implements Writer {
       return Parameter((builder) => builder
         ..name = parameter.name
         ..type = refer(parameter.type.getDisplayString(
-          withNullability: false,
+          // processor disallows nullable method parameters and throws if found,
+          // still interested in nullability here to future-proof codebase
+          withNullability: true,
         )));
     }).toList();
   }
@@ -47,116 +49,150 @@ class QueryMethodWriter implements Writer {
   String _generateMethodBody() {
     final _methodBody = StringBuffer();
 
-    final valueLists = _generateInClauseValueLists();
-    if (valueLists.isNotEmpty) {
-      _methodBody.write(valueLists.join(''));
-    }
+    // generate the variable definitions which will store the sqlite argument
+    // lists, e.g. '?5,?6,?7,?8'. These have to be generated for each call to
+    // the query method to accommodate for different list sizes. This is
+    // necessary to guarantee that each single value is inserted at the right
+    // place and only via SQLite's escape-mechanism.
+    // If no [List] parameters are present, Nothing will be written.
+    _methodBody.write(_generateListConvertersForQuery());
 
     final arguments = _generateArguments();
-    if (_queryMethod.returnsVoid) {
-      _methodBody.write(_generateNoReturnQuery(arguments));
-      return _methodBody.toString();
-    }
+    final query = _generateQueryString();
 
-    final constructor = _queryMethod.queryable.constructor;
-    final mapper = '(Map<String, dynamic> row) => $constructor';
-
-    if (_queryMethod.returnsStream) {
-      _methodBody.write(_generateStreamQuery(arguments, mapper));
+    final queryable = _queryMethod.queryable;
+    // null queryable implies void-returning query method
+    if (_queryMethod.returnsVoid || queryable == null) {
+      _methodBody.write(_generateNoReturnQuery(query, arguments));
     } else {
-      _methodBody.write(_generateQuery(arguments, mapper));
+      _methodBody.write(_generateQuery(query, arguments, queryable));
     }
 
     return _methodBody.toString();
   }
 
-  @nonNull
-  List<String> _generateInClauseValueLists() {
-    return _queryMethod.parameters
-        .where((parameter) => parameter.type.isDartCoreList)
-        .mapIndexed((index, parameter) {
-      // TODO #403 what about type converters that map between e.g. string and list?
-      final flattenedParameterType = parameter.type.flatten();
-      String value;
-      if (flattenedParameterType.isDefaultSqlType) {
-        value = '\$value';
+  String _generateListConvertersForQuery() {
+    final code = StringBuffer();
+    // because we ultimately want to give a query with numbered variables to sqflite, we have to compute them dynamically when working with lists.
+    // We establish the conventions that we provide the fixed parameters first and then append the list parameters one by one.
+    // parameters 1,2,... start-1 are already used by fixed (non-list) parameters.
+    final start = _queryMethod.parameters
+            .where((param) => !param.type.isDartCoreList)
+            .length +
+        1;
+
+    String? lastParam;
+    for (final listParam in _queryMethod.parameters
+        .where((param) => param.type.isDartCoreList)) {
+      if (lastParam == null) {
+        //make start final if it is only used once, fixes a lint
+        final constInt =
+            (start == _queryMethod.parameters.length) ? 'const' : 'int';
+        code.writeln('$constInt offset = $start;');
       } else {
-        final typeConverter =
-            _queryMethod.typeConverters.getClosest(flattenedParameterType);
-        value = '\${_${typeConverter.name.decapitalize()}.encode(value)}';
+        code.writeln('offset += $lastParam.length;');
       }
-      return '''final valueList$index = ${parameter.displayName}.map((value) => "'$value'").join(', ');''';
-    }).toList();
+      final currentParamName = listParam.displayName;
+      // dynamically generate strings of the form '?4,?5,?6,?7,?8' which we can
+      // later insert into the query at the marked locations.
+      code.write('final _sqliteVariablesFor${currentParamName.capitalize()}=');
+      code.write('Iterable<String>.generate(');
+      code.write("$currentParamName.length, (i)=>'?\${i+offset}'");
+      code.writeln(").join(',');");
+
+      lastParam = currentParamName;
+    }
+    return code.toString();
   }
 
-  @nonNull
   List<String> _generateParameters() {
-    return _queryMethod.parameters
-        .where((parameter) => !parameter.type.isDartCoreList)
-        .map((parameter) {
-      if (parameter.type.isDefaultSqlType) {
-        if (parameter.type.isDartCoreBool) {
-          return '${parameter.displayName} == null ? null : (${parameter.displayName} ? 1 : 0)';
+    //first, take fixed parameters, then insert list parameters.
+    return [
+      ..._queryMethod.parameters
+          .where((parameter) => !parameter.type.isDartCoreList)
+          .map((parameter) {
+        if (parameter.type.isDefaultSqlType) {
+          if (parameter.type.isDartCoreBool) {
+            // query method parameters can't be null
+            return '${parameter.displayName} ? 1 : 0';
+          } else {
+            return parameter.displayName;
+          }
         } else {
-          return parameter.displayName;
+          final typeConverter =
+              _queryMethod.typeConverters.getClosest(parameter.type);
+          return '_${typeConverter.name.decapitalize()}.encode(${parameter.displayName})';
         }
-      } else {
-        final typeConverter =
-            _queryMethod.typeConverters.getClosest(parameter.type);
-        return '_${typeConverter.name.decapitalize()}.encode(${parameter.displayName})';
-      }
-    }).toList();
+      }),
+      ..._queryMethod.parameters
+          .where((parameter) => parameter.type.isDartCoreList)
+          .map((parameter) {
+        // TODO #403 what about type converters that map between e.g. string and list?
+        final DartType flatType = parameter.type.flatten();
+        if (flatType.isDefaultSqlType) {
+          return '...${parameter.displayName}';
+        } else {
+          final typeConverter =
+              _queryMethod.typeConverters.getClosest(flatType);
+          return '...${parameter.displayName}.map((element) => _${typeConverter.name.decapitalize()}.encode(element))';
+        }
+      })
+    ];
   }
 
-  @nullable
-  String _generateArguments() {
+  String? _generateArguments() {
     final parameters = _generateParameters();
-    return parameters.isNotEmpty ? '<dynamic>[${parameters.join(', ')}]' : null;
+    return parameters.isNotEmpty ? '[${parameters.join(', ')}]' : null;
   }
 
-  @nonNull
-  String _generateNoReturnQuery(@nullable final String arguments) {
-    final parameters = StringBuffer()..write("'${_queryMethod.query}'");
+  String _generateQueryString() {
+    final code = StringBuffer();
+    int start = 0;
+    final originalQuery = _queryMethod.query.sql;
+    for (final listParameter in _queryMethod.query.listParameters) {
+      code.write(
+          originalQuery.substring(start, listParameter.position).toLiteral());
+      code.write(' + _sqliteVariablesFor${listParameter.name.capitalize()} + ');
+      start = listParameter.position + varlistPlaceholder.length;
+    }
+    code.write(originalQuery.substring(start).toLiteral());
+
+    return code.toString();
+  }
+
+  String _generateNoReturnQuery(final String query, final String? arguments) {
+    final parameters = StringBuffer(query);
     if (arguments != null) parameters.write(', arguments: $arguments');
     if (_queryMethod.isRaw) parameters.write(', isRaw: true');
     return 'await _queryAdapter.queryNoReturn($parameters);';
   }
 
-  @nonNull
   String _generateQuery(
-    @nullable final String arguments,
-    @nonNull final String mapper,
+    final String query,
+    final String? arguments,
+    final Queryable queryable,
   ) {
-    final parameters = StringBuffer()..write("'${_queryMethod.query}', ");
-    if (arguments != null) parameters.write('arguments: $arguments, ');
-    if (_queryMethod.isRaw) parameters.write('isRaw: true, ');
-    parameters.write('mapper: $mapper');
+    final mapper = _generateMapper(queryable);
+    final parameters = StringBuffer(query)..write(', mapper: $mapper');
+    if (arguments != null) parameters.write(', arguments: $arguments');
+    if (_queryMethod.isRaw) parameters.write(', isRaw: true');
 
-    if (_queryMethod.returnsList) {
-      return 'return _queryAdapter.queryList($parameters);';
-    } else {
-      return 'return _queryAdapter.query($parameters);';
+    if (_queryMethod.returnsStream) {
+      // for streamed queries, we need to provide the queryable to know which
+      // entity to monitor. For views, we monitor all entities.
+      parameters
+        ..write(", queryableName: '${queryable.name}'")
+        ..write(', isView: ${queryable is View}');
     }
-  }
 
-  @nonNull
-  String _generateStreamQuery(
-    @nullable final String arguments,
-    @nonNull final String mapper,
-  ) {
-    final queryableName = _queryMethod.queryable.name;
-    final isView = _queryMethod.queryable is View;
-    final parameters = StringBuffer()..write("'${_queryMethod.query}', ");
-    if (arguments != null) parameters.write('arguments: $arguments, ');
-    parameters
-      ..write("queryableName: '$queryableName', ")
-      ..write('isView: $isView, ')
-      ..write('mapper: $mapper');
+    final list = _queryMethod.returnsList ? 'List' : '';
+    final stream = _queryMethod.returnsStream ? 'Stream' : '';
 
-    if (_queryMethod.returnsList) {
-      return 'return _queryAdapter.queryListStream($parameters);';
-    } else {
-      return 'return _queryAdapter.queryStream($parameters);';
-    }
+    return 'return _queryAdapter.query$list$stream($parameters);';
   }
+}
+
+String _generateMapper(Queryable queryable) {
+  final constructor = queryable.constructor;
+  return '(Map<String, Object?> row) => $constructor';
 }

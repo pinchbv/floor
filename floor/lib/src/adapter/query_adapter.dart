@@ -1,30 +1,25 @@
 import 'dart:async';
 
-import 'package:meta/meta.dart';
 import 'package:sqflite/sqflite.dart';
 
 /// This class knows how to execute database queries.
 class QueryAdapter {
   final DatabaseExecutor _database;
-  final StreamController<String> _changeListener;
+  final StreamController<String>? _changeListener;
 
   QueryAdapter(
     final DatabaseExecutor database, [
-    final StreamController<String> changeListener,
-  ])  : assert(database != null),
-        _database = database,
+    final StreamController<String>? changeListener,
+  ])  : _database = database,
         _changeListener = changeListener;
 
   /// Executes a SQLite query that may return a single value.
-  Future<T> query<T>(
+  Future<T?> query<T>(
     final String sql, {
-    final List<dynamic> arguments,
-    final bool isRaw = false,
-    @required final T Function(Map<String, dynamic>) mapper,
+    final List<Object>? arguments,
+    required final T Function(Map<String, Object?>) mapper,
   }) async {
-    final rows = await (isRaw
-        ? _database.rawQuery(sql.replaceAll('?', arguments[0]))
-        : _database.rawQuery(sql, arguments));
+    final rows = await _database.rawQuery(sql, arguments);
 
     if (rows.isEmpty) {
       return null;
@@ -38,9 +33,9 @@ class QueryAdapter {
   /// Executes a SQLite query that may return multiple values.
   Future<List<T>> queryList<T>(
     final String sql, {
-    final List<dynamic> arguments,
+    final List<Object>? arguments,
     final bool isRaw = false,
-    @required final T Function(Map<String, dynamic>) mapper,
+    required final T Function(Map<String, Object?>) mapper,
   }) async {
     final rows = await (isRaw
         ? _database.rawQuery(sql.replaceAll('?', arguments[0]))
@@ -50,8 +45,7 @@ class QueryAdapter {
 
   Future<void> queryNoReturn(
     final String sql, {
-    final List<dynamic> arguments,
-    final bool isRaw = false,
+    final List<Object>? arguments,
   }) async {
     // TODO #94 differentiate between different query kinds (select, update, delete, insert)
     //  this enables to notify the observers
@@ -61,28 +55,29 @@ class QueryAdapter {
         : _database.rawQuery(sql, arguments));
   }
 
-  /// Executes a SQLite query that returns a stream of single query results.
-  Stream<T> queryStream<T>(
+  /// Executes a SQLite query that returns a stream of single query results
+  /// or `null`.
+  Stream<T?> queryStream<T>(
     final String sql, {
-    final List<dynamic> arguments,
-    @required final String queryableName,
-    @required final bool isView,
-    @required final T Function(Map<String, dynamic>) mapper,
+    final List<Object>? arguments,
+    required final String queryableName,
+    required final bool isView,
+    required final T Function(Map<String, Object?>) mapper,
   }) {
-    assert(_changeListener != null);
-
-    final controller = StreamController<T>.broadcast();
+    // ignore: close_sinks
+    final changeListener = ArgumentError.checkNotNull(_changeListener);
+    final controller = StreamController<T?>.broadcast();
 
     Future<void> executeQueryAndNotifyController() async {
       final result = await query(sql, arguments: arguments, mapper: mapper);
-      if (result != null) controller.add(result);
+      controller.add(result);
     }
 
     controller.onListen = () async => executeQueryAndNotifyController();
 
     // listen on all updates if the stream is on a view, only listen to the
     // name of the table if the stream is on a entity.
-    final subscription = _changeListener.stream
+    final subscription = changeListener.stream
         .where((updatedTable) => updatedTable == queryableName || isView)
         .listen(
           (_) async => executeQueryAndNotifyController(),
@@ -97,13 +92,13 @@ class QueryAdapter {
   /// Executes a SQLite query that returns a stream of multiple query results.
   Stream<List<T>> queryListStream<T>(
     final String sql, {
-    final List<dynamic> arguments,
-    @required final String queryableName,
-    @required final bool isView,
-    @required final T Function(Map<String, dynamic>) mapper,
+    final List<Object>? arguments,
+    required final String queryableName,
+    required final bool isView,
+    required final T Function(Map<String, Object?>) mapper,
   }) {
-    assert(_changeListener != null);
-
+    // ignore: close_sinks
+    final changeListener = ArgumentError.checkNotNull(_changeListener);
     final controller = StreamController<List<T>>.broadcast();
 
     Future<void> executeQueryAndNotifyController() async {
@@ -114,7 +109,7 @@ class QueryAdapter {
     controller.onListen = () async => executeQueryAndNotifyController();
 
     // Views listen on all events, Entities only on events that changed the same entity.
-    final subscription = _changeListener.stream
+    final subscription = changeListener.stream
         .where((updatedTable) => isView || updatedTable == queryableName)
         .listen(
           (_) async => executeQueryAndNotifyController(),

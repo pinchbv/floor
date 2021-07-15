@@ -18,10 +18,7 @@ class Migration {
   /// [migrate] will be called by the database and performs the actual
   /// migration.
   Migration(this.startVersion, this.endVersion, this.migrate)
-      : assert(startVersion != null),
-        assert(endVersion != null),
-        assert(migrate != null),
-        assert(startVersion > 0),
+      : assert(startVersion > 0),
         assert(startVersion < endVersion);
 
   @override

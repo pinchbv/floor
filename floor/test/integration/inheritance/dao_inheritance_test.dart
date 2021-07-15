@@ -9,8 +9,8 @@ part 'dao_inheritance_test.g.dart';
 
 void main() {
   group('dao inheritance tests', () {
-    TestDatabase database;
-    PersonDao personDao;
+    late TestDatabase database;
+    late PersonDao personDao;
 
     setUp(() async {
       database = await $FloorTestDatabase.inMemoryDatabaseBuilder().build();
@@ -40,7 +40,7 @@ abstract class TestDatabase extends FloorDatabase {
 @dao
 abstract class PersonDao extends AbstractDao<Person> {
   @Query('SELECT * FROM Person WHERE id = :id')
-  Future<Person> findPersonById(int id);
+  Future<Person?> findPersonById(int id);
 }
 
 abstract class AbstractDao<T> {

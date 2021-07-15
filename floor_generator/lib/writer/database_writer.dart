@@ -1,6 +1,5 @@
 import 'package:code_builder/code_builder.dart';
 import 'package:floor_generator/misc/annotation_expression.dart';
-import 'package:floor_generator/misc/annotations.dart';
 import 'package:floor_generator/value_object/database.dart';
 import 'package:floor_generator/value_object/entity.dart';
 import 'package:floor_generator/writer/writer.dart';
@@ -11,13 +10,11 @@ class DatabaseWriter implements Writer {
 
   DatabaseWriter(final this.database);
 
-  @nonNull
   @override
   Class write() {
     return _generateDatabaseImplementation(database);
   }
 
-  @nonNull
   Class _generateDatabaseImplementation(final Database database) {
     final databaseName = database.name;
 
@@ -25,21 +22,18 @@ class DatabaseWriter implements Writer {
       ..name = '_\$$databaseName'
       ..extend = refer(databaseName)
       ..methods.add(_generateOpenMethod(database))
-      ..methods.add(_generateAllDaoList(database))
       ..methods.addAll(_generateDaoGetters(database))
       ..fields.addAll(_generateDaoInstances(database))
-      ..fields.addAll(_generateCreateStatements(database))
       ..constructors.add(_generateConstructor()));
   }
 
-  @nonNull
   Constructor _generateConstructor() {
     return Constructor((builder) {
       final parameter = Parameter((builder) => builder
         ..name = 'listener'
-        ..type = refer('StreamController<String>'));
+        ..type = refer('StreamController<String>?'));
 
-      return builder
+      builder
         ..body = const Code(
           'changeListener = listener ?? StreamController<String>.broadcast();',
         )
@@ -47,7 +41,6 @@ class DatabaseWriter implements Writer {
     });
   }
 
-  @nonNull
   List<Method> _generateDaoGetters(final Database database) {
     return database.daoGetters.map((daoGetter) {
       final daoGetterName = daoGetter.name;
@@ -63,66 +56,32 @@ class DatabaseWriter implements Writer {
     }).toList();
   }
 
-  @nonNull
   List<Field> _generateDaoInstances(final Database database) {
     return database.daoGetters.map((daoGetter) {
       final daoGetterName = daoGetter.name;
       final daoTypeName = daoGetter.dao.classElement.displayName;
 
       return Field((builder) => builder
-        ..type = refer(daoTypeName)
+        ..type = refer('$daoTypeName?')
         ..name = '_${daoGetterName}Instance');
     }).toList();
   }
 
-  @nonNull
-  Method _generateAllDaoList(final Database database) {
-    final daoNames = database.daoGetters.map((daoGetter) => daoGetter.name).join(', \n');
-
-    return Method((builder) => builder
-      ..annotations.add(overrideAnnotationExpression)
-      ..type = MethodType.getter
-      ..returns = refer('List<dynamic>')
-      ..name = 'allDaos'
-      ..body = Code('return [$daoNames];'));
-  }
-
-  @nonNull
-  List<Field> _generateCreateStatements(final Database database) {
+  Method _generateOpenMethod(final Database database) {
     final createTableStatements =
-    _generateCreateTableSqlStatements(database.entities)
-        .map((statement) => "'$statement',")
-        .join('\n');
-
+        _generateCreateTableSqlStatements(database.entities)
+            .map((statement) => "await database.execute('$statement');")
+            .join('\n');
     final createIndexStatements = database.entities
         .map((entity) => entity.indices.map((index) => index.createQuery()))
         .expand((statements) => statements)
-        .map((statement) => "'$statement',")
+        .map((statement) => "await database.execute('$statement');")
         .join('\n');
-
     final createViewStatements = database.views
         .map((view) => view.getCreateViewStatement())
-        .map((statement) => "'''$statement''',")
+        .map((statement) => "await database.execute('''$statement''');")
         .join('\n');
 
-    return [
-      Field((builder) => builder
-        ..type = refer('final List<String>')
-        ..name = '_createTableStatements'
-        ..assignment = Code('[$createTableStatements]')),
-      Field((builder) => builder
-        ..type = refer('final List<String>')
-        ..name = '_createIndexStatements'
-        ..assignment = Code('[$createIndexStatements]')),
-      Field((builder) => builder
-        ..type = refer('final List<String>')
-        ..name = '_createViewStatements'
-        ..assignment = Code('[$createViewStatements]'))
-    ];
-  }
-
-  @nonNull
-  Method _generateOpenMethod(final Database database) {
     final pathParameter = Parameter((builder) => builder
       ..name = 'path'
       ..type = refer('String'));
@@ -131,7 +90,7 @@ class DatabaseWriter implements Writer {
       ..type = refer('List<Migration>'));
     final callbackParameter = Parameter((builder) => builder
       ..name = 'callback'
-      ..type = refer('Callback'));
+      ..type = refer('Callback?'));
 
     return Method((builder) => builder
       ..name = 'open'
@@ -144,21 +103,20 @@ class DatabaseWriter implements Writer {
             version: ${database.version},
             onConfigure: (database) async {
               await database.execute('PRAGMA foreign_keys = ON');
+              await callback?.onConfigure?.call(database);
             },
             onOpen: (database) async {
               await callback?.onOpen?.call(database);
             },
             onUpgrade: (database, startVersion, endVersion) async {
               await MigrationAdapter.runMigrations(database, startVersion, endVersion, migrations);
-              
-              await AutoMigration.migrate(database, _createTableStatements);
-              
+
               await callback?.onUpgrade?.call(database, startVersion, endVersion);
             },
             onCreate: (database, version) async {
-              Future.wait(_createTableStatements.map((statement) async => await database.execute(statement)));
-              Future.wait(_createIndexStatements.map((statement) async => await database.execute(statement)));
-              Future.wait(_createViewStatements.map((statement) async => await database.execute(statement)));
+              $createTableStatements
+              $createIndexStatements
+              $createViewStatements
 
               await callback?.onCreate?.call(database, version);
             },
@@ -167,7 +125,6 @@ class DatabaseWriter implements Writer {
           '''));
   }
 
-  @nonNull
   List<String> _generateCreateTableSqlStatements(final List<Entity> entities) {
     return entities.map((entity) => entity.getCreateTableStatement()).toList();
   }

@@ -1,5 +1,3 @@
-import 'package:meta/meta.dart';
-
 /// Declares an index on an Entity.
 /// see: <a href="https://sqlite.org/lang_createindex.html">SQLite Index Documentation</a>
 class Index {
@@ -10,7 +8,7 @@ class Index {
   /// and with an index of {"bar", "baz"}, generated index name will be
   /// 'index_Foo_bar_baz'. If you need to specify the index in a query, you
   /// should never rely on this name, instead, specify a name for your index.
-  final String name;
+  final String? name;
 
   /// If set to true, this will be a unique index and any duplicates will be
   /// rejected.
@@ -27,5 +25,5 @@ class Index {
   /// Declares an index on an Entity.
   ///
   /// Is not [unique] by default.
-  const Index({this.name, this.unique = false, @required this.value});
+  const Index({this.name, this.unique = false, required this.value});
 }

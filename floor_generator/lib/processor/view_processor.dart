@@ -1,6 +1,5 @@
 import 'package:analyzer/dart/element/element.dart';
 import 'package:floor_annotation/floor_annotation.dart' as annotations;
-import 'package:floor_generator/misc/annotations.dart';
 import 'package:floor_generator/misc/constants.dart';
 import 'package:floor_generator/misc/type_utils.dart';
 import 'package:floor_generator/processor/error/view_processor_error.dart';
@@ -17,7 +16,6 @@ class ViewProcessor extends QueryableProcessor<View> {
   )   : _processorError = ViewProcessorError(classElement),
         super(classElement, typeConverters);
 
-  @nonNull
   @override
   View process() {
     final fields = getFields();
@@ -30,25 +28,35 @@ class ViewProcessor extends QueryableProcessor<View> {
     );
   }
 
-  @nonNull
   String _getName() {
     return classElement
             .getAnnotation(annotations.DatabaseView)
-            .getField(AnnotationField.viewName)
+            ?.getField(AnnotationField.viewName)
             ?.toStringValue() ??
         classElement.displayName;
   }
 
-  @nonNull
   String _getQuery() {
     final query = classElement
         .getAnnotation(annotations.DatabaseView)
-        .getField(AnnotationField.viewQuery)
+        ?.getField(AnnotationField.viewQuery)
         ?.toStringValue();
 
-    if (query == null || !query.trimLeft().toLowerCase().startsWith('select')) {
+    if (query == null || !(query.isSelectQuery || query.isCteWithSelect)) {
       throw _processorError.missingQuery;
     }
     return query;
+  }
+}
+
+extension on String {
+  bool get isSelectQuery => toLowerCase().trimLeft().startsWith('select');
+
+  /// whether the string is a common table expression
+  /// followed by a `SELECT` query
+  bool get isCteWithSelect {
+    final lowerCasedString = toLowerCase();
+    return lowerCasedString.trimLeft().startsWith('with') &&
+        'select'.allMatches(lowerCasedString).length >= 2;
   }
 }

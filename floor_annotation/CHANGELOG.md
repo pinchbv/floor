@@ -1,8 +1,26 @@
 # Changelog
 
+# 1.0.0
+
+### Changes
+
+* Use stable Dart 2.12.0
+
+### 🚀 Features
+
+* Make floor null-safe
+
+# 0.12.0
+
+* Add `@Fts3` and `@Fts4` annotations
+
+# 0.11.0
+
+* Change `ForeignKeyAction` int constants to enum
+
 # 0.10.0
 
-* Add experimental  `TypeConverter` abstract class and `TypeConverters` annotation
+* Add experimental `TypeConverter` abstract class and `TypeConverters` annotation
 
 # 0.9.0
 
@@ -10,7 +28,8 @@
 
 # 0.8.0
 
-**⚠️ You need to migrate the explicit usages of `OnConflictStrategy` and `ForeignKeyAction` from snake case to camel case.**
+**⚠️ You need to migrate the explicit usages of `OnConflictStrategy` and `ForeignKeyAction` from
+snake case to camel case.**
 
 * Apply camel case to constants
 
@@ -51,7 +70,7 @@
 
 ### 🐛 Bug Fixes
 
-*  Correct mapper instance name referenced by generated query methods
+* Correct mapper instance name referenced by generated query methods
 
 # 0.2.0
 

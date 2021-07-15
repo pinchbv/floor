@@ -8,11 +8,34 @@ import 'package:source_gen/source_gen.dart';
 import 'package:test/test.dart';
 
 import '../dart_type.dart';
+import '../test_utils.dart';
 
 void main() {
   test('Process field', () async {
     final fieldElement = await _generateFieldElement('''
       final int id;
+    ''');
+
+    final actual = FieldProcessor(fieldElement, null).process();
+
+    const name = 'id';
+    const columnName = 'id';
+    const isNullable = false;
+    const sqlType = SqlType.integer;
+    final expected = Field(
+      fieldElement,
+      name,
+      columnName,
+      isNullable,
+      sqlType,
+      null,
+    );
+    expect(actual, equals(expected));
+  });
+
+  test('Process field with nullable Dart type', () async {
+    final fieldElement = await _generateFieldElement('''
+      final int? id;
     ''');
 
     final actual = FieldProcessor(fieldElement, null).process();
@@ -70,7 +93,7 @@ void main() {
 
     const name = 'dateTime';
     const columnName = 'dateTime';
-    const isNullable = true;
+    const isNullable = false;
     const sqlType = SqlType.integer; // converted from DateTime
     final expected = Field(
       fieldElement,
@@ -93,7 +116,7 @@ void main() {
 
     const name = 'dateTime';
     const columnName = 'dateTime';
-    const isNullable = true;
+    const isNullable = false;
     const sqlType = SqlType.integer; // converted from DateTime
     final typeConverter = TypeConverter(
       'DateTimeConverter',
@@ -129,7 +152,7 @@ void main() {
 
     const name = 'dateTime';
     const columnName = 'dateTime';
-    const isNullable = true;
+    const isNullable = false;
     const sqlType = SqlType.integer; // converted from DateTime
     final typeConverter = TypeConverter(
       'DateTimeConverter',
@@ -146,6 +169,20 @@ void main() {
       typeConverter,
     );
     expect(actual, equals(expected));
+  });
+  test('Field with unsupported type throws error', () async {
+    final fieldElement = await _generateFieldElement('''
+      final List<int> id;
+    ''');
+
+    expect(
+        FieldProcessor(fieldElement, null).process,
+        throwsInvalidGenerationSourceError(InvalidGenerationSourceError(
+          'Column type is not supported for List<int>.',
+          todo:
+              'Either make to use a supported type or supply a type converter.',
+          element: fieldElement,
+        )));
   });
 }
 
@@ -172,7 +209,7 @@ Future<FieldElement> _generateFieldElement(final String field) async {
         }
       }
       ''', (resolver) async {
-    return LibraryReader(await resolver.findLibraryByName('test'));
+    return LibraryReader((await resolver.findLibraryByName('test'))!);
   });
 
   return library.classes.first.fields.first;

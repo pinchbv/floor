@@ -1,20 +1,21 @@
+import 'package:floor_annotation/floor_annotation.dart' as annotations;
 import 'package:floor_generator/misc/constants.dart';
+import 'package:floor_generator/misc/extension/foreign_key_action_extension.dart';
 import 'package:floor_generator/value_object/entity.dart';
 import 'package:floor_generator/value_object/field.dart';
 import 'package:floor_generator/value_object/foreign_key.dart';
+import 'package:floor_generator/value_object/fts.dart';
 import 'package:floor_generator/value_object/primary_key.dart';
-import 'package:mockito/mockito.dart';
 import 'package:test/test.dart';
 
-import '../mocks.dart';
+import '../fakes.dart';
 
 void main() {
-  final mockClassElement = MockClassElement();
-  final mockFieldElement = MockFieldElement();
-  final mockDartType = MockDartType();
+  final fakeClassElement = FakeClassElement();
+  final fakeFieldElement = FakeFieldElement();
 
   final field = Field(
-    mockFieldElement,
+    fakeFieldElement,
     'field1Name',
     'field1ColumnName',
     false,
@@ -22,7 +23,7 @@ void main() {
     null,
   );
   final nullableField = Field(
-    mockFieldElement,
+    fakeFieldElement,
     'field2Name',
     'field2ColumnName',
     true,
@@ -31,20 +32,11 @@ void main() {
   );
   final allFields = [field, nullableField];
 
-  tearDown(() {
-    clearInteractions(mockClassElement);
-    clearInteractions(mockFieldElement);
-    clearInteractions(mockDartType);
-    reset(mockClassElement);
-    reset(mockFieldElement);
-    reset(mockDartType);
-  });
-
   group('Primary key', () {
     test('Create table statement with single primary key auto increment', () {
       final primaryKey = PrimaryKey([field], true);
       final entity = Entity(
-        mockClassElement,
+        fakeClassElement,
         'entityName',
         allFields,
         primaryKey,
@@ -53,6 +45,7 @@ void main() {
         false,
         '',
         '',
+        null,
       );
 
       final actual = entity.getCreateTableStatement();
@@ -67,7 +60,7 @@ void main() {
     test('Create table statement with single primary key', () {
       final primaryKey = PrimaryKey([field], false);
       final entity = Entity(
-        mockClassElement,
+        fakeClassElement,
         'entityName',
         allFields,
         primaryKey,
@@ -76,6 +69,7 @@ void main() {
         false,
         '',
         '',
+        null,
       );
 
       final actual = entity.getCreateTableStatement();
@@ -91,7 +85,7 @@ void main() {
     test('Create table statement with compound primary key', () {
       final primaryKey = PrimaryKey(allFields, false);
       final entity = Entity(
-        mockClassElement,
+        fakeClassElement,
         'entityName',
         allFields,
         primaryKey,
@@ -100,6 +94,7 @@ void main() {
         false,
         '',
         '',
+        null,
       );
 
       final actual = entity.getCreateTableStatement();
@@ -119,12 +114,12 @@ void main() {
         'parentName',
         ['parentColumn'],
         ['childColumn'],
-        'foo',
-        'bar',
+        annotations.ForeignKeyAction.cascade,
+        annotations.ForeignKeyAction.noAction,
       );
       final primaryKey = PrimaryKey([nullableField], true);
       final entity = Entity(
-        mockClassElement,
+        fakeClassElement,
         'entityName',
         [nullableField],
         primaryKey,
@@ -133,6 +128,7 @@ void main() {
         false,
         '',
         '',
+        null,
       );
 
       final actual = entity.getCreateTableStatement();
@@ -142,8 +138,39 @@ void main() {
           'FOREIGN KEY (`${foreignKey.childColumns[0]}`) '
           'REFERENCES `${foreignKey.parentName}` '
           '(`${foreignKey.parentColumns[0]}`) '
-          'ON UPDATE ${foreignKey.onUpdate} '
-          'ON DELETE ${foreignKey.onDelete}'
+          'ON UPDATE ${foreignKey.onUpdate.toSql()} '
+          'ON DELETE ${foreignKey.onDelete.toSql()}'
+          ')';
+      expect(actual, equals(expected));
+    });
+  });
+
+  group('Fts key', () {
+    test('Create table statement with fts key', () {
+      final fts = Fts4(
+        'porter',
+        [],
+      );
+      final primaryKey = PrimaryKey([], true);
+      final entity = Entity(
+        fakeClassElement,
+        'entityName',
+        [nullableField],
+        primaryKey,
+        [],
+        [],
+        false,
+        '',
+        '',
+        fts,
+      );
+
+      final actual = entity.getCreateTableStatement();
+
+      final expected = 'CREATE VIRTUAL TABLE IF NOT EXISTS `${entity.name}` '
+          'USING fts4'
+          '(`${nullableField.columnName}` ${nullableField.sqlType}, '
+          'tokenize=porter '
           ')';
       expect(actual, equals(expected));
     });
@@ -152,7 +179,7 @@ void main() {
   test('Create table statement with "WITHOUT ROWID"', () {
     final primaryKey = PrimaryKey([field], false);
     final entity = Entity(
-      mockClassElement,
+      fakeClassElement,
       'entityName',
       allFields,
       primaryKey,
@@ -161,6 +188,7 @@ void main() {
       true,
       '',
       '',
+      null,
     );
 
     final actual = entity.getCreateTableStatement();

@@ -22,11 +22,11 @@ class $FloorFlutterDatabase {
 class _$FlutterDatabaseBuilder {
   _$FlutterDatabaseBuilder(this.name);
 
-  final String name;
+  final String? name;
 
   final List<Migration> _migrations = [];
 
-  Callback _callback;
+  Callback? _callback;
 
   /// Adds migrations to the builder.
   _$FlutterDatabaseBuilder addMigrations(List<Migration> migrations) {
@@ -43,7 +43,7 @@ class _$FlutterDatabaseBuilder {
   /// Creates the database and initializes it.
   Future<FlutterDatabase> build() async {
     final path = name != null
-        ? await sqfliteDatabaseFactory.getDatabasePath(name)
+        ? await sqfliteDatabaseFactory.getDatabasePath(name!)
         : ':memory:';
     final database = _$FlutterDatabase();
     database.database = await database.open(
@@ -56,18 +56,19 @@ class _$FlutterDatabaseBuilder {
 }
 
 class _$FlutterDatabase extends FlutterDatabase {
-  _$FlutterDatabase([StreamController<String> listener]) {
+  _$FlutterDatabase([StreamController<String>? listener]) {
     changeListener = listener ?? StreamController<String>.broadcast();
   }
 
-  TaskDao _taskDaoInstance;
+  TaskDao? _taskDaoInstance;
 
   Future<sqflite.Database> open(String path, List<Migration> migrations,
-      [Callback callback]) async {
+      [Callback? callback]) async {
     final databaseOptions = sqflite.OpenDatabaseOptions(
       version: 1,
       onConfigure: (database) async {
         await database.execute('PRAGMA foreign_keys = ON');
+        await callback?.onConfigure?.call(database);
       },
       onOpen: (database) async {
         await callback?.onOpen?.call(database);
@@ -80,7 +81,7 @@ class _$FlutterDatabase extends FlutterDatabase {
       },
       onCreate: (database, version) async {
         await database.execute(
-            'CREATE TABLE IF NOT EXISTS `Task` (`id` INTEGER PRIMARY KEY AUTOINCREMENT, `message` TEXT)');
+            'CREATE TABLE IF NOT EXISTS `Task` (`id` INTEGER PRIMARY KEY AUTOINCREMENT, `message` TEXT NOT NULL)');
 
         await callback?.onCreate?.call(database, version);
       },
@@ -101,21 +102,21 @@ class _$TaskDao extends TaskDao {
             database,
             'Task',
             (Task item) =>
-                <String, dynamic>{'id': item.id, 'message': item.message},
+                <String, Object?>{'id': item.id, 'message': item.message},
             changeListener),
         _taskUpdateAdapter = UpdateAdapter(
             database,
             'Task',
             ['id'],
             (Task item) =>
-                <String, dynamic>{'id': item.id, 'message': item.message},
+                <String, Object?>{'id': item.id, 'message': item.message},
             changeListener),
         _taskDeletionAdapter = DeletionAdapter(
             database,
             'Task',
             ['id'],
             (Task item) =>
-                <String, dynamic>{'id': item.id, 'message': item.message},
+                <String, Object?>{'id': item.id, 'message': item.message},
             changeListener);
 
   final sqflite.DatabaseExecutor database;
@@ -131,27 +132,27 @@ class _$TaskDao extends TaskDao {
   final DeletionAdapter<Task> _taskDeletionAdapter;
 
   @override
-  Future<Task> findTaskById(int id) async {
-    return _queryAdapter.query('SELECT * FROM task WHERE id = ?',
-        arguments: <dynamic>[id],
-        mapper: (Map<String, dynamic> row) =>
-            Task(row['id'] as int, row['message'] as String));
+  Future<Task?> findTaskById(int id) async {
+    return _queryAdapter.query('SELECT * FROM task WHERE id = ?1',
+        mapper: (Map<String, Object?> row) =>
+            Task(row['id'] as int?, row['message'] as String),
+        arguments: [id]);
   }
 
   @override
   Future<List<Task>> findAllTasks() async {
     return _queryAdapter.queryList('SELECT * FROM task',
-        mapper: (Map<String, dynamic> row) =>
-            Task(row['id'] as int, row['message'] as String));
+        mapper: (Map<String, Object?> row) =>
+            Task(row['id'] as int?, row['message'] as String));
   }
 
   @override
   Stream<List<Task>> findAllTasksAsStream() {
     return _queryAdapter.queryListStream('SELECT * FROM task',
+        mapper: (Map<String, Object?> row) =>
+            Task(row['id'] as int?, row['message'] as String),
         queryableName: 'Task',
-        isView: false,
-        mapper: (Map<String, dynamic> row) =>
-            Task(row['id'] as int, row['message'] as String));
+        isView: false);
   }
 
   @override

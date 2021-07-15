@@ -1,9 +1,9 @@
 import 'package:analyzer/dart/element/element.dart';
 import 'package:analyzer/dart/element/type.dart';
-import 'package:dartx/dartx.dart';
+import 'package:collection/collection.dart';
 import 'package:floor_annotation/floor_annotation.dart' as annotations;
-import 'package:floor_generator/misc/annotations.dart';
 import 'package:floor_generator/misc/extension/set_extension.dart';
+import 'package:floor_generator/misc/extension/string_extension.dart';
 import 'package:floor_generator/misc/extension/type_converter_element_extension.dart';
 import 'package:floor_generator/misc/extension/type_converters_extension.dart';
 import 'package:floor_generator/misc/type_utils.dart';
@@ -28,13 +28,10 @@ abstract class QueryableProcessor<T extends Queryable> extends Processor<T> {
   QueryableProcessor(
     this.classElement,
     final Set<TypeConverter> typeConverters,
-  )   : assert(classElement != null),
-        assert(typeConverters != null),
-        _queryableProcessorError = QueryableProcessorError(classElement),
+  )   : _queryableProcessorError = QueryableProcessorError(classElement),
         queryableTypeConverters = typeConverters +
             classElement.getTypeConverters(TypeConverterScope.queryable);
 
-  @nonNull
   @protected
   List<Field> getFields() {
     if (classElement.mixins.isNotEmpty) {
@@ -54,7 +51,6 @@ abstract class QueryableProcessor<T extends Queryable> extends Processor<T> {
     }).toList();
   }
 
-  @nonNull
   @protected
   String getConstructor(final List<Field> fields) {
     final constructorParameters = classElement.constructors.first.parameters;
@@ -67,16 +63,14 @@ abstract class QueryableProcessor<T extends Queryable> extends Processor<T> {
   }
 
   /// Returns `null` whenever field is @ignored
-  @nullable
-  String _getParameterValue(
+  String? _getParameterValue(
     final ParameterElement parameterElement,
     final List<Field> fields,
   ) {
     final parameterName = parameterElement.displayName;
-    final field = fields.firstWhere(
-      (field) => field.name == parameterName,
-      orElse: () => null, // whenever field is @ignored
-    );
+    final field =
+        // null whenever field is @ignored
+        fields.firstWhereOrNull((field) => field.name == parameterName);
     if (field != null) {
       final databaseValue = "row['${field.columnName}']";
 
@@ -90,7 +84,7 @@ abstract class QueryableProcessor<T extends Queryable> extends Processor<T> {
         );
       } else {
         final typeConverter = [...queryableTypeConverters, field.typeConverter]
-            .filterNotNull()
+            .whereNotNull()
             .getClosest(parameterElement.type);
         final castedDatabaseValue = databaseValue.cast(
           typeConverter.databaseType,
@@ -127,13 +121,13 @@ extension on String {
         return '($this as int) != 0';
       }
     } else if (dartType.isDartCoreString) {
-      return '$this as String';
+      return '$this as String${isNullable ? '?' : ''}';
     } else if (dartType.isDartCoreInt) {
-      return '$this as int';
+      return '$this as int${isNullable ? '?' : ''}';
     } else if (dartType.isUint8List) {
-      return '$this as Uint8List';
+      return '$this as Uint8List${isNullable ? '?' : ''}';
     } else if (dartType.isDartCoreDouble) {
-      return '$this as double'; // must be double
+      return '$this as double${isNullable ? '?' : ''}';
     } else {
       throw InvalidGenerationSourceError(
         'Trying to convert unsupported type $dartType.',

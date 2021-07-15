@@ -1,5 +1,5 @@
 import 'package:analyzer/dart/element/element.dart';
-import 'package:floor_generator/misc/extension/list_equality_extension.dart';
+import 'package:collection/collection.dart';
 import 'package:floor_generator/misc/extension/set_equality_extension.dart';
 import 'package:floor_generator/value_object/dao_getter.dart';
 import 'package:floor_generator/value_object/entity.dart';

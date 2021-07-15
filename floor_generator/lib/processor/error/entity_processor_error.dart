@@ -1,3 +1,4 @@
+import 'package:analyzer/dart/constant/value.dart';
 import 'package:analyzer/dart/element/element.dart';
 import 'package:source_gen/source_gen.dart';
 
@@ -5,8 +6,7 @@ class EntityProcessorError {
   final ClassElement _classElement;
 
   EntityProcessorError(final ClassElement classElement)
-      : assert(classElement != null),
-        _classElement = classElement;
+      : _classElement = classElement;
 
   InvalidGenerationSourceError get missingPrimaryKey {
     return InvalidGenerationSourceError(
@@ -60,12 +60,22 @@ class EntityProcessorError {
   }
 
   InvalidGenerationSourceError noMatchingColumn(
-    final List<String> columnNames,
+    final String columnName,
   ) {
     return InvalidGenerationSourceError(
-      'No matching columns found for the given index. (${columnNames.join(', ')})',
+      'No matching column found for the given index. (`$columnName`)',
       todo:
           "Make sure to add a correct index column name like: Index(values: ['foo'])').",
+      element: _classElement,
+    );
+  }
+
+  InvalidGenerationSourceError wrongForeignKeyAction(
+      DartObject field, String triggerName) {
+    return InvalidGenerationSourceError(
+      'No ForeignKeyAction with the value $field exists for the $triggerName trigger.',
+      todo:
+          'Make sure to add a correct ForeignKeyAction like `ForeignKeyAction.noAction` or leave it out entirely.',
       element: _classElement,
     );
   }

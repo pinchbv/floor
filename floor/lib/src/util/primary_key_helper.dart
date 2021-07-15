@@ -6,10 +6,19 @@ class PrimaryKeyHelper {
   }
 
   /// Obtains the primary key values
-  static List<dynamic> getPrimaryKeyValues(
+  static List<Object> getPrimaryKeyValues(
     final List<String> primaryKeys,
-    final Map<String, dynamic> values,
+    final Map<String, Object?> values,
   ) {
-    return primaryKeys.map<dynamic>((key) => values[key]).toList();
+    return primaryKeys.mapNotNull((key) => values[key]).toList();
+  }
+}
+
+extension<T> on Iterable<T> {
+  Iterable<R> mapNotNull<R>(R? Function(T element) transform) sync* {
+    for (final element in this) {
+      final transformed = transform(element);
+      if (transformed != null) yield transformed;
+    }
   }
 }

@@ -33,13 +33,36 @@ void main() {
       expect(actual, equals(expected));
     });
 
-    test('Get group primary key values from composit primary key', () {
+    test('Get group primary key values from composite primary key', () {
       final primaryKey = ['foo', 'bar'];
       final values = {'foo': 1, 'bar': 2};
 
       final actual = PrimaryKeyHelper.getPrimaryKeyValues(primaryKey, values);
 
       final expected = [1, 2];
+      expect(actual, equals(expected));
+    });
+
+    test('Get group primary key values from composite primary key without null',
+        () {
+      final primaryKey = ['foo', 'bar'];
+      final values = {'foo': 1, 'bar': null};
+
+      final actual = PrimaryKeyHelper.getPrimaryKeyValues(primaryKey, values);
+
+      final expected = [1];
+      expect(actual, equals(expected));
+    });
+
+    test(
+        'Get group primary key values from composite primary key without null when value for key is missing',
+        () {
+      final primaryKey = ['foo', 'bar'];
+      final values = {'foo': 1};
+
+      final actual = PrimaryKeyHelper.getPrimaryKeyValues(primaryKey, values);
+
+      final expected = [1];
       expect(actual, equals(expected));
     });
   });

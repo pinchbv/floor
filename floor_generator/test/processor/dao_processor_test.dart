@@ -12,11 +12,13 @@ import 'package:source_gen/source_gen.dart';
 import 'package:test/test.dart';
 
 void main() {
-  List<Entity> entities;
-  List<View> views;
+  late List<Entity> entities;
+  late List<View> views;
 
-  setUpAll(() async => entities = await _getEntities());
-  setUpAll(() async => views = await _getViews());
+  setUpAll(() async {
+    entities = await _getEntities();
+    views = await _getViews();
+  });
 
   test('Includes methods from abstract parent class', () async {
     final classElement = await _createDao('''
@@ -196,7 +198,7 @@ Future<ClassElement> _createDao(final String dao) async {
       }
 
       ''', (resolver) async {
-    return LibraryReader(await resolver.findLibraryByName('test'));
+    return LibraryReader((await resolver.findLibraryByName('test'))!);
   });
 
   return library.classes.first;
@@ -218,7 +220,7 @@ Future<List<Entity>> _getEntities() async {
         Person(this.id, this.name);
       }
     ''', (resolver) async {
-    return LibraryReader(await resolver.findLibraryByName('test'));
+    return LibraryReader((await resolver.findLibraryByName('test'))!);
   });
 
   return library.classes
@@ -240,7 +242,7 @@ Future<List<View>> _getViews() async {
         Person(this.name);
       }
     ''', (resolver) async {
-    return LibraryReader(await resolver.findLibraryByName('test'));
+    return LibraryReader((await resolver.findLibraryByName('test'))!);
   });
 
   return library.classes

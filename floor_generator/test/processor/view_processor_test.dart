@@ -36,6 +36,90 @@ void main() {
     expect(actual, equals(expected));
   });
 
+  test('Process view starting with WITH statement', () async {
+    final classElement = await createClassElement('''
+      @DatabaseView("WITH subquery as (SELECT * from otherentity) SELECT subquery.*")
+      class Person {
+        final int id;
+      
+        final String name;
+      
+        Person(this.id, this.name);
+      }
+    ''');
+
+    final actual = ViewProcessor(classElement, {}).process();
+
+    const name = 'Person';
+    final fields = classElement.fields
+        .map((fieldElement) => FieldProcessor(fieldElement, null).process())
+        .toList();
+    const query =
+        'WITH subquery as (SELECT * from otherentity) SELECT subquery.*';
+    const constructor = "Person(row['id'] as int, row['name'] as String)";
+    final expected = View(
+      classElement,
+      name,
+      fields,
+      query,
+      constructor,
+    );
+    expect(actual, equals(expected));
+  });
+  test('Throws when processing view without SELECT', () async {
+    final classElement = await createClassElement('''
+      @DatabaseView("DELETE all from Person")
+      class Person {
+        final int id;
+      
+        final String name;
+      
+        Person(this.id, this.name);
+      }
+    ''');
+
+    final actual = () => ViewProcessor(classElement, {}).process();
+
+    expect(actual, throwsInvalidGenerationSourceError());
+  });
+
+  test(
+      'Throws when processing view starting with WITH statement without SELECT',
+      () async {
+    final classElement = await createClassElement('''
+      @DatabaseView("WITH subquery")
+      class Person {
+        final int id;
+      
+        final String name;
+      
+        Person(this.id, this.name);
+      }
+    ''');
+
+    final actual = () => ViewProcessor(classElement, {}).process();
+
+    expect(actual, throwsInvalidGenerationSourceError());
+  });
+
+  test(
+      'Throws when processing view starting with WITH statement with only one SELECT',
+      () async {
+    final classElement = await createClassElement('''
+      @DatabaseView("WITH subquery as (SELECT * from otherentity)")
+      class Person {
+        final int id;
+      
+        final String name;
+      
+        Person(this.id, this.name);
+      }
+    ''');
+
+    final actual = () => ViewProcessor(classElement, {}).process();
+
+    expect(actual, throwsInvalidGenerationSourceError());
+  });
   test('Process view with mutliline query', () async {
     final classElement = await createClassElement("""
       @DatabaseView('''

@@ -5,8 +5,7 @@ class QueryableProcessorError {
   final ClassElement _classElement;
 
   QueryableProcessorError(final ClassElement classElement)
-      : assert(classElement != null),
-        _classElement = classElement;
+      : _classElement = classElement;
 
   InvalidGenerationSourceError get prohibitedMixinUsage {
     return InvalidGenerationSourceError(

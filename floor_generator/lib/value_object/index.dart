@@ -1,4 +1,4 @@
-import 'package:floor_generator/misc/annotations.dart';
+import 'package:collection/collection.dart';
 
 class Index {
   final String name;
@@ -8,7 +8,6 @@ class Index {
 
   Index(this.name, this.tableName, this.unique, this.columnNames);
 
-  @nonNull
   String createQuery() {
     final uniqueSql = unique ? ' UNIQUE' : '';
     final escapedColumnNames =
@@ -28,7 +27,7 @@ class Index {
           name == other.name &&
           tableName == other.tableName &&
           unique == other.unique &&
-          columnNames == other.columnNames;
+          const ListEquality<String>().equals(columnNames, other.columnNames);
 
   @override
   int get hashCode =>

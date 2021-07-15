@@ -151,7 +151,7 @@ Future<ClassElement> _createDatabaseClassElement(
         Person(this.id, this.name);
       }
       ''', (resolver) async {
-    return LibraryReader(await resolver.findLibraryByName('test'));
+    return LibraryReader((await resolver.findLibraryByName('test'))!);
   });
 
   return library.classes.first;

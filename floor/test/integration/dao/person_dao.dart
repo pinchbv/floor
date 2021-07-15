@@ -12,19 +12,24 @@ abstract class PersonDao {
   Stream<List<Person>> findAllPersonsAsStream();
 
   @Query('SELECT * FROM person WHERE id = :id')
-  Future<Person> findPersonById(int id);
+  Future<Person?> findPersonById(int id);
 
   @Query('SELECT * FROM person WHERE id = :id')
-  Stream<Person> findPersonByIdAsStream(int id);
+  Stream<Person?> findPersonByIdAsStream(int id);
 
   @Query('SELECT * FROM person WHERE id = :id AND custom_name = :name')
-  Future<Person> findPersonByIdAndName(int id, String name);
+  Future<Person?> findPersonByIdAndName(int id, String name);
 
   @Query('SELECT * FROM person WHERE id IN (:ids)')
   Future<List<Person>> findPersonsWithIds(List<int> ids);
 
   @Query('SELECT * FROM person WHERE custom_name IN (:names)')
   Future<List<Person>> findPersonsWithNames(List<String> names);
+
+  @Query(
+      'SELECT * FROM person WHERE custom_name IN (:names) AND id>=:reference OR custom_name IN (:moreNames) AND id<=:reference')
+  Future<List<Person>> findPersonsWithNamesComplex(
+      int reference, List<String> names, List<String> moreNames);
 
   @Query('SELECT * FROM person WHERE custom_name LIKE :name')
   Future<List<Person>> findPersonsWithNamesLike(String name);

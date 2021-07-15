@@ -63,7 +63,7 @@ Future<MethodElement> _generateMethodElement(final String method) async {
         $method
       }
       ''', (resolver) async {
-    return LibraryReader(await resolver.findLibraryByName('test'));
+    return LibraryReader((await resolver.findLibraryByName('test'))!);
   });
 
   return library.classes.first.methods.first;

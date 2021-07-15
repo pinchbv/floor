@@ -1,8 +1,9 @@
 import 'package:analyzer/dart/element/element.dart';
 import 'package:analyzer/dart/element/type.dart';
-import 'package:floor_generator/misc/extension/list_equality_extension.dart';
+import 'package:collection/collection.dart';
 import 'package:floor_generator/misc/extension/set_equality_extension.dart';
 import 'package:floor_generator/misc/type_utils.dart';
+import 'package:floor_generator/value_object/query.dart';
 import 'package:floor_generator/value_object/queryable.dart';
 import 'package:floor_generator/value_object/type_converter.dart';
 
@@ -13,8 +14,8 @@ class QueryMethod {
 
   final String name;
 
-  /// Query where ':' got replaced with '$'.
-  final String query;
+  /// Query where the parameter mapping is stored.
+  final Query query;
 
   final bool isRaw;
 
@@ -32,7 +33,7 @@ class QueryMethod {
 
   final List<ParameterElement> parameters;
 
-  final Queryable queryable;
+  final Queryable? queryable;
 
   final Set<TypeConverter> typeConverters;
 
