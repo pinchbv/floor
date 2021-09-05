@@ -163,7 +163,7 @@ class QueryMethodWriter implements Writer {
   String _generateNoReturnQuery(final String query, final String? arguments) {
     final parameters = StringBuffer(query);
     if (arguments != null) parameters.write(', arguments: $arguments');
-    if (_queryMethod.isRaw) parameters.write(', isRaw: true');
+    if (_queryMethod.isRaw!) parameters.write(', isRaw: true');
     return 'await _queryAdapter.queryNoReturn($parameters);';
   }
 
@@ -175,7 +175,7 @@ class QueryMethodWriter implements Writer {
     final mapper = _generateMapper(queryable);
     final parameters = StringBuffer(query)..write(', mapper: $mapper');
     if (arguments != null) parameters.write(', arguments: $arguments');
-    if (_queryMethod.isRaw) parameters.write(', isRaw: true');
+    if (_queryMethod.isRaw!) parameters.write(', isRaw: true');
 
     if (_queryMethod.returnsStream) {
       // for streamed queries, we need to provide the queryable to know which

@@ -17,9 +17,12 @@ class QueryAdapter {
   Future<T?> query<T>(
     final String sql, {
     final List<Object>? arguments,
+    final bool isRaw = false,
     required final T Function(Map<String, Object?>) mapper,
   }) async {
-    final rows = await _database.rawQuery(sql, arguments);
+    final rows = await (isRaw
+        ? _database.rawQuery(sql.replaceAll('?', arguments![0] as String))
+        : _database.rawQuery(sql, arguments));
 
     if (rows.isEmpty) {
       return null;
@@ -38,7 +41,7 @@ class QueryAdapter {
     required final T Function(Map<String, Object?>) mapper,
   }) async {
     final rows = await (isRaw
-        ? _database.rawQuery(sql.replaceAll('?', arguments[0]))
+        ? _database.rawQuery(sql.replaceAll('?', arguments![0] as String))
         : _database.rawQuery(sql, arguments));
     return rows.map((row) => mapper(row)).toList();
   }
@@ -46,12 +49,13 @@ class QueryAdapter {
   Future<void> queryNoReturn(
     final String sql, {
     final List<Object>? arguments,
+    final bool isRaw = false,
   }) async {
     // TODO #94 differentiate between different query kinds (select, update, delete, insert)
     //  this enables to notify the observers
     //  also requires extracting the table name :(
     await (isRaw
-        ? _database.rawQuery(sql.replaceAll('?', arguments[0]))
+        ? _database.rawQuery(sql.replaceAll('?', arguments![0] as String))
         : _database.rawQuery(sql, arguments));
   }
 
