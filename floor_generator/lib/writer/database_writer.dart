@@ -70,16 +70,16 @@ class DatabaseWriter implements Writer {
   Method _generateOpenMethod(final Database database) {
     final createTableStatements =
         _generateCreateTableSqlStatements(database.entities)
-            .map((statement) => "await database.execute('$statement');")
+            .map((statement) => "'$statement',")
             .join('\n');
     final createIndexStatements = database.entities
         .map((entity) => entity.indices.map((index) => index.createQuery()))
         .expand((statements) => statements)
-        .map((statement) => "await database.execute('$statement');")
+        .map((statement) => "'$statement',")
         .join('\n');
     final createViewStatements = database.views
         .map((view) => view.getCreateViewStatement())
-        .map((statement) => "await database.execute('''$statement''');")
+        .map((statement) => "'''$statement'''")
         .join('\n');
 
     final pathParameter = Parameter((builder) => builder
@@ -99,6 +99,18 @@ class DatabaseWriter implements Writer {
       ..requiredParameters.addAll([pathParameter, migrationsParameter])
       ..optionalParameters.add(callbackParameter)
       ..body = Code('''
+          final List<String> _createTableStatements = [
+            $createTableStatements
+          ];
+
+          final List<String> _createIndexStatements = [
+            $createIndexStatements
+          ];
+
+          final List<String> _createViewStatements = [
+            $createViewStatements
+          ];
+
           final databaseOptions = sqflite.OpenDatabaseOptions(
             version: ${database.version},
             onConfigure: (database) async {
@@ -111,12 +123,17 @@ class DatabaseWriter implements Writer {
             onUpgrade: (database, startVersion, endVersion) async {
               await MigrationAdapter.runMigrations(database, startVersion, endVersion, migrations);
 
+              await AutoMigration.migrate(database, _createTableStatements);
+
               await callback?.onUpgrade?.call(database, startVersion, endVersion);
             },
             onCreate: (database, version) async {
-              $createTableStatements
-              $createIndexStatements
-              $createViewStatements
+              Future.wait(_createTableStatements
+                .map((statement) async => await database.execute(statement)));
+              Future.wait(_createIndexStatements
+                .map((statement) async => await database.execute(statement)));
+              Future.wait(_createViewStatements
+                .map((statement) async => await database.execute(statement)));
 
               await callback?.onCreate?.call(database, version);
             },
