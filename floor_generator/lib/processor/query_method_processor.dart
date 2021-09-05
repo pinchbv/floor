@@ -38,6 +38,7 @@ class QueryMethodProcessor extends Processor<QueryMethod> {
     final rawReturnType = _methodElement.returnType;
 
     final query = QueryProcessor(_methodElement, _getQuery()).process();
+    final isRaw = _getIsRaw();
 
     _getQuery();
     final returnsStream = rawReturnType.isStream;
@@ -85,6 +86,7 @@ class QueryMethodProcessor extends Processor<QueryMethod> {
       parameters,
       queryable,
       allTypeConverters,
+      isRaw: isRaw,
     );
   }
 
@@ -97,6 +99,15 @@ class QueryMethodProcessor extends Processor<QueryMethod> {
 
     if (query == null || query.isEmpty) throw _processorError.noQueryDefined;
     return query;
+  }
+
+  bool _getIsRaw() {
+    final isRaw = _methodElement
+        .getAnnotation(annotations.Query)!
+        .getField(AnnotationField.isRaw)
+        ?.toBoolValue();
+
+    return isRaw ?? false;
   }
 
   DartType _getFlattenedReturnType(

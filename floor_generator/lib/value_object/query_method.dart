@@ -17,6 +17,8 @@ class QueryMethod {
   /// Query where the parameter mapping is stored.
   final Query query;
 
+  final bool? isRaw;
+
   final DartType rawReturnType;
 
   /// Flattened return type.
@@ -36,15 +38,15 @@ class QueryMethod {
   final Set<TypeConverter> typeConverters;
 
   QueryMethod(
-    this.methodElement,
-    this.name,
-    this.query,
-    this.rawReturnType,
-    this.flattenedReturnType,
-    this.parameters,
-    this.queryable,
-    this.typeConverters,
-  );
+      this.methodElement,
+      this.name,
+      this.query,
+      this.rawReturnType,
+      this.flattenedReturnType,
+      this.parameters,
+      this.queryable,
+      this.typeConverters,
+      {this.isRaw});
 
   bool get returnsList {
     final type = returnsStream
