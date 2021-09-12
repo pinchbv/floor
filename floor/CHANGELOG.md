@@ -1,5 +1,19 @@
 # Changelog
 
+## 1.2.0
+
+### Changes
+
+* Improve escaping by using library
+
+### 🐛 Bug Fixes
+
+* Bugfix/nullable transaction return
+
+### 🛠 Maintenance
+
+* Update dependencies
+
 ## 1.1.0
 
 All credits for this release go to mqus.
