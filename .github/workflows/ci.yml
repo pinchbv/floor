@@ -28,7 +28,7 @@ jobs:
 
       - name: Format
         working-directory: floor_annotation
-        run: dartfmt -n --set-exit-if-changed .
+        run: dart format --output=none --set-exit-if-changed .
 
   floor-generator:
     runs-on: ubuntu-latest
@@ -51,7 +51,7 @@ jobs:
 
       - name: Format
         working-directory: floor_generator
-        run: dartfmt -n --set-exit-if-changed .
+        run: dart format --output=none --set-exit-if-changed .
 
       - name: Run tests
         working-directory: floor_generator

@@ -40,7 +40,8 @@ class FakeClassElement implements ClassElement {
   List<FieldElement> get fields => throw UnimplementedError();
 
   @override
-  String getDisplayString({required bool withNullability}) {
+  String getDisplayString(
+      {required bool withNullability, bool multiline = false}) {
     throw UnimplementedError();
   }
 
@@ -292,6 +293,15 @@ class FakeClassElement implements ClassElement {
 
   @override
   void visitChildren(ElementVisitor visitor) {}
+
+  @override
+  bool get hasUseResult => throw UnimplementedError();
+
+  @override
+  bool get hasVisibleForOverriding => throw UnimplementedError();
+
+  @override
+  Element get nonSynthetic => throw UnimplementedError();
 }
 
 class FakeFieldElement implements FieldElement {
@@ -321,7 +331,8 @@ class FakeFieldElement implements FieldElement {
   Element get enclosingElement => throw UnimplementedError();
 
   @override
-  String getDisplayString({required bool withNullability}) {
+  String getDisplayString(
+      {required bool withNullability, bool multiline = false}) {
     throw UnimplementedError();
   }
 
@@ -485,6 +496,15 @@ class FakeFieldElement implements FieldElement {
 
   @override
   void visitChildren(ElementVisitor visitor) {}
+
+  @override
+  bool get hasUseResult => throw UnimplementedError();
+
+  @override
+  bool get hasVisibleForOverriding => throw UnimplementedError();
+
+  @override
+  Element get nonSynthetic => throw UnimplementedError();
 }
 
 class FakeDartObject implements DartObject {

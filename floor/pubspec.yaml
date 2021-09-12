@@ -14,7 +14,7 @@ dependencies:
     path: ../floor_annotation/
   flutter:
     sdk: flutter
-  meta: ^1.3.0
+  meta: ^1.7.0
   path: ^1.8.0
   sqflite: ^2.0.0+3
   sqflite_common_ffi: ^2.0.0
