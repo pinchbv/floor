@@ -3,7 +3,7 @@ import 'dart:async';
 import 'package:floor/src/extension/on_conflict_strategy_extensions.dart';
 import 'package:floor/src/util/primary_key_helper.dart';
 import 'package:floor_annotation/floor_annotation.dart';
-import 'package:sqflite/sqlite_api.dart';
+import 'package:sqflite_sqlcipher/sqlite_api.dart';
 
 class UpdateAdapter<T> {
   final DatabaseExecutor _database;

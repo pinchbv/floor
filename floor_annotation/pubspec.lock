@@ -5,7 +5,7 @@ packages:
     dependency: "direct main"
     description:
       name: meta
-      url: "https://pub.dartlang.org"
+      url: "https://pub.flutter-io.cn"
     source: hosted
     version: "1.7.0"
 sdks:

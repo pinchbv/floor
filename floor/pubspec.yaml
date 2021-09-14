@@ -2,7 +2,7 @@ name: floor
 description: >
   The typesafe, reactive, and lightweight SQLite abstraction for your Flutter applications.
   This library is the runtime dependency.
-version: 1.2.0
+version: 1.2.0-sqlcipher
 homepage: https://floor.codes
 publish_to: none
 
@@ -16,7 +16,8 @@ dependencies:
     sdk: flutter
   meta: ^1.7.0
   path: ^1.8.0
-  sqflite: ^2.0.0+4
+  # sqflite: ^2.0.0+4
+  sqflite_sqlcipher: ^2.0.0
   sqflite_common_ffi: ^2.0.0+3
 
 dev_dependencies:

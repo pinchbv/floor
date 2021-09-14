@@ -14,6 +14,7 @@ class Database {
   final List<View> views;
   final List<DaoGetter> daoGetters;
   final int version;
+  final String? password;
   final Set<TypeConverter> databaseTypeConverters;
   final Set<TypeConverter> allTypeConverters;
   final bool hasViewStreams;
@@ -26,6 +27,7 @@ class Database {
     this.views,
     this.daoGetters,
     this.version,
+    this.password,
     this.databaseTypeConverters,
     this.allTypeConverters,
   )   : streamEntities =
@@ -43,6 +45,7 @@ class Database {
           views.equals(other.views) &&
           daoGetters.equals(other.daoGetters) &&
           version == other.version &&
+          password == other.password &&
           databaseTypeConverters.equals(other.databaseTypeConverters) &&
           allTypeConverters.equals(other.allTypeConverters) &&
           streamEntities.equals(other.streamEntities) &&
@@ -56,6 +59,7 @@ class Database {
       views.hashCode ^
       daoGetters.hashCode ^
       version.hashCode ^
+      password.hashCode ^
       databaseTypeConverters.hashCode ^
       allTypeConverters.hashCode ^
       streamEntities.hashCode ^
@@ -63,6 +67,6 @@ class Database {
 
   @override
   String toString() {
-    return 'Database{classElement: $classElement, name: $name, entities: $entities, views: $views, daoGetters: $daoGetters, version: $version, databaseTypeConverters: $databaseTypeConverters, allTypeConverters: $allTypeConverters, streamEntities: $streamEntities, hasViewStreams: $hasViewStreams}';
+    return 'Database{classElement: $classElement, name: $name, entities: $entities, views: $views, daoGetters: $daoGetters, version: $version, password: $password, databaseTypeConverters: $databaseTypeConverters, allTypeConverters: $allTypeConverters, streamEntities: $streamEntities, hasViewStreams: $hasViewStreams}';
   }
 }

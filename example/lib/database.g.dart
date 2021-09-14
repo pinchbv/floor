@@ -65,8 +65,9 @@ class _$FlutterDatabase extends FlutterDatabase {
 
   Future<sqflite.Database> open(String path, List<Migration> migrations,
       [Callback? callback]) async {
-    final databaseOptions = sqflite.OpenDatabaseOptions(
+    final databaseOptions = sqflite.SqlCipherOpenDatabaseOptions(
       version: 1,
+      password: '123456',
       onConfigure: (database) async {
         await database.execute('PRAGMA foreign_keys = ON');
         await callback?.onConfigure?.call(database);

@@ -100,8 +100,9 @@ class DatabaseWriter implements Writer {
       ..requiredParameters.addAll([pathParameter, migrationsParameter])
       ..optionalParameters.add(callbackParameter)
       ..body = Code('''
-          final databaseOptions = sqflite.OpenDatabaseOptions(
+          final databaseOptions = sqflite.SqlCipherOpenDatabaseOptions(
             version: ${database.version},
+            ${database.password == null ? '' : ("password:'" + database.password! + "',")}
             onConfigure: (database) async {
               await database.execute('PRAGMA foreign_keys = ON');
               await callback?.onConfigure?.call(database);

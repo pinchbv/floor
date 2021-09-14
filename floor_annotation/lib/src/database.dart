@@ -3,6 +3,9 @@ class Database {
   /// The database version.
   final int version;
 
+  /// The database password
+  final String? password;
+
   /// The entities the database manages.
   final List<Type> entities;
 
@@ -12,6 +15,7 @@ class Database {
   /// Marks a class as a FloorDatabase.
   const Database({
     required this.version,
+    this.password,
     required this.entities,
     this.views = const [],
   });
