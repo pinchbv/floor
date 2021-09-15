@@ -10,6 +10,7 @@ As a consequence, it's necessary to have an understanding of SQL and SQLite in o
 - typesafe
 - reactive
 - lightweight
+- sqlcipher
 - SQL centric
 - no hidden magic
 - no hidden costs
@@ -37,10 +38,11 @@ The third dependency is `build_runner` which has to be included as a dev depende
 dependencies:
   flutter:
     sdk: flutter
-  floor: ^1.2.0
+  floor: ^1.2.0-sqlcipher
+  floor_annotation: 1.0.1-sqlcipher
 
 dev_dependencies:
-  floor_generator: ^1.2.0
+  floor_generator: ^1.2.0-sqlcipher
   build_runner: ^2.1.2
 ```
 
@@ -113,14 +115,14 @@ In this case, the file is named `database.dart`.
 // required package imports
 import 'dart:async';
 import 'package:floor/floor.dart';
-import 'package:sqflite/sqflite.dart' as sqflite;
+import 'package:sqflite_sqlcipher/sqflite.dart' as sqflite;
 
 import 'dao/person_dao.dart';
 import 'entity/person.dart';
 
 part 'database.g.dart'; // the generated code will be there
 
-@Database(version: 1, entities: [Person])
+@Database(version: 1, entities: [Person], password: '123456')
 abstract class AppDatabase extends FloorDatabase {
   PersonDao get personDao;
 }
@@ -165,13 +167,13 @@ For general communication use [floor's Slack](https://join.slack.com/t/floor-flu
 
 ## License
     Copyright 2021 The Floor Project Authors
-
+    
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
     You may obtain a copy of the License at
-
+    
     http://www.apache.org/licenses/LICENSE-2.0
-
+    
     Unless required by applicable law or agreed to in writing, software
     distributed under the License is distributed on an "AS IS" BASIS,
     WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.

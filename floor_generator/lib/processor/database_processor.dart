@@ -40,6 +40,7 @@ class DatabaseProcessor extends Processor<Database> {
       databaseTypeConverters,
     );
     final version = _getDatabaseVersion();
+    final password = _getDatabasePassword();
     final allTypeConverters = _getAllTypeConverters(
       daoGetters,
       [...entities, ...views],
@@ -52,6 +53,7 @@ class DatabaseProcessor extends Processor<Database> {
       views,
       daoGetters,
       version,
+      password,
       databaseTypeConverters,
       allTypeConverters,
     );
@@ -67,6 +69,14 @@ class DatabaseProcessor extends Processor<Database> {
     if (version < 1) throw _processorError.versionIsBelowOne;
 
     return version;
+  }
+
+  String? _getDatabasePassword() {
+    final password = _classElement
+        .getAnnotation(annotations.Database)
+        ?.getField(AnnotationField.databasePassword)
+        ?.toStringValue();
+    return password;
   }
 
   List<DaoGetter> _getDaoGetters(

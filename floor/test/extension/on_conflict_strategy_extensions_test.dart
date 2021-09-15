@@ -1,7 +1,7 @@
 import 'package:floor/floor.dart';
 import 'package:floor/src/extension/on_conflict_strategy_extensions.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:sqflite/sqflite.dart';
+import 'package:sqflite_sqlcipher/sqflite.dart';
 
 void main() {
   group('asSqfliteConflictAlgorithm', () {

@@ -3,7 +3,7 @@ import 'dart:async';
 import 'package:floor/floor.dart';
 import 'package:floor_annotation/floor_annotation.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:sqflite/sqflite.dart' as sqflite;
+import 'package:sqflite_sqlcipher/sqflite.dart' as sqflite;
 
 part 'autoinc_test.g.dart';
 
