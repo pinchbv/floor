@@ -196,21 +196,21 @@ packages:
       path: "../floor"
       relative: true
     source: path
-    version: "1.2.0"
+    version: "1.2.0-sqlcipher"
   floor_annotation:
     dependency: transitive
     description:
       path: "../floor_annotation"
       relative: true
     source: path
-    version: "1.0.1"
+    version: "1.0.1-sqlcipher"
   floor_generator:
     dependency: "direct dev"
     description:
       path: "../floor_generator"
       relative: true
     source: path
-    version: "1.2.0"
+    version: "1.2.0-sqlcipher"
   flutter:
     dependency: "direct main"
     description: flutter

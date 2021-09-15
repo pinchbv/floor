@@ -175,7 +175,7 @@ packages:
       path: "../floor_annotation"
       relative: true
     source: path
-    version: "1.0.1"
+    version: "1.0.1-sqlcipher"
   frontend_server_client:
     dependency: transitive
     description:

@@ -10,20 +10,23 @@ part of 'database.dart';
 class $FloorFlutterDatabase {
   /// Creates a database builder for a persistent database.
   /// Once a database is built, you should keep a reference to it and re-use it.
-  static _$FlutterDatabaseBuilder databaseBuilder(String name) =>
-      _$FlutterDatabaseBuilder(name);
+  static _$FlutterDatabaseBuilder databaseBuilder(String name,
+          [String? password]) =>
+      _$FlutterDatabaseBuilder(name, password);
 
   /// Creates a database builder for an in memory database.
   /// Information stored in an in memory database disappears when the process is killed.
   /// Once a database is built, you should keep a reference to it and re-use it.
   static _$FlutterDatabaseBuilder inMemoryDatabaseBuilder() =>
-      _$FlutterDatabaseBuilder(null);
+      _$FlutterDatabaseBuilder(null, null);
 }
 
 class _$FlutterDatabaseBuilder {
-  _$FlutterDatabaseBuilder(this.name);
+  _$FlutterDatabaseBuilder(this.name, this.password);
 
   final String? name;
+
+  final String? password;
 
   final List<Migration> _migrations = [];
 
@@ -49,6 +52,7 @@ class _$FlutterDatabaseBuilder {
     final database = _$FlutterDatabase();
     database.database = await database.open(
       path,
+      password,
       _migrations,
       _callback,
     );
@@ -63,11 +67,12 @@ class _$FlutterDatabase extends FlutterDatabase {
 
   TaskDao? _taskDaoInstance;
 
-  Future<sqflite.Database> open(String path, List<Migration> migrations,
+  Future<sqflite.Database> open(
+      String path, String? password, List<Migration> migrations,
       [Callback? callback]) async {
     final databaseOptions = sqflite.SqlCipherOpenDatabaseOptions(
       version: 1,
-      password: '123456',
+      password: password ?? '123456',
       onConfigure: (database) async {
         await database.execute('PRAGMA foreign_keys = ON');
         await callback?.onConfigure?.call(database);
