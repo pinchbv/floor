@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.3.0
+
+### Changes
+
+* update analyzer version to ^3.0.0
+
 ## 1.2.0
 
 ### Changes
