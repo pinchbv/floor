@@ -4,7 +4,7 @@
 
 ### Changes
 
-* update analyzer version to ^3.0.0
+* Update analyzer version to ^3.0.0
 
 ## 1.2.0
 
