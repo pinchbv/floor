@@ -3,7 +3,6 @@ import 'dart:typed_data';
 
 import 'package:collection/collection.dart';
 import 'package:floor/floor.dart';
-import 'package:floor_annotation/floor_annotation.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:sqflite/sqflite.dart' as sqflite;
 

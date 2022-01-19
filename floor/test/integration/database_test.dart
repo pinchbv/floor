@@ -1,6 +1,5 @@
 import 'package:floor/floor.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:matcher/matcher.dart';
 import 'package:sqflite/sqflite.dart';
 
 import '../test_util/extensions.dart';
