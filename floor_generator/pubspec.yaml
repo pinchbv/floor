@@ -2,7 +2,7 @@ name: floor_generator
 description: >
   The typesafe, reactive, and lightweight SQLite abstraction for your Flutter applications.
   This library is the dev dependency.
-version: 1.2.0
+version: 1.3.0
 homepage: https://floor.codes
 publish_to: none
 
@@ -10,7 +10,7 @@ environment:
   sdk: '>=2.12.0 <3.0.0'
 
 dependencies:
-  analyzer: ^2.2.0
+  analyzer: ">=2.1.0 <4.0.0"
   build: ^2.1.0
   build_config: ^1.0.0
   code_builder: ^4.1.0

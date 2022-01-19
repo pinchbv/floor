@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.3.0
+
+### Changes
+
+* Support analyzer version 3.+
+
 ## 1.2.0
 
 ### Changes
