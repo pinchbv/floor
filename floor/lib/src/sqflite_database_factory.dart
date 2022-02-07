@@ -1,6 +1,5 @@
 import 'dart:io';
 
-import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 
@@ -17,10 +16,3 @@ final DatabaseFactory sqfliteDatabaseFactory = () {
     );
   }
 }();
-
-extension DatabaseFactoryExtension on DatabaseFactory {
-  Future<String> getDatabasePath(final String name) async {
-    final databasesPath = await this.getDatabasesPath();
-    return join(databasesPath, name);
-  }
-}

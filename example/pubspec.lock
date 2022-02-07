@@ -204,6 +204,13 @@ packages:
       relative: true
     source: path
     version: "1.0.1"
+  floor_common:
+    dependency: transitive
+    description:
+      path: "../floor_common"
+      relative: true
+    source: path
+    version: "1.2.0"
   floor_generator:
     dependency: "direct dev"
     description:
