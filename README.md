@@ -1,3 +1,14 @@
+# Floor is looking for a new home
+
+After more than three years of working on the database abstraction as a side-project, the library is looking for a new home.
+I, unfortunately, currently can't dedicate as much time to maintaining the library as it deserves. Thereby, we're looking for a team that can better support the codebase and the community around Floor. Reach out to us through [this form](https://forms.gle/oQhgqkPSEWVoDXb98) in case you're interested in taking ownership of the codebase.
+
+The library started as a university project to implement and validate the hypothesis of whether porting an Android database library (Room) to Flutter is a good idea. By now, Floor evolved into one of the most popular choices when it comes to Flutter databases.
+
+The project has received numerous contributions from volunteers, adding new features and bug fixes in their free time. Their work has been and will always be what makes the library. Thanks to every contributor!
+
+---
+
 ![Floor](https://raw.githubusercontent.com/vitusortner/floor/develop/img/floor.png)
 
 **See the [project's website](https://floor.codes) for the full documentation.**
