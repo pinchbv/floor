@@ -23,6 +23,7 @@ class DatabaseWriter implements Writer {
       ..name = '_\$$databaseName'
       ..extend = refer(databaseName)
       ..methods.add(_generateOpenMethod(database))
+      ..methods.add(_generateTransaction(database))
       ..methods.addAll(_generateDaoGetters(database))
       ..fields.addAll(_generateDaoInstances(database))
       ..constructors.add(_generateConstructor()));
@@ -67,6 +68,23 @@ class DatabaseWriter implements Writer {
         ..name = '_${daoGetterName}Instance');
     }).toList();
   }
+
+  Method _generateTransaction(final Database database) =>
+      Method((builder) => builder
+        ..annotations.add(overrideAnnotationExpression)
+        ..returns = refer('Future<T>')
+        ..name = 'transaction<T>'
+        ..requiredParameters.add(Parameter((builder) => builder
+          ..name = 'action'
+          ..type = refer('Future<T> Function(dynamic)')))
+        ..body = Code('''
+            if (database is sqflite.Transaction) {
+              return action(this);
+            } else {
+              return (database as sqflite.Database).transaction<T>((transaction) =>
+                   action(_\$${database.name}(changeListener)..database = transaction));
+            }
+          '''));
 
   Method _generateOpenMethod(final Database database) {
     final createTableStatements = _generateCreateTableSqlStatements(

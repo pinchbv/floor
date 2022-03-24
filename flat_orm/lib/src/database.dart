@@ -22,4 +22,8 @@ abstract class FlatDatabase {
       await database.close();
     }
   }
+
+  /// Just like the [transaction] in [sqflite.Database],
+  /// calls in action must only be done using the passed database object
+  Future<T> transaction<T>(Future<T> Function(dynamic) action);
 }

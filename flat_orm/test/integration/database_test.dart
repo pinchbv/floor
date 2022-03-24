@@ -200,6 +200,14 @@ void main() {
 
           expect(actual, emits(newPersons));
         });
+
+        test('action called with TestDatabase with transaction executor',
+                () async {
+              late TestDatabase createdDatabase;
+              await database.transaction<void>(
+                      (dynamic db) async => createdDatabase = db as TestDatabase);
+              expect(createdDatabase.database, isA<Transaction>());
+            });
       });
 
       group('change items and return int/list of int', () {

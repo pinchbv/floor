@@ -61,6 +61,16 @@ void main() {
           );
           return sqfliteDatabaseFactory.openDatabase(path, options: databaseOptions);
         }
+        
+        @override
+        Future<T> transaction<T>(Future<T> Function(dynamic) action) {
+          if (database is sqflite.Transaction) {
+            return action(this);
+          } else {
+            return (database as sqflite.Database).transaction<T>((transaction) =>
+                action(_$TestDatabase(changeListener)..database = transaction));
+          }
+        }
       }      
     '''));
   });
@@ -125,6 +135,16 @@ void main() {
           );
           return sqfliteDatabaseFactory.openDatabase(path, options: databaseOptions);
         }
+        
+        @override
+        Future<T> transaction<T>(Future<T> Function(dynamic) action) {
+          if (database is sqflite.Transaction) {
+            return action(this);
+          } else {
+            return (database as sqflite.Database).transaction<T>((transaction) =>
+                action(_$TestDatabase(changeListener)..database = transaction));
+          }
+        }
       
         @override
         TestDao get testDao {
@@ -184,6 +204,16 @@ void main() {
             },
           );
           return sqfliteDatabaseFactory.openDatabase(path, options: databaseOptions);
+        }
+        
+        @override
+        Future<T> transaction<T>(Future<T> Function(dynamic) action) {
+          if (database is sqflite.Transaction) {
+            return action(this);
+          } else {
+            return (database as sqflite.Database).transaction<T>((transaction) =>
+                action(_$TestDatabase(changeListener)..database = transaction));
+          }
         }
       }      
     '''));
@@ -250,6 +280,16 @@ void main() {
             },
           );
           return sqfliteDatabaseFactory.openDatabase(path, options: databaseOptions);
+        }
+        
+        @override
+        Future<T> transaction<T>(Future<T> Function(dynamic) action) {
+          if (database is sqflite.Transaction) {
+            return action(this);
+          } else {
+            return (database as sqflite.Database).transaction<T>((transaction) =>
+                action(_$TestDatabase(changeListener)..database = transaction));
+          }
         }
       }      
     """));
