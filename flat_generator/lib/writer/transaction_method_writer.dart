@@ -29,16 +29,15 @@ class TransactionMethodWriter implements Writer {
     final innerType = method.returnType.flatten();
     final innerTypeName = innerType.getDisplayString(withNullability: false);
     final finalExpression = innerType.isVoid ? 'await' : 'return';
+    final databaseName = '_\$${method.databaseName}';
 
     return '''
-    if (database is sqflite.Transaction) {
-      $finalExpression super.$methodCall;
-    } else {
-      $finalExpression (database as sqflite.Database).transaction<$innerTypeName>((transaction) async {
-        final transactionDatabase = _\$${method.databaseName}(changeListener)..database = transaction;
-        $finalExpression transactionDatabase.${method.daoFieldName}.$methodCall;
-      });
-    }
+      if (database is sqflite.Transaction) {
+        $finalExpression super.$methodCall;
+      } else{
+        $finalExpression transaction<$innerTypeName>((dynamic db) =>
+            (db as $databaseName).${method.daoFieldName}.$methodCall);
+      }
     ''';
   }
 

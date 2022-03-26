@@ -63,12 +63,19 @@ void main() {
         }
         
         @override
-        Future<T> transaction<T>(Future<T> Function(dynamic) action) {
+        Future<T> transaction<T>(Future<T> Function(dynamic) action) async {
           if (database is sqflite.Transaction) {
             return action(this);
           } else {
-            return (database as sqflite.Database).transaction<T>((transaction) =>
-                action(_$TestDatabase(changeListener)..database = transaction));
+            final _changeListener = StreamController<String>.broadcast();
+            final Set<String> _events = {};
+            _changeListener.stream.listen(_events.add);
+            final T result = await (database as sqflite.Database).transaction<T>(
+                (transaction) =>
+                    action(_$TestDatabase(_changeListener)..database = transaction));
+            await _changeListener.close();
+            _events.forEach(changeListener.add);
+            return result;
           }
         }
       }      
@@ -137,18 +144,25 @@ void main() {
         }
         
         @override
-        Future<T> transaction<T>(Future<T> Function(dynamic) action) {
+        Future<T> transaction<T>(Future<T> Function(dynamic) action) async {
           if (database is sqflite.Transaction) {
             return action(this);
           } else {
-            return (database as sqflite.Database).transaction<T>((transaction) =>
-                action(_$TestDatabase(changeListener)..database = transaction));
+            final _changeListener = StreamController<String>.broadcast();
+            final Set<String> _events = {};
+            _changeListener.stream.listen(_events.add);
+            final T result = await (database as sqflite.Database).transaction<T>(
+                (transaction) =>
+                    action(_$TestDatabase(_changeListener)..database = transaction));
+            await _changeListener.close();
+            _events.forEach(changeListener.add);
+            return result;
           }
         }
       
         @override
         TestDao get testDao {
-          return _testDaoInstance ??= _$TestDao(database, changeListener);
+          return _testDaoInstance ??= _$TestDao(database, changeListener, transaction);
         }
       }
     '''));
@@ -207,12 +221,19 @@ void main() {
         }
         
         @override
-        Future<T> transaction<T>(Future<T> Function(dynamic) action) {
+        Future<T> transaction<T>(Future<T> Function(dynamic) action) async {
           if (database is sqflite.Transaction) {
             return action(this);
           } else {
-            return (database as sqflite.Database).transaction<T>((transaction) =>
-                action(_$TestDatabase(changeListener)..database = transaction));
+            final _changeListener = StreamController<String>.broadcast();
+            final Set<String> _events = {};
+            _changeListener.stream.listen(_events.add);
+            final T result = await (database as sqflite.Database).transaction<T>(
+                (transaction) =>
+                    action(_$TestDatabase(_changeListener)..database = transaction));
+            await _changeListener.close();
+            _events.forEach(changeListener.add);
+            return result;
           }
         }
       }      
@@ -283,12 +304,19 @@ void main() {
         }
         
         @override
-        Future<T> transaction<T>(Future<T> Function(dynamic) action) {
+        Future<T> transaction<T>(Future<T> Function(dynamic) action) async {
           if (database is sqflite.Transaction) {
             return action(this);
           } else {
-            return (database as sqflite.Database).transaction<T>((transaction) =>
-                action(_$TestDatabase(changeListener)..database = transaction));
+            final _changeListener = StreamController<String>.broadcast();
+            final Set<String> _events = {};
+            _changeListener.stream.listen(_events.add);
+            final T result = await (database as sqflite.Database).transaction<T>(
+                (transaction) =>
+                    action(_$TestDatabase(_changeListener)..database = transaction));
+            await _changeListener.close();
+            _events.forEach(changeListener.add);
+            return result;
           }
         }
       }      

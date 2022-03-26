@@ -42,7 +42,7 @@ void main() {
 
     expect(actual, equalsDart(r'''
         class _$PersonDao extends PersonDao {
-          _$PersonDao(this.database, this.changeListener)
+          _$PersonDao(this.database, this.changeListener, this.transaction)
               : _queryAdapter = QueryAdapter(database),
                 _personInsertionAdapter = InsertionAdapter(
                     database,
@@ -66,6 +66,8 @@ void main() {
         
           final StreamController<String> changeListener;
         
+          final Future<T> Function<T>(Future<T> Function(dynamic)) transaction;
+
           final QueryAdapter _queryAdapter;
         
           final InsertionAdapter<Person> _personInsertionAdapter;
@@ -121,7 +123,7 @@ void main() {
 
     expect(actual, equalsDart(r'''
         class _$PersonDao extends PersonDao {
-          _$PersonDao(this.database, this.changeListener)
+          _$PersonDao(this.database, this.changeListener, this.transaction)
               : _queryAdapter = QueryAdapter(database, changeListener),
                 _personInsertionAdapter = InsertionAdapter(
                     database,
@@ -148,6 +150,8 @@ void main() {
         
           final StreamController<String> changeListener;
         
+          final Future<T> Function<T>(Future<T> Function(dynamic)) transaction;
+
           final QueryAdapter _queryAdapter;
         
           final InsertionAdapter<Person> _personInsertionAdapter;
@@ -199,7 +203,7 @@ void main() {
 
     expect(actual, equalsDart(r'''
         class _$PersonDao extends PersonDao {
-          _$PersonDao(this.database, this.changeListener)
+          _$PersonDao(this.database, this.changeListener, this.transaction)
               : _personInsertionAdapter = InsertionAdapter(
                     database,
                     'Person',
@@ -225,6 +229,8 @@ void main() {
         
           final StreamController<String> changeListener;
         
+          final Future<T> Function<T>(Future<T> Function(dynamic)) transaction;
+
           final InsertionAdapter<Person> _personInsertionAdapter;
         
           final UpdateAdapter<Person> _personUpdateAdapter;
@@ -280,7 +286,7 @@ void main() {
 
     expect(actual, equalsDart(r'''
       class _$PersonDao extends PersonDao {
-        _$PersonDao(this.database, this.changeListener)
+        _$PersonDao(this.database, this.changeListener, this.transaction)
             : _personInsertionAdapter = InsertionAdapter(
                   database,
                   'Person',
@@ -303,6 +309,8 @@ void main() {
       
         final StreamController<String> changeListener;
       
+        final Future<T> Function<T>(Future<T> Function(dynamic)) transaction;
+
         final InsertionAdapter<Person> _personInsertionAdapter;
       
         final UpdateAdapter<Person> _personUpdateAdapter;
@@ -346,7 +354,7 @@ void main() {
 
     expect(actual, equalsDart(r'''
         class _$PersonDao extends PersonDao {
-          _$PersonDao(this.database, this.changeListener)
+          _$PersonDao(this.database, this.changeListener, this.transaction)
               : _personInsertionAdapter = InsertionAdapter(
                     database,
                     'Person',
@@ -372,6 +380,8 @@ void main() {
         
           final StreamController<String> changeListener;
         
+          final Future<T> Function<T>(Future<T> Function(dynamic)) transaction;
+
           final InsertionAdapter<Person> _personInsertionAdapter;
         
           final UpdateAdapter<Person> _personUpdateAdapter;

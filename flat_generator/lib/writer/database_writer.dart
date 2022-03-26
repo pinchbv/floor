@@ -54,7 +54,7 @@ class DatabaseWriter implements Writer {
         ..returns = refer(daoTypeName)
         ..name = daoGetterName
         ..body = Code(
-            'return _${daoGetterName}Instance ??= _\$$daoTypeName(database, changeListener);'));
+            'return _${daoGetterName}Instance ??= _\$$daoTypeName(database, changeListener, transaction);'));
     }).toList();
   }
 
@@ -71,6 +71,7 @@ class DatabaseWriter implements Writer {
 
   Method _generateTransaction(final Database database) =>
       Method((builder) => builder
+        ..modifier = MethodModifier.async
         ..annotations.add(overrideAnnotationExpression)
         ..returns = refer('Future<T>')
         ..name = 'transaction<T>'
@@ -81,8 +82,15 @@ class DatabaseWriter implements Writer {
             if (database is sqflite.Transaction) {
               return action(this);
             } else {
-              return (database as sqflite.Database).transaction<T>((transaction) =>
-                   action(_\$${database.name}(changeListener)..database = transaction));
+              final _changeListener = StreamController<String>.broadcast();
+              final Set<String> _events = {};
+              _changeListener.stream.listen(_events.add);
+              final T result = await (database as sqflite.Database).transaction<T>(
+                  (transaction) =>
+                      action(_\$${database.name}(_changeListener)..database = transaction));
+              await _changeListener.close();
+              _events.forEach(changeListener.add);
+              return result;
             }
           '''));
 
