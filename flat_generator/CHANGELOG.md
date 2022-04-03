@@ -1,5 +1,15 @@
 # Changelog
 
+## 1.4.0
+
+### 🚀 Features
+
+* Add transaction method on database
+
+### 🐛 Bug Fixes
+
+* Fix change events being added during transaction
+
 ## 1.3.0+1
 
 * Renamed Floor to Flat
