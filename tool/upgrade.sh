@@ -2,15 +2,15 @@
 
 cd ..
 
-cd floor
+cd flat
 flutter packages pub upgrade
 cd ..
 
-cd floor_annotation
+cd flat_annotation
 flutter packages pub upgrade
 cd ..
 
-cd floor_generator
+cd flat_generator
 flutter packages pub upgrade
 cd ..
 

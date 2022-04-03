@@ -25,7 +25,7 @@ class Person {
 
 // bump up database version
 @Database(version: 2)
-abstract class AppDatabase extends FloorDatabase {
+abstract class AppDatabase extends FlatDatabase {
   PersonDao get personDao;
 }
 
@@ -34,7 +34,7 @@ final migration1to2 = Migration(1, 2, (database) async {
   await database.execute('ALTER TABLE person ADD COLUMN nickname TEXT');
 });
 
-final database = await $FloorAppDatabase
+final database = await $FlatAppDatabase
     .databaseBuilder('app_database.db')
     .addMigrations([migration1to2])
     .build();

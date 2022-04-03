@@ -1,8 +1,8 @@
 # Entities
 
 An entity is a persistent class.
-Floor automatically creates the mappings between the in-memory objects and database table rows.
-It's possible to supply custom metadata to Floor by adding optional values to the `Entity` annotation.
+Flat automatically creates the mappings between the in-memory objects and database table rows.
+It's possible to supply custom metadata to Flat by adding optional values to the `Entity` annotation.
 It has the additional attribute of `tableName` which opens up the possibility to use a custom name for that specific entity instead of using the class name.
 `foreignKeys` allows adding foreign keys to the entity.
 More information on how to use these can be found in the [Foreign Keys](#foreign-keys) section.
@@ -21,7 +21,7 @@ If you want a table's column to be nullable, mark the entity's field as nullable
 More information can be found in the [Null Safety](null-safety.md) section.
 
 !!! attention
-    - Floor automatically uses the **first** constructor defined in the entity class for creating in-memory objects from database rows.
+    - Flat automatically uses the **first** constructor defined in the entity class for creating in-memory objects from database rows.
     - There needs to be a constructor.
 
 ```dart
@@ -38,7 +38,7 @@ class Person {
 ```
 
 ### Supported Types
-Floor entities can hold values of the following Dart types which map to their corresponding SQLite types and vice versa.
+Flat entities can hold values of the following Dart types which map to their corresponding SQLite types and vice versa.
 
 - `int` - INTEGER
 - `double` - REAL
@@ -96,7 +96,7 @@ class Dog {
 ### Indices
 Indices help speeding up query, join and grouping operations.
 For more information on SQLite indices please refer to the official [documentation](https://sqlite.org/lang_createindex.html).
-To create an index with floor, add a list of indices to the `@Entity` annotation.
+To create an index with Flat, add a list of indices to the `@Entity` annotation.
 The example below shows how to create an index on the `custom_name` column of the entity.
 
 The index, moreover, can be named by using its `name` attribute.

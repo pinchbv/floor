@@ -3,11 +3,11 @@
 part of 'database.dart';
 
 // **************************************************************************
-// FloorGenerator
+// FlatGenerator
 // **************************************************************************
 
 // ignore: avoid_classes_with_only_static_members
-class $FloorFlutterDatabase {
+class $FlatFlutterDatabase {
   /// Creates a database builder for a persistent database.
   /// Once a database is built, you should keep a reference to it and re-use it.
   static _$FlutterDatabaseBuilder databaseBuilder(String name) =>

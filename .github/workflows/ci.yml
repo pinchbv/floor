@@ -7,7 +7,7 @@ on:
   pull_request:
 
 jobs:
-  floor-annotation:
+  flat-annotation:
     runs-on: ubuntu-latest
     timeout-minutes: 10
 
@@ -19,18 +19,18 @@ jobs:
         uses: actions/checkout@v2
 
       - name: Install dependencies
-        working-directory: floor_annotation
+        working-directory: flat_annotation
         run: pub get
 
       - name: Analyze
-        working-directory: floor_annotation
+        working-directory: flat_annotation
         run: dartanalyzer --fatal-infos --fatal-warnings .
 
       - name: Format
-        working-directory: floor_annotation
+        working-directory: flat_annotation
         run: dart format --output=none --set-exit-if-changed .
 
-  floor-generator:
+  flat-generator:
     runs-on: ubuntu-latest
     timeout-minutes: 10
 
@@ -42,29 +42,29 @@ jobs:
         uses: actions/checkout@v2
 
       - name: Install dependencies
-        working-directory: floor_generator
+        working-directory: flat_generator
         run: pub get
 
       - name: Analyze
-        working-directory: floor_generator
+        working-directory: flat_generator
         run: dartanalyzer --fatal-infos --fatal-warnings .
 
       - name: Format
-        working-directory: floor_generator
+        working-directory: flat_generator
         run: dart format --output=none --set-exit-if-changed .
 
       - name: Run tests
-        working-directory: floor_generator
+        working-directory: flat_generator
         run: pub run test_cov
 
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v1
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
-          flags: floor_generator
-          file: ./floor_generator/coverage/lcov.info
+          flags: flat_generator
+          file: ./flat_generator/coverage/lcov.info
 
-  floor:
+  flat:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
@@ -82,15 +82,15 @@ jobs:
 
       - name: Install dependencies
         run: flutter packages get
-        working-directory: floor
+        working-directory: flat
 
       - name: Run generator
         run: flutter packages pub run build_runner build --delete-conflicting-outputs
-        working-directory: floor
+        working-directory: flat
 
       - name: Analyze
         run: flutter analyze
-        working-directory: floor
+        working-directory: flat
 
       - name: Install SQLite
         if: matrix.os == 'ubuntu-latest'
@@ -100,14 +100,14 @@ jobs:
 
       - name: Run tests
         run: flutter test --coverage --coverage-path coverage/lcov.info
-        working-directory: floor
+        working-directory: flat
 
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v1
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
-          flags: floor
-          file: ./floor/coverage/lcov.info
+          flags: flat
+          file: ./flat/coverage/lcov.info
 
   example:
     runs-on: ubuntu-latest

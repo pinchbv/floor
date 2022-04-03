@@ -6,26 +6,26 @@ import 'package:flutter/material.dart';
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  final database = await $FloorFlutterDatabase
+  final database = await $FlatFlutterDatabase
       .databaseBuilder('flutter_database.db')
       .build();
   final dao = database.taskDao;
 
-  runApp(FloorApp(dao));
+  runApp(FlatApp(dao));
 }
 
-class FloorApp extends StatelessWidget {
+class FlatApp extends StatelessWidget {
   final TaskDao dao;
 
-  const FloorApp(this.dao);
+  const FlatApp(this.dao);
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Floor Demo',
+      title: 'Flat Demo',
       theme: ThemeData(primarySwatch: Colors.blueGrey),
       home: TasksWidget(
-        title: 'Floor Demo',
+        title: 'Flat Demo',
         dao: dao,
       ),
     );

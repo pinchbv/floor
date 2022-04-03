@@ -1,8 +1,8 @@
-site_name: Floor SQLite
-site_description: "Floor - The typesafe, reactive, and lightweight SQLite abstraction for your Flutter applications"
-site_url: https://floor.codes
-repo_name: floor
-repo_url: https://github.com/vitusortner/floor
+site_name: Flat SQLite
+site_description: "Flat - The typesafe, reactive, and lightweight SQLite abstraction for your Flutter applications"
+site_url: https://amir-p.github.io/flat
+repo_name: flat
+repo_url: https://github.com/Amir-P/flat
 edit_uri: edit/develop/docs/
 
 markdown_extensions:
