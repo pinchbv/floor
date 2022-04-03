@@ -154,18 +154,6 @@ StreamBuilder<List<Person>>(
       `@update`, `@insert`, `@delete` events in the whole database, which can get quite taxing on the runtime. Please add it only if you know what you are doing!
       This is mostly due to the complexity of detecting which entities are involved in a database view.
 
-## Transactions
-Whenever you want to perform some operations in a transaction you have to add the `@transaction` annotation to the method.
-It's also required to add the `async` modifier. These methods have to return a `Future`.
-
-```dart
-@transaction
-Future<void> replacePersons(List<Person> persons) async {
-  await deleteAllPersons();
-  await insertPersons(persons);
-}
-```
-
 ## Inheritance
 Data access object classes support inheritance as shown in the following.
 There is no limit to inheritance levels and thus, each abstract parent can have another abstract parent.

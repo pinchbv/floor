@@ -51,6 +51,7 @@ nav:
     - Entities: entities.md
     - Database Views: database-views.md
     - Data Access Objects: daos.md
+    - Transactions: transactions.md
     - Type Converters: type-converters.md
     - Null Safety: null-safety.md
     - Migrations: migrations.md
