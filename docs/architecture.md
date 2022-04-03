@@ -10,4 +10,4 @@ It holds the DAOs and, beyond that, takes care of initializing the database and 
 
 The figure shows the relationship between Entity, DAO and Database.
 
-![Floor Architecture](https://raw.githubusercontent.com/vitusortner/floor/develop/img/floor-architecture.png)
+![Flat Architecture](https://raw.githubusercontent.com/Amir-P/flat/develop/img/architecture.png)

@@ -1,12 +1,12 @@
 # Testing
 
 Simply instantiate an in-memory database and run the database tests on your local development machine as shown in the following snippet.
-For more test references, check out the [project's tests](https://github.com/vitusortner/floor/tree/develop/floor/test/integration).
+For more test references, check out the [project's tests](https://github.com/Amir-P/flat/tree/develop/flat/test/integration).
 
 In case you're running Linux, make sure to have sqlite3 and libsqlite3-dev installed.
 
 ```dart
-import 'package:floor/floor.dart';
+import 'package:flat_orm/flat.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 // your imports follow here
@@ -20,7 +20,7 @@ void main() {
     late PersonDao personDao;
 
     setUp(() async {
-      database = await $FloorTestDatabase
+      database = await $FlatTestDatabase
           .inMemoryDatabaseBuilder()
           .build();
       personDao = database.personDao;

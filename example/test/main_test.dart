@@ -9,7 +9,7 @@ void main() {
   late TaskDao taskDao;
 
   setUp(() async {
-    database = await $FloorFlutterDatabase.inMemoryDatabaseBuilder().build();
+    database = await $FlatFlutterDatabase.inMemoryDatabaseBuilder().build();
     taskDao = database.taskDao;
   });
 
@@ -19,7 +19,7 @@ void main() {
 
   testWidgets('Tapping save stores task in database', (tester) async {
     await tester.runAsync(() async {
-      await tester.pumpWidget(FloorApp(taskDao));
+      await tester.pumpWidget(FlatApp(taskDao));
       final textFieldFinder = find.byType(TextField);
       final raisedButtonFinder = find.byType(OutlinedButton);
 
@@ -33,7 +33,7 @@ void main() {
 
   testWidgets('Tapping save clears text input field', (tester) async {
     await tester.runAsync(() async {
-      await tester.pumpWidget(FloorApp(taskDao));
+      await tester.pumpWidget(FlatApp(taskDao));
       final textFieldFinder = find.byType(TextField);
       final raisedButtonFinder = find.byType(OutlinedButton);
 
@@ -49,7 +49,7 @@ void main() {
 
   testWidgets('Tapping save makes task appear in tasks list', (tester) async {
     await tester.runAsync(() async {
-      await tester.pumpWidget(FloorApp(taskDao));
+      await tester.pumpWidget(FlatApp(taskDao));
       final textFieldFinder = find.byType(TextField);
       final raisedButtonFinder = find.byType(OutlinedButton);
       final listViewFinder = find.byType(ListView);

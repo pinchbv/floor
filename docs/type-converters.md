@@ -34,7 +34,7 @@ class DateTimeConverter extends TypeConverter<DateTime, int> {
 ```dart
 @TypeConverters([DateTimeConverter])
 @Database(version: 1, entities: [Order])
-abstract class OrderDatabase extends FloorDatabase {
+abstract class OrderDatabase extends FlatDatabase {
   OrderDao get orderDao;
 }
 ```

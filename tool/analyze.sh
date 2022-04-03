@@ -2,15 +2,15 @@
 
 cd ..
 
-cd floor
+cd flat
 flutter analyze
 cd ..
 
-cd floor_annotation
+cd flat_annotation
 dart analyze --fatal-infos --fatal-warnings .
 cd ..
 
-cd floor_generator
+cd flat_generator
 dart analyze --fatal-infos --fatal-warnings .
 cd ..
 

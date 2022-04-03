@@ -1,21 +1,10 @@
-# Floor is looking for a new home
+# Flat (Based on [Floor](https://github.com/vitusortner/floor))
 
-After more than three years of working on the database abstraction as a side-project, the library is looking for a new home.
-I, unfortunately, currently can't dedicate as much time to maintaining the library as it deserves. Thereby, we're looking for a team that can better support the codebase and the community around Floor. Reach out to us through [this form](https://forms.gle/oQhgqkPSEWVoDXb98) in case you're interested in taking ownership of the codebase.
+**See the [project's website](https://amir-p.github.io/flat) for the full documentation.**
 
-The library started as a university project to implement and validate the hypothesis of whether porting an Android database library (Room) to Flutter is a good idea. By now, Floor evolved into one of the most popular choices when it comes to Flutter databases.
-
-The project has received numerous contributions from volunteers, adding new features and bug fixes in their free time. Their work has been and will always be what makes the library. Thanks to every contributor!
-
----
-
-![Floor](https://raw.githubusercontent.com/vitusortner/floor/develop/img/floor.png)
-
-**See the [project's website](https://floor.codes) for the full documentation.**
-
-Floor provides a neat SQLite abstraction for your Flutter applications inspired by the [Room persistence library](https://developer.android.com/topic/libraries/architecture/room).
+Flat provides a neat SQLite abstraction for your Flutter applications inspired by the [Room persistence library](https://developer.android.com/topic/libraries/architecture/room).
 It comes with automatic mapping between in-memory objects and database rows while still offering full control of the database with the use of SQL.
-As a consequence, it's necessary to have an understanding of SQL and SQLite in order to harvest Floor's full potential.
+As a consequence, it's necessary to have an understanding of SQL and SQLite in order to harvest Flat's full potential.
 
 - null-safe
 - typesafe
@@ -27,31 +16,31 @@ As a consequence, it's necessary to have an understanding of SQL and SQLite in o
 - iOS, Android, Linux, macOS, Windows
 
 ⚠️ The library is open to contributions!
-Refer to [GitHub Discussions](https://github.com/vitusortner/floor/discussions) for questions, ideas, and discussions.
+Refer to [GitHub Discussions](https://github.com/Amir-P/flat/discussions) for questions, ideas, and discussions.
 
-[![pub package](https://img.shields.io/pub/v/floor.svg)](https://pub.dartlang.org/packages/floor)
-[![build status](https://github.com/vitusortner/floor/workflows/Continuous%20integration/badge.svg)](https://github.com/vitusortner/floor/actions)
-[![codecov](https://codecov.io/gh/vitusortner/floor/branch/develop/graph/badge.svg)](https://codecov.io/gh/vitusortner/floor)
+[![pub package](https://img.shields.io/pub/v/flat_orm.svg)](https://pub.dartlang.org/packages/flat_orm)
+[![build status](https://github.com/Amir-P/flat/workflows/Continuous%20integration/badge.svg)](https://github.com/Amir-P/flat/actions)
+[![codecov](https://codecov.io/gh/Amir-P/flat/branch/develop/graph/badge.svg)](https://codecov.io/gh/Amir-P/flat)
 
 ## Getting Started
 
 ### 1. Setup Dependencies
 
-Add the runtime dependency `floor` as well as the generator `floor_generator` to your `pubspec.yaml`.
+Add the runtime dependency `flat_orm` as well as the generator `flat_generator` to your `pubspec.yaml`.
 The third dependency is `build_runner` which has to be included as a dev dependency just like the generator.
 
-- `floor` holds all the code you are going to use in your application.
-- `floor_generator` includes the code for generating the database classes.
+- `flat_orm` holds all the code you are going to use in your application.
+- `flat_generator` includes the code for generating the database classes.
 - `build_runner` enables a concrete way of generating source code files.
 
 ```yaml
 dependencies:
   flutter:
     sdk: flutter
-  floor: ^1.2.0
+  flat_orm: ^1.2.0
 
 dev_dependencies:
-  floor_generator: ^1.2.0
+  flat_generator: ^1.2.0
   build_runner: ^2.1.2
 ```
 
@@ -66,7 +55,7 @@ There is no restriction on where you put the file containing the entity.
 ```dart
 // entity/person.dart
 
-import 'package:floor/floor.dart';
+import 'package:flat_orm/flat.dart';
 
 @entity
 class Person {
@@ -92,7 +81,7 @@ The abstract class contains the method signatures for querying the database whic
 ```dart
 // dao/person_dao.dart
 
-import 'package:floor/floor.dart';
+import 'package:flat_orm/flat.dart';
 
 @dao
 abstract class PersonDao {
@@ -109,7 +98,7 @@ abstract class PersonDao {
 
 ### 4. Create the Database
 
-It has to be an abstract class which extends `FloorDatabase`.
+It has to be an abstract class which extends `FlatDatabase`.
 Furthermore, it's required to add `@Database()` to the signature of the class.
 Make sure to add the created entity to the `entities` attribute of the `@Database` annotation.
 In order to make the generated code work, it's required to also add the listed imports.
@@ -123,7 +112,7 @@ In this case, the file is named `database.dart`.
 
 // required package imports
 import 'dart:async';
-import 'package:floor/floor.dart';
+import 'package:flat_orm/flat.dart';
 import 'package:sqflite/sqflite.dart' as sqflite;
 
 import 'dao/person_dao.dart';
@@ -132,7 +121,7 @@ import 'entity/person.dart';
 part 'database.g.dart'; // the generated code will be there
 
 @Database(version: 1, entities: [Person])
-abstract class AppDatabase extends FloorDatabase {
+abstract class AppDatabase extends FlatDatabase {
   PersonDao get personDao;
 }
 ```
@@ -144,8 +133,8 @@ To automatically run it, whenever a file changes, use `flutter packages pub run 
 
 ### 6. Use the Generated Code
 
-For obtaining an instance of the database, use the generated `$FloorAppDatabase` class, which allows access to a database builder.
-The name is being composed by `$Floor` and the database class name.
+For obtaining an instance of the database, use the generated `$FlatAppDatabase` class, which allows access to a database builder.
+The name is being composed by `$Flat` and the database class name.
 The string passed to `databaseBuilder()` will be the database file name.
 For initializing the database, call `build()` and make sure to `await` the result.
 
@@ -153,7 +142,7 @@ In order to retrieve the `PersonDao` instance, invoking the `persoDao` getter on
 Its functions can be used as shown in the following snippet.
 
 ```dart
-final database = await $FloorAppDatabase.databaseBuilder('app_database.db').build();
+final database = await $FlatAppDatabase.databaseBuilder('app_database.db').build();
 
 final personDao = database.personDao;
 final person = Person(1, 'Frank');
@@ -162,19 +151,17 @@ await personDao.insertPerson(person);
 final result = await personDao.findPersonById(1);
 ```
 
-For further examples take a look at the [example](https://github.com/vitusortner/floor/tree/develop/example) and [test](https://github.com/vitusortner/floor/tree/develop/floor/test/integration) directories.
+For further examples take a look at the [example](https://github.com/Amir-P/flat/tree/develop/example) and [test](https://github.com/vitusortner/Amir-P/flat/develop/flat/test/integration) directories.
 
 ## Naming
-The library's name derives from the following.
-*Floor* as the *bottom layer* of a [Room](https://developer.android.com/topic/libraries/architecture/room) which points to the analogy of the database layer being the bottom and foundation layer of most applications.
-Where *fl* also gives a pointer that the library is used in the Flutter context.
+Just like [Floor](https://github.com/vitusortner/floor), Flat is another related word to Room [Room](https://developer.android.com/topic/libraries/architecture/room) with *fl* in it!
 
 ## Bugs, Ideas, and Feedback
-For bugs please use [GitHub Issues](https://github.com/vitusortner/floor/issues).
-For questions, ideas, and discussions use [GitHub Discussions](https://github.com/vitusortner/floor/discussions).
+For bugs please use [GitHub Issues](https://github.com/Amir-P/flat/issues).
+For questions, ideas, and discussions use [GitHub Discussions](https://github.com/Amir-P/flat/discussions).
 
 ## License
-    Copyright 2021 The Floor Project Authors
+    Copyright 2022 The Flat and The Floor Project Authors
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.

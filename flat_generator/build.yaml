@@ -1,0 +1,19 @@
+targets:
+  $default:
+    builders:
+      flat_generator:
+        enabled: true
+
+builders:
+  flat_generator:
+    import: "package:flat_generator/builder.dart"
+    # The builder function name, which gets called on build/watch
+    builder_factories: ["flatBuilder"]
+    # The 'partId' argument to 'SharedPartBuilder' is 'flat'
+    build_extensions: {".dart": [".flat.g.part"]}
+    # Apply the Builder to the package with a direct dependency on the package exposing the builder
+    auto_apply: dependents
+    build_to: cache
+    # To copy the '.g.dart' content into '.g.dart' in the source tree
+    # Combine the output of multiple builders into one output (combining_builder)
+    applies_builders: ["source_gen|combining_builder"]

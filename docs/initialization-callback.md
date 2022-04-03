@@ -1,6 +1,6 @@
 # Initialization Callback
 
-In order to hook into Floor's database initialization process, `Callback` should be used.
+In order to hook into Flat's database initialization process, `Callback` should be used.
 It allows the invocation of three separate callbacks which are triggered when the database has been
 
 - initialized for the first time (`onCreate`).
@@ -18,7 +18,7 @@ final callback = Callback(
    onUpgrade: (database, startVersion, endVersion) { /* database has been upgraded */ },
 );
 
-final database = await $FloorAppDatabase
+final database = await $FlatAppDatabase
     .databaseBuilder('app_database.db')
     .addCallback(callback)
     .build();
