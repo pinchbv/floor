@@ -11,7 +11,7 @@ environment:
 
 dependencies:
   flat_orm:
-    path: ../flat/
+    path: ../flat_orm/
   flutter:
     sdk: flutter
 

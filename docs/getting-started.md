@@ -13,10 +13,10 @@ The third dependency is `build_runner` which has to be included as a dev depende
 dependencies:
   flutter:
     sdk: flutter
-  flat_orm: ^1.2.0
+  flat_orm: ^1.2.0+1
 
 dev_dependencies:
-  flat_generator: ^1.2.0
+  flat_generator: ^1.3.0+1
   build_runner: ^2.1.2
 ```
 
@@ -31,7 +31,7 @@ There is no restriction on where you put the file containing the entity.
 ```dart
 // entity/person.dart
 
-import 'package:flat_orm/flat.dart';
+import 'package:flat_orm/flat_orm.dart';
 
 @entity
 class Person {
@@ -57,7 +57,7 @@ The abstract class contains the method signatures for querying the database whic
 ```dart
 // dao/person_dao.dart
 
-import 'package:flat_orm/flat.dart';
+import 'package:flat_orm/flat_orm.dart';
 
 @dao
 abstract class PersonDao {
@@ -88,7 +88,7 @@ In this case, the file is named `database.dart`.
 
 // required package imports
 import 'dart:async';
-import 'package:flat_orm/flat.dart';
+import 'package:flat_orm/flat_orm.dart';
 import 'package:sqflite/sqflite.dart' as sqflite;
 
 import 'dao/person_dao.dart';

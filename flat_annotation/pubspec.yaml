@@ -2,7 +2,7 @@ name: flat_annotation
 description: >
   The typesafe, reactive, and lightweight SQLite abstraction for your Flutter applications.
   Don't use this package directly. Import the flat package instead.
-version: 1.0.1
+version: 1.0.1+1
 homepage: https://amir-p.github.io/flat
 
 environment:

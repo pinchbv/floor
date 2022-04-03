@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.3.0+1
+
+* Renamed Floor to Flat
+
 ## 1.3.0
 
 ### Changes

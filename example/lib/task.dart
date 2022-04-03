@@ -1,4 +1,4 @@
-import 'package:flat_orm/flat.dart';
+import 'package:flat_orm/flat_orm.dart';
 
 @entity
 class Task {
