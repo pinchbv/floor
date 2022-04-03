@@ -1,5 +1,5 @@
 import 'package:example/task.dart';
-import 'package:flat_orm/flat.dart';
+import 'package:flat_orm/flat_orm.dart';
 
 @dao
 abstract class TaskDao {

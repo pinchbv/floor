@@ -6,7 +6,7 @@ For more test references, check out the [project's tests](https://github.com/Ami
 In case you're running Linux, make sure to have sqlite3 and libsqlite3-dev installed.
 
 ```dart
-import 'package:flat_orm/flat.dart';
+import 'package:flat_orm/flat_orm.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 // your imports follow here

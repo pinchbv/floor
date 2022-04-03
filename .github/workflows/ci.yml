@@ -64,7 +64,7 @@ jobs:
           flags: flat_generator
           file: ./flat_generator/coverage/lcov.info
 
-  flat:
+  flat_orm:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
@@ -82,15 +82,15 @@ jobs:
 
       - name: Install dependencies
         run: flutter packages get
-        working-directory: flat
+        working-directory: flat_orm
 
       - name: Run generator
         run: flutter packages pub run build_runner build --delete-conflicting-outputs
-        working-directory: flat
+        working-directory: flat_orm
 
       - name: Analyze
         run: flutter analyze
-        working-directory: flat
+        working-directory: flat_orm
 
       - name: Install SQLite
         if: matrix.os == 'ubuntu-latest'
@@ -100,14 +100,14 @@ jobs:
 
       - name: Run tests
         run: flutter test --coverage --coverage-path coverage/lcov.info
-        working-directory: flat
+        working-directory: flat_orm
 
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v1
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
-          flags: flat
-          file: ./flat/coverage/lcov.info
+          flags: flat_orm
+          file: ./flat_orm/coverage/lcov.info
 
   example:
     runs-on: ubuntu-latest

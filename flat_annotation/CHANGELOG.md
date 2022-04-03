@@ -1,5 +1,9 @@
 # Changelog
 
+# 1.0.1+1
+
+* Renamed Floor to Flat
+
 # 1.0.1
 
 * Update dependencies
