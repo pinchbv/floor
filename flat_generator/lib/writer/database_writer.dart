@@ -23,6 +23,7 @@ class DatabaseWriter implements Writer {
       ..name = '_\$$databaseName'
       ..extend = refer(databaseName)
       ..methods.add(_generateOpenMethod(database))
+      ..methods.add(_generateTransaction(database))
       ..methods.addAll(_generateDaoGetters(database))
       ..fields.addAll(_generateDaoInstances(database))
       ..constructors.add(_generateConstructor()));
@@ -53,7 +54,7 @@ class DatabaseWriter implements Writer {
         ..returns = refer(daoTypeName)
         ..name = daoGetterName
         ..body = Code(
-            'return _${daoGetterName}Instance ??= _\$$daoTypeName(database, changeListener);'));
+            'return _${daoGetterName}Instance ??= _\$$daoTypeName(database, changeListener, transaction);'));
     }).toList();
   }
 
@@ -67,6 +68,31 @@ class DatabaseWriter implements Writer {
         ..name = '_${daoGetterName}Instance');
     }).toList();
   }
+
+  Method _generateTransaction(final Database database) =>
+      Method((builder) => builder
+        ..modifier = MethodModifier.async
+        ..annotations.add(overrideAnnotationExpression)
+        ..returns = refer('Future<T>')
+        ..name = 'transaction<T>'
+        ..requiredParameters.add(Parameter((builder) => builder
+          ..name = 'action'
+          ..type = refer('Future<T> Function(dynamic)')))
+        ..body = Code('''
+            if (database is sqflite.Transaction) {
+              return action(this);
+            } else {
+              final _changeListener = StreamController<String>.broadcast();
+              final Set<String> _events = {};
+              _changeListener.stream.listen(_events.add);
+              final T result = await (database as sqflite.Database).transaction<T>(
+                  (transaction) =>
+                      action(_\$${database.name}(_changeListener)..database = transaction));
+              await _changeListener.close();
+              _events.forEach(changeListener.add);
+              return result;
+            }
+          '''));
 
   Method _generateOpenMethod(final Database database) {
     final createTableStatements = _generateCreateTableSqlStatements(

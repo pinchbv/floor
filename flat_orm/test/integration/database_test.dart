@@ -200,6 +200,50 @@ void main() {
 
           expect(actual, emits(newPersons));
         });
+
+        test('action called with TestDatabase with transaction executor',
+            () async {
+          late TestDatabase createdDatabase;
+          await database.transaction<void>(
+              (dynamic db) async => createdDatabase = db as TestDatabase);
+          expect(createdDatabase.database, isA<Transaction>());
+        });
+
+        test('Adds events to changeListener after transaction succeeded',
+            () async {
+          final persons = [Person(3, 'Paul'), Person(3, 'Karl')];
+          final dog = Dog(null, 'Peter', 'Pete', 3);
+          final List<String> events = [];
+          // ignore: invalid_use_of_protected_member
+          database.changeListener.stream.listen(events.add);
+          await database.transaction<void>((dynamic db) async {
+            if (db is TestDatabase) {
+              await db.personDao.insertPerson(persons[0]);
+              await db.dogDao.insertDog(dog);
+            }
+          });
+          await Future<void>.delayed(const Duration(milliseconds: 100));
+          expect(events, ['person', 'dog']);
+          events.clear();
+          await database.transaction<void>((dynamic db) async {
+            if (db is TestDatabase) {
+              await db.personDao.replacePersons([persons[0]]);
+            }
+          });
+          await Future<void>.delayed(const Duration(milliseconds: 100));
+          expect(events, ['person']);
+          events.clear();
+          try {
+            await database.transaction<void>((dynamic db) async {
+              if (db is TestDatabase) {
+                await db.personDao.insertPerson(persons[0]);
+                await db.personDao.replacePersons(persons);
+              }
+            });
+          } catch (_) {}
+          await Future<void>.delayed(const Duration(milliseconds: 100));
+          expect(events, <String>[]);
+        });
       });
 
       group('change items and return int/list of int', () {

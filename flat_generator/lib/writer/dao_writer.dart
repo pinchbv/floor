@@ -26,13 +26,14 @@ class DaoWriter extends Writer {
   Class write() {
     const databaseFieldName = 'database';
     const changeListenerFieldName = 'changeListener';
+    const transactionFieldName = 'transaction';
 
     final daoName = dao.name;
     final classBuilder = ClassBuilder()
       ..name = '_\$$daoName'
       ..extend = refer(daoName)
-      ..fields
-          .addAll(_createFields(databaseFieldName, changeListenerFieldName));
+      ..fields.addAll(_createFields(
+          databaseFieldName, changeListenerFieldName, transactionFieldName));
 
     final databaseParameter = Parameter((builder) => builder
       ..name = databaseFieldName
@@ -42,8 +43,13 @@ class DaoWriter extends Writer {
       ..name = changeListenerFieldName
       ..toThis = true);
 
+    final transactionParameter = Parameter((builder) => builder
+      ..name = transactionFieldName
+      ..toThis = true);
+
     final constructorBuilder = ConstructorBuilder()
-      ..requiredParameters.addAll([databaseParameter, changeListenerParameter]);
+      ..requiredParameters.addAll(
+          [databaseParameter, changeListenerParameter, transactionParameter]);
 
     final queryMethods = dao.queryMethods;
     if (queryMethods.isNotEmpty) {
@@ -159,6 +165,7 @@ class DaoWriter extends Writer {
   List<Field> _createFields(
     final String databaseName,
     final String changeListenerName,
+    final String transactionName,
   ) {
     final databaseField = Field((builder) => builder
       ..name = databaseName
@@ -170,7 +177,12 @@ class DaoWriter extends Writer {
       ..type = refer('StreamController<String>')
       ..modifier = FieldModifier.final$);
 
-    return [databaseField, changeListenerField];
+    final transactionField = Field((builder) => builder
+      ..name = transactionName
+      ..type = refer('Future<T> Function<T>(Future<T> Function(dynamic))')
+      ..modifier = FieldModifier.final$);
+
+    return [databaseField, changeListenerField, transactionField];
   }
 
   List<Method> _generateInsertionMethods(
