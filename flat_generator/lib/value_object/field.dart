@@ -2,31 +2,30 @@ import 'package:analyzer/dart/element/element.dart';
 import 'package:flat_generator/value_object/type_converter.dart';
 
 /// Represents an Entity field and thus a table column.
-class Field {
-  final FieldElement fieldElement;
-  final String name;
+class Field extends FieldBase {
   final String columnName;
   final bool isNullable;
   final String sqlType;
   final TypeConverter? typeConverter;
 
   Field(
-    this.fieldElement,
-    this.name,
+    FieldElement fieldElement,
+    String name,
     this.columnName,
     this.isNullable,
     this.sqlType,
     this.typeConverter,
-  );
+  ) : super(fieldElement, name);
 
   /// The database column definition.
-  String getDatabaseDefinition(final bool autoGenerate) {
+  String getDatabaseDefinition(
+      {required final bool autoGenerate, final bool forceNullability = false}) {
     final columnSpecification = StringBuffer();
 
     if (autoGenerate) {
       columnSpecification.write(' PRIMARY KEY AUTOINCREMENT');
     }
-    if (!isNullable) {
+    if (!isNullable && !forceNullability) {
       columnSpecification.write(' NOT NULL');
     }
 
@@ -58,4 +57,11 @@ class Field {
   String toString() {
     return 'Field{fieldElement: $fieldElement, name: $name, columnName: $columnName, isNullable: $isNullable, sqlType: $sqlType, typeConverter: $typeConverter}';
   }
+}
+
+class FieldBase {
+  final FieldElement fieldElement;
+  final String name;
+
+  FieldBase(this.fieldElement, this.name);
 }

@@ -1,3 +1,5 @@
+import 'package:flat_generator/misc/extension/field_element_extension.dart';
+import 'package:flat_generator/processor/embedded_processor.dart';
 import 'package:flat_generator/processor/field_processor.dart';
 import 'package:flat_generator/processor/view_processor.dart';
 import 'package:flat_generator/value_object/view.dart';
@@ -13,8 +15,19 @@ void main() {
         final int id;
       
         final String name;
+        
+        @Embedded('address_')
+        final Address address;
       
-        Person(this.id, this.name);
+        Person(this.id, this.name, this.address);
+      }
+      
+      class Address {
+        final String city;
+        
+        final String street;
+        
+        Address(this.city, this.street);
       }
     ''');
 
@@ -22,14 +35,18 @@ void main() {
 
     const name = 'Person';
     final fields = classElement.fields
+        .where((fieldElement) => !fieldElement.isEmbedded())
         .map((fieldElement) => FieldProcessor(fieldElement, null).process())
         .toList();
+    final embedded = [EmbeddedProcessor(classElement.fields[2], {}).process()];
     const query = 'SELECT * from otherentity';
-    const constructor = "Person(row['id'] as int, row['name'] as String)";
+    const constructor =
+        "Person(row['id'] as int, row['name'] as String, Address(row['address_city'] as String, row['address_street'] as String))";
     final expected = View(
       classElement,
       name,
       fields,
+      embedded,
       query,
       constructor,
     );
@@ -61,6 +78,7 @@ void main() {
       classElement,
       name,
       fields,
+      [],
       query,
       constructor,
     );
@@ -187,6 +205,7 @@ void main() {
       classElement,
       name,
       fields,
+      [],
       query,
       constructor,
     );

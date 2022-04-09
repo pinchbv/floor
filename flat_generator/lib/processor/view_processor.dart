@@ -19,12 +19,14 @@ class ViewProcessor extends QueryableProcessor<View> {
   @override
   View process() {
     final fields = getFields();
+    final embedded = getEmbedded();
     return View(
       classElement,
       _getName(),
       fields,
+      embedded,
       _getQuery(),
-      getConstructor(fields),
+      getConstructor([...fields, ...embedded]),
     );
   }
 

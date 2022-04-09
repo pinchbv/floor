@@ -1,5 +1,6 @@
 import 'package:analyzer/dart/element/element.dart';
 import 'package:collection/collection.dart';
+import 'package:flat_generator/value_object/embedded.dart';
 import 'package:flat_generator/value_object/field.dart';
 import 'package:flat_generator/value_object/queryable.dart';
 
@@ -10,9 +11,10 @@ class View extends Queryable {
     ClassElement classElement,
     String name,
     List<Field> fields,
+    List<Embedded> embedded,
     this.query,
     String constructor,
-  ) : super(classElement, name, fields, constructor);
+  ) : super(classElement, name, fields, embedded, constructor);
 
   String getCreateViewStatement() {
     return 'CREATE VIEW IF NOT EXISTS `$name` AS $query';

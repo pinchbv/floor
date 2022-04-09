@@ -35,6 +35,7 @@ enum TypeConverterScope {
   database,
   dao,
   queryable,
+  embedded,
   field,
   daoMethod,
   daoMethodParameter,

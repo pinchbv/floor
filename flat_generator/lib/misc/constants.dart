@@ -2,6 +2,7 @@ abstract class AnnotationField {
   static const queryValue = 'value';
   static const primaryKeyAutoGenerate = 'autoGenerate';
   static const onConflict = 'onConflict';
+  static const prefix = 'prefix';
 
   static const databaseVersion = 'version';
   static const databaseEntities = 'entities';

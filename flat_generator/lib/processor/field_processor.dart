@@ -15,17 +15,19 @@ import 'package:source_gen/source_gen.dart';
 class FieldProcessor extends Processor<Field> {
   final FieldElement _fieldElement;
   final TypeConverter? _typeConverter;
+  final String _prefix;
 
   FieldProcessor(
-    final FieldElement fieldElement,
-    final TypeConverter? typeConverter,
-  )   : _fieldElement = fieldElement,
-        _typeConverter = typeConverter;
+      final FieldElement fieldElement, final TypeConverter? typeConverter,
+      {final String prefix = ''})
+      : _fieldElement = fieldElement,
+        _typeConverter = typeConverter,
+        _prefix = prefix;
 
   @override
   Field process() {
     final name = _fieldElement.name;
-    final columnName = _getColumnName(name);
+    final columnName = _prefix + _getColumnName(name);
     final isNullable = _fieldElement.type.isNullable;
     final typeConverter = {
       ..._fieldElement.getTypeConverters(TypeConverterScope.field),

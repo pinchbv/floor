@@ -1,5 +1,6 @@
 import 'package:analyzer/dart/element/element.dart';
 import 'package:collection/collection.dart';
+import 'package:flat_generator/value_object/embedded.dart';
 import 'package:flat_generator/value_object/field.dart';
 import 'package:flat_generator/value_object/foreign_key.dart';
 import 'package:flat_generator/value_object/index.dart';
@@ -20,6 +21,7 @@ class Entity extends Queryable {
     ClassElement classElement,
     String name,
     List<Field> fields,
+    List<Embedded> embedded,
     this.primaryKey,
     this.foreignKeys,
     this.indices,
@@ -27,14 +29,24 @@ class Entity extends Queryable {
     String constructor,
     this.valueMapping,
     this.fts,
-  ) : super(classElement, name, fields, constructor);
+  ) : super(classElement, name, fields, embedded, constructor);
 
   String getCreateTableStatement() {
     final databaseDefinition = fields.map((field) {
       final autoIncrement =
           primaryKey.fields.contains(field) && primaryKey.autoGenerateId;
-      return field.getDatabaseDefinition(autoIncrement);
+      return field.getDatabaseDefinition(autoGenerate: autoIncrement);
     }).toList();
+
+    final embeddedDefinition = embedded
+        .map((e) => e.fields.map((field) {
+              final autoIncrement = primaryKey.fields.contains(field) &&
+                  primaryKey.autoGenerateId;
+              return field.getDatabaseDefinition(
+                  autoGenerate: autoIncrement, forceNullability: e.isNullable);
+            }))
+        .flattened;
+    databaseDefinition.addAll(embeddedDefinition);
 
     final foreignKeyDefinitions =
         foreignKeys.map((foreignKey) => foreignKey.getDefinition()).toList();

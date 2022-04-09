@@ -45,6 +45,7 @@ void main() {
       classElement,
       name,
       fields,
+      [],
       primaryKey,
       foreignKeys,
       indices,
@@ -54,6 +55,72 @@ void main() {
       null,
     );
     expect(actual, equals(expected));
+  });
+
+  test('Process entity with nested embedded objects', () async {
+    final classElement = await createClassElement('''
+      @entity
+      class Person {
+        @primaryKey
+        final int id;
+      
+        final String name;
+        
+        @Embedded('address_')
+        final Address? address;
+      
+        Person(this.id, this.name, this.address);
+      }
+      
+      class Address {
+        final String city;
+        
+        final String? street;
+        
+        @Embedded('coordinate_')
+        final Coordinate coordinate;
+        
+        Address(this.city, this.street, this.coordinate);
+      }
+      
+      class Coordinate {
+        final double lat;
+        
+        final double lng;
+        
+        Coordinate(this.lat, this.lng);
+      }
+    ''');
+
+    final actual = EntityProcessor(classElement, {}).process();
+
+    final mapping = actual.valueMapping;
+    final constructor = actual.constructor;
+
+    expect(
+        mapping,
+        '<String, Object?>{'
+        "'id': item.id, "
+        "'name': item.name, "
+        "'address_city': item.address?.city, "
+        "'address_street': item.address?.street, "
+        "'address_coordinate_lat': item.address?.coordinate.lat, "
+        "'address_coordinate_lng': item.address?.coordinate.lng"
+        '}');
+    expect(
+        constructor,
+        'Person('
+        "row['id'] as int, "
+        "row['name'] as String, "
+        "row['address_city'] != null || "
+        "row['address_street'] != null || "
+        "row['address_coordinate_lat'] != null || "
+        "row['address_coordinate_lng'] != null ? "
+        "Address(row['address_city'] as String, "
+        "row['address_street'] as String?, "
+        "Coordinate(row['address_coordinate_lat'] as double, "
+        "row['address_coordinate_lng'] as double"
+        ')) : null)');
   });
 
   test(
@@ -93,6 +160,7 @@ void main() {
       classElement,
       name,
       fields,
+      [],
       primaryKey,
       foreignKeys,
       indices,
@@ -131,6 +199,7 @@ void main() {
       classElement,
       name,
       fields,
+      [],
       primaryKey,
       foreignKeys,
       indices,
@@ -173,6 +242,7 @@ void main() {
       classElement,
       name,
       fields,
+      [],
       primaryKey,
       foreignKeys,
       indices,
@@ -279,9 +349,8 @@ void main() {
     });
   });
 
-  group('fts keys', () {
-    test('fts key with fts3', () async {
-      final classElements = await _createClassElements('''
+  test('Process entity with fts3', () async {
+    final classElements = await _createClassElements('''
         
         @entity
         @fts3
@@ -296,17 +365,15 @@ void main() {
         }
     ''');
 
-      final actual = EntityProcessor(classElements[0], {}).process().fts;
+    final actual = EntityProcessor(classElements[0], {}).process().fts;
 
-      final Fts expected = Fts3('simple', []);
+    final Fts expected = Fts3('simple', []);
 
-      expect(actual, equals(expected));
-    });
+    expect(actual, equals(expected));
   });
 
-  group('fts keys', () {
-    test('fts key with fts4', () async {
-      final classElements = await _createClassElements('''
+  test('Process entity with fts4', () async {
+    final classElements = await _createClassElements('''
         
         @entity
         @fts4
@@ -321,12 +388,11 @@ void main() {
         }
     ''');
 
-      final actual = EntityProcessor(classElements[0], {}).process().fts;
+    final actual = EntityProcessor(classElements[0], {}).process().fts;
 
-      final Fts expected = Fts4('simple', []);
+    final Fts expected = Fts4('simple', []);
 
-      expect(actual, equals(expected));
-    });
+    expect(actual, equals(expected));
   });
 
   test('Process entity with "WITHOUT ROWID"', () async {
@@ -356,6 +422,7 @@ void main() {
       classElement,
       name,
       fields,
+      [],
       primaryKey,
       foreignKeys,
       indices,

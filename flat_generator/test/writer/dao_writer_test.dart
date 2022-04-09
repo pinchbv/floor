@@ -48,19 +48,19 @@ void main() {
                     database,
                     'Person',
                     (Person item) =>
-                        <String, Object?>{'id': item.id, 'name': item.name}),
+                        <String, Object?>{'id': item.id, 'name': item.name, 'address_city': item.address.city, 'address_street': item.address.street}),
                 _personUpdateAdapter = UpdateAdapter(
                     database,
                     'Person',
                     ['id'],
                     (Person item) =>
-                        <String, Object?>{'id': item.id, 'name': item.name}),
+                        <String, Object?>{'id': item.id, 'name': item.name, 'address_city': item.address.city, 'address_street': item.address.street}),
                 _personDeletionAdapter = DeletionAdapter(
                     database,
                     'Person',
                     ['id'],
                     (Person item) =>
-                        <String, Object?>{'id': item.id, 'name': item.name});
+                        <String, Object?>{'id': item.id, 'name': item.name, 'address_city': item.address.city, 'address_street': item.address.street});
         
           final sqflite.DatabaseExecutor database;
         
@@ -78,7 +78,7 @@ void main() {
         
           @override
           Future<List<Person>> findAllPersons() async {
-            return _queryAdapter.queryList('SELECT * FROM person', mapper: (Map<String, Object?> row) => Person(row['id'] as int, row['name'] as String));
+            return _queryAdapter.queryList('SELECT * FROM person', mapper: (Map<String, Object?> row) => Person(row['id'] as int, row['name'] as String, Address(row['address_city'] as String, row['address_street'] as String)));
           }
           
           @override
@@ -129,21 +129,21 @@ void main() {
                     database,
                     'Person',
                     (Person item) =>
-                        <String, Object?>{'id': item.id, 'name': item.name},
+                        <String, Object?>{'id': item.id, 'name': item.name, 'address_city': item.address.city, 'address_street': item.address.street},
                     changeListener),
                 _personUpdateAdapter = UpdateAdapter(
                     database,
                     'Person',
                     ['id'],
                     (Person item) =>
-                        <String, Object?>{'id': item.id, 'name': item.name},
+                        <String, Object?>{'id': item.id, 'name': item.name, 'address_city': item.address.city, 'address_street': item.address.street},
                     changeListener),
                 _personDeletionAdapter = DeletionAdapter(
                     database,
                     'Person',
                     ['id'],
                     (Person item) =>
-                        <String, Object?>{'id': item.id, 'name': item.name},
+                        <String, Object?>{'id': item.id, 'name': item.name, 'address_city': item.address.city, 'address_street': item.address.street},
                     changeListener);
         
           final sqflite.DatabaseExecutor database;
@@ -162,7 +162,7 @@ void main() {
         
           @override
           Stream<List<Person>> findAllPersonsAsStream() {
-            return _queryAdapter.queryListStream('SELECT * FROM person', mapper: (Map<String, Object?> row) => Person(row['id'] as int, row['name'] as String), queryableName: 'Person', isView: false);
+            return _queryAdapter.queryListStream('SELECT * FROM person', mapper: (Map<String, Object?> row) => Person(row['id'] as int, row['name'] as String, Address(row['address_city'] as String, row['address_street'] as String)), queryableName: 'Person', isView: false);
           }
           
           @override
@@ -208,21 +208,21 @@ void main() {
                     database,
                     'Person',
                     (Person item) =>
-                        <String, Object?>{'id': item.id, 'name': item.name},
+                        <String, Object?>{'id': item.id, 'name': item.name, 'address_city': item.address.city, 'address_street': item.address.street},
                     changeListener),
                 _personUpdateAdapter = UpdateAdapter(
                     database,
                     'Person',
                     ['id'],
                     (Person item) =>
-                        <String, Object?>{'id': item.id, 'name': item.name},
+                        <String, Object?>{'id': item.id, 'name': item.name, 'address_city': item.address.city, 'address_street': item.address.street},
                     changeListener),
                 _personDeletionAdapter = DeletionAdapter(
                     database,
                     'Person',
                     ['id'],
                     (Person item) =>
-                        <String, Object?>{'id': item.id, 'name': item.name},
+                        <String, Object?>{'id': item.id, 'name': item.name, 'address_city': item.address.city, 'address_street': item.address.street},
                     changeListener);
         
           final sqflite.DatabaseExecutor database;
@@ -274,6 +274,7 @@ void main() {
       FakeClassElement(),
       'Dog',
       [],
+      [],
       PrimaryKey([], false),
       [],
       [],
@@ -291,19 +292,19 @@ void main() {
                   database,
                   'Person',
                   (Person item) =>
-                      <String, Object?>{'id': item.id, 'name': item.name}),
+                      <String, Object?>{'id': item.id, 'name': item.name, 'address_city': item.address.city, 'address_street': item.address.street}),
               _personUpdateAdapter = UpdateAdapter(
                   database,
                   'Person',
                   ['id'],
                   (Person item) =>
-                      <String, Object?>{'id': item.id, 'name': item.name}),
+                      <String, Object?>{'id': item.id, 'name': item.name, 'address_city': item.address.city, 'address_street': item.address.street}),
               _personDeletionAdapter = DeletionAdapter(
                   database,
                   'Person',
                   ['id'],
                   (Person item) =>
-                      <String, Object?>{'id': item.id, 'name': item.name});
+                      <String, Object?>{'id': item.id, 'name': item.name, 'address_city': item.address.city, 'address_street': item.address.street});
       
         final sqflite.DatabaseExecutor database;
       
@@ -359,21 +360,21 @@ void main() {
                     database,
                     'Person',
                     (Person item) =>
-                        <String, Object?>{'id': item.id, 'name': item.name},
+                        <String, Object?>{'id': item.id, 'name': item.name, 'address_city': item.address.city, 'address_street': item.address.street},
                     changeListener),
                 _personUpdateAdapter = UpdateAdapter(
                     database,
                     'Person',
                     ['id'],
                     (Person item) =>
-                        <String, Object?>{'id': item.id, 'name': item.name},
+                        <String, Object?>{'id': item.id, 'name': item.name, 'address_city': item.address.city, 'address_street': item.address.street},
                     changeListener),
                 _personDeletionAdapter = DeletionAdapter(
                     database,
                     'Person',
                     ['id'],
                     (Person item) =>
-                        <String, Object?>{'id': item.id, 'name': item.name},
+                        <String, Object?>{'id': item.id, 'name': item.name, 'address_city': item.address.city, 'address_street': item.address.street},
                     changeListener);
         
           final sqflite.DatabaseExecutor database;
@@ -421,8 +422,19 @@ Future<Dao> _createDao(final String dao) async {
         final int id;
       
         final String name;
+        
+        @Embedded('address_')
+        final Address address;
       
-        Person(this.id, this.name);
+        Person(this.id, this.name, this.address);
+      }
+      
+      class Address {
+        final String city;
+        
+        final String street;
+        
+        Address(this.city, this.street);
       }
 
       @DatabaseView("SELECT name FROM Person")

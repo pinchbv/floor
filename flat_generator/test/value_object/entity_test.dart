@@ -1,6 +1,7 @@
 import 'package:flat_annotation/flat_annotation.dart' as annotations;
 import 'package:flat_generator/misc/constants.dart';
 import 'package:flat_generator/misc/extension/foreign_key_action_extension.dart';
+import 'package:flat_generator/value_object/embedded.dart';
 import 'package:flat_generator/value_object/entity.dart';
 import 'package:flat_generator/value_object/field.dart';
 import 'package:flat_generator/value_object/foreign_key.dart';
@@ -30,7 +31,54 @@ void main() {
     SqlType.text,
     null,
   );
+  final embeddedField = Field(
+    fakeFieldElement,
+    'embeddedField1Name',
+    'embeddedField1ColumnName',
+    false,
+    SqlType.integer,
+    null,
+  );
+  final embeddedField2 = Field(
+    fakeFieldElement,
+    'embeddedField2Name',
+    'embeddedField2ColumnName',
+    false,
+    SqlType.integer,
+    null,
+  );
+  final nullableEmbeddedField = Field(
+    fakeFieldElement,
+    'embeddedField3Name',
+    'embeddedField3ColumnName',
+    true,
+    SqlType.text,
+    null,
+  );
+  final nullableEmbeddedField2 = Field(
+    fakeFieldElement,
+    'embeddedField4Name',
+    'embeddedField4ColumnName',
+    true,
+    SqlType.text,
+    null,
+  );
+  final embedded = Embedded(
+    fakeFieldElement,
+    'embedded1Name',
+    [embeddedField, nullableEmbeddedField],
+    [],
+    false,
+  );
+  final embedded2 = Embedded(
+    fakeFieldElement,
+    'embedded2Name',
+    [embeddedField2, nullableEmbeddedField2],
+    [],
+    true,
+  );
   final allFields = [field, nullableField];
+  final allEmbedded = [embedded, embedded2];
 
   group('Primary key', () {
     test('Create table statement with single primary key auto increment', () {
@@ -39,6 +87,7 @@ void main() {
         fakeClassElement,
         'entityName',
         allFields,
+        [],
         primaryKey,
         [],
         [],
@@ -63,6 +112,7 @@ void main() {
         fakeClassElement,
         'entityName',
         allFields,
+        [],
         primaryKey,
         [],
         [],
@@ -88,6 +138,7 @@ void main() {
         fakeClassElement,
         'entityName',
         allFields,
+        [],
         primaryKey,
         [],
         [],
@@ -122,6 +173,7 @@ void main() {
         fakeClassElement,
         'entityName',
         [nullableField],
+        [],
         primaryKey,
         [foreignKey],
         [],
@@ -156,6 +208,7 @@ void main() {
         fakeClassElement,
         'entityName',
         [nullableField],
+        [],
         primaryKey,
         [],
         [],
@@ -182,6 +235,7 @@ void main() {
       fakeClassElement,
       'entityName',
       allFields,
+      [],
       primaryKey,
       [],
       [],
@@ -198,6 +252,35 @@ void main() {
         '`${nullableField.columnName}` ${nullableField.sqlType}, '
         'PRIMARY KEY (`${field.columnName}`)'
         ') WITHOUT ROWID';
+    expect(actual, equals(expected));
+  });
+
+  test('Create table statement with embedded object', () {
+    final primaryKey = PrimaryKey([field], true);
+    final entity = Entity(
+      fakeClassElement,
+      'entityName',
+      allFields,
+      allEmbedded,
+      primaryKey,
+      [],
+      [],
+      false,
+      '',
+      '',
+      null,
+    );
+
+    final actual = entity.getCreateTableStatement();
+
+    final expected = 'CREATE TABLE IF NOT EXISTS `${entity.name}` '
+        '(`${field.columnName}` ${field.sqlType} PRIMARY KEY AUTOINCREMENT NOT NULL, '
+        '`${nullableField.columnName}` ${nullableField.sqlType}, '
+        '`${embedded.fields[0].columnName}` ${embedded.fields[0].sqlType} NOT NULL, '
+        '`${embedded.fields[1].columnName}` ${embedded.fields[1].sqlType}, '
+        '`${embedded2.fields[0].columnName}` ${embedded2.fields[0].sqlType}, '
+        '`${embedded2.fields[1].columnName}` ${embedded2.fields[1].sqlType}'
+        ')';
     expect(actual, equals(expected));
   });
 }

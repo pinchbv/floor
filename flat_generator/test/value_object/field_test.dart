@@ -18,7 +18,7 @@ void main() {
       null,
     );
 
-    final actual = field.getDatabaseDefinition(autoGenerate);
+    final actual = field.getDatabaseDefinition(autoGenerate: autoGenerate);
 
     final expected =
         '`${field.columnName}` ${field.sqlType} PRIMARY KEY AUTOINCREMENT NOT NULL';
@@ -36,7 +36,25 @@ void main() {
       null,
     );
 
-    final actual = field.getDatabaseDefinition(autoGenerate);
+    final actual = field.getDatabaseDefinition(autoGenerate: autoGenerate);
+
+    final expected = '`${field.columnName}` ${field.sqlType}';
+    expect(actual, equals(expected));
+  });
+
+  test('Get database definition with forced nullability', () {
+    const autoGenerate = false;
+    final field = Field(
+      fakeFieldElement,
+      'field1Name',
+      'field1ColumnName',
+      false,
+      SqlType.text,
+      null,
+    );
+
+    final actual = field.getDatabaseDefinition(
+        autoGenerate: autoGenerate, forceNullability: true);
 
     final expected = '`${field.columnName}` ${field.sqlType}';
     expect(actual, equals(expected));

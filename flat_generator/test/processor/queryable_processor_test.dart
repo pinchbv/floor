@@ -1,8 +1,11 @@
 import 'package:analyzer/dart/element/element.dart';
 import 'package:collection/collection.dart';
+import 'package:flat_generator/misc/extension/field_element_extension.dart';
+import 'package:flat_generator/processor/embedded_processor.dart';
 import 'package:flat_generator/processor/error/queryable_processor_error.dart';
 import 'package:flat_generator/processor/field_processor.dart';
 import 'package:flat_generator/processor/queryable_processor.dart';
+import 'package:flat_generator/value_object/embedded.dart';
 import 'package:flat_generator/value_object/field.dart';
 import 'package:flat_generator/value_object/queryable.dart';
 import 'package:flat_generator/value_object/type_converter.dart';
@@ -18,20 +21,38 @@ void main() {
         final int id;
       
         final String name;
+        
+        @embedded
+        final Address address;
       
-        Person(this.id, this.name);
+        Person(this.id, this.name, this.address);
+      }
+      
+      class Address {
+        final String city;
+        
+        final String street;
+        
+        Address(this.city, this.street);
       }
     ''');
 
     final actual = TestProcessor(classElement).process();
 
     final fields = classElement.fields
+        .where((fieldElement) => !fieldElement.isEmbedded())
         .map((fieldElement) => FieldProcessor(fieldElement, null).process())
         .toList();
-    const constructor = "Person(row['id'] as int, row['name'] as String)";
+    final embedded = classElement.fields
+        .where((fieldElement) => fieldElement.isEmbedded())
+        .map((fieldElement) => EmbeddedProcessor(fieldElement, {}).process())
+        .toList();
+    const constructor =
+        "Person(row['id'] as int, row['name'] as String, Address(row['city'] as String, row['street'] as String))";
     final expected = TestQueryable(
       classElement,
       fields,
+      embedded,
       constructor,
     );
     expect(actual, equals(expected));
@@ -48,10 +69,19 @@ void main() {
       final classElement = await createClassElement('''
       class Order {
         final int id;
-      
+
         final DateTime dateTime;
+        
+        @embedded
+        final Product product;
+
+        Order(this.id, this.dateTime, this.product);
+      }
       
-        Order(this.id, this.dateTime);
+      class Product {
+        final DateTime productionDate;
+      
+        Product(this.productionDate);
       }
     ''');
 
@@ -61,11 +91,15 @@ void main() {
       final dateTimeField =
           FieldProcessor(classElement.fields[1], typeConverter).process();
       final fields = [idField, dateTimeField];
+      final embedded = [
+        EmbeddedProcessor(classElement.fields[2], {typeConverter}).process()
+      ];
       const constructor =
-          "Order(row['id'] as int, _typeConverter.decode(row['dateTime'] as int))";
+          "Order(row['id'] as int, _typeConverter.decode(row['dateTime'] as int), Product(_typeConverter.decode(row['productionDate'] as int)))";
       final expected = TestQueryable(
         classElement,
         fields,
+        embedded,
         constructor,
       );
       expect(actual, equals(expected));
@@ -76,18 +110,18 @@ void main() {
       @TypeConverters([DateTimeConverter])
       class Order {
         final int id;
-      
+
         final DateTime dateTime;
-      
+
         Order(this.id, this.dateTime);
       }
-      
+
       class DateTimeConverter extends TypeConverter<DateTime, int> {
         @override
         DateTime decode(int databaseValue) {
           return DateTime.fromMillisecondsSinceEpoch(databaseValue);
         }
-            
+
         @override
         int encode(DateTime value) {
           return value.millisecondsSinceEpoch;
@@ -112,6 +146,7 @@ void main() {
       final expected = TestQueryable(
         classElement,
         fields,
+        [],
         constructor,
       );
       expect(actual, equals(expected));
@@ -129,18 +164,40 @@ void main() {
       @TypeConverters([DateTimeConverter])
       class Order {
         final int id;
-      
+
         final DateTime dateTime;
-      
-        Order(this.id, this.dateTime);
+
+        @embedded
+        final Product product;
+
+        Order(this.id, this.dateTime, this.product);
       }
       
+      @TypeConverters([EmbeddedDateTimeConverter])
+      class Product {
+        final DateTime productionDate;
+      
+        Product(this.productionDate);
+      }
+
       class DateTimeConverter extends TypeConverter<DateTime, int> {
         @override
         DateTime decode(int databaseValue) {
           return DateTime.fromMillisecondsSinceEpoch(databaseValue);
         }
-            
+
+        @override
+        int encode(DateTime value) {
+          return value.millisecondsSinceEpoch;
+        }
+      }
+      
+      class EmbeddedDateTimeConverter extends TypeConverter<DateTime, int> {
+        @override
+        DateTime decode(int databaseValue) {
+          return DateTime.fromMillisecondsSinceEpoch(databaseValue);
+        }
+
         @override
         int encode(DateTime value) {
           return value.millisecondsSinceEpoch;
@@ -157,15 +214,26 @@ void main() {
         await intDartType,
         TypeConverterScope.queryable,
       );
+      final embeddedTypeConverter = TypeConverter(
+        'EmbeddedDateTimeConverter',
+        await dateTimeDartType,
+        await intDartType,
+        TypeConverterScope.embedded,
+      );
       final idField = FieldProcessor(classElement.fields[0], null).process();
       final dateTimeField =
           FieldProcessor(classElement.fields[1], typeConverter).process();
+      final embedded = [
+        EmbeddedProcessor(classElement.fields[2], {embeddedTypeConverter})
+            .process()
+      ];
       final fields = [idField, dateTimeField];
       const constructor =
-          "Order(row['id'] as int, _dateTimeConverter.decode(row['dateTime'] as int))";
+          "Order(row['id'] as int, _dateTimeConverter.decode(row['dateTime'] as int), Product(_embeddedDateTimeConverter.decode(row['productionDate'] as int)))";
       final expected = TestQueryable(
         classElement,
         fields,
+        embedded,
         constructor,
       );
       expect(actual, equals(expected));
@@ -204,13 +272,16 @@ void main() {
         class TestEntity extends AnotherAbstractEntity {
           final String name;
         
-          TestEntity(int id, double foo, this.name) : super(id, foo);
+          TestEntity(int id, double foo, Person person, this.name) : super(id, foo, person);
         }
         
         abstract class AnotherAbstractEntity extends AbstractEntity {
           final double foo;
+          
+          @Embedded('person_')
+          final Person person;
         
-          AnotherAbstractEntity(int id, this.foo) : super(id);
+          AnotherAbstractEntity(int id, this.foo, this.person) : super(id);
         }
         
         abstract class AbstractEntity {
@@ -218,7 +289,13 @@ void main() {
           final int id;
         
           AbstractEntity(this.id);
-        }                 
+        }
+        
+        class Person {
+          final String name;
+          
+          Person(this.name);
+        }               
     ''');
 
       final actual = TestProcessor(classElement).process();
@@ -226,7 +303,7 @@ void main() {
 
       final expectedFieldNames = ['id', 'foo', 'name'];
       const expectedConstructor =
-          "TestEntity(row['id'] as int, row['foo'] as double, row['name'] as String)";
+          "TestEntity(row['id'] as int, row['foo'] as double, Person(row['person_name'] as String), row['name'] as String)";
       expect(fieldNames, containsAll(expectedFieldNames));
       expect(actual.constructor, equals(expectedConstructor));
     });
@@ -305,90 +382,52 @@ void main() {
     });
   });
 
-  group('Ignore special fields', () {
-    test('Ignore static field', () async {
-      final classElement = await createClassElement('''
+  test('Ignore special fields', () async {
+    final classElement = await createClassElement('''
       class Person {
         final int id;
       
         final String name;
-      
-        Person(this.id, this.name);
+        
+        @embedded
+        final Address address;
+        
+        String get label => '\$id: \$name'
+    
+        set printwith(String prefix) => print(prefix+name);
+  
+        Person(this.id, this.name, this.address);
         
         static String foo = 'foo';
-      }
-    ''');
-
-      final actual = TestProcessor(classElement).process();
-
-      expect(actual.fields.length, equals(2));
-    });
-
-    test('Ignore hashCode field', () async {
-      final classElement = await createClassElement('''
-      class Person {
-        final int id;
-      
-        final String name;
-      
-        Person(this.id, this.name);
         
         @override
         int get hashCode => id.hashCode ^ name.hashCode;
       }
-    ''');
-
-      final actual = TestProcessor(classElement).process();
-
-      expect(actual.fields.length, equals(2));
-    });
-
-    test('Ignore getter', () async {
-      final classElement = await createClassElement('''
-      class Person {
-        final int id;
       
-        final String name;
-      
-        String get label => '\$id: \$name'
-      
-        Person(this.id, this.name);
-      }
-    ''');
-
-      final actual = TestProcessor(classElement)
-          .process()
-          .fields
-          .map((field) => field.name)
-          .toList();
-
-      expect(actual, equals(['id', 'name']));
-    });
-
-    test('Ignore setter', () async {
-      final classElement = await createClassElement('''
-      class Person {
-        @primaryKey
-        final int id;
-      
-        final String name;
-      
-        set printwith(String prefix) => print(prefix+name);
-
-        Person(this.id, this.name);
+      class Address {
+        final String city;
+       
+        String get label => '\$city'
         
-        static String foo = 'foo';
+        set printwith(String prefix) => print(prefix+name);
+ 
+        Address(this.city);
+        
+        static String bar = 'bar';
+        
+        @override
+        int get hashCode => city.hashCode;
       }
     ''');
 
-      final actual = TestProcessor(classElement)
-          .process()
-          .fields
-          .map((field) => field.name)
-          .toList();
+    final entity = TestProcessor(classElement).process();
 
-      expect(actual, equals(['id', 'name']));
-    });
+    final entityFields = entity.fields.map((field) => field.name).toList();
+    final embeddedFields =
+        entity.embedded.first.fields.map((field) => field.name).toList();
+
+    expect(entityFields, ['id', 'name']);
+    expect(embeddedFields, ['city']);
   });
 
   group('Constructors', () {
@@ -524,15 +563,26 @@ void main() {
             final bool? bar;
             
             final Uint8List? blob;
+            
+            @embedded
+            final Address? address;
           
-            Person(this.id, this.doubleId, this.name, this.bar, this.blob);
+            Person(this.id, this.doubleId, this.name, this.bar, this.blob, this.address);
+          }
+          
+          class Address {
+            final String? city;
+            
+            final String? street;
+            
+            Address(this.city, this.street);
           }
         ''');
 
         final actual = TestProcessor(classElement).process().constructor;
 
         const expected =
-            "Person(row['id'] as int?, row['doubleId'] as double?, row['name'] as String?, row['bar'] == null ? null : (row['bar'] as int) != 0, row['blob'] as Uint8List?)";
+            "Person(row['id'] as int?, row['doubleId'] as double?, row['name'] as String?, row['bar'] == null ? null : (row['bar'] as int) != 0, row['blob'] as Uint8List?, row['city'] != null || row['street'] != null ? Address(row['city'] as String?, row['street'] as String?) : null)";
         expect(actual, equals(expected));
       });
 
@@ -548,15 +598,26 @@ void main() {
             final bool bar;
             
             final Uint8List blob;
+            
+            @embedded
+            final Address address;
           
-            Person(this.id, this.doubleId, this.name, this.bar, this.blob);
+            Person(this.id, this.doubleId, this.name, this.bar, this.blob, this.address);
+          }
+          
+          class Address {
+            final String city;
+           
+            final String street;
+ 
+            Address(this.city, this.street);
           }
         ''');
 
         final actual = TestProcessor(classElement).process().constructor;
 
         const expected =
-            "Person(row['id'] as int, row['doubleId'] as double, row['name'] as String, (row['bar'] as int) != 0, row['blob'] as Uint8List)";
+            "Person(row['id'] as int, row['doubleId'] as double, row['name'] as String, (row['bar'] as int) != 0, row['blob'] as Uint8List, Address(row['city'] as String, row['street'] as String))";
         expect(actual, equals(expected));
       });
     });
@@ -612,8 +673,9 @@ class TestQueryable extends Queryable {
   TestQueryable(
     ClassElement classElement,
     List<Field> fields,
+    List<Embedded> embedded,
     String constructor,
-  ) : super(classElement, '', fields, constructor);
+  ) : super(classElement, '', fields, embedded, constructor);
 
   @override
   bool operator ==(Object other) =>
@@ -626,11 +688,14 @@ class TestQueryable extends Queryable {
 
   @override
   int get hashCode =>
-      classElement.hashCode ^ fields.hashCode ^ constructor.hashCode;
+      classElement.hashCode ^
+      fields.hashCode ^
+      embedded.hashCode ^
+      constructor.hashCode;
 
   @override
   String toString() {
-    return 'TestQueryable{classElement: $classElement, name: $name, fields: $fields, constructor: $constructor}';
+    return 'TestQueryable{classElement: $classElement, name: $name, fields: $fields, embedded: $embedded, constructor: $constructor}';
   }
 }
 
@@ -643,10 +708,13 @@ class TestProcessor extends QueryableProcessor<TestQueryable> {
   @override
   TestQueryable process() {
     final fields = getFields();
+    final embedded = getEmbedded();
+
     return TestQueryable(
       classElement,
       fields,
-      getConstructor(fields),
+      embedded,
+      getConstructor([...fields, ...embedded]),
     );
   }
 }

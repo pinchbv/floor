@@ -6,9 +6,8 @@ import 'package:flutter/material.dart';
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  final database = await $FlatFlutterDatabase
-      .databaseBuilder('flutter_database.db')
-      .build();
+  final database =
+      await $FlatFlutterDatabase.databaseBuilder('flutter_database.db').build();
   final dao = database.taskDao;
 
   runApp(FlatApp(dao));
@@ -134,7 +133,7 @@ class TasksTextField extends StatelessWidget {
   TasksTextField({
     Key? key,
     required this.dao,
-  })   : _textEditingController = TextEditingController(),
+  })  : _textEditingController = TextEditingController(),
         super(key: key);
 
   @override

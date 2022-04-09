@@ -7,6 +7,7 @@ import 'package:sqflite/sqflite.dart' as sqflite;
 import '../dao/dog_dao.dart';
 import '../dao/name_dao.dart';
 import '../dao/person_dao.dart';
+import '../model/address.dart';
 import '../model/dog.dart';
 import '../model/mutliline_name.dart';
 import '../model/name.dart';

@@ -32,6 +32,7 @@ void main() {
       fakeClassElement,
       'entityName',
       allFields,
+      [],
       'SELECT * FROM x',
       '',
     );

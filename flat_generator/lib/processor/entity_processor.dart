@@ -10,6 +10,7 @@ import 'package:flat_generator/misc/extension/type_converters_extension.dart';
 import 'package:flat_generator/misc/type_utils.dart';
 import 'package:flat_generator/processor/error/entity_processor_error.dart';
 import 'package:flat_generator/processor/queryable_processor.dart';
+import 'package:flat_generator/value_object/embedded.dart';
 import 'package:flat_generator/value_object/entity.dart';
 import 'package:flat_generator/value_object/field.dart';
 import 'package:flat_generator/value_object/foreign_key.dart';
@@ -31,6 +32,7 @@ class EntityProcessor extends QueryableProcessor<Entity> {
   Entity process() {
     final name = _getName();
     final fields = getFields();
+    final embedded = getEmbedded();
     final primaryKey = _getPrimaryKey(fields);
     final withoutRowid = _getWithoutRowid();
 
@@ -42,12 +44,13 @@ class EntityProcessor extends QueryableProcessor<Entity> {
       classElement,
       name,
       fields,
+      embedded,
       _getPrimaryKey(fields),
       _getForeignKeys(),
       _getIndices(fields, name),
       _getWithoutRowid(),
-      getConstructor(fields),
-      _getValueMapping(fields),
+      getConstructor([...fields, ...embedded]),
+      _getValueMapping(fields, embedded),
       _getFts(),
     );
   }
@@ -262,32 +265,56 @@ class EntityProcessor extends QueryableProcessor<Entity> {
         false;
   }
 
-  String _getValueMapping(final List<Field> fields) {
-    final keyValueList = fields.map((field) {
-      final columnName = field.columnName;
-      final attributeValue = _getAttributeValue(field);
-      return "'$columnName': $attributeValue";
-    }).toList();
+  String _getValueMapping(
+      final List<Field> fields, final List<Embedded> embedded) {
+    final keyValueList = <String>[
+      ...fields.map((field) {
+        final columnName = field.columnName;
+        final attributeValue = _getAttributeValue(field);
+        return "'$columnName': $attributeValue";
+      }),
+      ...embedded
+          .map((embedded) => _getEmbeddedValueMapping(embedded))
+          .flattened,
+    ];
 
     return '<String, Object?>{${keyValueList.join(', ')}}';
   }
 
-  String _getAttributeValue(final Field field) {
+  List<String> _getEmbeddedValueMapping(final Embedded embedded,
+      [final String prefix = 'item']) {
+    final newPrefix = prefix +
+        '.' +
+        embedded.fieldElement.displayName +
+        (embedded.isNullable ? '?' : '');
+    return embedded.fields.map((e) {
+      final columnName = e.columnName;
+      final attributeValue = _getAttributeValue(e, newPrefix);
+      return "'$columnName': $attributeValue";
+    }).toList()
+      ..addAll(embedded.embedded
+          .map((embedded) => _getEmbeddedValueMapping(embedded, newPrefix))
+          .flattened);
+  }
+
+  String _getAttributeValue(final Field field, [final String prefix = 'item']) {
     final fieldElement = field.fieldElement;
-    final parameterName = fieldElement.displayName;
     final fieldType = fieldElement.type;
+
+    final parameterName = fieldElement.displayName;
+    final reference = '$prefix.$parameterName';
 
     String attributeValue;
 
     if (fieldType.isDefaultSqlType) {
-      attributeValue = 'item.$parameterName';
+      attributeValue = reference;
     } else {
       final typeConverter = [
         ...queryableTypeConverters,
         field.typeConverter,
       ].whereNotNull().getClosest(fieldType);
       attributeValue =
-          '_${typeConverter.name.decapitalize()}.encode(item.$parameterName)';
+          '_${typeConverter.name.decapitalize()}.encode($reference)';
     }
 
     if (fieldType.isDartCoreBool) {
