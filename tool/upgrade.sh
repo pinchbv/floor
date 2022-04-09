@@ -2,7 +2,7 @@
 
 cd ..
 
-cd flat
+cd flat_orm
 flutter packages pub upgrade
 cd ..
 
