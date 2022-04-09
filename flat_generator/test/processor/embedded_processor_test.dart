@@ -1,7 +1,6 @@
 import 'package:analyzer/dart/element/element.dart';
 import 'package:flat_generator/misc/extension/field_element_extension.dart';
 import 'package:flat_generator/processor/embedded_processor.dart';
-import 'package:flat_generator/processor/error/embedded_processor_error.dart';
 import 'package:flat_generator/processor/field_processor.dart';
 import 'package:flat_generator/value_object/embedded.dart';
 import 'package:test/test.dart';
@@ -140,13 +139,7 @@ void main() {
      ''');
 
     final fieldElement = classElement.fields[2];
-    final embeddedClassElement = fieldElement.type.element as ClassElement;
-
     final processor = EmbeddedProcessor(fieldElement, {});
-    expect(
-        processor.process,
-        throwsInvalidGenerationSourceError(
-            EmbeddedProcessorError(embeddedClassElement)
-                .possibleCyclicEmbeddedDependency));
+    expect(processor.process, throwsInvalidGenerationSourceError());
   });
 }
