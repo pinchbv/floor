@@ -19,7 +19,7 @@ As a consequence, it's necessary to have an understanding of SQL and SQLite in o
 Refer to [GitHub Discussions](https://github.com/Amir-P/flat/discussions) for questions, ideas, and discussions.
 
 [![pub package](https://img.shields.io/pub/v/flat_orm.svg)](https://pub.dartlang.org/packages/flat_orm)
-[![build status](https://github.com/Amir-P/flat/workflows/Continuous%20integration/badge.svg)](https://github.com/Amir-P/flat/actions)
+[![CI](https://github.com/Amir-P/flat/actions/workflows/ci.yml/badge.svg)](https://github.com/Amir-P/flat/actions)
 [![codecov](https://codecov.io/gh/Amir-P/flat/branch/develop/graph/badge.svg)](https://codecov.io/gh/Amir-P/flat)
 
 ## Getting Started
@@ -37,10 +37,10 @@ The third dependency is `build_runner` which has to be included as a dev depende
 dependencies:
   flutter:
     sdk: flutter
-  flat_orm: ^1.3.0
+  flat_orm: ^1.4.0
 
 dev_dependencies:
-  flat_generator: ^1.4.0
+  flat_generator: ^1.5.0
   build_runner: ^2.1.2
 ```
 

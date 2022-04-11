@@ -18,5 +18,5 @@ As a consequence, it's necessary to have an understanding of SQL and SQLite in o
     Refer to [GitHub Discussions](https://github.com/Amir-P/flat/discussions) for questions, ideas, and discussions.
 
 [![pub package](https://img.shields.io/pub/v/flat_orm.svg)](https://pub.dartlang.org/packages/flat_orm)
-[![build status](https://github.com/Amir-P/flat/workflows/Continuous%20integration/badge.svg)](https://github.com/Amir-P/flat/actions)
+[![CI](https://github.com/Amir-P/flat/actions/workflows/ci.yml/badge.svg)](https://github.com/Amir-P/flat/actions)
 [![codecov](https://codecov.io/gh/Amir-P/flat/branch/develop/graph/badge.svg)](https://codecov.io/gh/Amir-P/flat)

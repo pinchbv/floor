@@ -1,5 +1,9 @@
 # Changelog
 
+# 1.1.0
+
+* Added `Embedded` annotation
+
 # 1.0.1+1
 
 * Renamed Floor to Flat

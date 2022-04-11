@@ -175,7 +175,7 @@ packages:
       path: "../flat_annotation"
       relative: true
     source: path
-    version: "1.0.1+1"
+    version: "1.1.0"
   frontend_server_client:
     dependency: transitive
     description:

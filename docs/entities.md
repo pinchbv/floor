@@ -114,6 +114,35 @@ class Person {
 }
 ```
 
+### Embedded objects
+Embedded annotation can be used on fields of an entity, view or a plain object and can be helpful to add nested fields. If the container is an Entity, nested fields will be columns in the Entity's database table.
+
+If the embedded field is nullable, columns generated from it's fields will be nullable in the database. And when it's read, it will be set to null if all of it's fields are null. Otherwise, it will be constructed.
+
+Embedded annotation has a prefix field to prevent conflict between column names of owner and sub objects.
+```dart
+@entity
+class Person {
+  @primaryKey
+  final int id;
+
+  final String name;
+
+  @Embedded('address_')
+  final Address address;
+
+  Person(this.id, this.name, this.address);
+}
+
+class Address {
+  final String city;
+
+  final String street;
+
+  Address(this.city, this.street);
+}
+```
+
 ### Ignoring Fields
 Getters, setters and all static fields of entities are ignored by default and thus excluded from the library's mapping.
 In case further fields should be ignored, the `@ignore` annotation should be used and applied as shown in the following snippet.
