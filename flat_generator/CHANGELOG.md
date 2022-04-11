@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.5.0
+
+### 🚀 Features
+
+* Add embedded objects support
+
 ## 1.4.0
 
 ### 🚀 Features
