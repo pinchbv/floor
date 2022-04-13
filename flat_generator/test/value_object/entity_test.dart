@@ -47,18 +47,26 @@ void main() {
     SqlType.integer,
     null,
   );
-  final nullableEmbeddedField = Field(
+  final embeddedField3 = Field(
     fakeFieldElement,
     'embeddedField3Name',
     'embeddedField3ColumnName',
+    false,
+    SqlType.integer,
+    null,
+  );
+  final nullableEmbeddedField = Field(
+    fakeFieldElement,
+    'embeddedField4Name',
+    'embeddedField4ColumnName',
     true,
     SqlType.text,
     null,
   );
   final nullableEmbeddedField2 = Field(
     fakeFieldElement,
-    'embeddedField4Name',
-    'embeddedField4ColumnName',
+    'embeddedField5Name',
+    'embeddedField5ColumnName',
     true,
     SqlType.text,
     null,
@@ -73,12 +81,19 @@ void main() {
   final embedded2 = Embedded(
     fakeFieldElement,
     'embedded2Name',
-    [embeddedField2, nullableEmbeddedField2],
+    [embeddedField3],
     [],
+    false,
+  );
+  final embedded3 = Embedded(
+    fakeFieldElement,
+    'embedded3Name',
+    [embeddedField2, nullableEmbeddedField2],
+    [embedded2],
     true,
   );
   final allFields = [field, nullableField];
-  final allEmbedded = [embedded, embedded2];
+  final allEmbedded = [embedded, embedded3];
 
   group('Primary key', () {
     test('Create table statement with single primary key auto increment', () {
@@ -278,8 +293,9 @@ void main() {
         '`${nullableField.columnName}` ${nullableField.sqlType}, '
         '`${embedded.fields[0].columnName}` ${embedded.fields[0].sqlType} NOT NULL, '
         '`${embedded.fields[1].columnName}` ${embedded.fields[1].sqlType}, '
-        '`${embedded2.fields[0].columnName}` ${embedded2.fields[0].sqlType}, '
-        '`${embedded2.fields[1].columnName}` ${embedded2.fields[1].sqlType}'
+        '`${embedded3.fields[0].columnName}` ${embedded3.fields[0].sqlType}, '
+        '`${embedded3.fields[1].columnName}` ${embedded3.fields[1].sqlType}, '
+        '`${embedded2.fields[0].columnName}` ${embedded2.fields[0].sqlType}'
         ')';
     expect(actual, equals(expected));
   });

@@ -39,7 +39,7 @@ class Entity extends Queryable {
     }).toList();
 
     final embeddedDefinition = embedded
-        .map((e) => e.fields.map((field) {
+        .map((e) => e.getAllFields().map((field) {
               final autoIncrement = primaryKey.fields.contains(field) &&
                   primaryKey.autoGenerateId;
               return field.getDatabaseDefinition(
