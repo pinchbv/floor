@@ -180,8 +180,35 @@ void main() {
       
         @ColumnInfo(name: 'custom_name')
         final String name;
+        
+        @Embedded('address_')
+        final Address address;
+        
+        @Embedded('second_address_')
+        final Address? secondAddress;
       
-        Person(this.id, this.name);
+        Person(this.id, this.name, this.address, this.secondAddress);
+      }
+      
+      class Address {
+        final String city;
+        
+        final String? street;
+        
+        @embedded
+        final Coordinate coordinate;
+        
+        Address(this.city, this.street, this.coordinate);
+      }
+      
+      class Coordinate {
+        @ColumnInfo(name: 'lat')
+        final double latitude;
+      
+        @ColumnInfo(name: 'lng')
+        final double longitude;
+      
+        Coordinate(this.latitude, this.longitude);
       }
     ''');
 
@@ -212,7 +239,7 @@ void main() {
             },
             onCreate: (database, version) async {
               await database.execute(
-                  'CREATE TABLE IF NOT EXISTS `custom_table_name` (`id` INTEGER PRIMARY KEY AUTOINCREMENT, `custom_name` TEXT NOT NULL)');
+                  'CREATE TABLE IF NOT EXISTS `custom_table_name` (`id` INTEGER PRIMARY KEY AUTOINCREMENT, `custom_name` TEXT NOT NULL, `address_city` TEXT NOT NULL, `address_street` TEXT, `address_lat` REAL NOT NULL, `address_lng` REAL NOT NULL, `second_address_city` TEXT, `second_address_street` TEXT, `second_address_lat` REAL, `second_address_lng` REAL)');
 
               await callback?.onCreate?.call(database, version);
             },
