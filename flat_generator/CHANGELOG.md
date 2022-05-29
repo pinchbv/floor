@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.6.0+1
+
+### 🐛 Bug Fixes
+
+* Fixed wrong 1.6.0 release!
+
 ## 1.6.0
 
 ### 🐛 Bug Fixes

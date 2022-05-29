@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.5.0+1
+
+### 🐛 Bug Fixes
+
+* Fixed wrong 1.5.0 release!
+
 ## 1.5.0
 
 ### 🐛 Bug Fixes

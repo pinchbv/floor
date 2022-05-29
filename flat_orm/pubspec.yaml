@@ -2,7 +2,7 @@ name: flat_orm
 description: >
   The typesafe, reactive, and lightweight SQLite abstraction for your Flutter applications.
   This library is the runtime dependency.
-version: 1.5.0
+version: 1.5.0+1
 homepage: https://amir-p.github.io/flat
 publish_to: none
 
