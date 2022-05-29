@@ -13,10 +13,10 @@ The third dependency is `build_runner` which has to be included as a dev depende
 dependencies:
   flutter:
     sdk: flutter
-  flat_orm: ^1.4.0
+  flat_orm: ^1.5.0
 
 dev_dependencies:
-  flat_generator: ^1.5.0
+  flat_generator: ^1.6.0
   build_runner: ^2.1.2
 ```
 

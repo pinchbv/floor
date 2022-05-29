@@ -1,5 +1,15 @@
 # Changelog
 
+## 1.5.0
+
+### 🐛 Bug Fixes
+
+* Fixed nested embedded objects create statement
+
+### 🛠 Maintenance
+
+* Added support for analyzer v4
+
 ## 1.4.0
 
 ### 🚀 Features
