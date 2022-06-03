@@ -9,10 +9,17 @@ extension DartObjectExtension on DartObject {
   String? toEnumValueString() {
     final interfaceType = type as InterfaceType;
     final enumName = interfaceType.getDisplayString(withNullability: false);
-    final enumValue = interfaceType.element.fields
-        .where((element) => element.isEnumConstant)
-        .map((fieldElement) => fieldElement.name)
-        .singleWhereOrNull((valueName) => getField(valueName) != null);
+    final enumFields = interfaceType.element.fields.where((element) => element.isEnumConstant).toList();
+
+    // Find the index of the matching enum constant.
+    String? enumValue;
+    for (int i = 0; i < enumFields.length; i++) {
+      if (enumFields[i].computeConstantValue() == this) {
+        enumValue = OnConflictStrategy.values[i].name;
+        break;
+      }
+    }
+
     if (enumValue == null) {
       return null;
     } else {
@@ -23,12 +30,18 @@ extension DartObjectExtension on DartObject {
   /// get the ForeignKeyAction this enum represents,
   /// or the result of `null` if the enum did not contain a valid value
   ForeignKeyAction? toForeignKeyAction() {
-    final enumValueString = toEnumValueString();
-    if (enumValueString == null) {
-      return null;
-    } else {
-      return ForeignKeyAction.values.singleWhereOrNull(
-          (foreignKeyAction) => foreignKeyAction.toString() == enumValueString);
+    final interfaceType = type as InterfaceType;
+    final enumFields = interfaceType.element.fields.where((element) => element.isEnumConstant).toList();
+
+    // Find the index of the matching enum constant.
+    ForeignKeyAction? enumValue;
+    for (int i = 0; i < enumFields.length; i++) {
+      if (enumFields[i].computeConstantValue() == this) {
+        enumValue = ForeignKeyAction.values[i];
+        break;
+      }
     }
+
+    return enumValue;
   }
 }
