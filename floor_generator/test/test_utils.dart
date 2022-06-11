@@ -4,7 +4,7 @@ import 'package:analyzer/dart/element/element.dart';
 import 'package:analyzer/dart/element/type.dart';
 import 'package:build/build.dart';
 import 'package:build_test/build_test.dart';
-import 'package:code_builder/code_builder.dart';
+import 'package:code_builder/code_builder.dart' hide FunctionType;
 import 'package:dart_style/dart_style.dart';
 import 'package:floor_annotation/floor_annotation.dart' as annotations;
 import 'package:floor_generator/misc/type_utils.dart';
@@ -37,8 +37,8 @@ Future<DartType> getDartType(final dynamic value) async {
   return getDartTypeFromDeclaration('final value = $value');
 }
 
-Future<DartType> getDartTypeFromString(final String value) {
-  return getDartType(value);
+Future<DartType> getDartTypeFromString(final String value) async {
+  return (await getDartType(value) as FunctionType).returnType;
 }
 
 Future<DartType> getDartTypeWithPerson(String value) async {
