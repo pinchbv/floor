@@ -1,6 +1,5 @@
 import 'package:analyzer/dart/constant/value.dart';
 import 'package:analyzer/dart/element/type.dart';
-import 'package:collection/collection.dart';
 import 'package:floor_annotation/floor_annotation.dart';
 
 extension DartObjectExtension on DartObject {

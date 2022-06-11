@@ -37,8 +37,8 @@ Future<DartType> getDartType(final dynamic value) async {
   return getDartTypeFromDeclaration('final value = $value');
 }
 
-Future<DartType> getDartTypeFromString(final String value) async {
-  return (await getDartType(value) as FunctionType).returnType;
+Future<DartType> getDartTypeFromString(final String value) {
+  return getDartType(value);
 }
 
 Future<DartType> getDartTypeWithPerson(String value) async {
@@ -62,7 +62,7 @@ Future<DartType> getDartTypeWithPerson(String value) async {
   return resolveSource(source, (item) async {
     final libraryReader =
         LibraryReader((await item.findLibraryByName('test'))!);
-    return (libraryReader.allElements.first as PropertyAccessorElement)
+    return (libraryReader.allElements.elementAt(1) as PropertyAccessorElement)
         .type
         .returnType;
   });
@@ -86,7 +86,7 @@ Future<DartType> getDartTypeWithName(String value) async {
   return resolveSource(source, (item) async {
     final libraryReader =
         LibraryReader((await item.findLibraryByName('test'))!);
-    return (libraryReader.allElements.first as PropertyAccessorElement)
+    return (libraryReader.allElements.elementAt(1) as PropertyAccessorElement)
         .type
         .returnType;
   });
@@ -102,7 +102,7 @@ Future<DartType> getDartTypeFromDeclaration(final String declaration) async {
   return resolveSource(source, (item) async {
     final libraryReader =
         LibraryReader((await item.findLibraryByName('test'))!);
-    return (libraryReader.allElements.elementAt(1) as PropertyAccessorElement).type;
+    return (libraryReader.allElements.elementAt(1) as PropertyAccessorElement).type.returnType;
   });
 }
 
