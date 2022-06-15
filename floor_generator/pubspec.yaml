@@ -27,8 +27,4 @@ dev_dependencies:
   mockito: ^5.2.0
   path: ^1.8.0
   test: ^1.21.1
-  test_cov:
-    #  TODO:  Migrate to version declaration after the fix Git CI Action
-    git:
-      url: https://github.com/dkaera/test_cov.git
-      ref: issue/clean_up_deprecate
+  test_cov: ^1.0.1

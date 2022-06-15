@@ -35,9 +35,6 @@ void main() {
         QueryMethodProcessor(methodElement, [...entities, ...views], {})
             .process();
 
-    final rawReturnType = await getDartTypeWithPerson('Future<List<Person>>');
-    final flattenedReturnType = await getDartTypeWithPerson('Person');
-
     expect(
       actual,
       equals(
@@ -45,8 +42,8 @@ void main() {
           methodElement,
           'findAllPersons',
           Query('SELECT * FROM Person', []),
-          rawReturnType,
-          flattenedReturnType,
+          await getDartTypeWithPerson('Future<List<Person>>'),
+          await getDartTypeWithPerson('Person'),
           [],
           entities.first,
           {},
@@ -65,9 +62,6 @@ void main() {
         QueryMethodProcessor(methodElement, [...entities, ...views], {})
             .process();
 
-    final rawReturnType = await getDartTypeWithName('Future<List<Name>>');
-    final flattenedReturnType = await getDartTypeWithName('Name');
-
     expect(
       actual,
       equals(
@@ -75,8 +69,8 @@ void main() {
           methodElement,
           'findAllNames',
           Query('SELECT * FROM name', []),
-          rawReturnType,
-          flattenedReturnType,
+          await getDartTypeWithName('Future<List<Name>>'),
+          await getDartTypeWithName('Name'),
           [],
           views.first,
           {},

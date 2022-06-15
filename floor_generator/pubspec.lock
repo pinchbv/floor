@@ -431,11 +431,9 @@ packages:
   test_cov:
     dependency: "direct dev"
     description:
-      path: "."
-      ref: "issue/clean_up_deprecate"
-      resolved-ref: "832ae125aea3d48ef5f63d2cc8e9e9720bd02fda"
-      url: "https://github.com/dkaera/test_cov.git"
-    source: git
+      name: test_cov
+      url: "https://pub.dartlang.org"
+    source: hosted
     version: "1.0.1"
   typed_data:
     dependency: transitive
