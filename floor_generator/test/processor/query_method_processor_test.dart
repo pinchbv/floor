@@ -35,6 +35,9 @@ void main() {
         QueryMethodProcessor(methodElement, [...entities, ...views], {})
             .process();
 
+    final rawReturnType = await getDartTypeWithPerson('Future<List<Person>>');
+    final flattenedReturnType = await getDartTypeWithPerson('Person');
+
     expect(
       actual,
       equals(
@@ -42,8 +45,8 @@ void main() {
           methodElement,
           'findAllPersons',
           Query('SELECT * FROM Person', []),
-          await getDartTypeWithPerson('Future<List<Person>>'),
-          await getDartTypeWithPerson('Person'),
+          rawReturnType,
+          flattenedReturnType,
           [],
           entities.first,
           {},
@@ -62,6 +65,9 @@ void main() {
         QueryMethodProcessor(methodElement, [...entities, ...views], {})
             .process();
 
+    final rawReturnType = await getDartTypeWithName('Future<List<Name>>');
+    final flattenedReturnType = await getDartTypeWithName('Name');
+
     expect(
       actual,
       equals(
@@ -69,8 +75,8 @@ void main() {
           methodElement,
           'findAllNames',
           Query('SELECT * FROM name', []),
-          await getDartTypeWithName('Future<List<Name>>'),
-          await getDartTypeWithName('Name'),
+          rawReturnType,
+          flattenedReturnType,
           [],
           views.first,
           {},
@@ -478,7 +484,10 @@ Future<MethodElement> _createQueryMethodElement(
         Name(this.name);
       }
     ''', (resolver) async {
-    return LibraryReader((await resolver.findLibraryByName('test'))!);
+    return resolver
+        .findLibraryByName('test')
+        .then((value) => ArgumentError.checkNotNull(value))
+        .then((value) => LibraryReader(value));
   });
 
   return library.classes.first.methods.first;
@@ -500,7 +509,10 @@ Future<List<Entity>> _getEntities() async {
         Person(this.id, this.name);
       }
     ''', (resolver) async {
-    return LibraryReader((await resolver.findLibraryByName('test'))!);
+    return resolver
+        .findLibraryByName('test')
+        .then((value) => ArgumentError.checkNotNull(value))
+        .then((value) => LibraryReader(value));
   });
 
   return library.classes
@@ -522,7 +534,10 @@ Future<List<View>> _getViews() async {
         Name(this.name);
       }
     ''', (resolver) async {
-    return LibraryReader((await resolver.findLibraryByName('test'))!);
+    return resolver
+        .findLibraryByName('test')
+        .then((value) => ArgumentError.checkNotNull(value))
+        .then((value) => LibraryReader(value));
   });
 
   return library.classes

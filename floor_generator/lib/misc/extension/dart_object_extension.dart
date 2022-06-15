@@ -9,10 +9,7 @@ extension DartObjectExtension on DartObject {
   String? toEnumValueString() {
     final interfaceType = type as InterfaceType;
     final enumName = interfaceType.getDisplayString(withNullability: false);
-    final enumValue = interfaceType.element.fields
-        .where((element) => element.isEnumConstant)
-        .map((fieldElement) => fieldElement.name)
-        .singleWhereOrNull((valueName) => getField(valueName) != null);
+    final enumValue = getField('_name')?.toStringValue();
     if (enumValue == null) {
       return null;
     } else {

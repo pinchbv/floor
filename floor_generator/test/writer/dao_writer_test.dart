@@ -422,7 +422,10 @@ Future<Dao> _createDao(final String dao) async {
         Name(this.name);
       }
       ''', (resolver) async {
-    return LibraryReader((await resolver.findLibraryByName('test'))!);
+    return resolver
+        .findLibraryByName('test')
+        .then((value) => ArgumentError.checkNotNull(value))
+        .then((value) => LibraryReader(value));
   });
 
   final daoClass = library.classes.firstWhere((classElement) =>
