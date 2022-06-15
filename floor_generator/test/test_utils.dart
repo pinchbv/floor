@@ -102,7 +102,9 @@ Future<DartType> getDartTypeFromDeclaration(final String declaration) async {
   return resolveSource(source, (item) async {
     final libraryReader =
         LibraryReader((await item.findLibraryByName('test'))!);
-    return (libraryReader.allElements.elementAt(1) as PropertyAccessorElement).type.returnType;
+    return (libraryReader.allElements.elementAt(1) as PropertyAccessorElement)
+        .type
+        .returnType;
   });
 }
 

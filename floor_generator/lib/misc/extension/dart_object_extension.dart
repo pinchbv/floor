@@ -8,7 +8,9 @@ extension DartObjectExtension on DartObject {
   String? toEnumValueString() {
     final interfaceType = type as InterfaceType;
     final enumName = interfaceType.getDisplayString(withNullability: false);
-    final enumFields = interfaceType.element.fields.where((element) => element.isEnumConstant).toList();
+    final enumFields = interfaceType.element.fields
+        .where((element) => element.isEnumConstant)
+        .toList();
 
     // Find the index of the matching enum constant.
     String? enumValue;
@@ -30,7 +32,9 @@ extension DartObjectExtension on DartObject {
   /// or the result of `null` if the enum did not contain a valid value
   ForeignKeyAction? toForeignKeyAction() {
     final interfaceType = type as InterfaceType;
-    final enumFields = interfaceType.element.fields.where((element) => element.isEnumConstant).toList();
+    final enumFields = interfaceType.element.fields
+        .where((element) => element.isEnumConstant)
+        .toList();
 
     // Find the index of the matching enum constant.
     ForeignKeyAction? enumValue;
