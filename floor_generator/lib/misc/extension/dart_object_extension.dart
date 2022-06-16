@@ -1,5 +1,7 @@
 import 'package:analyzer/dart/constant/value.dart';
+import 'package:analyzer/dart/element/element.dart';
 import 'package:analyzer/dart/element/type.dart';
+import 'package:collection/collection.dart';
 import 'package:floor_annotation/floor_annotation.dart';
 
 extension DartObjectExtension on DartObject {
@@ -13,13 +15,9 @@ extension DartObjectExtension on DartObject {
         .toList();
 
     // Find the index of the matching enum constant.
-    String? enumValue;
-    for (int i = 0; i < enumFields.length; i++) {
-      if (enumFields[i].computeConstantValue() == this) {
-        enumValue = OnConflictStrategy.values[i].name;
-        break;
-      }
-    }
+    final enumIndex = _getIndex(enumFields);
+    final enumValue =
+        enumIndex != null ? OnConflictStrategy.values[enumIndex].name : null;
 
     if (enumValue == null) {
       return null;
@@ -37,14 +35,13 @@ extension DartObjectExtension on DartObject {
         .toList();
 
     // Find the index of the matching enum constant.
-    ForeignKeyAction? enumValue;
-    for (int i = 0; i < enumFields.length; i++) {
-      if (enumFields[i].computeConstantValue() == this) {
-        enumValue = ForeignKeyAction.values[i];
-        break;
-      }
-    }
-
-    return enumValue;
+    final enumIndex = _getIndex(enumFields);
+    return enumIndex != null ? ForeignKeyAction.values[enumIndex] : null;
   }
+
+  int? _getIndex(List<FieldElement> enumFields) => enumFields
+      .asMap()
+      .entries
+      .firstWhereOrNull((e) => e.value.computeConstantValue() == this)
+      ?.key;
 }
