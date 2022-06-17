@@ -1,5 +1,17 @@
 # Changelog
 
+## 1.3.0
+
+### Changes
+
+* Remove Slack invite links
+
+### 🛠 Maintenance
+
+* Update Analyzer to 4.1.0
+* Allow release drafter to create GitHub releases
+* Support latest analyzer
+
 ## 1.2.0
 
 ### Changes
