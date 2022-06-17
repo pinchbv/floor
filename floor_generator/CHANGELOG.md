@@ -4,7 +4,13 @@
 
 ### Changes
 
-* Support analyzer version 3.+
+* Remove Slack invite links
+
+### 🛠 Maintenance
+
+* Update Analyzer to 4.1.0
+* Allow release drafter to create GitHub releases
+* Support latest analyzer
 
 ## 1.2.0
 
