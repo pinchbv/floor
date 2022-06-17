@@ -4,7 +4,7 @@ import 'package:analyzer/dart/element/element.dart';
 import 'package:analyzer/dart/element/type.dart';
 import 'package:build/build.dart';
 import 'package:build_test/build_test.dart';
-import 'package:code_builder/code_builder.dart';
+import 'package:code_builder/code_builder.dart' hide FunctionType;
 import 'package:dart_style/dart_style.dart';
 import 'package:floor_annotation/floor_annotation.dart' as annotations;
 import 'package:floor_generator/misc/type_utils.dart';
@@ -62,7 +62,7 @@ Future<DartType> getDartTypeWithPerson(String value) async {
   return resolveSource(source, (item) async {
     final libraryReader =
         LibraryReader((await item.findLibraryByName('test'))!);
-    return (libraryReader.allElements.first as PropertyAccessorElement)
+    return (libraryReader.allElements.elementAt(1) as PropertyAccessorElement)
         .type
         .returnType;
   });
@@ -86,7 +86,7 @@ Future<DartType> getDartTypeWithName(String value) async {
   return resolveSource(source, (item) async {
     final libraryReader =
         LibraryReader((await item.findLibraryByName('test'))!);
-    return (libraryReader.allElements.first as PropertyAccessorElement)
+    return (libraryReader.allElements.elementAt(1) as PropertyAccessorElement)
         .type
         .returnType;
   });
@@ -102,7 +102,9 @@ Future<DartType> getDartTypeFromDeclaration(final String declaration) async {
   return resolveSource(source, (item) async {
     final libraryReader =
         LibraryReader((await item.findLibraryByName('test'))!);
-    return (libraryReader.allElements.elementAt(1) as VariableElement).type;
+    return (libraryReader.allElements.elementAt(1) as PropertyAccessorElement)
+        .type
+        .returnType;
   });
 }
 

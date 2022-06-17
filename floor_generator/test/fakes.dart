@@ -302,6 +302,9 @@ class FakeClassElement implements ClassElement {
 
   @override
   Element get nonSynthetic => throw UnimplementedError();
+
+  @override
+  bool get isDartCoreEnum => throw UnimplementedError();
 }
 
 class FakeFieldElement implements FieldElement {
