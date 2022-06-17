@@ -4,7 +4,7 @@ import 'package:analyzer/dart/element/element.dart';
 import 'package:analyzer/dart/element/type.dart';
 import 'package:build/build.dart';
 import 'package:build_test/build_test.dart';
-import 'package:code_builder/code_builder.dart';
+import 'package:code_builder/code_builder.dart' hide FunctionType;
 import 'package:dart_style/dart_style.dart';
 import 'package:floor_annotation/floor_annotation.dart' as annotations;
 import 'package:floor_generator/misc/type_utils.dart';
@@ -104,12 +104,11 @@ Future<DartType> getDartTypeFromDeclaration(final String declaration) async {
   $declaration;
   ''';
   return resolveSource(source, (item) async {
-    final libraryReader = await item
-        .findLibraryByName('test')
-        .then((value) => ArgumentError.checkNotNull(value))
-        .then((value) => LibraryReader(value));
-    return (libraryReader.allElements.elementAt(2) as TopLevelVariableElement)
-        .type;
+    final libraryReader =
+        LibraryReader((await item.findLibraryByName('test'))!);
+    return (libraryReader.allElements.elementAt(1) as PropertyAccessorElement)
+        .type
+        .returnType;
   });
 }
 

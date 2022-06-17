@@ -1,6 +1,5 @@
 import 'package:analyzer/dart/constant/value.dart';
 import 'package:analyzer/dart/element/type.dart';
-import 'package:collection/collection.dart';
 import 'package:floor_annotation/floor_annotation.dart';
 
 extension DartObjectExtension on DartObject {
@@ -20,12 +19,7 @@ extension DartObjectExtension on DartObject {
   /// get the ForeignKeyAction this enum represents,
   /// or the result of `null` if the enum did not contain a valid value
   ForeignKeyAction? toForeignKeyAction() {
-    final enumValueString = toEnumValueString();
-    if (enumValueString == null) {
-      return null;
-    } else {
-      return ForeignKeyAction.values.singleWhereOrNull(
-          (foreignKeyAction) => foreignKeyAction.toString() == enumValueString);
-    }
+    final enumIndex = getField('index')?.toIntValue();
+    return enumIndex != null ? ForeignKeyAction.values[enumIndex] : null;
   }
 }
