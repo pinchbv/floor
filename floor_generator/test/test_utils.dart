@@ -60,8 +60,10 @@ Future<DartType> getDartTypeWithPerson(String value) async {
   }
   ''';
   return resolveSource(source, (item) async {
-    final libraryReader =
-        LibraryReader((await item.findLibraryByName('test'))!);
+    final libraryReader = await item
+        .findLibraryByName('test')
+        .then((value) => ArgumentError.checkNotNull(value))
+        .then((value) => LibraryReader(value));
     return (libraryReader.allElements.elementAt(1) as PropertyAccessorElement)
         .type
         .returnType;
@@ -84,8 +86,10 @@ Future<DartType> getDartTypeWithName(String value) async {
   }
   ''';
   return resolveSource(source, (item) async {
-    final libraryReader =
-        LibraryReader((await item.findLibraryByName('test'))!);
+    final libraryReader = await item
+        .findLibraryByName('test')
+        .then((value) => ArgumentError.checkNotNull(value))
+        .then((value) => LibraryReader(value));
     return (libraryReader.allElements.elementAt(1) as PropertyAccessorElement)
         .type
         .returnType;
@@ -168,7 +172,10 @@ Future<Dao> createDao(final String methodSignature) async {
       
       $_nameView
       ''', (resolver) async {
-    return LibraryReader((await resolver.findLibraryByName('test'))!);
+    return resolver
+        .findLibraryByName('test')
+        .then((value) => ArgumentError.checkNotNull(value))
+        .then((value) => LibraryReader(value));
   });
 
   final daoClass = library.classes.firstWhere((classElement) =>
@@ -197,7 +204,10 @@ Future<ClassElement> createClassElement(final String clazz) async {
       
       $clazz
       ''', (resolver) async {
-    return LibraryReader((await resolver.findLibraryByName('test'))!);
+    return resolver
+        .findLibraryByName('test')
+        .then((value) => ArgumentError.checkNotNull(value))
+        .then((value) => LibraryReader(value));
   });
 
   return library.classes.first;
@@ -216,7 +226,10 @@ extension StringTestExtension on String {
       
       $this
       ''', (resolver) async {
-      return LibraryReader((await resolver.findLibraryByName('test'))!);
+      return resolver
+          .findLibraryByName('test')
+          .then((value) => ArgumentError.checkNotNull(value))
+          .then((value) => LibraryReader(value));
     });
 
     return library.classes.first;
@@ -231,7 +244,10 @@ Future<Entity> getPersonEntity() async {
       
       $_personEntity
     ''', (resolver) async {
-    return LibraryReader((await resolver.findLibraryByName('test'))!);
+    return resolver
+        .findLibraryByName('test')
+        .then((value) => ArgumentError.checkNotNull(value))
+        .then((value) => LibraryReader(value));
   });
 
   return library.classes
@@ -254,7 +270,10 @@ extension StringExtension on String {
       
       $_personEntity
     ''', (resolver) async {
-      return LibraryReader((await resolver.findLibraryByName('test'))!);
+      return resolver
+          .findLibraryByName('test')
+          .then((value) => ArgumentError.checkNotNull(value))
+          .then((value) => LibraryReader(value));
     });
 
     return library.classes.first.methods.first;
