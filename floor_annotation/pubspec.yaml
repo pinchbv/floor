@@ -3,7 +3,7 @@ description: >
   The typesafe, reactive, and lightweight SQLite abstraction for your Flutter applications.
   Don't use this package directly. Import the floor package instead.
 version: 1.3.0
-homepage: https://vitusortner.github.io/floor/
+homepage: https://pinchbv.github.io/floor/
 
 environment:
   sdk: '>=2.12.0 <3.0.0'

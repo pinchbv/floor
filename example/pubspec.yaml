@@ -3,7 +3,7 @@ description: >
   The typesafe, reactive and lightweight SQLite abstraction for your Flutter applications.
   This is an example on how to use the library.
 version: 1.0.0
-homepage: https://floor.codes
+homepage: https://pinchbv.github.io/floor/
 publish_to: none
 
 environment:

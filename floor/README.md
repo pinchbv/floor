@@ -1,6 +1,6 @@
-![Floor](https://raw.githubusercontent.com/vitusortner/floor/develop/img/floor.png)
+![Floor](https://raw.githubusercontent.com/pinchbv/floor/develop/img/floor.png)
 
-**See the [project's website](https://floor.codes) for the full documentation.**
+**See the [project's website](https://pinchbv.github.io/floor/) for the full documentation.**
 
 Floor provides a neat SQLite abstraction for your Flutter applications inspired by the [Room persistence library](https://developer.android.com/topic/libraries/architecture/room).
 It comes with automatic mapping between in-memory objects and database rows while still offering full control of the database with the use of SQL.
@@ -16,10 +16,10 @@ As a consequence, it's necessary to have an understanding of SQL and SQLite in o
 - iOS, Android, Linux, macOS, Windows
 
 ⚠️ The library is open to contributions!
-Refer to [GitHub Discussions](https://github.com/vitusortner/floor/discussions) for questions, ideas, and discussions.
+Refer to [GitHub Discussions](https://github.com/pinchbv/floor/discussions) for questions, ideas, and discussions.
 
 [![pub package](https://img.shields.io/pub/v/floor.svg)](https://pub.dartlang.org/packages/floor)
-[![build status](https://github.com/vitusortner/floor/workflows/Continuous%20integration/badge.svg)](https://github.com/vitusortner/floor/actions)
+[![build status](https://github.com/pinchbv/floor/workflows/Continuous%20integration/badge.svg)](https://github.com/pinchbv/floor/actions)
 [![codecov](https://codecov.io/gh/vitusortner/floor/branch/develop/graph/badge.svg)](https://codecov.io/gh/vitusortner/floor)
 
 ## Getting Started
@@ -151,7 +151,7 @@ await personDao.insertPerson(person);
 final result = await personDao.findPersonById(1);
 ```
 
-For further examples take a look at the [example](https://github.com/vitusortner/floor/tree/develop/example) and [test](https://github.com/vitusortner/floor/tree/develop/floor/test/integration) directories.
+For further examples take a look at the [example](https://github.com/pinchbv/floor/tree/develop/example) and [test](https://github.com/pinchbv/floor/tree/develop/floor/test/integration) directories.
 
 ## Naming
 The library's name derives from the following.
@@ -159,11 +159,11 @@ The library's name derives from the following.
 Where *fl* also gives a pointer that the library is used in the Flutter context.
 
 ## Bugs, Ideas, and Feedback
-For bugs please use [GitHub Issues](https://github.com/vitusortner/floor/issues).
-For questions, ideas, and discussions use [GitHub Discussions](https://github.com/vitusortner/floor/discussions).
+For bugs please use [GitHub Issues](https://github.com/pinchbv/floor/issues).
+For questions, ideas, and discussions use [GitHub Discussions](https://github.com/pinchbv/floor/discussions).
 
 ## License
-    Copyright 2021 The Floor Project Authors
+    Copyright 2022 The Floor Project Authors
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
