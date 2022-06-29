@@ -209,7 +209,10 @@ Future<FieldElement> _generateFieldElement(final String field) async {
         }
       }
       ''', (resolver) async {
-    return LibraryReader((await resolver.findLibraryByName('test'))!);
+    return resolver
+        .findLibraryByName('test')
+        .then((value) => ArgumentError.checkNotNull(value))
+        .then((value) => LibraryReader(value));
   });
 
   return library.classes.first.fields.first;

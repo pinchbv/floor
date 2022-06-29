@@ -39,7 +39,6 @@ class QueryMethodProcessor extends Processor<QueryMethod> {
 
     final query = QueryProcessor(_methodElement, _getQuery()).process();
 
-    _getQuery();
     final returnsStream = rawReturnType.isStream;
 
     _assertReturnsFutureOrStream(rawReturnType, returnsStream);

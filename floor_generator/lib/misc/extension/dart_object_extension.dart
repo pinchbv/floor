@@ -9,7 +9,6 @@ extension DartObjectExtension on DartObject {
     final interfaceType = type as InterfaceType;
     final enumName = interfaceType.getDisplayString(withNullability: false);
     final enumValue = getField('_name')?.toStringValue();
-
     if (enumValue == null) {
       return null;
     } else {
