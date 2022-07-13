@@ -177,13 +177,16 @@ void main() {
 
   group('insertion while stream is listening', () {
     // ignore: close_sinks
-    final mockStreamController = MockStreamController<String>();
+    final mockStreamController = MockStreamController<Set<String>>();
 
+    final changeHandler = (bool isReplace) {
+      mockStreamController.add({entityName});
+    };
     final underTest = InsertionAdapter(
       mockDatabaseExecutor,
       entityName,
       valueMapper,
-      mockStreamController,
+      changeHandler,
     );
 
     tearDown(() {
@@ -201,7 +204,7 @@ void main() {
 
       await underTest.insert(person, onConflictStrategy);
 
-      verify(mockStreamController.add(entityName));
+      verify(mockStreamController.add({entityName}));
     });
 
     test('insert item but transaction failed (returns 0)', () async {
@@ -228,7 +231,7 @@ void main() {
 
       await underTest.insertList(persons, onConflictStrategy);
 
-      verify(mockStreamController.add(entityName));
+      verify(mockStreamController.add({entityName}));
     });
 
     test('insert empty list', () async {
