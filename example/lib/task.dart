@@ -7,7 +7,9 @@ class Task {
 
   final String message;
 
-  Task(this.id, this.message);
+  final DateTime timestamp;
+
+  Task(this.id, this.message, this.timestamp);
 
   @override
   bool operator ==(Object other) =>
@@ -15,13 +17,14 @@ class Task {
       other is Task &&
           runtimeType == other.runtimeType &&
           id == other.id &&
-          message == other.message;
+          message == other.message &&
+          timestamp == other.timestamp;
 
   @override
-  int get hashCode => id.hashCode ^ message.hashCode;
+  int get hashCode => id.hashCode ^ message.hashCode ^ timestamp.hashCode;
 
   @override
   String toString() {
-    return 'Task{id: $id, message: $message}';
+    return 'Task{id: $id, message: $message, timestamp: $timestamp}';
   }
 }
