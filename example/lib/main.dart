@@ -159,6 +159,7 @@ class TaskListCell extends StatelessWidget {
             SnackBar(content: Text(statusMessage)),
           );
         }
+        return statusMessage != null;
       },
 
       // onDismissed: (_) async {
