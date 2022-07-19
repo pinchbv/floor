@@ -161,16 +161,6 @@ class TaskListCell extends StatelessWidget {
         }
         return statusMessage != null;
       },
-
-      // onDismissed: (_) async {
-      //   await dao.deleteTask(task);
-      //
-      //   final scaffoldMessengerState = ScaffoldMessenger.of(context);
-      //   scaffoldMessengerState.hideCurrentSnackBar();
-      //   scaffoldMessengerState.showSnackBar(
-      //     const SnackBar(content: Text('Removed task')),
-      //   );
-      // },
     );
   }
 }
