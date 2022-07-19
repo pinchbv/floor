@@ -295,11 +295,10 @@ class EntityProcessor extends QueryableProcessor<Entity> {
   }
 
   String _serializeBoolean(Field field, String attributeValue) {
-    final booleanSerializer = '($attributeValue! ? 1 : 0)';
     return field.isNullable
         // force! underlying non-nullable type as null check has been done
-        ? '$attributeValue == null ? null : $booleanSerializer'
-        : booleanSerializer;
+        ? '$attributeValue == null ? null : ($attributeValue! ? 1 : 0)'
+        : '$attributeValue ? 1 : 0';
   }
 
   String _serializeEnum(String attributeValue, Field field) {
