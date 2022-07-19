@@ -23,6 +23,13 @@ extension SupportedTypeChecker on DartType {
   }
 }
 
+extension EnumTypeChecker on DartType {
+  bool get isEnumType {
+    final mType = this;
+    return mType is InterfaceType ? mType.element.isEnum : false;
+  }
+}
+
 extension Uint8ListTypeChecker on DartType {
   bool get isUint8List =>
       getDisplayString(withNullability: false) == 'Uint8List';

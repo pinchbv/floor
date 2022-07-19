@@ -54,11 +54,12 @@ class FieldProcessor extends Processor<Field> {
 
   String _getSqlType(final TypeConverter? typeConverter) {
     final type = _fieldElement.type;
-    if (type.isDefaultSqlType) {
+    if (type.isDefaultSqlType || type.isEnumType) {
       return type.asSqlType();
     } else if (typeConverter != null) {
       return typeConverter.databaseType.asSqlType();
     } else {
+      print('DEBUG:: getClosest == null');
       throw InvalidGenerationSourceError(
         'Column type is not supported for $type.',
         todo: 'Either make to use a supported type or supply a type converter.',
@@ -80,6 +81,8 @@ extension on DartType {
       return SqlType.real;
     } else if (isUint8List) {
       return SqlType.blob;
+    } else if (isEnumType) {
+      return SqlType.text;
     }
     throw StateError('This should really be unreachable');
   }

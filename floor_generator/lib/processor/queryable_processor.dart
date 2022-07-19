@@ -77,7 +77,8 @@ abstract class QueryableProcessor<T extends Queryable> extends Processor<T> {
 
       String parameterValue;
 
-      if (parameterElement.type.isDefaultSqlType) {
+      if (parameterElement.type.isDefaultSqlType ||
+          parameterElement.type.isEnumType) {
         parameterValue = databaseValue.cast(
           parameterElement.type,
           parameterElement,
@@ -108,12 +109,22 @@ abstract class QueryableProcessor<T extends Queryable> extends Processor<T> {
 extension on String {
   String cast(DartType dartType, ParameterElement parameterElement) {
     if (dartType.isDartCoreBool) {
+      final booleanDeserializer = '($this as int) != 0';
       if (dartType.isNullable) {
         // if the value is null, return null
         // if the value is not null, interpret 1 as true and 0 as false
-        return '$this == null ? null : ($this as int) != 0';
+        return '$this == null ? null : $booleanDeserializer';
       } else {
-        return '($this as int) != 0';
+        return booleanDeserializer;
+      }
+    } else if (dartType.isEnumType) {
+      final typeString = dartType.getDisplayString(withNullability: false);
+      final enumDeserializer =
+          '$typeString.values.firstWhere((element) => element.name == $this)';
+      if (dartType.isNullable) {
+        return '$this == null ? null : $enumDeserializer';
+      } else {
+        return enumDeserializer;
       }
     } else if (dartType.isDartCoreString ||
         dartType.isDartCoreInt ||
