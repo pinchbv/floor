@@ -119,8 +119,7 @@ extension on String {
       }
     } else if (dartType.isEnumType) {
       final typeString = dartType.getDisplayString(withNullability: false);
-      final enumDeserializer =
-          '$typeString.values[$this as int]';
+      final enumDeserializer = '$typeString.values[$this as int]';
       if (dartType.isNullable) {
         return '$this == null ? null : $enumDeserializer';
       } else {
