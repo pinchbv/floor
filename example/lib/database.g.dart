@@ -184,7 +184,7 @@ class _$TaskDao extends TaskDao {
   }
 
   @override
-  Stream<List<Task>> findAllTasksByType(TaskType type) {
+  Stream<List<Task>> findAllTasksByTypeAsStream(TaskType type) {
     return _queryAdapter.queryListStream('SELECT * FROM task WHERE type = ?1',
         mapper: (Map<String, Object?> row) => Task(
             row['id'] as int?,

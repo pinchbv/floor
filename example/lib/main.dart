@@ -32,7 +32,7 @@ class FloorApp extends StatelessWidget {
   }
 }
 
-class TasksWidget extends StatelessWidget {
+class TasksWidget extends StatefulWidget {
   final String title;
   final TaskDao dao;
 
@@ -43,34 +43,71 @@ class TasksWidget extends StatelessWidget {
   }) : super(key: key);
 
   @override
+  State<StatefulWidget> createState() => TasksWidgetState();
+}
+
+class TasksWidgetState extends State<TasksWidget> {
+  TaskType? _selectedType;
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text(title)),
+      appBar: AppBar(
+        title: Text(widget.title),
+        actions: <Widget>[
+          PopupMenuButton<int>(
+            itemBuilder: (context) {
+              return List.generate(4, (index) {
+                return PopupMenuItem<int>(
+                  value: index,
+                  child: Text(
+                    index == 0 ? 'All' : _getMenuType(index).title,
+                  ),
+                );
+              });
+            },
+            onSelected: (index) {
+              setState(() {
+                _selectedType = index == 0 ? null : _getMenuType(index);
+              });
+            },
+          )
+        ],
+      ),
       body: SafeArea(
         child: Column(
           children: <Widget>[
-            TasksListView(dao: dao),
-            TasksTextField(dao: dao),
+            TasksListView(
+              dao: widget.dao,
+              selectedType: _selectedType,
+            ),
+            TasksTextField(dao: widget.dao),
           ],
         ),
       ),
     );
   }
+
+  TaskType _getMenuType(int index) => TaskType.values[index - 1];
 }
 
 class TasksListView extends StatelessWidget {
   final TaskDao dao;
+  final TaskType? selectedType;
 
   const TasksListView({
     Key? key,
     required this.dao,
+    required this.selectedType,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return Expanded(
       child: StreamBuilder<List<Task>>(
-        stream: dao.findAllTasksAsStream(),
+        stream: selectedType == null
+            ? dao.findAllTasksAsStream()
+            : dao.findAllTasksByTypeAsStream(selectedType!),
         builder: (_, snapshot) {
           if (!snapshot.hasData) return Container();
 
@@ -141,12 +178,11 @@ class TaskListCell extends StatelessWidget {
             statusMessage = 'Removed task';
             break;
           case DismissDirection.startToEnd:
-            const taskTypes = TaskType.values;
-            final nextIndex = task.type.index + 1;
-            final newType =
-                taskTypes[taskTypes.length == nextIndex ? 0 : nextIndex];
-            await dao.updateTask(task.copy(type: newType));
-            statusMessage = 'Updated task status by: ${newType.title}';
+            final tasksLength = TaskType.values.length;
+            final nextIndex = (tasksLength + task.type.index + 1) % tasksLength;
+            final taskCopy = task.copy(type: TaskType.values[nextIndex]);
+            await dao.updateTask(taskCopy);
+            statusMessage = 'Updated task status by: ${taskCopy.type.title}';
             break;
           default:
             break;

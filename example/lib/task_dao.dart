@@ -13,7 +13,7 @@ abstract class TaskDao {
   Stream<List<Task>> findAllTasksAsStream();
 
   @Query('SELECT * FROM task WHERE type = :type')
-  Stream<List<Task>> findAllTasksByType(TaskType type);
+  Stream<List<Task>> findAllTasksByTypeAsStream(TaskType type);
 
   @insert
   Future<void> insertTask(Task task);
