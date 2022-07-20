@@ -432,7 +432,7 @@ void main() {
 
       const expected = '<String, Object?>{'
           "'id': item.id, "
-          "'someType': item.someType.toString().split('.')[1]"
+          "'someType': item.someType.index"
           '}';
       expect(actual, equals(expected));
     });
@@ -457,7 +457,7 @@ void main() {
 
       const expected = '<String, Object?>{'
           "'id': item.id, "
-          "'someType': item.someType == null ? null : item.someType.toString().split('.')[1]"
+          "'someType': item.someType == null ? null : item.someType.index"
           '}';
       expect(actual, equals(expected));
     });

@@ -82,7 +82,7 @@ extension on DartType {
     } else if (isUint8List) {
       return SqlType.blob;
     } else if (isEnumType) {
-      return SqlType.text;
+      return SqlType.integer;
     }
     throw StateError('This should really be unreachable');
   }

@@ -227,7 +227,7 @@ void main() {
         return _queryAdapter.queryList(
         'SELECT * FROM Person WHERE characterType = ?1', 
         mapper: (Map<String, Object?> row) => Person(row['id'] as int, row['name'] as String), 
-        arguments: [type.toString().split('.')[1]]);
+        arguments: [type.index]);
       }
     '''));
   });

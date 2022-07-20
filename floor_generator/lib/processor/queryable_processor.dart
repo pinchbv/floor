@@ -120,7 +120,7 @@ extension on String {
     } else if (dartType.isEnumType) {
       final typeString = dartType.getDisplayString(withNullability: false);
       final enumDeserializer =
-          '$typeString.values.firstWhere((element) => element.name == $this)';
+          '$typeString.values[$this as int]';
       if (dartType.isNullable) {
         return '$this == null ? null : $enumDeserializer';
       } else {

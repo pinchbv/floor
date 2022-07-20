@@ -302,7 +302,7 @@ class EntityProcessor extends QueryableProcessor<Entity> {
   }
 
   String _serializeEnum(String attributeValue, Field field) {
-    final enumSerializer = '$attributeValue.toString().split(\'.\')[1]';
+    final enumSerializer = '$attributeValue.index';
     return field.isNullable
         // force! underlying non-nullable type as null check has been done
         ? '$attributeValue == null ? null : $enumSerializer'

@@ -118,7 +118,7 @@ class QueryMethodWriter implements Writer {
           // query method parameters can't be null
           return '$displayName ? 1 : 0';
         } else if (type.isEnumType) {
-          return '$displayName.toString().split(\'.\')[1]';
+          return '$displayName.index';
         } else if (type.isDefaultSqlType) {
           return displayName;
         } else {

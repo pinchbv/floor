@@ -474,8 +474,8 @@ void main() {
       const expected = 'Person('
           "row['id'] as int, "
           "row['name'] as String, "
-          "bar: CharacterType.values.firstWhere((element) => element.name == row['bar']), "
-          "foo: row['foo'] == null ? null : CharacterType.values.firstWhere((element) => element.name == row['foo'])"
+          "bar: CharacterType.values[row['bar'] as int], "
+          "foo: row['foo'] == null ? null : CharacterType.values[row['foo'] as int]"
           ')';
       expect(actual, equals(expected));
     });
@@ -571,7 +571,7 @@ void main() {
             "row['name'] as String?, "
             "row['bar'] == null ? null : (row['bar'] as int) != 0, "
             "row['blob'] as Uint8List?, "
-            "row['character'] == null ? null : CharacterType.values.firstWhere((element) => element.name == row['character'])"
+            "row['character'] == null ? null : CharacterType.values[row['character'] as int]"
             ')';
         expect(actual, equals(expected));
       });
@@ -606,7 +606,7 @@ void main() {
             "row['name'] as String, "
             "(row['bar'] as int) != 0, "
             "row['blob'] as Uint8List, "
-            "CharacterType.values.firstWhere((element) => element.name == row['character'])"
+            "CharacterType.values[row['character'] as int]"
             ')';
         expect(actual, equals(expected));
       });
