@@ -1,4 +1,5 @@
 import 'package:example/database.dart';
+import 'package:example/messages_dao.dart';
 import 'package:example/task.dart';
 import 'package:example/task_dao.dart';
 import 'package:flutter/material.dart';
@@ -10,17 +11,23 @@ Future<void> main() async {
       .databaseBuilder('flutter_database.db')
       .build();
   final dao = database.taskDao;
+  final messagesDao = database.messagesDao;
 
-  runApp(FloorApp(dao));
+  runApp(FloorApp(dao, messagesDao));
 }
 
 class FloorApp extends StatelessWidget {
   final TaskDao dao;
+  final MessagesDao messagesDao;
 
-  const FloorApp(this.dao);
+  const FloorApp(this.dao, this.messagesDao);
 
   @override
   Widget build(BuildContext context) {
+    messagesDao.findAlMessages().then((result) {
+      return result.map((e) => debugPrint('Message ${e.message}'));
+    });
+
     return MaterialApp(
       title: 'Floor Demo',
       theme: ThemeData(primarySwatch: Colors.blueGrey),

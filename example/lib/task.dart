@@ -28,3 +28,10 @@ class Task {
     return 'Task{id: $id, message: $message, timestamp: $timestamp}';
   }
 }
+
+@DatabaseView('SELECT message as message FROM task', viewName: 'messages')
+class Message {
+  final String message;
+
+  Message(this.message);
+}
