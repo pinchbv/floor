@@ -57,14 +57,17 @@ class TasksWidgetState extends State<TasksWidget> {
         actions: <Widget>[
           PopupMenuButton<int>(
             itemBuilder: (context) {
-              return List.generate(4, (index) {
-                return PopupMenuItem<int>(
-                  value: index,
-                  child: Text(
-                    index == 0 ? 'All' : _getMenuType(index).title,
-                  ),
-                );
-              });
+              return List.generate(
+                TaskType.values.length + 1, //Uses increment to handle All types
+                (index) {
+                  return PopupMenuItem<int>(
+                    value: index,
+                    child: Text(
+                      index == 0 ? 'All' : _getMenuType(index).title,
+                    ),
+                  );
+                },
+              );
             },
             onSelected: (index) {
               setState(() {
@@ -167,8 +170,8 @@ class TaskListCell extends StatelessWidget {
       direction: DismissDirection.horizontal,
       child: ListTile(
         title: Text(task.message),
-        trailing: Text(task.timestamp.toIso8601String()),
         subtitle: Text('Status: ${task.type.title}'),
+        trailing: Text(task.timestamp.toIso8601String()),
       ),
       confirmDismiss: (direction) async {
         String? statusMessage;
@@ -180,7 +183,7 @@ class TaskListCell extends StatelessWidget {
           case DismissDirection.startToEnd:
             final tasksLength = TaskType.values.length;
             final nextIndex = (tasksLength + task.type.index + 1) % tasksLength;
-            final taskCopy = task.copy(type: TaskType.values[nextIndex]);
+            final taskCopy = task.copyWith(type: TaskType.values[nextIndex]);
             await dao.updateTask(taskCopy);
             statusMessage = 'Updated task status by: ${taskCopy.type.title}';
             break;
@@ -251,7 +254,7 @@ class TasksTextField extends StatelessWidget {
     if (message.trim().isEmpty) {
       _textEditingController.clear();
     } else {
-      final task = Task(null, false, message, DateTime.now(), TaskType.open);
+      final task = Task.optional(message: message);
       await dao.insertTask(task);
       _textEditingController.clear();
     }

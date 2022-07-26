@@ -59,7 +59,6 @@ class FieldProcessor extends Processor<Field> {
     } else if (typeConverter != null) {
       return typeConverter.databaseType.asSqlType();
     } else {
-      print('DEBUG:: getClosest == null');
       throw InvalidGenerationSourceError(
         'Column type is not supported for $type.',
         todo: 'Either make to use a supported type or supply a type converter.',

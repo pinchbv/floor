@@ -17,7 +17,7 @@ class Task {
 
   final String message;
 
-  final bool? isRead;
+  final bool isRead;
 
   final DateTime timestamp;
 
@@ -25,12 +25,27 @@ class Task {
 
   Task(this.id, this.isRead, this.message, this.timestamp, this.type);
 
+  factory Task.optional({
+    int? id,
+    DateTime? timestamp,
+    String? message,
+    bool? isRead,
+    TaskType? type,
+  }) =>
+      Task(
+        id,
+        isRead ?? false,
+        message ?? 'empty',
+        timestamp ?? DateTime.now(),
+        type ?? TaskType.open,
+      );
+
   @override
   String toString() {
     return 'Task{id: $id, message: $message, read: $isRead, timestamp: $timestamp, type: $type}';
   }
 
-  Task copy({
+  Task copyWith({
     int? id,
     String? message,
     bool? isRead,
