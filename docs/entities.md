@@ -45,6 +45,7 @@ Floor entities can hold values of the following Dart types which map to their co
 - `String` - TEXT
 - `bool` - INTEGER (0 = false, 1 = true)
 - `Uint8List` - BLOB
+- `enum` - INTEGER (records by the index 0..n)
 
 In case you want to store sophisticated Dart objects that can be represented by one of the above types, take a look at [Type Converters](type-converters.md).
 
