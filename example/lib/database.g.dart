@@ -63,6 +63,8 @@ class _$FlutterDatabase extends FlutterDatabase {
 
   TaskDao? _taskDaoInstance;
 
+  MessagesDao? _messagesDaoInstance;
+
   Future<sqflite.Database> open(String path, List<Migration> migrations,
       [Callback? callback]) async {
     final databaseOptions = sqflite.OpenDatabaseOptions(
@@ -84,6 +86,9 @@ class _$FlutterDatabase extends FlutterDatabase {
         await database.execute(
             'CREATE TABLE IF NOT EXISTS `Task` (`id` INTEGER PRIMARY KEY AUTOINCREMENT, `message` TEXT NOT NULL, `timestamp` INTEGER NOT NULL)');
 
+        await database.execute(
+            'CREATE VIEW IF NOT EXISTS `messages` AS SELECT message as message FROM task');
+
         await callback?.onCreate?.call(database, version);
       },
     );
@@ -93,6 +98,11 @@ class _$FlutterDatabase extends FlutterDatabase {
   @override
   TaskDao get taskDao {
     return _taskDaoInstance ??= _$TaskDao(database, changeListener);
+  }
+
+  @override
+  MessagesDao get messagesDao {
+    return _messagesDaoInstance ??= _$MessagesDao(database, changeListener);
   }
 }
 
@@ -199,6 +209,24 @@ class _$TaskDao extends TaskDao {
   @override
   Future<void> deleteTasks(List<Task> tasks) async {
     await _taskDeletionAdapter.deleteList(tasks);
+  }
+}
+
+class _$MessagesDao extends MessagesDao {
+  _$MessagesDao(this.database, this.changeListener)
+      : _queryAdapter = QueryAdapter(database);
+
+  final sqflite.DatabaseExecutor database;
+
+  final StreamController<String> changeListener;
+
+  final QueryAdapter _queryAdapter;
+
+  @override
+  Future<List<Message>> findAlMessages() async {
+    return _queryAdapter.queryList('SELECT * FROM messages',
+        mapper: (Map<String, Object?> row) =>
+            Message(row['message'] as String));
   }
 }
 
