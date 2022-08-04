@@ -441,6 +441,16 @@ void main() {
 
     expect(actual, throwsA(const TypeMatcher<InvalidGenerationSourceError>()));
   });
+
+  test('query with unsupported return type throws', () async {
+    final queryMethod = () => _createQueryMethod('''
+      @Query('DELETE * FROM Person WHERE name = :name')
+      void deleteByName(String name);
+    ''');
+
+    expect(queryMethod,
+        throwsA(const TypeMatcher<InvalidGenerationSourceError>()));
+  });
 }
 
 Future<QueryMethod> _createQueryMethod(final String methodSignature) async {
