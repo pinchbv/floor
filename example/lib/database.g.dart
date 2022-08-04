@@ -63,6 +63,8 @@ class _$FlutterDatabase extends FlutterDatabase {
 
   TaskDao? _taskDaoInstance;
 
+  MessagesDao? _messagesDaoInstance;
+
   Future<sqflite.Database> open(String path, List<Migration> migrations,
       [Callback? callback]) async {
     final databaseOptions = sqflite.OpenDatabaseOptions(
@@ -82,7 +84,10 @@ class _$FlutterDatabase extends FlutterDatabase {
       },
       onCreate: (database, version) async {
         await database.execute(
-            'CREATE TABLE IF NOT EXISTS `Task` (`id` INTEGER PRIMARY KEY AUTOINCREMENT, `message` TEXT NOT NULL, `timestamp` INTEGER NOT NULL)');
+            'CREATE TABLE IF NOT EXISTS `Task` (`id` INTEGER PRIMARY KEY AUTOINCREMENT, `message` TEXT NOT NULL, `isRead` INTEGER NOT NULL, `timestamp` INTEGER NOT NULL, `type` INTEGER NOT NULL)');
+
+        await database.execute(
+            'CREATE VIEW IF NOT EXISTS `messages` AS SELECT message as message FROM task');
 
         await callback?.onCreate?.call(database, version);
       },
@@ -93,6 +98,11 @@ class _$FlutterDatabase extends FlutterDatabase {
   @override
   TaskDao get taskDao {
     return _taskDaoInstance ??= _$TaskDao(database, changeListener);
+  }
+
+  @override
+  MessagesDao get messagesDao {
+    return _messagesDaoInstance ??= _$MessagesDao(database, changeListener);
   }
 }
 
@@ -105,7 +115,9 @@ class _$TaskDao extends TaskDao {
             (Task item) => <String, Object?>{
                   'id': item.id,
                   'message': item.message,
-                  'timestamp': _dateTimeConverter.encode(item.timestamp)
+                  'isRead': item.isRead ? 1 : 0,
+                  'timestamp': _dateTimeConverter.encode(item.timestamp),
+                  'type': item.type.index
                 },
             changeListener),
         _taskUpdateAdapter = UpdateAdapter(
@@ -115,7 +127,9 @@ class _$TaskDao extends TaskDao {
             (Task item) => <String, Object?>{
                   'id': item.id,
                   'message': item.message,
-                  'timestamp': _dateTimeConverter.encode(item.timestamp)
+                  'isRead': item.isRead ? 1 : 0,
+                  'timestamp': _dateTimeConverter.encode(item.timestamp),
+                  'type': item.type.index
                 },
             changeListener),
         _taskDeletionAdapter = DeletionAdapter(
@@ -125,7 +139,9 @@ class _$TaskDao extends TaskDao {
             (Task item) => <String, Object?>{
                   'id': item.id,
                   'message': item.message,
-                  'timestamp': _dateTimeConverter.encode(item.timestamp)
+                  'isRead': item.isRead ? 1 : 0,
+                  'timestamp': _dateTimeConverter.encode(item.timestamp),
+                  'type': item.type.index
                 },
             changeListener);
 
@@ -146,8 +162,10 @@ class _$TaskDao extends TaskDao {
     return _queryAdapter.query('SELECT * FROM task WHERE id = ?1',
         mapper: (Map<String, Object?> row) => Task(
             row['id'] as int?,
+            (row['isRead'] as int) != 0,
             row['message'] as String,
-            _dateTimeConverter.decode(row['timestamp'] as int)),
+            _dateTimeConverter.decode(row['timestamp'] as int),
+            TaskType.values[row['type'] as int]),
         arguments: [id]);
   }
 
@@ -156,8 +174,10 @@ class _$TaskDao extends TaskDao {
     return _queryAdapter.queryList('SELECT * FROM task',
         mapper: (Map<String, Object?> row) => Task(
             row['id'] as int?,
+            (row['isRead'] as int) != 0,
             row['message'] as String,
-            _dateTimeConverter.decode(row['timestamp'] as int)));
+            _dateTimeConverter.decode(row['timestamp'] as int),
+            TaskType.values[row['type'] as int]));
   }
 
   @override
@@ -165,8 +185,24 @@ class _$TaskDao extends TaskDao {
     return _queryAdapter.queryListStream('SELECT * FROM task',
         mapper: (Map<String, Object?> row) => Task(
             row['id'] as int?,
+            (row['isRead'] as int) != 0,
             row['message'] as String,
-            _dateTimeConverter.decode(row['timestamp'] as int)),
+            _dateTimeConverter.decode(row['timestamp'] as int),
+            TaskType.values[row['type'] as int]),
+        queryableName: 'Task',
+        isView: false);
+  }
+
+  @override
+  Stream<List<Task>> findAllTasksByTypeAsStream(TaskType type) {
+    return _queryAdapter.queryListStream('SELECT * FROM task WHERE type = ?1',
+        mapper: (Map<String, Object?> row) => Task(
+            row['id'] as int?,
+            (row['isRead'] as int) != 0,
+            row['message'] as String,
+            _dateTimeConverter.decode(row['timestamp'] as int),
+            TaskType.values[row['type'] as int]),
+        arguments: [type.index],
         queryableName: 'Task',
         isView: false);
   }
@@ -199,6 +235,24 @@ class _$TaskDao extends TaskDao {
   @override
   Future<void> deleteTasks(List<Task> tasks) async {
     await _taskDeletionAdapter.deleteList(tasks);
+  }
+}
+
+class _$MessagesDao extends MessagesDao {
+  _$MessagesDao(this.database, this.changeListener)
+      : _queryAdapter = QueryAdapter(database);
+
+  final sqflite.DatabaseExecutor database;
+
+  final StreamController<String> changeListener;
+
+  final QueryAdapter _queryAdapter;
+
+  @override
+  Future<List<Message>> findAlMessages() async {
+    return _queryAdapter.queryList('SELECT * FROM messages',
+        mapper: (Map<String, Object?> row) =>
+            Message(row['message'] as String));
   }
 }
 
