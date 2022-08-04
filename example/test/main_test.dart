@@ -1,5 +1,6 @@
 import 'package:example/database.dart';
 import 'package:example/main.dart';
+import 'package:example/messages_dao.dart';
 import 'package:example/task_dao.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -7,10 +8,12 @@ import 'package:flutter_test/flutter_test.dart';
 void main() {
   late FlutterDatabase database;
   late TaskDao taskDao;
+  late MessagesDao messagesDao;
 
   setUp(() async {
     database = await $FloorFlutterDatabase.inMemoryDatabaseBuilder().build();
     taskDao = database.taskDao;
+    messagesDao = database.messagesDao;
   });
 
   tearDown(() async {
@@ -19,7 +22,7 @@ void main() {
 
   testWidgets('Tapping save stores task in database', (tester) async {
     await tester.runAsync(() async {
-      await tester.pumpWidget(FloorApp(taskDao));
+      await tester.pumpWidget(FloorApp(taskDao, messagesDao));
       final textFieldFinder = find.byType(TextField);
       final raisedButtonFinder = find.byType(OutlinedButton);
 
@@ -33,7 +36,7 @@ void main() {
 
   testWidgets('Tapping save clears text input field', (tester) async {
     await tester.runAsync(() async {
-      await tester.pumpWidget(FloorApp(taskDao));
+      await tester.pumpWidget(FloorApp(taskDao, messagesDao));
       final textFieldFinder = find.byType(TextField);
       final raisedButtonFinder = find.byType(OutlinedButton);
 
@@ -49,7 +52,7 @@ void main() {
 
   testWidgets('Tapping save makes task appear in tasks list', (tester) async {
     await tester.runAsync(() async {
-      await tester.pumpWidget(FloorApp(taskDao));
+      await tester.pumpWidget(FloorApp(taskDao, messagesDao));
       final textFieldFinder = find.byType(TextField);
       final raisedButtonFinder = find.byType(OutlinedButton);
       final listViewFinder = find.byType(ListView);

@@ -26,6 +26,8 @@ extension DartTypeChecker on DartType {
 
   bool get isUint8List => _uint8ListTypeChecker.isExactlyType(this);
 
+}
+
 extension StreamTypeChecker on DartType {
   bool get isStream => !isVoid && _streamTypeChecker.isExactlyType(this);
 }

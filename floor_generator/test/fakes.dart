@@ -305,6 +305,16 @@ class FakeClassElement implements ClassElement {
 
   @override
   bool get isDartCoreEnum => throw UnimplementedError();
+
+  @override
+  // TODO: implement enclosingElement2
+  CompilationUnitElement get enclosingElement2 => throw UnimplementedError();
+
+  @override
+  bool isAccessibleIn2(LibraryElement library) {
+    // TODO: implement isAccessibleIn2
+    throw UnimplementedError();
+  }
 }
 
 class FakeFieldElement implements FieldElement {
@@ -508,6 +518,16 @@ class FakeFieldElement implements FieldElement {
 
   @override
   Element get nonSynthetic => throw UnimplementedError();
+
+  @override
+  // TODO: implement enclosingElement2
+  Element get enclosingElement2 => throw UnimplementedError();
+
+  @override
+  bool isAccessibleIn2(LibraryElement library) {
+    // TODO: implement isAccessibleIn2
+    throw UnimplementedError();
+  }
 }
 
 class FakeDartObject implements DartObject {
@@ -577,4 +597,10 @@ class FakeDartObject implements DartObject {
 
   @override
   ParameterizedType? get type => throw UnimplementedError();
+
+  @override
+  VariableElement? get variable {
+    // TODO: implement variable
+    throw UnimplementedError();
+  }
 }
