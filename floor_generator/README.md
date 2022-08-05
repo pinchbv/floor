@@ -2,7 +2,7 @@
 **The typesafe, reactive and lightweight SQLite abstraction for your Flutter applications (iOS, Android, Linux, macOS, Windows)**
 
 This is the dev dependency and contains the annotation processor.
-Please refer to the [floor](https://pub.dartlang.org/packages/floor) package on pub or visit [Github](https://github.com/vitusortner/floor) for more information.
+Please refer to the [floor](https://pub.dartlang.org/packages/floor) package on pub or visit [Github](https://github.com/pinchbv/floor) for more information.
 
 ---
 
@@ -11,11 +11,10 @@ The library's name derives from the following.
 Where *fl* also gives a pointer that the library is used in the Flutter context.
 
 ## Bugs and Feedback
-For bugs, questions and discussions please use [Github Issues](https://github.com/vitusortner/floor/issues).
-For general communication use [floor's Slack](https://join.slack.com/t/floor-flutter/shared_invite/zt-d7i4yhgn-070n~ijDwXVHTpTxcVC47w).
+For bugs, questions and discussions please use [Github Issues](https://github.com/pinchbv/floor/issues).
 
 ## License
-    Copyright 2021 The Floor Project Authors
+    Copyright 2022 The Floor Project Authors
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.

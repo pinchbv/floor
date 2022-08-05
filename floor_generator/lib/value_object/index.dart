@@ -1,3 +1,5 @@
+import 'package:collection/collection.dart';
+
 class Index {
   final String name;
   final String tableName;
@@ -25,7 +27,7 @@ class Index {
           name == other.name &&
           tableName == other.tableName &&
           unique == other.unique &&
-          columnNames == other.columnNames;
+          const ListEquality<String>().equals(columnNames, other.columnNames);
 
   @override
   int get hashCode =>

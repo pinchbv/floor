@@ -1,4 +1,3 @@
-// ignore_for_file: import_of_legacy_library_into_null_safe
 import 'package:code_builder/code_builder.dart';
 import 'package:floor_generator/writer/writer.dart';
 
@@ -39,6 +38,7 @@ class FloorWriter extends Writer {
 
     return Class((builder) => builder
       ..name = '\$Floor$_databaseName'
-      ..methods.addAll([databaseBuilderMethod, inMemoryDatabaseBuilderMethod]));
+      ..methods.addAll([databaseBuilderMethod, inMemoryDatabaseBuilderMethod])
+      ..docs.add('// ignore: avoid_classes_with_only_static_members'));
   }
 }

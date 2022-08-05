@@ -17,6 +17,10 @@ abstract class NameDao {
   @Query('SELECT * FROM names WHERE name LIKE :suffix ORDER BY name ASC')
   Future<List<Name>> findNamesLike(String suffix);
 
+  @Query(
+      'SELECT * FROM names WHERE name LIKE :suffix AND name LIKE :prefix ORDER BY name ASC')
+  Future<List<Name>> findNamesMatchingBoth(String prefix, String suffix);
+
   @Query('SELECT * FROM multiline_query_names WHERE name = :name')
   Future<MultilineQueryName?> findMultilineQueryName(String name);
 }

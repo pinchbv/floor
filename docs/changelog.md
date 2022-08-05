@@ -1,5 +1,60 @@
 # Changelog
 
+## 1.3.0
+
+### Changes
+
+* Remove Slack invite links
+
+### 🛠 Maintenance
+
+* Update Analyzer to 4.1.0
+* Allow release drafter to create GitHub releases
+* Support latest analyzer
+
+## 1.2.0
+
+### Changes
+
+* Improve escaping by using library
+
+### 🐛 Bug Fixes
+
+* Bugfix/nullable transaction return
+
+### 🛠 Maintenance
+
+* Update dependencies
+
+## 1.1.0
+
+All credits for this release go to mqus.
+
+### Changes
+
+* Update deps
+* Increase test coverage
+* Bump locked floor_generator version to 1.0.1
+
+### 🚀 Features
+
+* Add onConfigure callback
+
+### 🐛 Bug Fixes
+
+* Retain index ordering
+
+## 1.0.1
+
+### Changes
+
+* Bump mockito to 5.0.3
+* Update dependencies to null-safe versions
+
+### 🚀 Features
+
+* Improved Parameter mapping for query methods
+
 ## 1.0.0
 
 ### Changes

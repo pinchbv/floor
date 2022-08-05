@@ -1,4 +1,3 @@
-// ignore_for_file: import_of_legacy_library_into_null_safe
 import 'package:code_builder/code_builder.dart';
 import 'package:floor_generator/misc/annotation_expression.dart';
 import 'package:floor_generator/misc/type_utils.dart';
@@ -15,7 +14,7 @@ class TransactionMethodWriter implements Writer {
     return Method((builder) => builder
       ..annotations.add(overrideAnnotationExpression)
       ..returns = refer(method.returnType.getDisplayString(
-        withNullability: false,
+        withNullability: true,
       ))
       ..name = method.name
       ..requiredParameters.addAll(_generateParameters())
@@ -48,7 +47,7 @@ class TransactionMethodWriter implements Writer {
       return Parameter((builder) => builder
         ..name = parameter.name
         ..type = refer(parameter.type.getDisplayString(
-          withNullability: false,
+          withNullability: true,
         )));
     }).toList();
   }

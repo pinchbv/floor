@@ -55,7 +55,7 @@ class EntityProcessor extends QueryableProcessor<Entity> {
   String _getName() {
     return classElement
             .getAnnotation(annotations.Entity)
-            .getField(AnnotationField.entityTableName)
+            ?.getField(AnnotationField.entityTableName)
             ?.toStringValue() ??
         classElement.displayName;
   }
@@ -63,7 +63,7 @@ class EntityProcessor extends QueryableProcessor<Entity> {
   List<ForeignKey> _getForeignKeys() {
     return classElement
             .getAnnotation(annotations.Entity)
-            .getField(AnnotationField.entityForeignKeys)
+            ?.getField(AnnotationField.entityForeignKeys)
             ?.toListValue()
             ?.map((foreignKeyObject) {
           final parentType = foreignKeyObject
@@ -75,7 +75,7 @@ class EntityProcessor extends QueryableProcessor<Entity> {
           final parentName = parentElement is ClassElement
               ? parentElement
                       .getAnnotation(annotations.Entity)
-                      .getField(AnnotationField.entityTableName)
+                      ?.getField(AnnotationField.entityTableName)
                       ?.toStringValue() ??
                   parentType.getDisplayString(withNullability: false)
               : throw _processorError.foreignKeyDoesNotReferenceEntity;
@@ -123,11 +123,11 @@ class EntityProcessor extends QueryableProcessor<Entity> {
     final ftsObject = classElement.getAnnotation(annotations.Fts3);
 
     final tokenizer =
-        ftsObject.getField(Fts3Field.tokenizer)?.toStringValue() ??
+        ftsObject?.getField(Fts3Field.tokenizer)?.toStringValue() ??
             annotations.FtsTokenizer.simple;
 
     final tokenizerArgs = ftsObject
-            .getField(Fts3Field.tokenizerArgs)
+            ?.getField(Fts3Field.tokenizerArgs)
             ?.toListValue()
             ?.mapNotNull((object) => object.toStringValue())
             .toList() ??
@@ -140,11 +140,11 @@ class EntityProcessor extends QueryableProcessor<Entity> {
     final ftsObject = classElement.getAnnotation(annotations.Fts4);
 
     final tokenizer =
-        ftsObject.getField(Fts4Field.tokenizer)?.toStringValue() ??
+        ftsObject?.getField(Fts4Field.tokenizer)?.toStringValue() ??
             annotations.FtsTokenizer.simple;
 
     final tokenizerArgs = ftsObject
-            .getField(Fts4Field.tokenizerArgs)
+            ?.getField(Fts4Field.tokenizerArgs)
             ?.toListValue()
             ?.mapNotNull((object) => object.toStringValue())
             .toList() ??
@@ -156,30 +156,27 @@ class EntityProcessor extends QueryableProcessor<Entity> {
   List<Index> _getIndices(final List<Field> fields, final String tableName) {
     return classElement
             .getAnnotation(annotations.Entity)
-            .getField(AnnotationField.entityIndices)
+            ?.getField(AnnotationField.entityIndices)
             ?.toListValue()
             ?.map((indexObject) {
           final unique = indexObject.getField(IndexField.unique)?.toBoolValue();
           // can't happen as Index.unique is non-nullable
           if (unique == null) throw ArgumentError.notNull();
 
-          final values = indexObject
+          final indexColumnNames = indexObject
               .getField(IndexField.value)
               ?.toListValue()
               ?.mapNotNull((valueObject) => valueObject.toStringValue())
               .toList();
 
-          if (values == null || values.isEmpty) {
+          if (indexColumnNames == null || indexColumnNames.isEmpty) {
             throw _processorError.missingIndexColumnName;
           }
 
-          final indexColumnNames = fields
-              .map((field) => field.columnName)
-              .where((columnName) => values.any((value) => value == columnName))
-              .toList();
-
-          if (indexColumnNames.isEmpty) {
-            throw _processorError.noMatchingColumn(values);
+          for (final indexColumnName in indexColumnNames) {
+            if (!fields.any((field) => field.columnName == indexColumnName)) {
+              throw _processorError.noMatchingColumn(indexColumnName);
+            }
           }
 
           final name = indexObject.getField(IndexField.name)?.toStringValue() ??
@@ -222,7 +219,7 @@ class EntityProcessor extends QueryableProcessor<Entity> {
   PrimaryKey? _getCompoundPrimaryKey(final List<Field> fields) {
     final compoundPrimaryKeyColumnNames = classElement
         .getAnnotation(annotations.Entity)
-        .getField(AnnotationField.entityPrimaryKeys)
+        ?.getField(AnnotationField.entityPrimaryKeys)
         ?.toListValue()
         ?.map((object) => object.toStringValue());
 
@@ -250,7 +247,7 @@ class EntityProcessor extends QueryableProcessor<Entity> {
 
     final autoGenerate = primaryKeyField.fieldElement
             .getAnnotation(annotations.PrimaryKey)
-            .getField(AnnotationField.primaryKeyAutoGenerate)
+            ?.getField(AnnotationField.primaryKeyAutoGenerate)
             ?.toBoolValue() ??
         false;
 
@@ -260,7 +257,7 @@ class EntityProcessor extends QueryableProcessor<Entity> {
   bool _getWithoutRowid() {
     return classElement
             .getAnnotation(annotations.Entity)
-            .getField(AnnotationField.entityWithoutRowid)
+            ?.getField(AnnotationField.entityWithoutRowid)
             ?.toBoolValue() ??
         false;
   }

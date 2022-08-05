@@ -1,6 +1,5 @@
-// ignore_for_file: import_of_legacy_library_into_null_safe
+import 'package:floor_generator/processor/error/change_method_processor_error.dart';
 import 'package:floor_generator/processor/insertion_method_processor.dart';
-import 'package:source_gen/source_gen.dart';
 import 'package:test/test.dart';
 
 import '../test_utils.dart';
@@ -21,17 +20,57 @@ void main() {
     expect(actual, equals('OnConflictStrategy.replace'));
   });
 
-  test('Error on wrong onConflict value', () async {
-    final insertionMethod = await '''
+  group('expected errors', () {
+    test('on wrong onConflict value', () async {
+      final insertionMethod = await '''
       @Insert(onConflict: OnConflictStrategy.doesnotexist)
       Future<void> insertPerson(Person person);
     '''
-        .asDaoMethodElement();
-    final entities = await getPersonEntity();
+          .asDaoMethodElement();
+      final entities = await getPersonEntity();
 
-    final actual =
-        () => InsertionMethodProcessor(insertionMethod, [entities]).process();
+      final actual =
+          () => InsertionMethodProcessor(insertionMethod, [entities]).process();
 
-    expect(actual, throwsA(const TypeMatcher<InvalidGenerationSourceError>()));
+      expect(
+          actual,
+          throwsInvalidGenerationSourceError(
+              ChangeMethodProcessorError(insertionMethod, 'Insertion')
+                  .wrongOnConflictValue));
+    });
+    test('when not returning Future', () async {
+      final insertionMethod = await '''
+      @insert
+      void insertPerson(Person person);
+    '''
+          .asDaoMethodElement();
+      final entities = await getPersonEntity();
+
+      final actual =
+          () => InsertionMethodProcessor(insertionMethod, [entities]).process();
+
+      expect(
+          actual,
+          throwsInvalidGenerationSourceError(
+              ChangeMethodProcessorError(insertionMethod, 'Insertion')
+                  .doesNotReturnFuture));
+    });
+    test('when not returning int or void or List<int>', () async {
+      final insertionMethod = await '''
+      @insert
+      Future<bool> insertPerson(Person person);
+    '''
+          .asDaoMethodElement();
+      final entities = await getPersonEntity();
+
+      final actual =
+          () => InsertionMethodProcessor(insertionMethod, [entities]).process();
+
+      expect(
+          actual,
+          throwsInvalidGenerationSourceError(
+              ChangeMethodProcessorError(insertionMethod, 'Insertion')
+                  .doesNotReturnVoidNorIntNorListInt));
+    });
   });
 }

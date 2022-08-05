@@ -107,12 +107,9 @@ class TaskListCell extends StatelessWidget {
       key: Key('${task.hashCode}'),
       background: Container(color: Colors.red),
       direction: DismissDirection.endToStart,
-      child: Padding(
-        padding: const EdgeInsets.symmetric(
-          vertical: 8,
-          horizontal: 16,
-        ),
-        child: Text(task.message),
+      child: ListTile(
+        leading: Text(task.message),
+        trailing: Text(task.timestamp.toIso8601String()),
       ),
       onDismissed: (_) async {
         await dao.deleteTask(task);
@@ -134,7 +131,7 @@ class TasksTextField extends StatelessWidget {
   TasksTextField({
     Key? key,
     required this.dao,
-  })   : _textEditingController = TextEditingController(),
+  })  : _textEditingController = TextEditingController(),
         super(key: key);
 
   @override
@@ -177,7 +174,7 @@ class TasksTextField extends StatelessWidget {
     if (message.trim().isEmpty) {
       _textEditingController.clear();
     } else {
-      final task = Task(null, message);
+      final task = Task(null, message, DateTime.now());
       await dao.insertTask(task);
       _textEditingController.clear();
     }

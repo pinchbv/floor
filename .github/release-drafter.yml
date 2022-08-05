@@ -3,6 +3,8 @@ categories:
     label: feature
   - title: 🐛 Bug Fixes
     label: fix
+  - title: 🛠 Maintenance
+    label: maintenance
 template: |
   ## Changes
 

@@ -1,6 +1,7 @@
 import 'package:floor/src/migration.dart';
 import 'package:sqflite/sqflite.dart';
 
+// ignore: avoid_classes_with_only_static_members
 abstract class MigrationAdapter {
   /// Runs the given [migrations] for migrating the database schema and data.
   static Future<void> runMigrations(
@@ -12,8 +13,8 @@ abstract class MigrationAdapter {
     final relevantMigrations = migrations
         .where((migration) => migration.startVersion >= startVersion)
         .toList()
-          ..sort((first, second) =>
-              first.startVersion.compareTo(second.startVersion));
+      ..sort(
+          (first, second) => first.startVersion.compareTo(second.startVersion));
 
     if (relevantMigrations.isEmpty ||
         relevantMigrations.last.endVersion != endVersion) {

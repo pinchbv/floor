@@ -1,4 +1,3 @@
-// ignore_for_file: import_of_legacy_library_into_null_safe
 import 'package:code_builder/code_builder.dart';
 import 'package:floor_generator/writer/floor_writer.dart';
 import 'package:test/test.dart';
@@ -14,6 +13,7 @@ void main() {
     final actual = FloorWriter(databaseName).write();
 
     expect(actual, equalsDart(r'''
+      // ignore: avoid_classes_with_only_static_members
       class $FloorFooBar {
         /// Creates a database builder for a persistent database.
         /// Once a database is built, you should keep a reference to it and re-use it.

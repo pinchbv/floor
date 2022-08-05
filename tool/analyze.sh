@@ -7,11 +7,11 @@ flutter analyze
 cd ..
 
 cd floor_annotation
-dartanalyzer --fatal-infos --fatal-warnings .
+dart analyze --fatal-infos --fatal-warnings .
 cd ..
 
 cd floor_generator
-dartanalyzer --fatal-infos --fatal-warnings .
+dart analyze --fatal-infos --fatal-warnings .
 cd ..
 
 cd example

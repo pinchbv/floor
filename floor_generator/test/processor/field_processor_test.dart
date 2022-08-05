@@ -1,4 +1,3 @@
-// ignore_for_file: import_of_legacy_library_into_null_safe
 import 'package:analyzer/dart/element/element.dart';
 import 'package:build_test/build_test.dart';
 import 'package:floor_generator/misc/constants.dart';
@@ -9,6 +8,7 @@ import 'package:source_gen/source_gen.dart';
 import 'package:test/test.dart';
 
 import '../dart_type.dart';
+import '../test_utils.dart';
 
 void main() {
   test('Process field', () async {
@@ -170,6 +170,20 @@ void main() {
     );
     expect(actual, equals(expected));
   });
+  test('Field with unsupported type throws error', () async {
+    final fieldElement = await _generateFieldElement('''
+      final List<int> id;
+    ''');
+
+    expect(
+        FieldProcessor(fieldElement, null).process,
+        throwsInvalidGenerationSourceError(InvalidGenerationSourceError(
+          'Column type is not supported for List<int>.',
+          todo:
+              'Either make to use a supported type or supply a type converter.',
+          element: fieldElement,
+        )));
+  });
 }
 
 Future<FieldElement> _generateFieldElement(final String field) async {
@@ -195,7 +209,10 @@ Future<FieldElement> _generateFieldElement(final String field) async {
         }
       }
       ''', (resolver) async {
-    return LibraryReader(await resolver.findLibraryByName('test'));
+    return resolver
+        .findLibraryByName('test')
+        .then((value) => ArgumentError.checkNotNull(value))
+        .then((value) => LibraryReader(value));
   });
 
   return library.classes.first.fields.first;

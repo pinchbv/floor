@@ -1,3 +1,4 @@
+// ignore: avoid_classes_with_only_static_members
 /// Utility functions for primary key actions
 class PrimaryKeyHelper {
   /// Creates the WHERE clause in order to select the rows to be changed

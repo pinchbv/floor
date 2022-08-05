@@ -1,4 +1,3 @@
-// ignore_for_file: import_of_legacy_library_into_null_safe
 import 'package:code_builder/code_builder.dart';
 import 'package:floor_generator/value_object/transaction_method.dart';
 import 'package:floor_generator/writer/transaction_method_writer.dart';
@@ -83,6 +82,88 @@ void main() {
             final transactionDatabase = _$TestDatabase(changeListener)
               ..database = transaction;
             return transactionDatabase.personDao.replacePersons(persons);
+          });
+        }
+      }
+    '''));
+  });
+
+  test('Generate transaction method with nullable future return', () async {
+    final transactionMethod = await _createTransactionMethod('''
+      @transaction
+      Future<Person>? replacePersons(List<Person> persons) async {
+        return null;
+      }
+    ''');
+
+    final actual = TransactionMethodWriter(transactionMethod).write();
+
+    expect(actual, equalsDart(r'''
+      @override
+      Future<Person>? replacePersons(List<Person> persons) async {
+        if (database is sqflite.Transaction) {
+          return super.replacePersons(persons);
+        } else {
+          return (database as sqflite.Database)
+              .transaction<Person>((transaction) async {
+            final transactionDatabase = _$TestDatabase(changeListener)
+              ..database = transaction;
+            return transactionDatabase.personDao.replacePersons(persons);
+          });
+        }
+      }
+    '''));
+  });
+
+  test('Generate transaction method with nullable return type parameter',
+      () async {
+    final transactionMethod = await _createTransactionMethod('''
+      @transaction
+      Future<Person?> replacePersons(List<Person> persons) async {
+        return null;
+      }
+    ''');
+
+    final actual = TransactionMethodWriter(transactionMethod).write();
+
+    expect(actual, equalsDart(r'''
+      @override
+      Future<Person?> replacePersons(List<Person> persons) async {
+        if (database is sqflite.Transaction) {
+          return super.replacePersons(persons);
+        } else {
+          return (database as sqflite.Database)
+              .transaction<Person>((transaction) async {
+            final transactionDatabase = _$TestDatabase(changeListener)
+              ..database = transaction;
+            return transactionDatabase.personDao.replacePersons(persons);
+          });
+        }
+      }
+    '''));
+  });
+
+  test('Generate transaction method with nullable parameter', () async {
+    final transactionMethod = await _createTransactionMethod('''
+      @transaction
+      Future<Person>? replacePersons(Person? person) async {
+        return null;
+      }
+    ''');
+
+    final actual = TransactionMethodWriter(transactionMethod).write();
+
+    expect(actual, equalsDart(r'''
+      @override
+      Future<Person>? replacePersons(Person? person) async {
+        if (database is sqflite.Transaction) {
+          return super.replacePersons(person);
+        } else {
+          return (database as sqflite.Database)
+              .transaction<Person>((transaction) async {
+            final transactionDatabase = _$TestDatabase(changeListener)
+              ..database = transaction;
+            return transactionDatabase.personDao.replacePersons(person);
           });
         }
       }

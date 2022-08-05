@@ -6,6 +6,7 @@ part of 'database.dart';
 // FloorGenerator
 // **************************************************************************
 
+// ignore: avoid_classes_with_only_static_members
 class $FloorFlutterDatabase {
   /// Creates a database builder for a persistent database.
   /// Once a database is built, you should keep a reference to it and re-use it.
@@ -68,6 +69,7 @@ class _$FlutterDatabase extends FlutterDatabase {
       version: 1,
       onConfigure: (database) async {
         await database.execute('PRAGMA foreign_keys = ON');
+        await callback?.onConfigure?.call(database);
       },
       onOpen: (database) async {
         await callback?.onOpen?.call(database);
@@ -80,7 +82,7 @@ class _$FlutterDatabase extends FlutterDatabase {
       },
       onCreate: (database, version) async {
         await database.execute(
-            'CREATE TABLE IF NOT EXISTS `Task` (`id` INTEGER PRIMARY KEY AUTOINCREMENT, `message` TEXT NOT NULL)');
+            'CREATE TABLE IF NOT EXISTS `Task` (`id` INTEGER PRIMARY KEY AUTOINCREMENT, `message` TEXT NOT NULL, `timestamp` INTEGER NOT NULL)');
 
         await callback?.onCreate?.call(database, version);
       },
@@ -100,22 +102,31 @@ class _$TaskDao extends TaskDao {
         _taskInsertionAdapter = InsertionAdapter(
             database,
             'Task',
-            (Task item) =>
-                <String, Object?>{'id': item.id, 'message': item.message},
+            (Task item) => <String, Object?>{
+                  'id': item.id,
+                  'message': item.message,
+                  'timestamp': _dateTimeConverter.encode(item.timestamp)
+                },
             changeListener),
         _taskUpdateAdapter = UpdateAdapter(
             database,
             'Task',
             ['id'],
-            (Task item) =>
-                <String, Object?>{'id': item.id, 'message': item.message},
+            (Task item) => <String, Object?>{
+                  'id': item.id,
+                  'message': item.message,
+                  'timestamp': _dateTimeConverter.encode(item.timestamp)
+                },
             changeListener),
         _taskDeletionAdapter = DeletionAdapter(
             database,
             'Task',
             ['id'],
-            (Task item) =>
-                <String, Object?>{'id': item.id, 'message': item.message},
+            (Task item) => <String, Object?>{
+                  'id': item.id,
+                  'message': item.message,
+                  'timestamp': _dateTimeConverter.encode(item.timestamp)
+                },
             changeListener);
 
   final sqflite.DatabaseExecutor database;
@@ -132,26 +143,32 @@ class _$TaskDao extends TaskDao {
 
   @override
   Future<Task?> findTaskById(int id) async {
-    return _queryAdapter.query('SELECT * FROM task WHERE id = ?',
-        arguments: [id],
-        mapper: (Map<String, Object?> row) =>
-            Task(row['id'] as int?, row['message'] as String));
+    return _queryAdapter.query('SELECT * FROM task WHERE id = ?1',
+        mapper: (Map<String, Object?> row) => Task(
+            row['id'] as int?,
+            row['message'] as String,
+            _dateTimeConverter.decode(row['timestamp'] as int)),
+        arguments: [id]);
   }
 
   @override
   Future<List<Task>> findAllTasks() async {
     return _queryAdapter.queryList('SELECT * FROM task',
-        mapper: (Map<String, Object?> row) =>
-            Task(row['id'] as int?, row['message'] as String));
+        mapper: (Map<String, Object?> row) => Task(
+            row['id'] as int?,
+            row['message'] as String,
+            _dateTimeConverter.decode(row['timestamp'] as int)));
   }
 
   @override
   Stream<List<Task>> findAllTasksAsStream() {
     return _queryAdapter.queryListStream('SELECT * FROM task',
+        mapper: (Map<String, Object?> row) => Task(
+            row['id'] as int?,
+            row['message'] as String,
+            _dateTimeConverter.decode(row['timestamp'] as int)),
         queryableName: 'Task',
-        isView: false,
-        mapper: (Map<String, Object?> row) =>
-            Task(row['id'] as int?, row['message'] as String));
+        isView: false);
   }
 
   @override
@@ -194,3 +211,6 @@ class _$TaskDao extends TaskDao {
     await _taskDeletionAdapter.deleteList(tasks);
   }
 }
+
+// ignore_for_file: unused_element
+final _dateTimeConverter = DateTimeConverter();

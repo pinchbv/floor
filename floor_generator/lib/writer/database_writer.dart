@@ -1,6 +1,6 @@
-// ignore_for_file: import_of_legacy_library_into_null_safe
 import 'package:code_builder/code_builder.dart';
 import 'package:floor_generator/misc/annotation_expression.dart';
+import 'package:floor_generator/misc/extension/string_extension.dart';
 import 'package:floor_generator/value_object/database.dart';
 import 'package:floor_generator/value_object/entity.dart';
 import 'package:floor_generator/writer/writer.dart';
@@ -69,18 +69,18 @@ class DatabaseWriter implements Writer {
   }
 
   Method _generateOpenMethod(final Database database) {
-    final createTableStatements =
-        _generateCreateTableSqlStatements(database.entities)
-            .map((statement) => "await database.execute('$statement');")
-            .join('\n');
+    final createTableStatements = _generateCreateTableSqlStatements(
+            database.entities)
+        .map((statement) => 'await database.execute(${statement.toLiteral()});')
+        .join('\n');
     final createIndexStatements = database.entities
         .map((entity) => entity.indices.map((index) => index.createQuery()))
         .expand((statements) => statements)
-        .map((statement) => "await database.execute('$statement');")
+        .map((statement) => 'await database.execute(${statement.toLiteral()});')
         .join('\n');
     final createViewStatements = database.views
-        .map((view) => view.getCreateViewStatement())
-        .map((statement) => "await database.execute('''$statement''');")
+        .map((view) => view.getCreateViewStatement().toLiteral())
+        .map((statement) => 'await database.execute($statement);')
         .join('\n');
 
     final pathParameter = Parameter((builder) => builder
@@ -104,6 +104,7 @@ class DatabaseWriter implements Writer {
             version: ${database.version},
             onConfigure: (database) async {
               await database.execute('PRAGMA foreign_keys = ON');
+              await callback?.onConfigure?.call(database);
             },
             onOpen: (database) async {
               await callback?.onOpen?.call(database);

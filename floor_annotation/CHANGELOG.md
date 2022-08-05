@@ -1,6 +1,22 @@
 # Changelog
 
-# 1.0.0
+## 1.3.0
+
+### Changes
+
+* Remove Slack invite links
+
+### 🛠 Maintenance
+
+* Update Analyzer to 4.1.0
+* Allow release drafter to create GitHub releases
+* Support latest analyzer
+
+## 1.0.1
+
+* Update dependencies
+
+## 1.0.0
 
 ### Changes
 
@@ -10,52 +26,52 @@
 
 * Make floor null-safe
 
-# 0.12.0
+## 0.12.0
 
 * Add `@Fts3` and `@Fts4` annotations
 
-# 0.11.0
+## 0.11.0
 
 * Change `ForeignKeyAction` int constants to enum
 
-# 0.10.0
+## 0.10.0
 
 * Add experimental `TypeConverter` abstract class and `TypeConverters` annotation
 
-# 0.9.0
+## 0.9.0
 
 * Update meta package
 
-# 0.8.0
+## 0.8.0
 
 **⚠️ You need to migrate the explicit usages of `OnConflictStrategy` and `ForeignKeyAction` from
 snake case to camel case.**
 
 * Apply camel case to constants
 
-# 0.7.0
+## 0.7.0
 
 * Add @DatabaseView annotation
 
-# 0.6.0
+## 0.6.0
 
 * Add @ignore annotation
 
-# 0.5.0
+## 0.5.0
 
 * Update dependency
 
-# 0.4.0
+## 0.4.0
 
 * Add primary key field to @Entity annotation
 
-# 0.3.1
+## 0.3.1
 
 ### Changes
 
 * Revert meta package to version 1.1.6
 
-# 0.3.0
+## 0.3.0
 
 ### Changes
 
@@ -72,7 +88,7 @@ snake case to camel case.**
 
 * Correct mapper instance name referenced by generated query methods
 
-# 0.2.0
+## 0.2.0
 
 ### Changes
 
@@ -91,7 +107,7 @@ snake case to camel case.**
 * Add entity classes to database annotation
 * Add support for indices
 
-# 0.1.0
+## 0.1.0
 
 ### 🚀 Features
 
