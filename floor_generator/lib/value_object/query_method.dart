@@ -15,7 +15,7 @@ class QueryMethod {
   final String name;
 
   /// Query where the parameter mapping is stored.
-  final Query query;
+  final Query? query;
 
   final DartType rawReturnType;
 

@@ -131,7 +131,8 @@ class TasksTextField extends StatelessWidget {
   TasksTextField({
     Key? key,
     required this.dao,
-  })  : _textEditingController = TextEditingController(),
+  })
+      : _textEditingController = TextEditingController(),
         super(key: key);
 
   @override
@@ -171,7 +172,9 @@ class TasksTextField extends StatelessWidget {
 
   Future<void> _persistMessage() async {
     final message = _textEditingController.text;
-    if (message.trim().isEmpty) {
+    if (message
+        .trim()
+        .isEmpty) {
       _textEditingController.clear();
     } else {
       final task = Task(null, message, DateTime.now());

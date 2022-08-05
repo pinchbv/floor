@@ -89,8 +89,8 @@ void main() {
       final actual =
           QueryMethodProcessor(methodElement, [], {}).process().query;
 
-      expect(actual.sql, equals('SELECT * FROM Person WHERE id = ?1'));
-      expect(actual.listParameters, equals(<ListParameter>[]));
+      expect(actual?.sql, equals('SELECT * FROM Person WHERE id = ?1'));
+      expect(actual?.listParameters, equals(<ListParameter>[]));
     });
 
     test('parse query reusing a single parameter', () async {
@@ -100,7 +100,7 @@ void main() {
     ''');
 
       final actual =
-          QueryMethodProcessor(methodElement, [], {}).process().query.sql;
+          QueryMethodProcessor(methodElement, [], {}).process().query?.sql;
 
       expect(actual, equals('SELECT * FROM Person WHERE id = ?1 AND id = ?1'));
     });
@@ -112,7 +112,7 @@ void main() {
     ''');
 
       final actual =
-          QueryMethodProcessor(methodElement, [], {}).process().query.sql;
+          QueryMethodProcessor(methodElement, [], {}).process().query?.sql;
 
       expect(
           actual,
@@ -130,7 +130,7 @@ void main() {
       """);
 
       final actual =
-          QueryMethodProcessor(methodElement, [], {}).process().query.sql;
+          QueryMethodProcessor(methodElement, [], {}).process().query?.sql;
 
       expect(
         actual,
@@ -147,7 +147,7 @@ void main() {
       ''');
 
       final actual =
-          QueryMethodProcessor(methodElement, [], {}).process().query.sql;
+          QueryMethodProcessor(methodElement, [], {}).process().query?.sql;
 
       expect(
         actual,
@@ -165,10 +165,10 @@ void main() {
           QueryMethodProcessor(methodElement, [], {}).process().query;
 
       expect(
-        actual.sql,
+        actual?.sql,
         equals(r'update sports set rated = 1 where id in (:varlist)'),
       );
-      expect(actual.listParameters, equals([ListParameter(41, 'ids')]));
+      expect(actual?.listParameters, equals([ListParameter(41, 'ids')]));
     });
 
     test('parses IN clause without space after IN', () async {
@@ -181,10 +181,10 @@ void main() {
           QueryMethodProcessor(methodElement, [], {}).process().query;
 
       expect(
-        actual.sql,
+        actual?.sql,
         equals(r'update sports set rated = 1 where id in(:varlist)'),
       );
-      expect(actual.listParameters, equals([ListParameter(40, 'ids')]));
+      expect(actual?.listParameters, equals([ListParameter(40, 'ids')]));
     });
 
     test('parses IN clause with multiple spaces after IN', () async {
@@ -197,10 +197,10 @@ void main() {
           QueryMethodProcessor(methodElement, [], {}).process().query;
 
       expect(
-        actual.sql,
+        actual?.sql,
         equals(r'update sports set rated = 1 where id in      (:varlist)'),
       );
-      expect(actual.listParameters, equals([ListParameter(46, 'ids')]));
+      expect(actual?.listParameters, equals([ListParameter(46, 'ids')]));
     });
 
     test('Parse query with multiple IN clauses', () async {
@@ -213,13 +213,13 @@ void main() {
           QueryMethodProcessor(methodElement, [], {}).process().query;
 
       expect(
-        actual.sql,
+        actual?.sql,
         equals(
           r'update sports set rated = 1 where id in (:varlist) '
           r'and where foo in (:varlist)',
         ),
       );
-      expect(actual.listParameters,
+      expect(actual?.listParameters,
           equals([ListParameter(41, 'ids'), ListParameter(69, 'bar')]));
     });
 
@@ -233,13 +233,13 @@ void main() {
           QueryMethodProcessor(methodElement, [], {}).process().query;
 
       expect(
-        actual.sql,
+        actual?.sql,
         equals(
           r'update sports set rated = 1 where id in (:varlist) '
           r'AND foo = ?1',
         ),
       );
-      expect(actual.listParameters, equals([ListParameter(41, 'ids')]));
+      expect(actual?.listParameters, equals([ListParameter(41, 'ids')]));
     });
 
     test('Parse query with mixed IN clauses and other parameters', () async {
@@ -252,13 +252,13 @@ void main() {
           QueryMethodProcessor(methodElement, [], {}).process().query;
 
       expect(
-        actual.sql,
+        actual?.sql,
         equals(
           r'update sports set rated = 1 where id in (:varlist) AND foo = ?2 '
           r'AND name in (:varlist) and ?2 = ?1',
         ),
       );
-      expect(actual.listParameters,
+      expect(actual?.listParameters,
           equals([ListParameter(41, 'ids'), ListParameter(77, 'names')]));
     });
 
@@ -269,7 +269,7 @@ void main() {
     ''');
 
       final actual =
-          QueryMethodProcessor(methodElement, [], {}).process().query.sql;
+          QueryMethodProcessor(methodElement, [], {}).process().query?.sql;
 
       expect(actual, equals('SELECT * FROM Persons WHERE name LIKE ?1'));
     });
@@ -281,7 +281,7 @@ void main() {
     ''');
 
       final actual =
-          QueryMethodProcessor(methodElement, [], {}).process().query.sql;
+          QueryMethodProcessor(methodElement, [], {}).process().query?.sql;
       // note: this will throw an error at runtime, because
       // sqlite variables can not be used in place of table
       // names. But the Processor is not aware of this.

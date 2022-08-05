@@ -96,11 +96,7 @@ class DaoProcessor extends Processor<Dao> {
           typeConverters,
         ).process();
       } else {
-        return RawQueryMethodProcessor(
-          method,
-          [..._entities, ..._views],
-          typeConverters,
-        ).process();
+        return RawQueryMethodProcessor(method, [..._entities, ..._views],).process();
       }
     }).toList();
   }

@@ -1,7 +1,9 @@
 import 'dart:core';
 
+import 'package:analyzer/dart/element/element.dart';
 import 'package:analyzer/dart/element/type.dart';
 import 'package:code_builder/code_builder.dart';
+import 'package:collection/collection.dart';
 import 'package:floor_generator/misc/annotation_expression.dart';
 import 'package:floor_generator/misc/extension/string_extension.dart';
 import 'package:floor_generator/misc/extension/type_converters_extension.dart';
@@ -145,11 +147,17 @@ class QueryMethodWriter implements Writer {
     return parameters.isNotEmpty ? '[${parameters.join(', ')}]' : null;
   }
 
-  String _generateQueryString() {
+  String? _generateQueryString() {
+    final query = _queryMethod.query;
+    if (query == null) {
+      return null;
+    }
+
     final code = StringBuffer();
     int start = 0;
-    final originalQuery = _queryMethod.query.sql;
-    for (final listParameter in _queryMethod.query.listParameters) {
+
+    final originalQuery = query.sql;
+    for (final listParameter in query.listParameters) {
       code.write(
           originalQuery.substring(start, listParameter.position).toLiteral());
       code.write(' + _sqliteVariablesFor${listParameter.name.capitalize()} + ');
@@ -160,20 +168,44 @@ class QueryMethodWriter implements Writer {
     return code.toString();
   }
 
-  String _generateNoReturnQuery(final String query, final String? arguments) {
-    final parameters = StringBuffer(query);
-    if (arguments != null) parameters.write(', arguments: $arguments');
+  String _generateNoReturnQuery(final String? query, final String? arguments) {
+    // TODO duplicate. Refactor it.
+    final parameters = StringBuffer();
+    final ParameterElement? parameter = _queryMethod.parameters.firstOrNull;
+    if (query != null) {
+      parameters.write(query);
+      if (arguments != null) parameters.write(', arguments: $arguments');
+    } else if (parameter?.type.isSQLiteQuery == true) {
+      parameters
+        ..write('${parameter!.name}.query, ')
+        ..write('arguments: ${parameter.name}.arguments');
+    } else {
+      throw ArgumentError('Neither @Query nor @RawQuery can be defined.');
+    }
     return 'await _queryAdapter.queryNoReturn($parameters);';
   }
 
   String _generateQuery(
-    final String query,
+    final String? query,
     final String? arguments,
     final Queryable queryable,
   ) {
     final mapper = _generateMapper(queryable);
-    final parameters = StringBuffer(query)..write(', mapper: $mapper');
-    if (arguments != null) parameters.write(', arguments: $arguments');
+    final parameters = StringBuffer();
+    // TODO duplicate. Refactor it.
+    final ParameterElement? parameter = _queryMethod.parameters.firstOrNull;
+
+    if (query != null) {
+      parameters.write(query);
+      if (arguments != null) parameters.write(', arguments: $arguments');
+    } else if (parameter?.type.isSQLiteQuery == true) {
+      parameters
+        ..write('${parameter!.name}.query, ')
+        ..write('arguments: ${parameter.name}.arguments');
+    } else {
+      throw ArgumentError('Neither @Query nor @RawQuery can be defined.');
+    }
+    parameters..write(', mapper: $mapper');
 
     if (_queryMethod.returnsStream) {
       // for streamed queries, we need to provide the queryable to know which
@@ -188,9 +220,9 @@ class QueryMethodWriter implements Writer {
 
     return 'return _queryAdapter.query$list$stream($parameters);';
   }
-}
 
-String _generateMapper(Queryable queryable) {
-  final constructor = queryable.constructor;
-  return '(Map<String, Object?> row) => $constructor';
+  String _generateMapper(Queryable queryable) {
+    final constructor = queryable.constructor;
+    return '(Map<String, Object?> row) => $constructor';
+  }
 }

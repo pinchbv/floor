@@ -15,6 +15,18 @@ abstract class TaskDao {
   @rawQuery
   Stream<List<Task>> rawFindAllTasksAsStream(SQLiteQuery query);
 
+  @rawQuery
+  Future<List<Task>> rawFindAllTasks(SQLiteQuery query);
+
+  @rawQuery
+  Stream<Task?> rawFindTaskAsStream(SQLiteQuery query);
+
+  @rawQuery
+  Future<Task?> rawFindTask(SQLiteQuery query);
+
+  @rawQuery
+  Future<void> rawInsertionTask(SQLiteQuery query);
+
   @insert
   Future<void> insertTask(Task task);
 
