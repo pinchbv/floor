@@ -169,20 +169,10 @@ class QueryMethodWriter implements Writer {
   }
 
   String _generateNoReturnQuery(final String? query, final String? arguments) {
-    // TODO duplicate. Refactor it.
-    final parameters = StringBuffer();
-    final ParameterElement? parameter = _queryMethod.parameters.firstOrNull;
-    if (query != null) {
-      parameters.write(query);
-      if (arguments != null) parameters.write(', arguments: $arguments');
-    } else if (parameter?.type.isSQLiteQuery == true) {
-      parameters
-        ..write('${parameter!.name}.query, ')
-        ..write('arguments: ${parameter.name}.arguments');
-    } else {
-      throw ArgumentError('Neither @Query nor @RawQuery can be defined.');
-    }
-    return 'await _queryAdapter.queryNoReturn($parameters);';
+    return 'await _queryAdapter.queryNoReturn(${_generateParametersStringBuffer(
+      query,
+      arguments,
+    )});';
   }
 
   String _generateQuery(
@@ -190,22 +180,8 @@ class QueryMethodWriter implements Writer {
     final String? arguments,
     final Queryable queryable,
   ) {
-    final mapper = _generateMapper(queryable);
-    final parameters = StringBuffer();
-    // TODO duplicate. Refactor it.
-    final ParameterElement? parameter = _queryMethod.parameters.firstOrNull;
-
-    if (query != null) {
-      parameters.write(query);
-      if (arguments != null) parameters.write(', arguments: $arguments');
-    } else if (parameter?.type.isSQLiteQuery == true) {
-      parameters
-        ..write('${parameter!.name}.query, ')
-        ..write('arguments: ${parameter.name}.arguments');
-    } else {
-      throw ArgumentError('Neither @Query nor @RawQuery can be defined.');
-    }
-    parameters..write(', mapper: $mapper');
+    final parameters = _generateParametersStringBuffer(query, arguments)
+      ..write(', mapper: ${_generateMapper(queryable)}');
 
     if (_queryMethod.returnsStream) {
       // for streamed queries, we need to provide the queryable to know which
@@ -219,6 +195,24 @@ class QueryMethodWriter implements Writer {
     final stream = _queryMethod.returnsStream ? 'Stream' : '';
 
     return 'return _queryAdapter.query$list$stream($parameters);';
+  }
+
+  StringBuffer _generateParametersStringBuffer(
+      String? query, String? arguments) {
+    final parameters = StringBuffer();
+    final ParameterElement? parameter = _queryMethod.parameters.firstOrNull;
+
+    if (query != null) {
+      parameters.write(query);
+      if (arguments != null) parameters.write(', arguments: $arguments');
+    } else if (parameter?.type.isSQLiteQuery == true) {
+      parameters
+        ..write('${parameter!.name}.query, ')
+        ..write('arguments: ${parameter.name}.arguments');
+    } else {
+      throw ArgumentError('Neither @Query nor @RawQuery can be defined.');
+    }
+    return parameters;
   }
 
   String _generateMapper(Queryable queryable) {
