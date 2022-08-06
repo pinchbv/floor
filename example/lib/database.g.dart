@@ -144,11 +144,11 @@ class _$TaskDao extends TaskDao {
   @override
   Future<Task?> findTaskById(int id) async {
     return _queryAdapter.query('SELECT * FROM task WHERE id = ?1',
+        arguments: [id],
         mapper: (Map<String, Object?> row) => Task(
             row['id'] as int?,
             row['message'] as String,
-            _dateTimeConverter.decode(row['timestamp'] as int)),
-        arguments: [id]);
+            _dateTimeConverter.decode(row['timestamp'] as int)));
   }
 
   @override
@@ -163,6 +163,18 @@ class _$TaskDao extends TaskDao {
   @override
   Stream<List<Task>> findAllTasksAsStream() {
     return _queryAdapter.queryListStream('SELECT * FROM task',
+        mapper: (Map<String, Object?> row) => Task(
+            row['id'] as int?,
+            row['message'] as String,
+            _dateTimeConverter.decode(row['timestamp'] as int)),
+        queryableName: 'Task',
+        isView: false);
+  }
+
+  @override
+  Stream<List<Task>> rawQueryTasksAsStream(SQLiteQuery query) {
+    return _queryAdapter.queryListStream(query.query,
+        arguments: query.arguments,
         mapper: (Map<String, Object?> row) => Task(
             row['id'] as int?,
             row['message'] as String,

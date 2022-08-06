@@ -78,7 +78,7 @@ extension on DartType {
       return SqlType.integer;
     } else if (isDartCoreDouble) {
       return SqlType.real;
-    } else if (isUint8List) {
+    } else if (isUint8List || isSQLiteQuery) {
       return SqlType.blob;
     }
     throw StateError('This should really be unreachable');

@@ -12,6 +12,23 @@ abstract class TaskDao {
   @Query('SELECT * FROM task')
   Stream<List<Task>> findAllTasksAsStream();
 
+  @rawQuery
+  Stream<List<Task>> rawQueryTasksAsStream(SQLiteQuery query);
+
+  Stream<List<Task>> findYesterdaysTasksByMessageAsStream(String message) {
+    final timestamp = DateTime.now()
+        .subtract(
+          const Duration(days: 1),
+        )
+        .millisecondsSinceEpoch;
+    return rawQueryTasksAsStream(SQLiteQuery(
+        'SELECT * FROM task WHERE timestamp > ?1 AND message == ?2',
+        arguments: [
+          timestamp,
+          message,
+        ]));
+  }
+
   @insert
   Future<void> insertTask(Task task);
 
