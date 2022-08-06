@@ -60,7 +60,7 @@ void main() {
     expect(actual, equalsDart(r'''
       @override
       Future<Person?> findById(int id) async {
-        return _queryAdapter.query('SELECT * FROM Person WHERE id = ?1', mapper: (Map<String, Object?> row) => Person(row['id'] as int, row['name'] as String), arguments: [id]);
+        return _queryAdapter.query('SELECT * FROM Person WHERE id = ?1', arguments: [id], mapper: (Map<String, Object?> row) => Person(row['id'] as int, row['name'] as String));
       }
     '''));
   });
@@ -84,7 +84,7 @@ void main() {
       expect(actual, equalsDart(r'''
       @override
       Future<Order?> findById(int id) async {
-        return _queryAdapter.query('SELECT * FROM Order WHERE id = ?1', mapper: (Map<String, Object?> row) => Order(row['id'] as int, _dateTimeConverter.decode(row['dateTime'] as int)), arguments: [id]);
+        return _queryAdapter.query('SELECT * FROM Order WHERE id = ?1', arguments: [id], mapper: (Map<String, Object?> row) => Order(row['id'] as int, _dateTimeConverter.decode(row['dateTime'] as int)));
       }
     '''));
     });
@@ -108,7 +108,7 @@ void main() {
       expect(actual, equalsDart(r'''
       @override
       Future<Order?> findByDateTime(DateTime dateTime) async {
-        return _queryAdapter.query('SELECT * FROM Order WHERE dateTime = ?1', mapper: (Map<String, Object?> row) => Order(row['id'] as int, _externalTypeConverter.decode(row['dateTime'] as int)), arguments: [_dateTimeConverter.encode(dateTime)]);
+        return _queryAdapter.query('SELECT * FROM Order WHERE dateTime = ?1', arguments: [_dateTimeConverter.encode(dateTime)], mapper: (Map<String, Object?> row) => Order(row['id'] as int, _externalTypeConverter.decode(row['dateTime'] as int)));
       }
     '''));
     });
@@ -132,7 +132,7 @@ void main() {
       expect(actual, equalsDart(r'''
       @override
       Future<Order?> findByDateTime(DateTime dateTime) async {
-        return _queryAdapter.query('SELECT * FROM Order WHERE dateTime = ?1', mapper: (Map<String, Object?> row) => Order(row['id'] as int, _externalTypeConverter.decode(row['dateTime'] as int)), arguments: [_dateTimeConverter.encode(dateTime)]);
+        return _queryAdapter.query('SELECT * FROM Order WHERE dateTime = ?1', arguments: [_dateTimeConverter.encode(dateTime)], mapper: (Map<String, Object?> row) => Order(row['id'] as int, _externalTypeConverter.decode(row['dateTime'] as int)));
       }
     '''));
     });
@@ -158,9 +158,9 @@ void main() {
       Future<List<Order>> findByDates(List<DateTime> dates) async {
         const offset = 1;
         final _sqliteVariablesForDates=Iterable<String>.generate(dates.length, (i)=>'?${i+offset}').join(',');
-        return _queryAdapter.queryList('SELECT * FROM Order WHERE date IN (' + _sqliteVariablesForDates + ')', 
-          mapper: (Map<String, Object?> row) => Order(row['id'] as int, _dateTimeConverter.decode(row['dateTime'] as int)),
-          arguments: [...dates.map((element) => _dateTimeConverter.encode(element))]);
+        return _queryAdapter.queryList('SELECT * FROM Order WHERE date IN (' + _sqliteVariablesForDates + ')',
+          arguments: [...dates.map((element) => _dateTimeConverter.encode(element))], 
+          mapper: (Map<String, Object?> row) => Order(row['id'] as int, _dateTimeConverter.decode(row['dateTime'] as int)));
       }
     '''));
     });
@@ -190,9 +190,9 @@ void main() {
         final _sqliteVariablesForIds=Iterable<String>.generate(ids.length, (i)=>'?${i+offset}').join(',');
         offset += ids.length;
         final _sqliteVariablesForDateTimeList=Iterable<String>.generate(dateTimeList.length, (i)=>'?${i+offset}').join(',');
-        return _queryAdapter.queryList('SELECT * FROM Order WHERE id IN (' + _sqliteVariablesForIds + ') AND id IN (' + _sqliteVariablesForDateTimeList + ') OR foo in (' + _sqliteVariablesForIds + ') AND bar = ?2 OR name = ?1', 
-          mapper: (Map<String, Object?> row) => Order(row['id'] as int, _dateTimeConverter.decode(row['dateTime'] as int)),
-          arguments: [name, _dateTimeConverter.encode(foo), ...ids, ...dateTimeList.map((element) => _dateTimeConverter.encode(element))]);
+        return _queryAdapter.queryList('SELECT * FROM Order WHERE id IN (' + _sqliteVariablesForIds + ') AND id IN (' + _sqliteVariablesForDateTimeList + ') OR foo in (' + _sqliteVariablesForIds + ') AND bar = ?2 OR name = ?1',
+          arguments: [name, _dateTimeConverter.encode(foo), ...ids, ...dateTimeList.map((element) => _dateTimeConverter.encode(element))], 
+          mapper: (Map<String, Object?> row) => Order(row['id'] as int, _dateTimeConverter.decode(row['dateTime'] as int)));
       }
     '''));
   });
@@ -208,7 +208,7 @@ void main() {
     expect(actual, equalsDart(r'''
       @override
       Future<List<Person>> findWithFlag(bool flag) async {
-        return _queryAdapter.queryList('SELECT * FROM Person WHERE flag = ?1', mapper: (Map<String, Object?> row) => Person(row['id'] as int, row['name'] as String), arguments: [flag ? 1 : 0]);
+        return _queryAdapter.queryList('SELECT * FROM Person WHERE flag = ?1', arguments: [flag ? 1 : 0], mapper: (Map<String, Object?> row) => Person(row['id'] as int, row['name'] as String));
       }
     '''));
   });
@@ -224,7 +224,7 @@ void main() {
     expect(actual, equalsDart(r'''
       @override
       Future<Person?> findById(int id, String name) async {
-        return _queryAdapter.query('SELECT * FROM Person WHERE id = ?1 AND name = ?2', mapper: (Map<String, Object?> row) => Person(row['id'] as int, row['name'] as String), arguments: [id, name]);
+        return _queryAdapter.query('SELECT * FROM Person WHERE id = ?1 AND name = ?2', arguments: [id, name], mapper: (Map<String, Object?> row) => Person(row['id'] as int, row['name'] as String));
       }
     '''));
   });
@@ -240,7 +240,7 @@ void main() {
     expect(actual, equalsDart(r'''
       @override
       Future<Person?> findById(int id, String name, String bar) async {
-        return _queryAdapter.query('SELECT * FROM Person WHERE foo = ?3 AND id = ?1 AND name = ?2 AND name = ?3', mapper: (Map<String, Object?> row) => Person(row['id'] as int, row['name'] as String), arguments: [id, name, bar]);
+        return _queryAdapter.query('SELECT * FROM Person WHERE foo = ?3 AND id = ?1 AND name = ?2 AND name = ?3', arguments: [id, name, bar], mapper: (Map<String, Object?> row) => Person(row['id'] as int, row['name'] as String));
       }
     '''));
   });
@@ -272,7 +272,7 @@ void main() {
     expect(actual, equalsDart(r'''
       @override
       Stream<Person?> findByIdAsStream(int id) {
-        return _queryAdapter.queryStream('SELECT * FROM Person WHERE id = ?1', mapper: (Map<String, Object?> row) => Person(row['id'] as int, row['name'] as String), arguments: [id], queryableName: 'Person', isView: false);
+        return _queryAdapter.queryStream('SELECT * FROM Person WHERE id = ?1', arguments: [id], mapper: (Map<String, Object?> row) => Person(row['id'] as int, row['name'] as String), queryableName: 'Person', isView: false);
       }
     '''));
   });
@@ -323,8 +323,8 @@ void main() {
         const offset = 1;
         final _sqliteVariablesForIds=Iterable<String>.generate(ids.length, (i)=>'?${i+offset}').join(',');
         return _queryAdapter.queryList('SELECT * FROM Person WHERE id IN (' + _sqliteVariablesForIds + ')', 
-          mapper: (Map<String, Object?> row) => Person(row['id'] as int, row['name'] as String), 
-          arguments: [...ids]);
+          arguments: [...ids], 
+          mapper: (Map<String, Object?> row) => Person(row['id'] as int, row['name'] as String));
      }
     '''));
   });
@@ -343,8 +343,8 @@ void main() {
         const offset = 1;
         final _sqliteVariablesForIds=Iterable<String>.generate(ids.length, (i)=>'?${i+offset}').join(',');
         return _queryAdapter.queryList('SELECT * FROM Person WHERE id IN(' + _sqliteVariablesForIds + ')',
-          mapper: (Map<String, Object?> row) => Person(row['id'] as int, row['name'] as String),
-          arguments: [...ids]);
+          arguments: [...ids],
+          mapper: (Map<String, Object?> row) => Person(row['id'] as int, row['name'] as String));
       }
     '''));
   });
@@ -365,8 +365,8 @@ void main() {
         offset += ids.length;
         final _sqliteVariablesForIdx=Iterable<String>.generate(idx.length, (i)=>'?${i+offset}').join(',');
         return _queryAdapter.queryList('SELECT * FROM Person WHERE id IN (' + _sqliteVariablesForIds + ') AND id IN (' + _sqliteVariablesForIdx + ')',
-          mapper: (Map<String, Object?> row) => Person(row['id'] as int, row['name'] as String),
-          arguments: [...ids, ...idx]);
+          arguments: [...ids, ...idx],
+          mapper: (Map<String, Object?> row) => Person(row['id'] as int, row['name'] as String));
       }
     '''));
   });
@@ -389,8 +389,8 @@ void main() {
         offset += idx.length;
         final _sqliteVariablesForIds=Iterable<String>.generate(ids.length, (i)=>'?${i+offset}').join(',');
         return _queryAdapter.queryList('SELECT * FROM Person WHERE id IN (' + _sqliteVariablesForIds + ') AND id IN (' + _sqliteVariablesForIdx + ') OR foo in (' + _sqliteVariablesForIds + ') AND bar = ?2 OR name = ?1', 
-          mapper: (Map<String, Object?> row) => Person(row['id'] as int, row['name'] as String), 
-          arguments: [name, foo, ...idx, ...ids]);
+          arguments: [name, foo, ...idx, ...ids], 
+          mapper: (Map<String, Object?> row) => Person(row['id'] as int, row['name'] as String));
       }
     '''));
   });
