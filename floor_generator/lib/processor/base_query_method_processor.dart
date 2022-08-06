@@ -3,6 +3,7 @@ import 'package:analyzer/dart/element/type.dart';
 import 'package:collection/collection.dart';
 import 'package:floor_generator/misc/extension/dart_type_extension.dart';
 import 'package:floor_generator/misc/type_utils.dart';
+import 'package:floor_generator/processor/error/base_query_method_processor_error.dart';
 import 'package:floor_generator/processor/processor.dart';
 import 'package:floor_generator/value_object/query_method.dart';
 import 'package:floor_generator/value_object/queryable.dart';
@@ -10,12 +11,14 @@ import 'package:floor_generator/value_object/queryable.dart';
 abstract class BaseQueryMethodProcessor extends Processor<QueryMethod> {
   final MethodElement _methodElement;
   final List<Queryable> _queryables;
+  final BaseQueryMethodProcessorError _processorError;
 
   BaseQueryMethodProcessor(
     final MethodElement methodElement,
     final List<Queryable> queryables,
   )   : _methodElement = methodElement,
-        _queryables = queryables;
+        _queryables = queryables,
+        _processorError = BaseQueryMethodProcessorError(methodElement);
 
   @override
   QueryMethod process() {
@@ -76,11 +79,9 @@ abstract class BaseQueryMethodProcessor extends Processor<QueryMethod> {
     final bool returnsStream,
   ) {
     if (!rawReturnType.isDartAsyncFuture && !returnsStream) {
-      onDoesNotReturnFutureNorStream();
+      throw _processorError.doesNotReturnFutureNorStream;
     }
   }
-
-  void onDoesNotReturnFutureNorStream();
 
   void _assertReturnsNullableSingle(
     final bool returnsStream,
@@ -90,7 +91,9 @@ abstract class BaseQueryMethodProcessor extends Processor<QueryMethod> {
     if (!returnsList &&
         !flattenedReturnType.isVoid &&
         !flattenedReturnType.isNullable) {
-      onAssertReturnsNullableSingle(returnsStream);
+      returnsStream
+          ? throw _processorError.doesNotReturnNullableStream
+          : throw _processorError.doesNotReturnNullableFuture;
     }
   }
 
@@ -102,6 +105,4 @@ abstract class BaseQueryMethodProcessor extends Processor<QueryMethod> {
     List<ParameterElement> parameters,
     Queryable? queryable,
   );
-
-  void onAssertReturnsNullableSingle(bool returnsStream);
 }

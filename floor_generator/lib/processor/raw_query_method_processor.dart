@@ -9,7 +9,6 @@ import 'package:floor_generator/value_object/queryable.dart';
 
 class RawQueryMethodProcessor extends BaseQueryMethodProcessor {
   final RawQueryMethodProcessorError _processorError;
-
   final MethodElement _methodElement;
 
   RawQueryMethodProcessor(
@@ -35,18 +34,6 @@ class RawQueryMethodProcessor extends BaseQueryMethodProcessor {
     if (!type.isDartCoreString && !type.isSQLiteQuery) {
       throw _processorError.queryArgumentsShouldBeSingle;
     }
-  }
-
-  @override
-  void onAssertReturnsNullableSingle(bool returnsStream) {
-    returnsStream
-        ? throw _processorError.doesNotReturnNullableStream
-        : throw _processorError.doesNotReturnNullableFuture;
-  }
-
-  @override
-  void onDoesNotReturnFutureNorStream() {
-    throw _processorError.doesNotReturnFutureNorStream;
   }
 
   @override

@@ -39,29 +39,6 @@ class QueryMethodProcessor extends BaseQueryMethodProcessor {
     return query;
   }
 
-  DartType _getFlattenedReturnType(
-    final DartType rawReturnType,
-    final bool returnsStream,
-    final bool returnsList,
-  ) {
-    final type = returnsStream
-        ? _methodElement.returnType.flatten()
-        : _methodElement.library.typeSystem.flatten(rawReturnType);
-    return returnsList ? type.flatten() : type;
-  }
-
-  @override
-  void onAssertReturnsNullableSingle(bool returnsStream) {
-    returnsStream
-        ? throw _processorError.doesNotReturnNullableStream
-        : throw _processorError.doesNotReturnNullableFuture;
-  }
-
-  @override
-  void onDoesNotReturnFutureNorStream() {
-    throw _processorError.doesNotReturnFutureNorStream;
-  }
-
   @override
   QueryMethod onProcess(
     MethodElement methodElement,

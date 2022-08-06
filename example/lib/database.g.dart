@@ -172,7 +172,7 @@ class _$TaskDao extends TaskDao {
   }
 
   @override
-  Stream<List<Task>> rawFindAllTasksAsStream(SQLiteQuery query) {
+  Stream<List<Task>> rawQueryTasksAsStream(SQLiteQuery query) {
     return _queryAdapter.queryListStream(query.query,
         arguments: query.arguments,
         mapper: (Map<String, Object?> row) => Task(
@@ -181,43 +181,6 @@ class _$TaskDao extends TaskDao {
             _dateTimeConverter.decode(row['timestamp'] as int)),
         queryableName: 'Task',
         isView: false);
-  }
-
-  @override
-  Future<List<Task>> rawFindAllTasks(SQLiteQuery query) async {
-    return _queryAdapter.queryList(query.query,
-        arguments: query.arguments,
-        mapper: (Map<String, Object?> row) => Task(
-            row['id'] as int?,
-            row['message'] as String,
-            _dateTimeConverter.decode(row['timestamp'] as int)));
-  }
-
-  @override
-  Stream<Task?> rawFindTaskAsStream(SQLiteQuery query) {
-    return _queryAdapter.queryStream(query.query,
-        arguments: query.arguments,
-        mapper: (Map<String, Object?> row) => Task(
-            row['id'] as int?,
-            row['message'] as String,
-            _dateTimeConverter.decode(row['timestamp'] as int)),
-        queryableName: 'Task',
-        isView: false);
-  }
-
-  @override
-  Future<Task?> rawFindTask(SQLiteQuery query) async {
-    return _queryAdapter.query(query.query,
-        arguments: query.arguments,
-        mapper: (Map<String, Object?> row) => Task(
-            row['id'] as int?,
-            row['message'] as String,
-            _dateTimeConverter.decode(row['timestamp'] as int)));
-  }
-
-  @override
-  Future<void> rawInsertionTask(SQLiteQuery query) async {
-    await _queryAdapter.queryNoReturn(query.query, arguments: query.arguments);
   }
 
   @override
