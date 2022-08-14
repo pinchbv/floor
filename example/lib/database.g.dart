@@ -167,8 +167,42 @@ class _$TaskDao extends TaskDao {
             row['id'] as int?,
             row['message'] as String,
             _dateTimeConverter.decode(row['timestamp'] as int)),
-        queryableName: 'Task',
+        queryableName: 'task',
         isView: false);
+  }
+
+  @override
+  Stream<int?> findUniqueMessagesCountAsStream() {
+    return _queryAdapter.queryStream('SELECT DISTINCT COUNT(message) FROM task',
+        mapper: (Map<String, Object?> row) => row.values.first as int,
+        queryableName: 'task',
+        isView: false);
+  }
+
+  @override
+  Future<int?> findUniqueMessagesCount() async {
+    return _queryAdapter.query('SELECT DISTINCT COUNT(message) FROM task',
+        mapper: (Map<String, Object?> row) => row.values.first as int);
+  }
+
+  @override
+  Stream<List<String>> findUniqueMessagesAsStream() {
+    return _queryAdapter.queryListStream('SELECT DISTINCT message FROM task',
+        mapper: (Map<String, Object?> row) => row.values.first as String,
+        queryableName: 'task',
+        isView: false);
+  }
+
+  @override
+  Future<List<String>> findUniqueMessages() async {
+    return _queryAdapter.queryList('SELECT DISTINCT message FROM task',
+        mapper: (Map<String, Object?> row) => row.values.first as String);
+  }
+
+  @override
+  Future<List<String>> findAllMessages() async {
+    return _queryAdapter.queryList('SELECT message FROM task',
+        mapper: (Map<String, Object?> row) => row.values.first as String);
   }
 
   @override

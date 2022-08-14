@@ -65,6 +65,70 @@ void main() {
     '''));
   });
 
+  test('query return int type', () async {
+    final queryMethod = await _createQueryMethod('''
+      @Query('SELECT COUNT(id) FROM Person')
+      Future<int?> getUnique();
+    ''');
+
+    final actual = QueryMethodWriter(queryMethod).write();
+
+    expect(actual, equalsDart(r'''
+      @override
+      Future<int?> getUnique() async {
+        return _queryAdapter.query('SELECT COUNT(id) FROM Person', mapper: (Map<String, Object?> row) => row.values.first as int);
+      }
+    '''));
+  });
+
+  test('query return List<int> type', () async {
+    final queryMethod = await _createQueryMethod('''
+      @Query('SELECT id FROM Person')
+      Future<List<int>> getPeopleIdList();
+    ''');
+
+    final actual = QueryMethodWriter(queryMethod).write();
+
+    expect(actual, equalsDart(r'''
+      @override
+      Future<List<int>> getPeopleIdList() async {
+        return _queryAdapter.queryList('SELECT id FROM Person', mapper: (Map<String, Object?> row) => row.values.first as int);
+      }
+    '''));
+  });
+
+  test('query return List<String> type', () async {
+    final queryMethod = await _createQueryMethod('''
+      @Query('SELECT name FROM Person')
+      Future<List<String>> getPeopleNameList();
+    ''');
+
+    final actual = QueryMethodWriter(queryMethod).write();
+
+    expect(actual, equalsDart(r'''
+      @override
+      Future<List<String>> getPeopleNameList() async {
+        return _queryAdapter.queryList('SELECT name FROM Person', mapper: (Map<String, Object?> row) => row.values.first as String);
+      }
+    '''));
+  });
+
+  test('query return List<String> type stream', () async {
+    final queryMethod = await _createQueryMethod('''
+      @Query('SELECT name FROM Person')
+      Stream<List<String>> getPeopleNameListAsStream();
+    ''');
+
+    final actual = QueryMethodWriter(queryMethod).write();
+
+    expect(actual, equalsDart(r'''
+      @override
+      Stream<List<String>> getPeopleNameListAsStream() {
+        return _queryAdapter.queryListStream('SELECT name FROM Person', mapper: (Map<String, Object?> row) => row.values.first as String, queryableName: 'Person', isView: false);
+      }
+    '''));
+  });
+
   group('type converters', () {
     test('generates method with external type converter', () async {
       final typeConverter = TypeConverter(

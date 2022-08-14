@@ -12,6 +12,21 @@ abstract class TaskDao {
   @Query('SELECT * FROM task')
   Stream<List<Task>> findAllTasksAsStream();
 
+  @Query('SELECT DISTINCT COUNT(message) FROM task')
+  Stream<int?> findUniqueMessagesCountAsStream();
+
+  @Query('SELECT DISTINCT COUNT(message) FROM task')
+  Future<int?> findUniqueMessagesCount();
+
+  @Query('SELECT DISTINCT message FROM task')
+  Stream<List<String>> findUniqueMessagesAsStream();
+
+  @Query('SELECT DISTINCT message FROM task')
+  Future<List<String>> findUniqueMessages();
+
+  @Query('SELECT message FROM task')
+  Future<List<String>> findAllMessages();
+
   @insert
   Future<void> insertTask(Task task);
 

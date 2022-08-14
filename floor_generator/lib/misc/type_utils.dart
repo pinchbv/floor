@@ -21,6 +21,15 @@ extension SupportedTypeChecker on DartType {
       _uint8ListTypeChecker,
     ]).isExactlyType(this);
   }
+
+  bool get isDartCoreType {
+    return TypeChecker.any([
+      _stringTypeChecker,
+      _boolTypeChecker,
+      _intTypeChecker,
+      _doubleTypeChecker
+    ]).isExactlyType(this);
+  }
 }
 
 extension Uint8ListTypeChecker on DartType {
