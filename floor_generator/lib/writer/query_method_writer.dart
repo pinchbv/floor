@@ -111,17 +111,19 @@ class QueryMethodWriter implements Writer {
       ..._queryMethod.parameters
           .where((parameter) => !parameter.type.isDartCoreList)
           .map((parameter) {
-        if (parameter.type.isDefaultSqlType) {
-          if (parameter.type.isDartCoreBool) {
-            // query method parameters can't be null
-            return '${parameter.displayName} ? 1 : 0';
-          } else {
-            return parameter.displayName;
-          }
+        final type = parameter.type;
+        final displayName = parameter.displayName;
+
+        if (type.isDartCoreBool) {
+          // query method parameters can't be null
+          return '$displayName ? 1 : 0';
+        } else if (type.isEnumType) {
+          return '$displayName.index';
+        } else if (type.isDefaultSqlType) {
+          return displayName;
         } else {
-          final typeConverter =
-              _queryMethod.typeConverters.getClosest(parameter.type);
-          return '_${typeConverter.name.decapitalize()}.encode(${parameter.displayName})';
+          final typeConverter = _queryMethod.typeConverters.getClosest(type);
+          return '_${typeConverter.name.decapitalize()}.encode($displayName)';
         }
       }),
       ..._queryMethod.parameters
@@ -129,12 +131,14 @@ class QueryMethodWriter implements Writer {
           .map((parameter) {
         // TODO #403 what about type converters that map between e.g. string and list?
         final DartType flatType = parameter.type.flatten();
-        if (flatType.isDefaultSqlType) {
-          return '...${parameter.displayName}';
+        final displayName = parameter.displayName;
+
+        if (flatType.isDefaultSqlType || flatType.isEnumType) {
+          return '...$displayName';
         } else {
           final typeConverter =
               _queryMethod.typeConverters.getClosest(flatType);
-          return '...${parameter.displayName}.map((element) => _${typeConverter.name.decapitalize()}.encode(element))';
+          return '...$displayName.map((element) => _${typeConverter.name.decapitalize()}.encode(element))';
         }
       })
     ];

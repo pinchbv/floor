@@ -411,6 +411,56 @@ void main() {
           '}';
       expect(actual, equals(expected));
     });
+
+    test('Non-nullable enum value mapping', () async {
+      final classElement = await createClassElement('''
+      
+      $characterType
+      
+      @entity
+      class Person {
+        @primaryKey
+        final int id;
+      
+        final CharacterType someType;
+      
+        Person(this.id, this.someType);
+      }
+    ''');
+
+      final actual = EntityProcessor(classElement, {}).process().valueMapping;
+
+      const expected = '<String, Object?>{'
+          "'id': item.id, "
+          "'someType': item.someType.index"
+          '}';
+      expect(actual, equals(expected));
+    });
+
+    test('Nullable enum value mapping', () async {
+      final classElement = await createClassElement('''
+      
+      $characterType
+      
+      @entity
+      class Person {
+        @primaryKey
+        final int id;
+      
+        final CharacterType? someType;
+      
+        Person(this.id, this.someType);
+      }
+    ''');
+
+      final actual = EntityProcessor(classElement, {}).process().valueMapping;
+
+      const expected = '<String, Object?>{'
+          "'id': item.id, "
+          "'someType': item.someType == null ? null : item.someType.index"
+          '}';
+      expect(actual, equals(expected));
+    });
   });
 
   group('expected errors', () {
