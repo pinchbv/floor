@@ -305,6 +305,32 @@ class FakeClassElement implements ClassElement {
 
   @override
   bool get isDartCoreEnum => throw UnimplementedError();
+
+  @override
+  // TODO: implement augmentation
+  ClassAugmentationElement? get augmentation => throw UnimplementedError();
+
+  @override
+  // TODO: implement augmented
+  AugmentedClassElement get augmented => throw UnimplementedError();
+
+  @override
+  // TODO: implement enclosingElement2
+  CompilationUnitElement get enclosingElement2 => throw UnimplementedError();
+
+  @override
+  // TODO: implement enclosingElement3
+  CompilationUnitElement get enclosingElement3 => throw UnimplementedError();
+
+  @override
+  // TODO: implement hasMustBeOverridden
+  bool get hasMustBeOverridden => throw UnimplementedError();
+
+  @override
+  bool isAccessibleIn2(LibraryElement library) {
+    // TODO: implement isAccessibleIn2
+    throw UnimplementedError();
+  }
 }
 
 class FakeFieldElement implements FieldElement {
@@ -508,6 +534,28 @@ class FakeFieldElement implements FieldElement {
 
   @override
   Element get nonSynthetic => throw UnimplementedError();
+
+  @override
+  // TODO: implement augmentation
+  FieldAugmentationElement? get augmentation => throw UnimplementedError();
+
+  @override
+  // TODO: implement enclosingElement2
+  Element get enclosingElement2 => throw UnimplementedError();
+
+  @override
+  // TODO: implement enclosingElement3
+  Element get enclosingElement3 => throw UnimplementedError();
+
+  @override
+  // TODO: implement hasMustBeOverridden
+  bool get hasMustBeOverridden => throw UnimplementedError();
+
+  @override
+  bool isAccessibleIn2(LibraryElement library) {
+    // TODO: implement isAccessibleIn2
+    throw UnimplementedError();
+  }
 }
 
 class FakeDartObject implements DartObject {
@@ -577,4 +625,8 @@ class FakeDartObject implements DartObject {
 
   @override
   ParameterizedType? get type => throw UnimplementedError();
+
+  @override
+  // TODO: implement variable
+  VariableElement? get variable => throw UnimplementedError();
 }
