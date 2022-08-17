@@ -451,6 +451,35 @@ void main() {
       expect(actual, equals(expected));
     });
 
+    test('generate constructor with enum arguments', () async {
+      final classElement = await createClassElement('''
+      
+      $characterType
+      
+      class Person {
+        final int id;
+      
+        final String name;
+      
+        final CharacterType bar;
+      
+        final CharacterType? foo;
+      
+        Person(this.id, this.name, {required this.bar, this.foo});
+      }
+    ''');
+
+      final actual = TestProcessor(classElement).process().constructor;
+
+      const expected = 'Person('
+          "row['id'] as int, "
+          "row['name'] as String, "
+          "bar: CharacterType.values[row['bar'] as int], "
+          "foo: row['foo'] == null ? null : CharacterType.values[row['foo'] as int]"
+          ')';
+      expect(actual, equals(expected));
+    });
+
     test('generate constructor with named arguments', () async {
       final classElement = await createClassElement('''
       class Person {
@@ -514,6 +543,9 @@ void main() {
     group('nullability', () {
       test('generates constructor with only nullable types', () async {
         final classElement = await createClassElement('''
+          
+          $characterType
+          
           class Person {
             final int? id;
             
@@ -524,20 +556,31 @@ void main() {
             final bool? bar;
             
             final Uint8List? blob;
+            
+            final CharacterType? character;
           
-            Person(this.id, this.doubleId, this.name, this.bar, this.blob);
+            Person(this.id, this.doubleId, this.name, this.bar, this.blob, this.character);
           }
         ''');
 
         final actual = TestProcessor(classElement).process().constructor;
 
-        const expected =
-            "Person(row['id'] as int?, row['doubleId'] as double?, row['name'] as String?, row['bar'] == null ? null : (row['bar'] as int) != 0, row['blob'] as Uint8List?)";
+        const expected = 'Person('
+            "row['id'] as int?, "
+            "row['doubleId'] as double?, "
+            "row['name'] as String?, "
+            "row['bar'] == null ? null : (row['bar'] as int) != 0, "
+            "row['blob'] as Uint8List?, "
+            "row['character'] == null ? null : CharacterType.values[row['character'] as int]"
+            ')';
         expect(actual, equals(expected));
       });
 
       test('generates constructor with only non-nullable types', () async {
         final classElement = await createClassElement('''
+          
+          $characterType
+        
           class Person {
             final int id;
             
@@ -548,15 +591,23 @@ void main() {
             final bool bar;
             
             final Uint8List blob;
+            
+            final CharacterType character;
           
-            Person(this.id, this.doubleId, this.name, this.bar, this.blob);
+            Person(this.id, this.doubleId, this.name, this.bar, this.blob, this.character);
           }
         ''');
 
         final actual = TestProcessor(classElement).process().constructor;
 
-        const expected =
-            "Person(row['id'] as int, row['doubleId'] as double, row['name'] as String, (row['bar'] as int) != 0, row['blob'] as Uint8List)";
+        const expected = 'Person('
+            "row['id'] as int, "
+            "row['doubleId'] as double, "
+            "row['name'] as String, "
+            "(row['bar'] as int) != 0, "
+            "row['blob'] as Uint8List, "
+            "CharacterType.values[row['character'] as int]"
+            ')';
         expect(actual, equals(expected));
       });
     });

@@ -32,7 +32,7 @@ class FloorApp extends StatelessWidget {
   }
 }
 
-class TasksWidget extends StatelessWidget {
+class TasksWidget extends StatefulWidget {
   final String title;
   final TaskDao dao;
 
@@ -43,34 +43,74 @@ class TasksWidget extends StatelessWidget {
   }) : super(key: key);
 
   @override
+  State<StatefulWidget> createState() => TasksWidgetState();
+}
+
+class TasksWidgetState extends State<TasksWidget> {
+  TaskType? _selectedType;
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text(title)),
+      appBar: AppBar(
+        title: Text(widget.title),
+        actions: <Widget>[
+          PopupMenuButton<int>(
+            itemBuilder: (context) {
+              return List.generate(
+                TaskType.values.length + 1, //Uses increment to handle All types
+                (index) {
+                  return PopupMenuItem<int>(
+                    value: index,
+                    child: Text(
+                      index == 0 ? 'All' : _getMenuType(index).title,
+                    ),
+                  );
+                },
+              );
+            },
+            onSelected: (index) {
+              setState(() {
+                _selectedType = index == 0 ? null : _getMenuType(index);
+              });
+            },
+          )
+        ],
+      ),
       body: SafeArea(
         child: Column(
           children: <Widget>[
-            TasksListView(dao: dao),
-            TasksTextField(dao: dao),
+            TasksListView(
+              dao: widget.dao,
+              selectedType: _selectedType,
+            ),
+            TasksTextField(dao: widget.dao),
           ],
         ),
       ),
     );
   }
+
+  TaskType _getMenuType(int index) => TaskType.values[index - 1];
 }
 
 class TasksListView extends StatelessWidget {
   final TaskDao dao;
+  final TaskType? selectedType;
 
   const TasksListView({
     Key? key,
     required this.dao,
+    required this.selectedType,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return Expanded(
       child: StreamBuilder<List<Task>>(
-        stream: dao.findAllTasksAsStream(),
+        stream: selectedType == null
+            ? dao.findAllTasksAsStream()
+            : dao.findAllTasksByTypeAsStream(selectedType!),
         builder: (_, snapshot) {
           if (!snapshot.hasData) return Container();
 
@@ -105,20 +145,60 @@ class TaskListCell extends StatelessWidget {
   Widget build(BuildContext context) {
     return Dismissible(
       key: Key('${task.hashCode}'),
-      background: Container(color: Colors.red),
-      direction: DismissDirection.endToStart,
+      background: Container(
+        padding: const EdgeInsets.only(left: 16),
+        color: Colors.green,
+        child: const Align(
+          child: Text(
+            'Change status',
+            style: TextStyle(color: Colors.white),
+          ),
+          alignment: Alignment.centerLeft,
+        ),
+      ),
+      secondaryBackground: Container(
+        padding: const EdgeInsets.only(right: 16),
+        color: Colors.red,
+        child: const Align(
+          child: Text(
+            'Delete',
+            style: TextStyle(color: Colors.white),
+          ),
+          alignment: Alignment.centerRight,
+        ),
+      ),
+      direction: DismissDirection.horizontal,
       child: ListTile(
-        leading: Text(task.message),
+        title: Text(task.message),
+        subtitle: Text('Status: ${task.type.title}'),
         trailing: Text(task.timestamp.toIso8601String()),
       ),
-      onDismissed: (_) async {
-        await dao.deleteTask(task);
+      confirmDismiss: (direction) async {
+        String? statusMessage;
+        switch (direction) {
+          case DismissDirection.endToStart:
+            await dao.deleteTask(task);
+            statusMessage = 'Removed task';
+            break;
+          case DismissDirection.startToEnd:
+            final tasksLength = TaskType.values.length;
+            final nextIndex = (tasksLength + task.type.index + 1) % tasksLength;
+            final taskCopy = task.copyWith(type: TaskType.values[nextIndex]);
+            await dao.updateTask(taskCopy);
+            statusMessage = 'Updated task status by: ${taskCopy.type.title}';
+            break;
+          default:
+            break;
+        }
 
-        final scaffoldMessengerState = ScaffoldMessenger.of(context);
-        scaffoldMessengerState.hideCurrentSnackBar();
-        scaffoldMessengerState.showSnackBar(
-          const SnackBar(content: Text('Removed task')),
-        );
+        if (statusMessage != null) {
+          final scaffoldMessengerState = ScaffoldMessenger.of(context);
+          scaffoldMessengerState.hideCurrentSnackBar();
+          scaffoldMessengerState.showSnackBar(
+            SnackBar(content: Text(statusMessage)),
+          );
+        }
+        return statusMessage != null;
       },
     );
   }
@@ -174,7 +254,7 @@ class TasksTextField extends StatelessWidget {
     if (message.trim().isEmpty) {
       _textEditingController.clear();
     } else {
-      final task = Task(null, message, DateTime.now());
+      final task = Task.optional(message: message);
       await dao.insertTask(task);
       _textEditingController.clear();
     }

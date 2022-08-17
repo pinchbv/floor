@@ -54,7 +54,7 @@ class FieldProcessor extends Processor<Field> {
 
   String _getSqlType(final TypeConverter? typeConverter) {
     final type = _fieldElement.type;
-    if (type.isDefaultSqlType) {
+    if (type.isDefaultSqlType || type.isEnumType) {
       return type.asSqlType();
     } else if (typeConverter != null) {
       return typeConverter.databaseType.asSqlType();
@@ -80,6 +80,8 @@ extension on DartType {
       return SqlType.real;
     } else if (isUint8List) {
       return SqlType.blob;
+    } else if (isEnumType) {
+      return SqlType.integer;
     }
     throw StateError('This should really be unreachable');
   }
