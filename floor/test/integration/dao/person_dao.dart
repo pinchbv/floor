@@ -89,6 +89,6 @@ abstract class PersonDao {
   Future<void> deleteAllPersons();
 
   // Used in regression test for Streams on Entities with update methods in other Dao
-  @Query('SELECT * FROM Dog WHERE owner_id = :id')
+  @Query('SELECT * FROM dog WHERE owner_id = :id')
   Stream<List<Dog>> findAllDogsOfPersonAsStream(int id);
 }

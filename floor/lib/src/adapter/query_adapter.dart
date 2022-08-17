@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:floor/src/util/string_utils.dart';
 import 'package:sqflite/sqflite.dart';
 
 /// This class knows how to execute database queries.
@@ -105,7 +106,8 @@ class QueryAdapter {
 
     // Views listen on all events, Entities only on events that changed the same entity.
     final subscription = changeListener.stream
-        .where((updatedTable) => isView || updatedTable == queryableName)
+        .where((updatedTable) =>
+            isView || updatedTable.equals(queryableName, ignoreCase: true))
         .listen(
           (_) async => executeQueryAndNotifyController(),
           onDone: () => controller.close(),
