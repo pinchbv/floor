@@ -15,7 +15,7 @@ extension TypeConverterElementExtension on Element {
       final typeConverterElements = getAnnotation(annotations.TypeConverters)
           ?.getField(AnnotationField.typeConverterValue)
           ?.toListValue()
-          ?.mapNotNull((object) => object.toTypeValue()?.element);
+          ?.mapNotNull((object) => object.toTypeValue()?.element2);
 
       if (typeConverterElements == null || typeConverterElements.isEmpty) {
         throw ProcessorError(
@@ -49,5 +49,6 @@ extension TypeConverterElementExtension on Element {
 }
 
 extension on ClassElement {
-  bool get isTypeConverter => supertype?.element.displayName == 'TypeConverter';
+  bool get isTypeConverter =>
+      supertype?.element2.displayName == 'TypeConverter';
 }

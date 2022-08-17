@@ -40,7 +40,7 @@ abstract class QueryableProcessor<T extends Queryable> extends Processor<T> {
     }
     final fields = [
       ...classElement.fields,
-      ...classElement.allSupertypes.expand((type) => type.element.fields),
+      ...classElement.allSupertypes.expand((type) => type.element2.fields),
     ];
 
     return fields

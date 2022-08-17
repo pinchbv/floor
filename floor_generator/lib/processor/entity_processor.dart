@@ -72,7 +72,7 @@ class EntityProcessor extends QueryableProcessor<Entity> {
                   ?.toTypeValue() ??
               (throw _processorError.foreignKeyNoEntity);
 
-          final parentElement = parentType.element;
+          final parentElement = parentType.element2;
           final parentName = parentElement is ClassElement
               ? parentElement
                       .getAnnotation(annotations.Entity)

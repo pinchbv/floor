@@ -76,7 +76,7 @@ class DatabaseProcessor extends Processor<Database> {
     final Set<TypeConverter> typeConverters,
   ) {
     return _classElement.fields.where(_isDao).map((field) {
-      final classElement = field.type.element as ClassElement;
+      final classElement = field.type.element2 as ClassElement;
       final name = field.displayName;
 
       final dao = DaoProcessor(
@@ -93,7 +93,7 @@ class DatabaseProcessor extends Processor<Database> {
   }
 
   bool _isDao(final FieldElement fieldElement) {
-    final element = fieldElement.type.element;
+    final element = fieldElement.type.element2;
     return element is ClassElement ? _isDaoClass(element) : false;
   }
 
@@ -110,7 +110,7 @@ class DatabaseProcessor extends Processor<Database> {
         .getAnnotation(annotations.Database)
         ?.getField(AnnotationField.databaseEntities)
         ?.toListValue()
-        ?.mapNotNull((object) => object.toTypeValue()?.element)
+        ?.mapNotNull((object) => object.toTypeValue()?.element2)
         .whereType<ClassElement>()
         .where(_isEntity)
         .map((classElement) => EntityProcessor(
@@ -134,7 +134,7 @@ class DatabaseProcessor extends Processor<Database> {
             .getAnnotation(annotations.Database)
             ?.getField(AnnotationField.databaseViews)
             ?.toListValue()
-            ?.mapNotNull((object) => object.toTypeValue()?.element)
+            ?.mapNotNull((object) => object.toTypeValue()?.element2)
             .whereType<ClassElement>()
             .where(_isView)
             .map((classElement) => ViewProcessor(
