@@ -27,6 +27,9 @@ abstract class TaskDao {
   @Query('SELECT message FROM task')
   Future<List<String>> findAllMessages();
 
+  @Query('SELECT * FROM task WHERE type = :type')
+  Stream<List<Task>> findAllTasksByTypeAsStream(TaskType type);
+
   @insert
   Future<void> insertTask(Task task);
 

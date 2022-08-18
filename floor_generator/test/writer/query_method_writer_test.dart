@@ -277,6 +277,25 @@ void main() {
     '''));
   });
 
+  test('query enum parameter', () async {
+    final queryMethod = await _createQueryMethod('''
+      @Query('SELECT * FROM Person WHERE characterType = :type')
+      Future<List<Person>> findByType(CharacterType type);
+    ''');
+
+    final actual = QueryMethodWriter(queryMethod).write();
+
+    expect(actual, equalsDart(r'''
+      @override
+      Future<List<Person>> findByType(CharacterType type) async {
+        return _queryAdapter.queryList(
+        'SELECT * FROM Person WHERE characterType = ?1', 
+        mapper: (Map<String, Object?> row) => Person(row['id'] as int, row['name'] as String), 
+        arguments: [type.index]);
+      }
+    '''));
+  });
+
   test('query item multiple parameters', () async {
     final queryMethod = await _createQueryMethod('''
       @Query('SELECT * FROM Person WHERE id = :id AND name = :name')
@@ -288,7 +307,10 @@ void main() {
     expect(actual, equalsDart(r'''
       @override
       Future<Person?> findById(int id, String name) async {
-        return _queryAdapter.query('SELECT * FROM Person WHERE id = ?1 AND name = ?2', mapper: (Map<String, Object?> row) => Person(row['id'] as int, row['name'] as String), arguments: [id, name]);
+        return _queryAdapter.query(
+        'SELECT * FROM Person WHERE id = ?1 AND name = ?2', 
+        mapper: (Map<String, Object?> row) => Person(row['id'] as int, row['name'] as String), 
+        arguments: [id, name]);
       }
     '''));
   });
@@ -304,7 +326,10 @@ void main() {
     expect(actual, equalsDart(r'''
       @override
       Future<Person?> findById(int id, String name, String bar) async {
-        return _queryAdapter.query('SELECT * FROM Person WHERE foo = ?3 AND id = ?1 AND name = ?2 AND name = ?3', mapper: (Map<String, Object?> row) => Person(row['id'] as int, row['name'] as String), arguments: [id, name, bar]);
+        return _queryAdapter.query(
+        'SELECT * FROM Person WHERE foo = ?3 AND id = ?1 AND name = ?2 AND name = ?3', 
+        mapper: (Map<String, Object?> row) => Person(row['id'] as int, row['name'] as String), 
+        arguments: [id, name, bar]);
       }
     '''));
   });
@@ -320,7 +345,9 @@ void main() {
     expect(actual, equalsDart('''
       @override
       Future<List<Person>> findAll() async {
-        return _queryAdapter.queryList('SELECT * FROM Person', mapper: (Map<String, Object?> row) => Person(row['id'] as int, row['name'] as String));
+        return _queryAdapter.queryList(
+        'SELECT * FROM Person', 
+        mapper: (Map<String, Object?> row) => Person(row['id'] as int, row['name'] as String));
       }
     '''));
   });
@@ -336,7 +363,10 @@ void main() {
     expect(actual, equalsDart(r'''
       @override
       Stream<Person?> findByIdAsStream(int id) {
-        return _queryAdapter.queryStream('SELECT * FROM Person WHERE id = ?1', mapper: (Map<String, Object?> row) => Person(row['id'] as int, row['name'] as String), arguments: [id], queryableName: 'Person', isView: false);
+        return _queryAdapter.queryStream(
+        'SELECT * FROM Person WHERE id = ?1', 
+        mapper: (Map<String, Object?> row) => Person(row['id'] as int, row['name'] as String), 
+        arguments: [id], queryableName: 'Person', isView: false);
       }
     '''));
   });
@@ -352,7 +382,10 @@ void main() {
     expect(actual, equalsDart(r'''
       @override
       Stream<List<Person>> findAllAsStream() {
-        return _queryAdapter.queryListStream('SELECT * FROM Person', mapper: (Map<String, Object?> row) => Person(row['id'] as int, row['name'] as String), queryableName: 'Person', isView: false);
+        return _queryAdapter.queryListStream(
+        'SELECT * FROM Person', 
+        mapper: (Map<String, Object?> row) => Person(row['id'] as int, row['name'] as String), 
+        queryableName: 'Person', isView: false);
       }
     '''));
   });
@@ -368,7 +401,10 @@ void main() {
     expect(actual, equalsDart(r'''
       @override
       Stream<List<Name>> findAllAsStream() {
-        return _queryAdapter.queryListStream('SELECT * FROM Name', mapper: (Map<String, Object?> row) => Name(row['name'] as String), queryableName: 'Name', isView: true);
+        return _queryAdapter.queryListStream(
+        'SELECT * FROM Name', 
+        mapper: (Map<String, Object?> row) => Name(row['name'] as String), 
+        queryableName: 'Name', isView: true);
       }
     '''));
   });
@@ -468,6 +504,16 @@ void main() {
     final actual = () => QueryMethodWriter(queryMethod).write();
 
     expect(actual, throwsA(const TypeMatcher<InvalidGenerationSourceError>()));
+  });
+
+  test('query with unsupported return type throws', () async {
+    final queryMethod = () => _createQueryMethod('''
+      @Query('DELETE * FROM Person WHERE name = :name')
+      void deleteByName(String name);
+    ''');
+
+    expect(queryMethod,
+        throwsA(const TypeMatcher<InvalidGenerationSourceError>()));
   });
 }
 

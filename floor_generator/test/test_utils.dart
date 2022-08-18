@@ -168,6 +168,8 @@ Future<Dao> createDao(final String methodSignature) async {
         $methodSignature
       }
       
+      $characterType
+      
       $_personEntity
       
       $_nameView
@@ -300,4 +302,8 @@ const _nameView = '''
     Name(this.name);
   }
 
+''';
+
+const characterType = '''
+  enum CharacterType { generous, honest, faithful, faithful, loving, kind, sincere }
 ''';

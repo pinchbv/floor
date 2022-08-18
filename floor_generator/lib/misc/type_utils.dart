@@ -5,7 +5,7 @@ import 'package:analyzer/dart/element/element.dart';
 import 'package:analyzer/dart/element/type.dart';
 import 'package:source_gen/source_gen.dart';
 
-extension SupportedTypeChecker on DartType {
+extension DartTypeChecker on DartType {
   /// Whether this [DartType] is either
   /// - String
   /// - bool
@@ -30,15 +30,14 @@ extension SupportedTypeChecker on DartType {
       _doubleTypeChecker
     ]).isExactlyType(this);
   }
-}
 
-extension Uint8ListTypeChecker on DartType {
-  bool get isUint8List =>
-      getDisplayString(withNullability: false) == 'Uint8List';
+  bool get isEnumType => _enumTypeChecker.isSuperTypeOf(this);
+
+  bool get isUint8List => _uint8ListTypeChecker.isExactlyType(this);
 }
 
 extension StreamTypeChecker on DartType {
-  bool get isStream => _streamTypeChecker.isExactlyType(this);
+  bool get isStream => !isVoid && _streamTypeChecker.isExactlyType(this);
 }
 
 extension FlattenUtil on DartType {
@@ -72,3 +71,5 @@ final _doubleTypeChecker = _typeChecker(double);
 final _uint8ListTypeChecker = _typeChecker(Uint8List);
 
 final _streamTypeChecker = _typeChecker(Stream);
+
+final _enumTypeChecker = _typeChecker(Enum);
