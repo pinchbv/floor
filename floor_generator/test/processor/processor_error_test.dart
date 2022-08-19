@@ -16,9 +16,9 @@ void main() {
     expect(
         error.toString(),
         equals('mymessage mytodo\n'
-            'package:_resolve_source/_resolve_source.dart:8:20\n'
+            'package:_resolve_source/_resolve_source.dart:9:20\n'
             '  ╷\n'
-            '8 │       Future<void> insertPerson(Person person);\n'
+            '9 │       Future<void> insertPerson(Person person);\n'
             '  │                    ^^^^^^^^^^^^\n'
             '  ╵'));
   });

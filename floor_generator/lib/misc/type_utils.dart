@@ -22,15 +22,6 @@ extension DartTypeChecker on DartType {
     ]).isExactlyType(this);
   }
 
-  bool get isDartCoreType {
-    return TypeChecker.any([
-      _stringTypeChecker,
-      _boolTypeChecker,
-      _intTypeChecker,
-      _doubleTypeChecker
-    ]).isExactlyType(this);
-  }
-
   bool get isEnumType => _enumTypeChecker.isSuperTypeOf(this);
 
   bool get isUint8List => _uint8ListTypeChecker.isExactlyType(this);

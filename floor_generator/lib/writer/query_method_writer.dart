@@ -65,7 +65,7 @@ class QueryMethodWriter implements Writer {
 
     if (_queryMethod.returnsVoid) {
       _methodBody.write(_generateNoReturnQuery(query, arguments));
-    } else if (queryable != null || returnType.isDartCoreType) {
+    } else if (queryable != null || returnType.isDefaultSqlType) {
       _methodBody
           .write(_generateQuery(query, arguments, queryable, returnType));
     } else {
@@ -181,11 +181,8 @@ class QueryMethodWriter implements Writer {
     final Queryable? queryable,
     final DartType returnType,
   ) {
-    final nonNullReturnType = returnType.getDisplayString(
-      withNullability: false,
-    );
     final mapper = queryable == null
-        ? '(Map<String, Object?> row) => row.values.first as $nonNullReturnType'
+        ? _generateDartCoreMapper(returnType)
         : _generateMapper(queryable);
     final parameters = StringBuffer(query)..write(', mapper: $mapper');
     if (arguments != null) parameters.write(', arguments: $arguments');
@@ -202,6 +199,16 @@ class QueryMethodWriter implements Writer {
     final stream = _queryMethod.returnsStream ? 'Stream' : '';
 
     return 'return _queryAdapter.query$list$stream($parameters);';
+  }
+
+  String _generateDartCoreMapper(final DartType returnType) {
+    final nonNullReturnType = returnType.getDisplayString(
+      withNullability: false,
+    );
+    final mapperPredicate = returnType.isDartCoreBool
+        ? '(row.values.first as int) == 1'
+        : 'row.values.first as $nonNullReturnType';
+    return '(Map<String, Object?> row) => $mapperPredicate';
   }
 
   String _parseTableName(String query) {

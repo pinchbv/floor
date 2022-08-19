@@ -179,20 +179,6 @@ class _$TaskDao extends TaskDao {
             row['message'] as String,
             _dateTimeConverter.decode(row['timestamp'] as int),
             TaskType.values[row['type'] as int]),
-        queryableName: 'Task',
-        isView: false);
-  }
-
-  @override
-  Stream<List<Task>> findAllTasksByTypeAsStream(TaskType type) {
-    return _queryAdapter.queryListStream('SELECT * FROM task WHERE type = ?1',
-        mapper: (Map<String, Object?> row) => Task(
-            row['id'] as int?,
-            (row['isRead'] as int) != 0,
-            row['message'] as String,
-            _dateTimeConverter.decode(row['timestamp'] as int),
-            TaskType.values[row['type'] as int]),
-        arguments: [type.index],
         queryableName: 'task',
         isView: false);
   }
@@ -229,6 +215,20 @@ class _$TaskDao extends TaskDao {
   Future<List<String>> findAllMessages() async {
     return _queryAdapter.queryList('SELECT message FROM task',
         mapper: (Map<String, Object?> row) => row.values.first as String);
+  }
+
+  @override
+  Stream<List<Task>> findAllTasksByTypeAsStream(TaskType type) {
+    return _queryAdapter.queryListStream('SELECT * FROM task WHERE type = ?1',
+        mapper: (Map<String, Object?> row) => Task(
+            row['id'] as int?,
+            (row['isRead'] as int) != 0,
+            row['message'] as String,
+            _dateTimeConverter.decode(row['timestamp'] as int),
+            TaskType.values[row['type'] as int]),
+        arguments: [type.index],
+        queryableName: 'task',
+        isView: false);
   }
 
   @override
