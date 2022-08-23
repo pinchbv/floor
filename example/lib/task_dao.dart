@@ -15,30 +15,6 @@ abstract class TaskDao {
   @Query('SELECT DISTINCT COUNT(message) FROM task')
   Stream<int?> findUniqueMessagesCountAsStream();
 
-  @Query('SELECT DISTINCT COUNT(message) FROM task')
-  Future<int?> findUniqueMessagesCount();
-
-  @Query('SELECT DISTINCT message FROM task')
-  Stream<List<String>> findUniqueMessagesAsStream();
-
-  @Query('SELECT DISTINCT message FROM task')
-  Future<List<String>> findUniqueMessages();
-
-  @Query('SELECT message FROM task')
-  Future<List<String>> findAllMessages();
-
-  @Query('SELECT timestamp FROM task')
-  Future<List<DateTime>> findAllTimestamps();
-
-  @Query('SELECT timestamp FROM task')
-  Stream<List<DateTime>> findAllTimestampsAsStream();
-
-  @Query('SELECT type FROM task')
-  Future<List<TaskType>> findAllTypes();
-
-  @Query('SELECT type FROM task')
-  Stream<List<TaskType>> findAllTypesAsStream();
-
   @Query('SELECT * FROM task WHERE type = :type')
   Stream<List<Task>> findAllTasksByTypeAsStream(TaskType type);
 

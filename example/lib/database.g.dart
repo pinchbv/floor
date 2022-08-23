@@ -192,64 +192,6 @@ class _$TaskDao extends TaskDao {
   }
 
   @override
-  Future<int?> findUniqueMessagesCount() async {
-    return _queryAdapter.query('SELECT DISTINCT COUNT(message) FROM task',
-        mapper: (Map<String, Object?> row) => row.values.first as int);
-  }
-
-  @override
-  Stream<List<String>> findUniqueMessagesAsStream() {
-    return _queryAdapter.queryListStream('SELECT DISTINCT message FROM task',
-        mapper: (Map<String, Object?> row) => row.values.first as String,
-        queryableName: 'task',
-        isView: false);
-  }
-
-  @override
-  Future<List<String>> findUniqueMessages() async {
-    return _queryAdapter.queryList('SELECT DISTINCT message FROM task',
-        mapper: (Map<String, Object?> row) => row.values.first as String);
-  }
-
-  @override
-  Future<List<String>> findAllMessages() async {
-    return _queryAdapter.queryList('SELECT message FROM task',
-        mapper: (Map<String, Object?> row) => row.values.first as String);
-  }
-
-  @override
-  Future<List<DateTime>> findAllTimestamps() async {
-    return _queryAdapter.queryList('SELECT timestamp FROM task',
-        mapper: (Map<String, Object?> row) =>
-            _dateTimeConverter.decode(row.values.first as int));
-  }
-
-  @override
-  Stream<List<DateTime>> findAllTimestampsAsStream() {
-    return _queryAdapter.queryListStream('SELECT timestamp FROM task',
-        mapper: (Map<String, Object?> row) =>
-            _dateTimeConverter.decode(row.values.first as int),
-        queryableName: 'task',
-        isView: false);
-  }
-
-  @override
-  Future<List<TaskType>> findAllTypes() async {
-    return _queryAdapter.queryList('SELECT type FROM task',
-        mapper: (Map<String, Object?> row) =>
-            TaskType.values[row.values.first as int]);
-  }
-
-  @override
-  Stream<List<TaskType>> findAllTypesAsStream() {
-    return _queryAdapter.queryListStream('SELECT type FROM task',
-        mapper: (Map<String, Object?> row) =>
-            TaskType.values[row.values.first as int],
-        queryableName: 'task',
-        isView: false);
-  }
-
-  @override
   Stream<List<Task>> findAllTasksByTypeAsStream(TaskType type) {
     return _queryAdapter.queryListStream('SELECT * FROM task WHERE type = ?1',
         mapper: (Map<String, Object?> row) => Task(
