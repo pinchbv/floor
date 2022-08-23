@@ -74,7 +74,8 @@ class QueryAdapter {
     // listen on all updates if the stream is on a view, only listen to the
     // name of the table if the stream is on a entity.
     final subscription = changeListener.stream
-        .where((updatedTable) => updatedTable == queryableName || isView)
+        .where((updatedTable) =>
+            isView || updatedTable.equals(queryableName, ignoreCase: true))
         .listen(
           (_) async => executeQueryAndNotifyController(),
           onDone: () => controller.close(),
