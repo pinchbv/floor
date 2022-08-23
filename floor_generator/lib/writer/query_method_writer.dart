@@ -10,6 +10,7 @@ import 'package:floor_generator/processor/error/query_method_writer_error.dart';
 import 'package:floor_generator/value_object/query.dart';
 import 'package:floor_generator/value_object/query_method.dart';
 import 'package:floor_generator/value_object/queryable.dart';
+import 'package:floor_generator/value_object/type_converter.dart';
 import 'package:floor_generator/value_object/view.dart';
 import 'package:floor_generator/writer/writer.dart';
 
@@ -60,17 +61,11 @@ class QueryMethodWriter implements Writer {
 
     final arguments = _generateArguments();
     final query = _generateQueryString();
-    final returnType = _queryMethod.flattenedReturnType;
-    final queryable = _queryMethod.queryable;
 
     if (_queryMethod.returnsVoid) {
       _methodBody.write(_generateNoReturnQuery(query, arguments));
-    } else if (queryable != null || returnType.isDefaultSqlType) {
-      _methodBody
-          .write(_generateQuery(query, arguments, queryable, returnType));
     } else {
-      throw QueryMethodWriterError(_queryMethod.methodElement)
-          .queryMethodReturnType();
+      _methodBody.write(_generateQuery(query, arguments));
     }
 
     return _methodBody.toString();
@@ -175,15 +170,23 @@ class QueryMethodWriter implements Writer {
     return 'await _queryAdapter.queryNoReturn($parameters);';
   }
 
-  String _generateQuery(
-    final String query,
-    final String? arguments,
-    final Queryable? queryable,
-    final DartType returnType,
-  ) {
-    final mapper = queryable == null
-        ? _generateDartCoreMapper(returnType)
-        : _generateMapper(queryable);
+  String _generateQuery(final String query, final String? arguments) {
+    final queryable = _queryMethod.queryable;
+    final returnType = _queryMethod.flattenedReturnType;
+    final converter = _queryMethod.typeConverters.getClosestOrNull(returnType);
+
+    String? mapper;
+    if (queryable != null) {
+      mapper = _generateMapper(queryable);
+    } else if (returnType.isDefaultSqlType || returnType.isEnumType) {
+      mapper = _generateDartCoreMapper(returnType);
+    } else if (converter != null) {
+      mapper = _generateConverterMapper(converter);
+    } else {
+      throw QueryMethodWriterError(_queryMethod.methodElement)
+          .queryMethodReturnType();
+    }
+
     final parameters = StringBuffer(query)..write(', mapper: $mapper');
     if (arguments != null) parameters.write(', arguments: $arguments');
 
@@ -202,13 +205,20 @@ class QueryMethodWriter implements Writer {
   }
 
   String _generateDartCoreMapper(final DartType returnType) {
-    final nonNullReturnType = returnType.getDisplayString(
+    final castedDatabaseValue = 'row.values.first'.cast(
+      returnType,
+      returnType.element,
       withNullability: false,
     );
-    final mapperPredicate = returnType.isDartCoreBool
-        ? '(row.values.first as int) == 1'
-        : 'row.values.first as $nonNullReturnType';
-    return '(Map<String, Object?> row) => $mapperPredicate';
+    return '(Map<String, Object?> row) => $castedDatabaseValue';
+  }
+
+  String _generateConverterMapper(final TypeConverter typeConverter) {
+    final castedDatabaseValue = 'row.values.first'.cast(
+      typeConverter.databaseType,
+      typeConverter.fieldType.element,
+    );
+    return '(Map<String, Object?> row) => _${typeConverter.name.decapitalize()}.decode($castedDatabaseValue)';
   }
 
   String _parseTableName(String query) {

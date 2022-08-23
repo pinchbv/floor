@@ -1,8 +1,6 @@
 import 'package:analyzer/dart/element/element.dart';
-import 'package:analyzer/dart/element/type.dart';
 import 'package:collection/collection.dart';
 import 'package:floor_annotation/floor_annotation.dart' as annotations;
-import 'package:floor_generator/misc/extension/dart_type_extension.dart';
 import 'package:floor_generator/misc/extension/set_extension.dart';
 import 'package:floor_generator/misc/extension/string_extension.dart';
 import 'package:floor_generator/misc/extension/type_converter_element_extension.dart';
@@ -15,7 +13,6 @@ import 'package:floor_generator/value_object/field.dart';
 import 'package:floor_generator/value_object/queryable.dart';
 import 'package:floor_generator/value_object/type_converter.dart';
 import 'package:meta/meta.dart';
-import 'package:source_gen/source_gen.dart';
 
 abstract class QueryableProcessor<T extends Queryable> extends Processor<T> {
   final QueryableProcessorError _queryableProcessorError;
@@ -102,41 +99,6 @@ abstract class QueryableProcessor<T extends Queryable> extends Processor<T> {
       return parameterValue; // also covers positional parameter
     } else {
       return null;
-    }
-  }
-}
-
-extension on String {
-  String cast(DartType dartType, ParameterElement parameterElement) {
-    if (dartType.isDartCoreBool) {
-      final booleanDeserializer = '($this as int) != 0';
-      if (dartType.isNullable) {
-        // if the value is null, return null
-        // if the value is not null, interpret 1 as true and 0 as false
-        return '$this == null ? null : $booleanDeserializer';
-      } else {
-        return booleanDeserializer;
-      }
-    } else if (dartType.isEnumType) {
-      final typeString = dartType.getDisplayString(withNullability: false);
-      final enumDeserializer = '$typeString.values[$this as int]';
-      if (dartType.isNullable) {
-        return '$this == null ? null : $enumDeserializer';
-      } else {
-        return enumDeserializer;
-      }
-    } else if (dartType.isDartCoreString ||
-        dartType.isDartCoreInt ||
-        dartType.isUint8List ||
-        dartType.isDartCoreDouble) {
-      final typeString = dartType.getDisplayString(withNullability: true);
-      return '$this as $typeString';
-    } else {
-      throw InvalidGenerationSourceError(
-        'Trying to convert unsupported type $dartType.',
-        todo: 'Consider adding a type converter.',
-        element: parameterElement,
-      );
     }
   }
 }

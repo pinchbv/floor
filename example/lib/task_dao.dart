@@ -27,6 +27,18 @@ abstract class TaskDao {
   @Query('SELECT message FROM task')
   Future<List<String>> findAllMessages();
 
+  @Query('SELECT timestamp FROM task')
+  Future<List<DateTime>> findAllTimestamps();
+
+  @Query('SELECT timestamp FROM task')
+  Stream<List<DateTime>> findAllTimestampsAsStream();
+
+  @Query('SELECT type FROM task')
+  Future<List<TaskType>> findAllTypes();
+
+  @Query('SELECT type FROM task')
+  Stream<List<TaskType>> findAllTypesAsStream();
+
   @Query('SELECT * FROM task WHERE type = :type')
   Stream<List<Task>> findAllTasksByTypeAsStream(TaskType type);
 

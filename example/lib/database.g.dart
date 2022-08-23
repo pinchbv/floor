@@ -218,6 +218,38 @@ class _$TaskDao extends TaskDao {
   }
 
   @override
+  Future<List<DateTime>> findAllTimestamps() async {
+    return _queryAdapter.queryList('SELECT timestamp FROM task',
+        mapper: (Map<String, Object?> row) =>
+            _dateTimeConverter.decode(row.values.first as int));
+  }
+
+  @override
+  Stream<List<DateTime>> findAllTimestampsAsStream() {
+    return _queryAdapter.queryListStream('SELECT timestamp FROM task',
+        mapper: (Map<String, Object?> row) =>
+            _dateTimeConverter.decode(row.values.first as int),
+        queryableName: 'task',
+        isView: false);
+  }
+
+  @override
+  Future<List<TaskType>> findAllTypes() async {
+    return _queryAdapter.queryList('SELECT type FROM task',
+        mapper: (Map<String, Object?> row) =>
+            TaskType.values[row.values.first as int]);
+  }
+
+  @override
+  Stream<List<TaskType>> findAllTypesAsStream() {
+    return _queryAdapter.queryListStream('SELECT type FROM task',
+        mapper: (Map<String, Object?> row) =>
+            TaskType.values[row.values.first as int],
+        queryableName: 'task',
+        isView: false);
+  }
+
+  @override
   Stream<List<Task>> findAllTasksByTypeAsStream(TaskType type) {
     return _queryAdapter.queryListStream('SELECT * FROM task WHERE type = ?1',
         mapper: (Map<String, Object?> row) => Task(

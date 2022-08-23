@@ -172,7 +172,7 @@ void main() {
     expect(actual, equalsDart(r'''
       @override
       Future<bool?> getAdminValue() async {
-        return _queryAdapter.query('SELECT admin FROM Person LIMIT 1', mapper: (Map<String, Object?> row) => (row.values.first as int) == 1);
+        return _queryAdapter.query('SELECT admin FROM Person LIMIT 1', mapper: (Map<String, Object?> row) => (row.values.first as int) != 0);
       }
     '''));
   });
@@ -188,7 +188,7 @@ void main() {
     expect(actual, equalsDart(r'''
       @override
       Future<List<bool>> getAdminValueList() async {
-        return _queryAdapter.queryList('SELECT admin FROM Person', mapper: (Map<String, Object?> row) => (row.values.first as int) == 1);
+        return _queryAdapter.queryList('SELECT admin FROM Person', mapper: (Map<String, Object?> row) => (row.values.first as int) != 0);
       }
     '''));
   });
@@ -204,7 +204,7 @@ void main() {
     expect(actual, equalsDart(r'''
       @override
       Stream<List<bool>> getAdminValueListAsStream() {
-        return _queryAdapter.queryListStream('SELECT admin FROM Person', mapper: (Map<String, Object?> row) => (row.values.first as int) == 1, queryableName: 'Person', isView: false);
+        return _queryAdapter.queryListStream('SELECT admin FROM Person', mapper: (Map<String, Object?> row) => (row.values.first as int) != 0, queryableName: 'Person', isView: false);
       }
     '''));
   });
@@ -305,6 +305,54 @@ void main() {
     '''));
   });
 
+  test('query return CharacterType type', () async {
+    final queryMethod = await _createQueryMethod('''
+      @Query('SELECT someType FROM Person LIMIT 1')
+      Future<CharacterType?> getFirstPersonCharacter();
+    ''');
+
+    final actual = QueryMethodWriter(queryMethod).write();
+
+    expect(actual, equalsDart(r'''
+      @override
+      Future<CharacterType?> getFirstPersonCharacter() async {
+        return _queryAdapter.query('SELECT someType FROM Person LIMIT 1', mapper: (Map<String, Object?> row) => CharacterType.values[row.values.first as int]);
+      }
+    '''));
+  });
+
+  test('query return List<CharacterType> type', () async {
+    final queryMethod = await _createQueryMethod('''
+      @Query('SELECT someType FROM Person')
+      Future<List<CharacterType>> getPeopleCharacterList();
+    ''');
+
+    final actual = QueryMethodWriter(queryMethod).write();
+
+    expect(actual, equalsDart(r'''
+      @override
+      Future<List<CharacterType>> getPeopleCharacterList() async {
+        return _queryAdapter.queryList('SELECT someType FROM Person', mapper: (Map<String, Object?> row) => CharacterType.values[row.values.first as int]);
+      }
+    '''));
+  });
+
+  test('query return List<CharacterType> type stream', () async {
+    final queryMethod = await _createQueryMethod('''
+      @Query('SELECT someType FROM Person')
+      Stream<List<CharacterType>> getPeopleCharacterAsStream();
+    ''');
+
+    final actual = QueryMethodWriter(queryMethod).write();
+
+    expect(actual, equalsDart(r'''
+      @override
+      Stream<List<CharacterType>> getPeopleCharacterAsStream() {
+        return _queryAdapter.queryListStream('SELECT someType FROM Person', mapper: (Map<String, Object?> row) => CharacterType.values[row.values.first as int], queryableName: 'Person', isView: false);
+      }
+    '''));
+  });
+
   group('type converters', () {
     test('generates method with external type converter', () async {
       final typeConverter = TypeConverter(
@@ -401,6 +449,30 @@ void main() {
         return _queryAdapter.queryList('SELECT * FROM Order WHERE date IN (' + _sqliteVariablesForDates + ')', 
           mapper: (Map<String, Object?> row) => Order(row['id'] as int, _dateTimeConverter.decode(row['dateTime'] as int)),
           arguments: [...dates.map((element) => _dateTimeConverter.encode(element))]);
+      }
+    '''));
+    });
+
+    test('generates method with the type converted return type', () async {
+      final typeConverter = TypeConverter(
+        'DateTimeConverter',
+        await dateTimeDartType,
+        await intDartType,
+        TypeConverterScope.database,
+      );
+
+      final queryMethod = await '''
+      @Query('SELECT timestamp FROM Person')
+      Future<List<DateTime>> findTimestampList();
+    '''
+          .asOrderQueryMethod({typeConverter});
+
+      final actual = QueryMethodWriter(queryMethod).write();
+
+      expect(actual, equalsDart(r'''
+      @override
+      Future<List<DateTime>> findTimestampList() async {
+        return _queryAdapter.queryList('SELECT timestamp FROM Person', mapper: (Map<String, Object?> row) => _dateTimeConverter.decode(row.values.first as int));
       }
     '''));
     });
@@ -692,7 +764,7 @@ void main() {
         throwsA(const TypeMatcher<InvalidGenerationSourceError>()));
   });
 
-  test('query with unsupported return type throws', () async {
+  test('query without TypeConverter for return type throws', () async {
     final queryMethod = await _createQueryMethod('''
       @Query('SELECT timestamp FROM Person')
       Future<List<DateTime>> findTimestampList();
