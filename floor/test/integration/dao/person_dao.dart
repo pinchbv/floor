@@ -17,6 +17,9 @@ abstract class PersonDao {
   @Query('SELECT * FROM person WHERE id = :id')
   Stream<Person?> findPersonByIdAsStream(int id);
 
+  @Query('SELECT DISTINCT COUNT(id) FROM person')
+  Stream<int?> uniqueRecordsCountAsStream();
+
   @Query('SELECT * FROM person WHERE id = :id AND custom_name = :name')
   Future<Person?> findPersonByIdAndName(int id, String name);
 

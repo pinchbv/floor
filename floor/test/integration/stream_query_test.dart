@@ -60,6 +60,18 @@ void main() {
         await personDao.insertPersons(persons2);
         expect(actual, emits(persons + persons2));
       });
+
+      test('unique records count', () async {
+        final persons = [Person(1, 'Simon'), Person(2, 'Frank')];
+        final persons2 = [Person(3, 'Paul'), Person(4, 'George')];
+        await personDao.insertPersons(persons);
+
+        final actual = personDao.uniqueRecordsCountAsStream();
+        expect(actual, emits(persons.length));
+
+        await personDao.insertPersons(persons2);
+        expect(actual, emits(persons.length + persons2.length));
+      });
     });
 
     group('update change', () {
