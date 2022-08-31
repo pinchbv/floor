@@ -77,9 +77,9 @@ This component is responsible for managing access to the underlying SQLite datab
 class contains the method signatures for querying the database which have to return a `Future`
 or `Stream`.
 
-- You can define queries by adding the `@Query` annotation to a method. The SQL statement has to get
-  added in parenthesis. The method must return a `Future` or `Stream` of next supported
-  types `String`, `int`, `double`, `bool`, `Uint8List` or `Entity` you're querying for.
+- You can define queries by adding the `@Query` annotation to a method. The SQL statement then has to
+  be added in parenthesis. The method must return a `Future` or `Stream` with the primitive
+  types `String`, `int`, `double`, `bool`, `Uint8List`, or a Floor `Entity` you're querying for.
 - `@insert` marks a method as an insertion method.
 
 ```dart
