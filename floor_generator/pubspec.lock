@@ -175,7 +175,7 @@ packages:
       name: glob
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "2.1.0"
+    version: "2.1.1"
   graphs:
     dependency: transitive
     description:
@@ -431,10 +431,12 @@ packages:
   test_cov:
     dependency: "direct dev"
     description:
-      name: test_cov
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "1.0.1"
+      path: "."
+      ref: HEAD
+      resolved-ref: e3bb980197a0b9388ab1fb8cd841b0e1d05c6356
+      url: "https://github.com/dkaera/test_cov"
+    source: git
+    version: "1.0.4"
   typed_data:
     dependency: transitive
     description:
