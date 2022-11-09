@@ -22,7 +22,7 @@ extension DartTypeChecker on DartType {
     ]).isExactlyType(this);
   }
 
-  bool get isEnumType => _enumTypeChecker.isSuperTypeOf(this);
+  bool get isEnumType => element is EnumElement;
 
   bool get isUint8List => _uint8ListTypeChecker.isExactlyType(this);
 }
@@ -62,5 +62,3 @@ final _doubleTypeChecker = _typeChecker(double);
 final _uint8ListTypeChecker = _typeChecker(Uint8List);
 
 final _streamTypeChecker = _typeChecker(Stream);
-
-final _enumTypeChecker = _typeChecker(Enum);

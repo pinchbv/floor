@@ -4,7 +4,7 @@ import 'package:code_builder/code_builder.dart';
 class AnnotationExpression extends CodeExpression {
   final String annotation;
 
-  AnnotationExpression(final this.annotation) : super(Code(annotation));
+  AnnotationExpression(this.annotation) : super(Code(annotation));
 }
 
 final overrideAnnotationExpression = AnnotationExpression('override');
