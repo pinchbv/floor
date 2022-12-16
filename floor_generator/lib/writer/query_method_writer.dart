@@ -132,7 +132,6 @@ class QueryMethodWriter implements Writer {
         // TODO #403 what about type converters that map between e.g. string and list?
         final DartType flatType = parameter.type.flatten();
         final displayName = parameter.displayName;
-
         if (flatType.isDefaultSqlType || flatType.isEnumType) {
           return '...$displayName';
         } else {

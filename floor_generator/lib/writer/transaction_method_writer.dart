@@ -7,7 +7,7 @@ import 'package:floor_generator/writer/writer.dart';
 class TransactionMethodWriter implements Writer {
   final TransactionMethod method;
 
-  TransactionMethodWriter(final this.method);
+  TransactionMethodWriter(this.method);
 
   @override
   Method write() {

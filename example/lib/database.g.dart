@@ -63,8 +63,11 @@ class _$FlutterDatabase extends FlutterDatabase {
 
   TaskDao? _taskDaoInstance;
 
-  Future<sqflite.Database> open(String path, List<Migration> migrations,
-      [Callback? callback]) async {
+  Future<sqflite.Database> open(
+    String path,
+    List<Migration> migrations, [
+    Callback? callback,
+  ]) async {
     final databaseOptions = sqflite.OpenDatabaseOptions(
       version: 1,
       onConfigure: (database) async {
@@ -97,8 +100,10 @@ class _$FlutterDatabase extends FlutterDatabase {
 }
 
 class _$TaskDao extends TaskDao {
-  _$TaskDao(this.database, this.changeListener)
-      : _queryAdapter = QueryAdapter(database, changeListener),
+  _$TaskDao(
+    this.database,
+    this.changeListener,
+  )   : _queryAdapter = QueryAdapter(database, changeListener),
         _taskInsertionAdapter = InsertionAdapter(
             database,
             'Task',
