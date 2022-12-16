@@ -12,7 +12,7 @@ jobs:
     timeout-minutes: 10
 
     container:
-      image: google/dart:latest
+      image: dart:2.18.3
 
     steps:
       - name: Check out code
@@ -20,11 +20,11 @@ jobs:
 
       - name: Install dependencies
         working-directory: floor_annotation
-        run: pub get
+        run: dart pub get
 
       - name: Analyze
         working-directory: floor_annotation
-        run: dartanalyzer --fatal-infos --fatal-warnings .
+        run: dart analyze --fatal-infos --fatal-warnings .
 
       - name: Format
         working-directory: floor_annotation
@@ -35,7 +35,7 @@ jobs:
     timeout-minutes: 10
 
     container:
-      image: google/dart:latest
+      image: dart:2.18.3
 
     steps:
       - name: Check out code
@@ -43,11 +43,11 @@ jobs:
 
       - name: Install dependencies
         working-directory: floor_generator
-        run: pub get
+        run: dart pub get
 
       - name: Analyze
         working-directory: floor_generator
-        run: dartanalyzer --fatal-infos --fatal-warnings .
+        run: dart analyze --fatal-infos --fatal-warnings .
 
       - name: Format
         working-directory: floor_generator
@@ -58,7 +58,7 @@ jobs:
         run: dart run test_cov
 
       - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v1
+        uses: codecov/codecov-action@v3
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           flags: floor_generator
@@ -104,7 +104,7 @@ jobs:
         working-directory: floor
 
       - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v1
+        uses: codecov/codecov-action@v3
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           flags: floor
