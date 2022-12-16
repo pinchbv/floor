@@ -30,13 +30,16 @@ void main() {
     final actual = DatabaseWriter(database).write();
 
     expect(actual, equalsDart(r'''
-      class _$TestDatabase extends TestDatabase {
+    class _$TestDatabase extends TestDatabase {
         _$TestDatabase([StreamController<String>? listener]) {
-         changeListener = listener ?? StreamController<String>.broadcast();
+          changeListener = listener ?? StreamController<String>.broadcast();
         }
       
-        Future<sqflite.Database> open(String path, List<Migration> migrations,
-            [Callback? callback]) async {
+        Future<sqflite.Database> open(
+          String path,
+          List<Migration> migrations, [
+          Callback? callback,
+        ]) async {
           final databaseOptions = sqflite.OpenDatabaseOptions(
             version: 1,
             onConfigure: (database) async {
@@ -49,20 +52,20 @@ void main() {
             onUpgrade: (database, startVersion, endVersion) async {
               await MigrationAdapter.runMigrations(
                   database, startVersion, endVersion, migrations);
-
+      
               await callback?.onUpgrade?.call(database, startVersion, endVersion);
             },
             onCreate: (database, version) async {
               await database.execute(
                   'CREATE TABLE IF NOT EXISTS `Person` (`id` INTEGER NOT NULL, `name` TEXT NOT NULL, PRIMARY KEY (`id`))');
-
+      
               await callback?.onCreate?.call(database, version);
             },
           );
           return sqfliteDatabaseFactory.openDatabase(path, options: databaseOptions);
         }
-      }      
-    '''));
+      } 
+      '''));
   });
 
   test('open database with DAO', () async {
@@ -99,8 +102,11 @@ void main() {
         
         TestDao? _testDaoInstance;
         
-        Future<sqflite.Database> open(String path, List<Migration> migrations,
-            [Callback? callback]) async {
+        Future<sqflite.Database> open(
+          String path,
+          List<Migration> migrations, [
+          Callback? callback,
+        ]) async {
           final databaseOptions = sqflite.OpenDatabaseOptions(
             version: 1,
             onConfigure: (database) async {
@@ -159,8 +165,11 @@ void main() {
           changeListener = listener ?? StreamController<String>.broadcast();
         }
         
-        Future<sqflite.Database> open(String path, List<Migration> migrations,
-            [Callback? callback]) async {
+        Future<sqflite.Database> open(
+          String path,
+          List<Migration> migrations, [
+          Callback? callback,
+        ]) async {
           final databaseOptions = sqflite.OpenDatabaseOptions(
             version: 1,
             onConfigure: (database) async {
@@ -222,8 +231,11 @@ void main() {
          changeListener = listener ?? StreamController<String>.broadcast();
         }
       
-        Future<sqflite.Database> open(String path, List<Migration> migrations,
-            [Callback? callback]) async {
+        Future<sqflite.Database> open(
+          String path,
+          List<Migration> migrations, [
+          Callback? callback,
+        ]) async {
           final databaseOptions = sqflite.OpenDatabaseOptions(
             version: 1,
             onConfigure: (database) async {

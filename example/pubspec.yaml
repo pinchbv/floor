@@ -16,8 +16,8 @@ dependencies:
     sdk: flutter
 
 dev_dependencies:
-  analyzer: ^4.1.0
-  build_runner: ^2.1.7
+  analyzer: ^5.0.0
+  build_runner: ^2.2.1
   floor_generator:
     path: ../floor_generator/
   flutter_test:
