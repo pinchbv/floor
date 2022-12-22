@@ -12,6 +12,9 @@ abstract class TaskDao {
   @Query('SELECT * FROM task')
   Stream<List<Task>> findAllTasksAsStream();
 
+  @Query('SELECT DISTINCT COUNT(message) FROM task')
+  Stream<int?> findUniqueMessagesCountAsStream();
+
   @Query('SELECT * FROM task WHERE type = :type')
   Stream<List<Task>> findAllTasksByTypeAsStream(TaskType type);
 

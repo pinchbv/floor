@@ -1,3 +1,8 @@
+import 'package:analyzer/dart/element/element.dart';
+import 'package:analyzer/dart/element/type.dart';
+import 'package:floor_generator/misc/extension/dart_type_extension.dart';
+import 'package:floor_generator/misc/type_utils.dart';
+import 'package:source_gen/source_gen.dart';
 import 'package:strings/strings.dart';
 
 extension StringExtension on String {
@@ -51,6 +56,44 @@ extension NullableStringExtension on String? {
       return 'null';
     } else {
       return "'${escape(this!)}'";
+    }
+  }
+}
+
+extension CastStringExtension on String {
+  String cast(DartType dartType, Element? parameterElement,
+      {bool withNullability = true}) {
+    if (dartType.isDartCoreBool) {
+      final booleanDeserializer = '($this as int) != 0';
+      if (dartType.isNullable && withNullability) {
+        // if the value is null, return null
+        // if the value is not null, interpret 1 as true and 0 as false
+        return '$this == null ? null : $booleanDeserializer';
+      } else {
+        return booleanDeserializer;
+      }
+    } else if (dartType.isEnumType) {
+      final typeString = dartType.getDisplayString(withNullability: false);
+      final enumDeserializer = '$typeString.values[$this as int]';
+      if (dartType.isNullable && withNullability) {
+        return '$this == null ? null : $enumDeserializer';
+      } else {
+        return enumDeserializer;
+      }
+    } else if (dartType.isDartCoreString ||
+        dartType.isDartCoreInt ||
+        dartType.isUint8List ||
+        dartType.isDartCoreDouble) {
+      final typeString = dartType.getDisplayString(
+        withNullability: withNullability,
+      );
+      return '$this as $typeString';
+    } else {
+      throw InvalidGenerationSourceError(
+        'Trying to convert unsupported type $dartType.',
+        todo: 'Consider adding a type converter.',
+        element: parameterElement,
+      );
     }
   }
 }

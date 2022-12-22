@@ -184,7 +184,15 @@ class _$TaskDao extends TaskDao {
             row['message'] as String,
             _dateTimeConverter.decode(row['timestamp'] as int),
             TaskType.values[row['type'] as int]),
-        queryableName: 'Task',
+        queryableName: 'task',
+        isView: false);
+  }
+
+  @override
+  Stream<int?> findUniqueMessagesCountAsStream() {
+    return _queryAdapter.queryStream('SELECT DISTINCT COUNT(message) FROM task',
+        mapper: (Map<String, Object?> row) => row.values.first as int,
+        queryableName: 'task',
         isView: false);
   }
 
@@ -198,7 +206,7 @@ class _$TaskDao extends TaskDao {
             _dateTimeConverter.decode(row['timestamp'] as int),
             TaskType.values[row['type'] as int]),
         arguments: [type.index],
-        queryableName: 'Task',
+        queryableName: 'task',
         isView: false);
   }
 

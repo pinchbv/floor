@@ -162,6 +162,7 @@ Future<Dao> createDao(final String methodSignature) async {
       library test;
       
       import 'package:floor_annotation/floor_annotation.dart';
+      import 'dart:typed_data';
       
       @dao
       abstract class PersonDao {
@@ -243,6 +244,7 @@ Future<Entity> getPersonEntity() async {
       library test;
       
       import 'package:floor_annotation/floor_annotation.dart';
+      import 'dart:typed_data';
       
       $_personEntity
     ''', (resolver) async {
@@ -264,6 +266,7 @@ extension StringExtension on String {
       library test;
             
       import 'package:floor_annotation/floor_annotation.dart';
+      import 'dart:typed_data';
       
       @dao
       abstract class PersonDao {
@@ -289,8 +292,14 @@ const _personEntity = '''
     final int id;
         
     final String name;
+    
+    final double weight;
+    
+    final bool admin;
+    
+    final Uint8List avatar;
         
-    Person(this.id, this.name);
+    Person(this.id, this.name, this.weight, this.admin, this.avatar);
   }
 ''';
 

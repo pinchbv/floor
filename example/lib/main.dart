@@ -54,6 +54,13 @@ class TasksWidgetState extends State<TasksWidget> {
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.title),
+        centerTitle: true,
+        leading: Align(
+          alignment: Alignment.center,
+          child: StreamBuilder(
+              stream: widget.dao.findUniqueMessagesCountAsStream(),
+              builder: (_, snapshot) => Text('count: ${snapshot.data ?? 0}')),
+        ),
         actions: <Widget>[
           PopupMenuButton<int>(
             itemBuilder: (context) {

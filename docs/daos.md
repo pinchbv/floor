@@ -7,7 +7,7 @@ DAO classes can use inherited methods by implementing and extending classes whil
 @dao
 abstract class PersonDao {
   @Query('SELECT * FROM Person')
-  Future<List<Person>> findAllPersons();
+  Future<List<Person>> findAllPeople();
 
   @Query('SELECT * FROM Person WHERE id = :id')
   Stream<Person?> findPersonById(int id);
@@ -20,8 +20,9 @@ abstract class PersonDao {
 ## Queries
 Method signatures turn into query methods by adding the `@Query()` annotation with the query in parenthesis to them.
 Be mindful about the correctness of your SQL statements as they are only partly validated while generating the code.
-These queries have to return either a `Future` or a `Stream` of an entity or `void`.
-Returning `Future<void>` comes in handy whenever you want to delete the full content of a table, for instance.
+These queries have to return either a `Future` or a `Stream` of an entity, Dart core type or `void`. 
+Retrieval of Dart Core types such as `String`, `double`, `int`, `double`, `Uint8List` can be used if you want to get all records from a certain column or return `COUNT` records in the table. 
+Returning `Future<void>` comes in handy whenever you want to delete the full content of a table, for instance. 
 Some query method examples can be seen in the following.
 
 A function returning a single item will return `null` when no matching row is found.
@@ -36,17 +37,23 @@ Future<Person?> findPersonById(int id);
 @Query('SELECT * FROM Person WHERE id = :id AND name = :name')
 Future<Person?> findPersonByIdAndName(int id, String name);
 
-@Query('SELECT * FROM Person')
-Future<List<Person>> findAllPersons(); // select multiple items
+@Query('SELECT COUNT(id) FROM Person')
+Future<int?> getPeopleCount(); // fetch records count
+
+@Query('SELECT name FROM Person')
+Future<List<String>> getAllPeopleNames(); // fetch all records from one column
 
 @Query('SELECT * FROM Person')
-Stream<List<Person>> findAllPersonsAsStream(); // stream return
+Future<List<Person>> findAllPeople(); // select multiple items
+
+@Query('SELECT * FROM Person')
+Stream<List<Person>> findAllPeopleAsStream(); // stream return
 
 @Query('DELETE FROM Person')
-Future<void> deleteAllPersons(); // query without returning an entity
+Future<void> deleteAllPeople(); // query without returning an entity
 
 @Query('SELECT * FROM Person WHERE id IN (:ids)')
-Future<List<Person>> findPersonsWithIds(List<int> ids); // query with IN clause
+Future<List<Person>> findPeopleWithIds(List<int> ids); // query with IN clause
 ```
 
 Query arguments, when using SQLite's `LIKE` operator, have to be supplied by the input of a method.
@@ -55,11 +62,11 @@ It's not possible to define a pattern matching argument like `%foo%` in the quer
 ```dart
 // dao
 @Query('SELECT * FROM Person WHERE name LIKE :name')
-Future<List<Person>> findPersonsWithNamesLike(String name);
+Future<List<Person>> findPeopleWithNamesLike(String name);
 
 // usage
 final name = '%foo%';
-await dao.findPersonsWithNamesLike(name);
+await dao.findPeopleWithNamesLike(name);
 ```
 
 ## Data Changes
@@ -81,7 +88,7 @@ These methods can return a `Future` of either `void`, `int` or `List<int>`.
 Future<void> insertPerson(Person person);
 
 @insert
-Future<List<int>> insertPersons(List<Person> persons);
+Future<List<int>> insertPeople(List<Person> people);
 ```
 
 ### Update
@@ -98,7 +105,7 @@ These methods can return a `Future` of either `void` or `int`.
 Future<void> updatePerson(Person person);
 
 @update
-Future<int> updatePersons(List<Person> persons);
+Future<int> updatePeople(List<Person> people);
 ```
 
 ### Delete
@@ -113,7 +120,7 @@ These methods can return a `Future` of either `void` or `int`.
 Future<void> deletePerson(Person person);
 
 @delete
-Future<int> deletePersons(List<Person> persons);
+Future<int> deletePeople(List<Person> people);
 ```
 
 ## Streams
@@ -135,12 +142,12 @@ abstract class PersonDao {
   Stream<Person?> findPersonByIdAsStream(int id);
 
   @Query('SELECT * FROM Person')
-  Stream<List<Person>> findAllPersonsAsStream();
+  Stream<List<Person>> findAllPeopleAsStream();
 }
 
 // usage
 StreamBuilder<List<Person>>(
-  stream: dao.findAllPersonsAsStream(),
+  stream: dao.findAllPeopleAsStream(),
   builder: (BuildContext context, AsyncSnapshot<List<Person>> snapshot) {
     // do something with the values here
   },
@@ -160,9 +167,9 @@ It's also required to add the `async` modifier. These methods have to return a `
 
 ```dart
 @transaction
-Future<void> replacePersons(List<Person> persons) async {
-  await deleteAllPersons();
-  await insertPersons(persons);
+Future<void> replacePeople(List<Person> people) async {
+  await deleteAllPeople();
+  await insertPeople(people);
 }
 ```
 
