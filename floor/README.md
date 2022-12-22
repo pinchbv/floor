@@ -19,8 +19,8 @@ As a consequence, it's necessary to have an understanding of SQL and SQLite in o
 Refer to [GitHub Discussions](https://github.com/pinchbv/floor/discussions) for questions, ideas, and discussions.
 
 [![pub package](https://img.shields.io/pub/v/floor.svg)](https://pub.dartlang.org/packages/floor)
-[![build status](https://github.com/pinchbv/floor/workflows/Continuous%20integration/badge.svg)](https://github.com/pinchbv/floor/actions)
-[![codecov](https://codecov.io/gh/vitusortner/floor/branch/develop/graph/badge.svg)](https://codecov.io/gh/vitusortner/floor)
+[![build status](https://github.com/pinchbv/floor/workflows/CI/badge.svg)](https://github.com/pinchbv/floor/actions)
+[![codecov](https://codecov.io/gh/pinchbv/floor/branch/develop/graph/badge.svg)](https://codecov.io/gh/pinchbv/floor)
 
 ## Getting Started
 
