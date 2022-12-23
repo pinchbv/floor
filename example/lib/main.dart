@@ -177,7 +177,7 @@ class TaskListCell extends StatelessWidget {
       direction: DismissDirection.horizontal,
       child: ListTile(
         title: Text(task.message),
-        subtitle: Text('Status: ${task.type.title}'),
+        subtitle: Text('Status: ${task.typeTitle}'),
         trailing: Text(task.timestamp.toIso8601String()),
       ),
       confirmDismiss: (direction) async {
@@ -189,10 +189,10 @@ class TaskListCell extends StatelessWidget {
             break;
           case DismissDirection.startToEnd:
             final tasksLength = TaskType.values.length;
-            final nextIndex = (tasksLength + task.type.index + 1) % tasksLength;
+            final nextIndex = (tasksLength + task.typeIndex + 1) % tasksLength;
             final taskCopy = task.copyWith(type: TaskType.values[nextIndex]);
             await dao.updateTask(taskCopy);
-            statusMessage = 'Updated task status by: ${taskCopy.type.title}';
+            statusMessage = 'Updated task status by: ${taskCopy.typeTitle}';
             break;
           default:
             break;
