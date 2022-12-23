@@ -385,7 +385,7 @@ void main() {
 
       const expected = '<String, Object?>{'
           "'id': item.id, "
-          "'isSomething': item.isSomething == true ? 1 : 0"
+          "'isSomething': item.isSomething ? 1 : 0"
           '}';
       expect(actual, equals(expected));
     });
@@ -407,7 +407,7 @@ void main() {
 
       const expected = '<String, Object?>{'
           "'id': item.id, "
-          "'isSomething': item.isSomething == true ? 1 : 0"
+          "'isSomething': item.isSomething == null ? null : (item.isSomething! ? 1 : 0)"
           '}';
       expect(actual, equals(expected));
     });

@@ -110,7 +110,7 @@ class _$TaskDao extends TaskDao {
             (Task item) => <String, Object?>{
                   'id': item.id,
                   'message': item.message,
-                  'isRead': item.isRead == true ? 1 : 0,
+                  'isRead': item.isRead == null ? null : (item.isRead! ? 1 : 0),
                   'timestamp': _dateTimeConverter.encode(item.timestamp),
                   'type': item.type?.index
                 },
@@ -122,7 +122,7 @@ class _$TaskDao extends TaskDao {
             (Task item) => <String, Object?>{
                   'id': item.id,
                   'message': item.message,
-                  'isRead': item.isRead == true ? 1 : 0,
+                  'isRead': item.isRead == null ? null : (item.isRead! ? 1 : 0),
                   'timestamp': _dateTimeConverter.encode(item.timestamp),
                   'type': item.type?.index
                 },
@@ -134,7 +134,7 @@ class _$TaskDao extends TaskDao {
             (Task item) => <String, Object?>{
                   'id': item.id,
                   'message': item.message,
-                  'isRead': item.isRead == true ? 1 : 0,
+                  'isRead': item.isRead == null ? null : (item.isRead! ? 1 : 0),
                   'timestamp': _dateTimeConverter.encode(item.timestamp),
                   'type': item.type?.index
                 },
