@@ -182,14 +182,14 @@ packages:
       path: "../floor_annotation"
       relative: true
     source: path
-    version: "1.3.0"
+    version: "1.4.0"
   floor_generator:
     dependency: "direct dev"
     description:
       path: "../floor_generator"
       relative: true
     source: path
-    version: "1.3.0"
+    version: "1.4.0"
   flutter:
     dependency: "direct main"
     description: flutter

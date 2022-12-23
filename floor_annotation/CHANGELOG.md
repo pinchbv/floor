@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.4.0
+
+### Changes
+
+* Update to Analyzer 5
+* Add Enum support
+* Add primitive Dart type support in queries
+
 ## 1.3.0
 
 ### Changes
