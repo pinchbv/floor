@@ -457,7 +457,7 @@ void main() {
 
       const expected = '<String, Object?>{'
           "'id': item.id, "
-          "'someType': item.someType == null ? null : item.someType.index"
+          "'someType': item.someType?.index"
           '}';
       expect(actual, equals(expected));
     });

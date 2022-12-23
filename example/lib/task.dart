@@ -17,11 +17,11 @@ class Task {
 
   final String message;
 
-  final bool isRead;
+  final bool? isRead;
 
   final DateTime timestamp;
 
-  final TaskType type;
+  final TaskType? type;
 
   Task(this.id, this.isRead, this.message, this.timestamp, this.type);
 
@@ -37,7 +37,7 @@ class Task {
         isRead ?? false,
         message ?? 'empty',
         timestamp ?? DateTime.now(),
-        type ?? TaskType.open,
+        type,
       );
 
   @override
@@ -79,4 +79,10 @@ class Task {
       isRead.hashCode ^
       timestamp.hashCode ^
       type.hashCode;
+}
+
+extension TaskExtension on Task {
+  String get typeTitle => type?.title ?? 'Empty';
+
+  int get typeIndex => type?.index ?? 0;
 }
