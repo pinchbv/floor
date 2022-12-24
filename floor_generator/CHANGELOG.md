@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.4.1
+
+### Changes
+
+* Fix issue with nullable enum declaration in entity
+
 ## 1.4.0
 
 ### Changes
