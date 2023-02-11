@@ -59,7 +59,6 @@ class QueryAdapter {
   Stream<T?> queryStream<T>(
     final String sql, {
     final List<Object>? arguments,
-    // TODO remove queryableName at finish refactoring
     required final String queryableName,
     required final bool isView,
     required final T Function(Map<String, Object?>) mapper,
