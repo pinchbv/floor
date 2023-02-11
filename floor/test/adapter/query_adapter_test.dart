@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:floor/floor.dart';
 import 'package:floor/src/adapter/query_adapter.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/mockito.dart';
@@ -13,6 +14,8 @@ void main() {
   const sql = 'SELECT * FROM dbName';
   final mapper = (Map<String, Object?> row) =>
       Person(row['id'] as int, row['name'] as String);
+
+  final intResultMapper = (Map<String, Object?> row) => row.values.first as int;
 
   tearDown(() {
     clearInteractions(mockDatabaseExecutor);
@@ -141,42 +144,128 @@ void main() {
     });
 
     group('query update', () {
-      test('executes query', () async {
-        const updateSql = 'UPDATE OR ABORT Task SET id = 1, message = "2"';
-        final queryResult = Future.value(1);
-        when(mockDatabaseExecutor.rawUpdate(updateSql))
-            .thenAnswer((_) => queryResult);
+      final arguments = [1, 'Nick'];
+      const updateSQL = 'UPDATE OR ABORT Person SET id = ?, name = ?';
 
-        await underTest.queryNoReturn(updateSql);
+      test('executes query update returns rows tick', () async {
+        when(mockDatabaseExecutor.rawUpdate(
+          updateSQL,
+          arguments,
+        )).thenAnswer((_) => Future.value(1));
 
-        verify(mockDatabaseExecutor.rawUpdate(updateSql));
+        final actual = await underTest.query(
+          updateSQL,
+          arguments: arguments,
+          mapper: intResultMapper,
+        );
+
+        expect(actual, equals(1));
+        verify(mockDatabaseExecutor.rawUpdate(updateSQL, arguments));
+      });
+
+      test('executes query update with arguments no return', () async {
+        when(mockDatabaseExecutor.rawUpdate(
+          updateSQL,
+          arguments,
+        )).thenAnswer((_) => Future.value(1));
+
+        await underTest.queryNoReturn(updateSQL, arguments: arguments);
+
+        verify(mockDatabaseExecutor.rawUpdate(updateSQL, arguments));
+      });
+
+      test('throws error when update query returns List', () async {
+        final queryList = () => underTest.queryList(
+              updateSQL,
+              arguments: arguments,
+              mapper: intResultMapper,
+            );
+
+        expect(queryList, throwsA(const TypeMatcher<StateError>()));
       });
     });
 
     group('query insert', () {
-      test('executes query', () async {
-        const insertSql =
-            'INSERT OR ABORT INTO Task (id, message) VALUES (NULL, "1")';
-        final queryResult = Future.value(1);
-        when(mockDatabaseExecutor.rawInsert(insertSql))
-            .thenAnswer((_) => queryResult);
+      const arguments = [1, 'Frank'];
+      const insertSQL = 'INSERT OR ABORT INTO Person (id, name) VALUES (?, ?)';
 
-        await underTest.queryNoReturn(insertSql);
+      test('executes query insert with arguments returns rows tick', () async {
+        when(mockDatabaseExecutor.rawInsert(
+          insertSQL,
+          arguments,
+        )).thenAnswer((_) => Future.value(1));
 
-        verify(mockDatabaseExecutor.rawInsert(insertSql));
+        final actual = await underTest.query(
+          insertSQL,
+          arguments: arguments,
+          mapper: intResultMapper,
+        );
+
+        expect(actual, equals(1));
+        verify(mockDatabaseExecutor.rawInsert(insertSQL, arguments));
+      });
+
+      test('executes query insert with arguments no return', () async {
+        when(mockDatabaseExecutor.rawInsert(
+          insertSQL,
+          arguments,
+        )).thenAnswer((_) => Future.value(1));
+
+        await underTest.queryNoReturn(insertSQL, arguments: arguments);
+
+        verify(mockDatabaseExecutor.rawInsert(insertSQL, arguments));
+      });
+
+      test('throws error when insert query returns List', () async {
+        final queryList = () => underTest.queryList(
+              insertSQL,
+              arguments: arguments,
+              mapper: intResultMapper,
+            );
+
+        expect(queryList, throwsA(const TypeMatcher<StateError>()));
       });
     });
 
     group('query delete', () {
-      test('executes query', () async {
-        const updateSql = 'DELETE FROM Task WHERE id = 1';
-        final queryResult = Future.value(1);
-        when(mockDatabaseExecutor.rawDelete(updateSql))
-            .thenAnswer((_) => queryResult);
+      const arguments = [1];
+      const deleteSQL = 'DELETE FROM Person WHERE id = ?';
 
-        await underTest.queryNoReturn(updateSql);
+      test('executes query delete with arguments returns rows tick', () async {
+        when(mockDatabaseExecutor.rawDelete(
+          deleteSQL,
+          arguments,
+        )).thenAnswer((_) => Future.value(1));
 
-        verify(mockDatabaseExecutor.rawDelete(updateSql));
+        final actual = await underTest.query(
+          deleteSQL,
+          arguments: arguments,
+          mapper: intResultMapper,
+        );
+
+        expect(actual, equals(1));
+        verify(mockDatabaseExecutor.rawDelete(deleteSQL, arguments));
+      });
+
+      test('executes query delete with arguments no return', () async {
+        when(mockDatabaseExecutor.rawDelete(
+          deleteSQL,
+          arguments,
+        )).thenAnswer((_) => Future.value(1));
+
+        await underTest.queryNoReturn(deleteSQL, arguments: arguments);
+
+        verify(mockDatabaseExecutor.rawDelete(deleteSQL, arguments));
+      });
+
+      test('throws error when delete query returns List', () async {
+        final queryList = () => underTest.queryList(
+              deleteSQL,
+              arguments: arguments,
+              mapper: intResultMapper,
+            );
+
+        expect(queryList, throwsA(const TypeMatcher<StateError>()));
       });
     });
   });
@@ -337,6 +426,103 @@ void main() {
 
       streamController!.add(entityName);
       streamController!.add('otherEntity');
+    });
+
+    group('non select query', () {
+      final person = Person(1, 'Frank');
+      final newPerson = Person(1, 'Nick');
+      final queryResult = Future(() => [
+            {'id': person.id, 'name': person.name}
+          ]);
+      final newQueryResult = Future(() => [
+            {'id': newPerson.id, 'name': newPerson.name}
+          ]);
+
+      test('query item and emit persistent item and new on update', () async {
+        final arguments = [newPerson.id, newPerson.name];
+        const updateSQL = 'UPDATE OR ABORT Person SET name = ? WHERE id = ?';
+        int tick = 0;
+
+        when(mockDatabaseExecutor.rawQuery(sql)).thenAnswer((_) {
+          final result = tick == 0 ? queryResult : newQueryResult;
+          tick++;
+          return result;
+        });
+
+        when(mockDatabaseExecutor.rawUpdate(
+          updateSQL,
+          arguments,
+        )).thenAnswer((_) => Future(() => 1));
+
+        final actual = underTest.queryStream(
+          sql,
+          queryableName: entityName,
+          isView: false,
+          mapper: mapper,
+        );
+
+        await underTest.queryNoReturn(updateSQL, arguments: arguments);
+
+        expect(actual, emitsInOrder(<Person>[person, newPerson]));
+      });
+
+      test('query item and emit persistent item and new on insert', () async {
+        final arguments = [newPerson.id, newPerson.name];
+        const insertSQL =
+            'INSERT OR ABORT INTO Person (id, name) VALUES (?, ?)';
+        int tick = 0;
+
+        when(mockDatabaseExecutor.rawQuery(sql)).thenAnswer((_) {
+          final result = tick == 0 ? queryResult : newQueryResult;
+          tick++;
+          return result;
+        });
+
+        when(mockDatabaseExecutor.rawInsert(
+          insertSQL,
+          arguments,
+        )).thenAnswer((_) => Future(() => 1));
+
+        final actual = underTest.queryStream(
+          sql,
+          queryableName: entityName,
+          isView: false,
+          mapper: mapper,
+        );
+
+        await underTest.queryNoReturn(insertSQL, arguments: arguments);
+
+        expect(actual, emitsInOrder(<Person>[person, newPerson]));
+      });
+
+      test('query item and emit persistent item and new on delete', () async {
+        final emptyQueryResult = Future(() => <Map<String, Object?>>[]);
+        final arguments = [person.id];
+        const deleteSQL = 'DELETE FROM Person WHERE id = ?';
+        int tick = 0;
+
+        when(mockDatabaseExecutor.rawQuery(sql)).thenAnswer((_) {
+          final result = tick == 0 ? queryResult : emptyQueryResult;
+          tick++;
+          return result;
+        });
+
+        when(mockDatabaseExecutor.rawDelete(
+          deleteSQL,
+          arguments,
+        )).thenAnswer((_) => Future(() => 1));
+
+        final actual = underTest.queryStream(
+          sql,
+          queryableName: entityName,
+          isView: false,
+          mapper: mapper,
+        );
+
+        await underTest.queryNoReturn(deleteSQL, arguments: arguments);
+
+        expect(actual, emitsInOrder(<Person?>[person, null]));
+      });
     });
   });
 }

@@ -41,10 +41,17 @@ class QueryAdapter {
     final String sql, {
     final List<Object>? arguments,
     required final T Function(Map<String, Object?>) mapper,
-  }) {
-    return _preformQuery(sql, arguments).then(
-      (rows) => rows.map((row) => mapper(row)).toList(),
-    );
+  }) async {
+    final rootNode = _parseRootNode(sql);
+
+    if (rootNode is SelectStatement) {
+      return _database
+          .rawQuery(sql, arguments)
+          .then((rows) => rows.map((row) => mapper(row)).toList());
+    } else {
+      throw StateError(
+          'Unsupported query "$sql" for List return type. It should be SELECT, since DELETE, UPDATE, INSERT returns `int` type.');
+    }
   }
 
   Future<void> queryNoReturn(
@@ -129,7 +136,7 @@ class QueryAdapter {
   ) async {
     List<Map<String, Object?>> result = List.empty();
     String tableName = '';
-    final rootNode = _sqlEngine.parse(sql).rootNode;
+    final rootNode = _parseRootNode(sql);
 
     if (rootNode is SelectStatement) {
       result = await _database.rawQuery(sql, arguments);
@@ -164,4 +171,7 @@ class QueryAdapter {
   FutureOr<List<Map<String, Object?>>> _mapResult(int value) => [
         {changedRowsKey: value}
       ];
+
+  /// Parses a root node to validate SQL
+  AstNode _parseRootNode(String sql) => _sqlEngine.parse(sql).rootNode;
 }
