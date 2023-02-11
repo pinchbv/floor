@@ -10,7 +10,7 @@ import '../test_util/person.dart';
 void main() {
   final mockDatabaseExecutor = MockDatabaseExecutor();
 
-  const sql = 'abcd';
+  const sql = 'SELECT * FROM dbName';
   final mapper = (Map<String, Object?> row) =>
       Person(row['id'] as int, row['name'] as String);
 
@@ -137,6 +137,42 @@ void main() {
         await underTest.queryNoReturn(sql, arguments: arguments);
 
         verify(mockDatabaseExecutor.rawQuery(sql, arguments));
+      });
+    });
+
+    group('query update', () {
+      test('executes query', () async {
+        const updateSql = 'UPDATE OR ABORT Task SET id = 1, message = "2"';
+        final queryResult = Future.value(1);
+        when(mockDatabaseExecutor.rawUpdate(updateSql)).thenAnswer((_) => queryResult);
+
+        await underTest.queryNoReturn(updateSql);
+
+        verify(mockDatabaseExecutor.rawUpdate(updateSql));
+      });
+    });
+
+    group('query insert', () {
+      test('executes query', () async {
+        const insertSql = 'INSERT OR ABORT INTO Task (id, message) VALUES (NULL, "1")';
+        final queryResult = Future.value(1);
+        when(mockDatabaseExecutor.rawInsert(insertSql)).thenAnswer((_) => queryResult);
+
+        await underTest.queryNoReturn(insertSql);
+
+        verify(mockDatabaseExecutor.rawInsert(insertSql));
+      });
+    });
+
+    group('query delete', () {
+      test('executes query', () async {
+        const updateSql = 'DELETE FROM Task WHERE id = 1';
+        final queryResult = Future.value(1);
+        when(mockDatabaseExecutor.rawDelete(updateSql)).thenAnswer((_) => queryResult);
+
+        await underTest.queryNoReturn(updateSql);
+
+        verify(mockDatabaseExecutor.rawDelete(updateSql));
       });
     });
   });

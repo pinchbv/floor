@@ -190,6 +190,11 @@ class TaskListCell extends StatelessWidget {
           case DismissDirection.startToEnd:
             final tasksLength = TaskType.values.length;
             final nextIndex = (tasksLength + task.typeIndex + 1) % tasksLength;
+
+            // final newType = TaskType.values[nextIndex];
+            // final count = await dao.updateTypeById(newType, task.id!);
+            // statusMessage = count == 1 ? 'Success' : 'Error';
+
             final taskCopy = task.copyWith(type: TaskType.values[nextIndex]);
             await dao.updateTask(taskCopy);
             statusMessage = 'Updated task status by: ${taskCopy.typeTitle}';

@@ -1,12 +1,17 @@
 import 'dart:async';
 
+import 'package:collection/collection.dart';
 import 'package:floor/src/util/string_utils.dart';
 import 'package:sqflite/sqflite.dart';
+import 'package:sqlparser/sqlparser.dart';
+
+import '../util/constants.dart';
 
 /// This class knows how to execute database queries.
 class QueryAdapter {
   final DatabaseExecutor _database;
   final StreamController<String>? _changeListener;
+  late final SqlEngine _sqlEngine = SqlEngine();
 
   QueryAdapter(
     final DatabaseExecutor database, [
@@ -20,7 +25,7 @@ class QueryAdapter {
     final List<Object>? arguments,
     required final T Function(Map<String, Object?>) mapper,
   }) async {
-    final rows = await _database.rawQuery(sql, arguments);
+    final rows = await _preformQuery(sql, arguments);
 
     if (rows.isEmpty) {
       return null;
@@ -36,19 +41,17 @@ class QueryAdapter {
     final String sql, {
     final List<Object>? arguments,
     required final T Function(Map<String, Object?>) mapper,
-  }) async {
-    final rows = await _database.rawQuery(sql, arguments);
-    return rows.map((row) => mapper(row)).toList();
+  }) {
+    return _preformQuery(sql, arguments).then(
+      (rows) => rows.map((row) => mapper(row)).toList(),
+    );
   }
 
   Future<void> queryNoReturn(
     final String sql, {
     final List<Object>? arguments,
   }) async {
-    // TODO #94 differentiate between different query kinds (select, update, delete, insert)
-    //  this enables to notify the observers
-    //  also requires extracting the table name :(
-    await _database.rawQuery(sql, arguments);
+    await _preformQuery(sql, arguments);
   }
 
   /// Executes a SQLite query that returns a stream of single query results
@@ -56,6 +59,7 @@ class QueryAdapter {
   Stream<T?> queryStream<T>(
     final String sql, {
     final List<Object>? arguments,
+    // TODO remove queryableName at finish refactoring
     required final String queryableName,
     required final bool isView,
     required final T Function(Map<String, Object?>) mapper,
@@ -118,4 +122,47 @@ class QueryAdapter {
 
     return controller.stream;
   }
+
+  /// Parses the SQL query to determine which method is declared and executes it.
+  Future<List<Map<String, Object?>>> _preformQuery(
+    String sql,
+    List<Object>? arguments,
+  ) async {
+    List<Map<String, Object?>> result = List.empty();
+    String tableName = '';
+    final rootNode = _sqlEngine.parse(sql).rootNode;
+
+    if (rootNode is SelectStatement) {
+      result = await _database.rawQuery(sql, arguments);
+    } else if (rootNode is InsertStatement) {
+      result = await _database.rawInsert(sql, arguments).then(_mapResult);
+      tableName = rootNode.table.tableName;
+    } else if (rootNode is UpdateStatement) {
+      result = await _database.rawUpdate(sql, arguments).then(_mapResult);
+      tableName = rootNode.table.tableName;
+    } else if (rootNode is DeleteStatement) {
+      result = await _database.rawDelete(sql, arguments).then(_mapResult);
+      tableName = rootNode.table.tableName;
+    }
+
+    _notifyIfChanged(tableName, result);
+
+    return result;
+  }
+
+  /// Checks the query result, if it is a table change, notifies by table name.
+  void _notifyIfChanged(
+    String tableName,
+    List<Map<String, Object?>> result,
+  ) {
+    final count = result.firstOrNull?[changedRowsKey];
+    if (tableName.isNotEmpty && count is int && count > 0) {
+      _changeListener?.add(tableName);
+    }
+  }
+
+  /// Converts the modification `int` result to a query result.
+  FutureOr<List<Map<String, Object?>>> _mapResult(int value) => [
+        {changedRowsKey: value}
+      ];
 }

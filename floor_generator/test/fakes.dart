@@ -547,6 +547,10 @@ class FakeFieldElement implements FieldElement {
   @override
   // TODO: implement children
   List<Element> get children => throw UnimplementedError();
+
+  @override
+  // TODO: implement isPromotable
+  bool get isPromotable => throw UnimplementedError();
 }
 
 class FakeDartObject implements DartObject {
