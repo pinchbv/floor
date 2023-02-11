@@ -144,7 +144,8 @@ void main() {
       test('executes query', () async {
         const updateSql = 'UPDATE OR ABORT Task SET id = 1, message = "2"';
         final queryResult = Future.value(1);
-        when(mockDatabaseExecutor.rawUpdate(updateSql)).thenAnswer((_) => queryResult);
+        when(mockDatabaseExecutor.rawUpdate(updateSql))
+            .thenAnswer((_) => queryResult);
 
         await underTest.queryNoReturn(updateSql);
 
@@ -154,9 +155,11 @@ void main() {
 
     group('query insert', () {
       test('executes query', () async {
-        const insertSql = 'INSERT OR ABORT INTO Task (id, message) VALUES (NULL, "1")';
+        const insertSql =
+            'INSERT OR ABORT INTO Task (id, message) VALUES (NULL, "1")';
         final queryResult = Future.value(1);
-        when(mockDatabaseExecutor.rawInsert(insertSql)).thenAnswer((_) => queryResult);
+        when(mockDatabaseExecutor.rawInsert(insertSql))
+            .thenAnswer((_) => queryResult);
 
         await underTest.queryNoReturn(insertSql);
 
@@ -168,7 +171,8 @@ void main() {
       test('executes query', () async {
         const updateSql = 'DELETE FROM Task WHERE id = 1';
         final queryResult = Future.value(1);
-        when(mockDatabaseExecutor.rawDelete(updateSql)).thenAnswer((_) => queryResult);
+        when(mockDatabaseExecutor.rawDelete(updateSql))
+            .thenAnswer((_) => queryResult);
 
         await underTest.queryNoReturn(updateSql);
 
