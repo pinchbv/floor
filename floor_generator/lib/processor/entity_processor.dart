@@ -1,6 +1,5 @@
 import 'package:analyzer/dart/constant/value.dart';
 import 'package:analyzer/dart/element/element.dart';
-import 'package:analyzer/dart/element/type.dart';
 import 'package:collection/collection.dart';
 import 'package:floor_annotation/floor_annotation.dart' as annotations;
 import 'package:floor_generator/misc/constants.dart';
@@ -277,19 +276,18 @@ class EntityProcessor extends QueryableProcessor<Entity> {
     final fieldElement = field.fieldElement;
     final parameterName = fieldElement.displayName;
     final fieldType = fieldElement.type;
+    final typeConverter = [...queryableTypeConverters, field.typeConverter]
+        .whereNotNull()
+        .getClosestOrNull(fieldType);
     String attributeValue = 'item.$parameterName';
 
-    if (fieldType.isDartCoreBool) {
+    if (typeConverter != null) {
+      attributeValue =
+          '_${typeConverter.name.decapitalize()}.encode(item.$parameterName)';
+    } else if (fieldType.isDartCoreBool) {
       attributeValue = _serializeBoolean(field, attributeValue);
     } else if (fieldType.isEnumType) {
       attributeValue = _serializeEnum(attributeValue, field);
-    } else if (!fieldType.isDefaultSqlType) {
-      attributeValue = _typeConverterSerialization(
-        field,
-        fieldType,
-        attributeValue,
-        parameterName,
-      );
     }
     return attributeValue;
   }
@@ -304,21 +302,6 @@ class EntityProcessor extends QueryableProcessor<Entity> {
   String _serializeEnum(String attributeValue, Field field) {
     final operator = field.isNullable ? '?.' : '.';
     return '$attributeValue${operator}index';
-  }
-
-  String _typeConverterSerialization(
-    Field field,
-    DartType fieldType,
-    String attributeValue,
-    String parameterName,
-  ) {
-    final typeConverter = [
-      ...queryableTypeConverters,
-      field.typeConverter,
-    ].whereNotNull().getClosest(fieldType);
-    attributeValue =
-        '_${typeConverter.name.decapitalize()}.encode(item.$parameterName)';
-    return attributeValue;
   }
 
   annotations.ForeignKeyAction _getForeignKeyAction(
