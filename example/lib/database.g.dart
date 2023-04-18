@@ -85,7 +85,7 @@ class _$FlutterDatabase extends FlutterDatabase {
       },
       onCreate: (database, version) async {
         await database.execute(
-            'CREATE TABLE IF NOT EXISTS `Task` (`id` INTEGER PRIMARY KEY AUTOINCREMENT, `message` TEXT NOT NULL, `isRead` INTEGER, `timestamp` INTEGER NOT NULL, `type` INTEGER)');
+            'CREATE TABLE IF NOT EXISTS `Task` (`id` INTEGER PRIMARY KEY AUTOINCREMENT, `message` TEXT NOT NULL, `isRead` INTEGER, `timestamp` INTEGER NOT NULL, `status` INTEGER, `type` TEXT)');
 
         await callback?.onCreate?.call(database, version);
       },
@@ -112,7 +112,8 @@ class _$TaskDao extends TaskDao {
                   'message': item.message,
                   'isRead': item.isRead == null ? null : (item.isRead! ? 1 : 0),
                   'timestamp': _dateTimeConverter.encode(item.timestamp),
-                  'type': item.type?.index
+                  'status': item.status?.index,
+                  'type': _taskTypeConverter.encode(item.type)
                 },
             changeListener),
         _taskUpdateAdapter = UpdateAdapter(
@@ -124,7 +125,8 @@ class _$TaskDao extends TaskDao {
                   'message': item.message,
                   'isRead': item.isRead == null ? null : (item.isRead! ? 1 : 0),
                   'timestamp': _dateTimeConverter.encode(item.timestamp),
-                  'type': item.type?.index
+                  'status': item.status?.index,
+                  'type': _taskTypeConverter.encode(item.type)
                 },
             changeListener),
         _taskDeletionAdapter = DeletionAdapter(
@@ -136,7 +138,8 @@ class _$TaskDao extends TaskDao {
                   'message': item.message,
                   'isRead': item.isRead == null ? null : (item.isRead! ? 1 : 0),
                   'timestamp': _dateTimeConverter.encode(item.timestamp),
-                  'type': item.type?.index
+                  'status': item.status?.index,
+                  'type': _taskTypeConverter.encode(item.type)
                 },
             changeListener);
 
@@ -160,7 +163,10 @@ class _$TaskDao extends TaskDao {
             row['isRead'] == null ? null : (row['isRead'] as int) != 0,
             row['message'] as String,
             _dateTimeConverter.decode(row['timestamp'] as int),
-            row['type'] == null ? null : TaskType.values[row['type'] as int]),
+            row['status'] == null
+                ? null
+                : TaskStatus.values[row['status'] as int],
+            _taskTypeConverter.decode(row['type'] as String?)),
         arguments: [id]);
   }
 
@@ -172,7 +178,10 @@ class _$TaskDao extends TaskDao {
             row['isRead'] == null ? null : (row['isRead'] as int) != 0,
             row['message'] as String,
             _dateTimeConverter.decode(row['timestamp'] as int),
-            row['type'] == null ? null : TaskType.values[row['type'] as int]));
+            row['status'] == null
+                ? null
+                : TaskStatus.values[row['status'] as int],
+            _taskTypeConverter.decode(row['type'] as String?)));
   }
 
   @override
@@ -183,7 +192,10 @@ class _$TaskDao extends TaskDao {
             row['isRead'] == null ? null : (row['isRead'] as int) != 0,
             row['message'] as String,
             _dateTimeConverter.decode(row['timestamp'] as int),
-            row['type'] == null ? null : TaskType.values[row['type'] as int]),
+            row['status'] == null
+                ? null
+                : TaskStatus.values[row['status'] as int],
+            _taskTypeConverter.decode(row['type'] as String?)),
         queryableName: 'task',
         isView: false);
   }
@@ -197,15 +209,18 @@ class _$TaskDao extends TaskDao {
   }
 
   @override
-  Stream<List<Task>> findAllTasksByTypeAsStream(TaskType type) {
-    return _queryAdapter.queryListStream('SELECT * FROM task WHERE type = ?1',
+  Stream<List<Task>> findAllTasksByStatusAsStream(TaskStatus status) {
+    return _queryAdapter.queryListStream('SELECT * FROM task WHERE status = ?1',
         mapper: (Map<String, Object?> row) => Task(
             row['id'] as int?,
             row['isRead'] == null ? null : (row['isRead'] as int) != 0,
             row['message'] as String,
             _dateTimeConverter.decode(row['timestamp'] as int),
-            row['type'] == null ? null : TaskType.values[row['type'] as int]),
-        arguments: [type.index],
+            row['status'] == null
+                ? null
+                : TaskStatus.values[row['status'] as int],
+            _taskTypeConverter.decode(row['type'] as String?)),
+        arguments: [status.index],
         queryableName: 'task',
         isView: false);
   }
@@ -254,3 +269,4 @@ class _$TaskDao extends TaskDao {
 
 // ignore_for_file: unused_element
 final _dateTimeConverter = DateTimeConverter();
+final _taskTypeConverter = TaskTypeConverter();

@@ -1,3 +1,4 @@
+import 'package:analyzer/dart/element/type.dart';
 import 'package:code_builder/code_builder.dart';
 import 'package:floor_generator/misc/annotation_expression.dart';
 import 'package:floor_generator/misc/type_utils.dart';
@@ -28,7 +29,7 @@ class TransactionMethodWriter implements Writer {
     final methodCall = '${method.name}($parameters)';
     final innerType = method.returnType.flatten();
     final innerTypeName = innerType.getDisplayString(withNullability: false);
-    final finalExpression = innerType.isVoid ? 'await' : 'return';
+    final finalExpression = innerType is VoidType ? 'await' : 'return';
 
     return '''
     if (database is sqflite.Transaction) {

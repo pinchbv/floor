@@ -56,7 +56,7 @@ class QueryMethod {
 
   bool get returnsStream => rawReturnType.isStream;
 
-  bool get returnsVoid => flattenedReturnType.isVoid;
+  bool get returnsVoid => flattenedReturnType is VoidType;
 
   @override
   bool operator ==(Object other) =>

@@ -54,10 +54,10 @@ class FieldProcessor extends Processor<Field> {
 
   String _getSqlType(final TypeConverter? typeConverter) {
     final type = _fieldElement.type;
-    if (type.isDefaultSqlType || type.isEnumType) {
-      return type.asSqlType();
-    } else if (typeConverter != null) {
+    if (typeConverter != null) {
       return typeConverter.databaseType.asSqlType();
+    } else if (type.isDefaultSqlType || type.isEnumType) {
+      return type.asSqlType();
     } else {
       throw InvalidGenerationSourceError(
         'Column type is not supported for $type.',

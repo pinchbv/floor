@@ -132,7 +132,7 @@ class QueryMethodProcessor extends Processor<QueryMethod> {
     final DartType flattenedReturnType,
   ) {
     if (!returnsList &&
-        !flattenedReturnType.isVoid &&
+        !(flattenedReturnType is VoidType) &&
         !flattenedReturnType.isNullable) {
       if (returnsStream) {
         throw _processorError.doesNotReturnNullableStream;

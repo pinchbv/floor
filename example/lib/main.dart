@@ -47,7 +47,7 @@ class TasksWidget extends StatefulWidget {
 }
 
 class TasksWidgetState extends State<TasksWidget> {
-  TaskType? _selectedType;
+  TaskStatus? _selectedType;
 
   @override
   Widget build(BuildContext context) {
@@ -65,7 +65,8 @@ class TasksWidgetState extends State<TasksWidget> {
           PopupMenuButton<int>(
             itemBuilder: (context) {
               return List.generate(
-                TaskType.values.length + 1, //Uses increment to handle All types
+                TaskStatus.values.length +
+                    1, //Uses increment to handle All types
                 (index) {
                   return PopupMenuItem<int>(
                     value: index,
@@ -98,12 +99,12 @@ class TasksWidgetState extends State<TasksWidget> {
     );
   }
 
-  TaskType _getMenuType(int index) => TaskType.values[index - 1];
+  TaskStatus _getMenuType(int index) => TaskStatus.values[index - 1];
 }
 
 class TasksListView extends StatelessWidget {
   final TaskDao dao;
-  final TaskType? selectedType;
+  final TaskStatus? selectedType;
 
   const TasksListView({
     Key? key,
@@ -117,7 +118,7 @@ class TasksListView extends StatelessWidget {
       child: StreamBuilder<List<Task>>(
         stream: selectedType == null
             ? dao.findAllTasksAsStream()
-            : dao.findAllTasksByTypeAsStream(selectedType!),
+            : dao.findAllTasksByStatusAsStream(selectedType!),
         builder: (_, snapshot) {
           if (!snapshot.hasData) return Container();
 
@@ -177,7 +178,7 @@ class TaskListCell extends StatelessWidget {
       direction: DismissDirection.horizontal,
       child: ListTile(
         title: Text(task.message),
-        subtitle: Text('Status: ${task.typeTitle}'),
+        subtitle: Text('Status: ${task.statusTitle}'),
         trailing: Text(task.timestamp.toIso8601String()),
       ),
       confirmDismiss: (direction) async {
@@ -188,11 +189,13 @@ class TaskListCell extends StatelessWidget {
             statusMessage = 'Removed task';
             break;
           case DismissDirection.startToEnd:
-            final tasksLength = TaskType.values.length;
-            final nextIndex = (tasksLength + task.typeIndex + 1) % tasksLength;
-            final newType = TaskType.values[nextIndex];
-            final count = await dao.updateTypeById(newType, task.id!);
-            statusMessage = count == 1 ? 'Success' : 'Error';
+            final tasksLength = TaskStatus.values.length;
+            final nextIndex =
+                (tasksLength + task.statusIndex + 1) % tasksLength;
+            final taskCopy =
+                task.copyWith(status: TaskStatus.values[nextIndex]);
+            await dao.updateTask(taskCopy);
+            statusMessage = 'Updated task status by: ${taskCopy.statusTitle}';
             break;
           default:
             break;
@@ -261,7 +264,7 @@ class TasksTextField extends StatelessWidget {
     if (message.trim().isEmpty) {
       _textEditingController.clear();
     } else {
-      final task = Task.optional(message: message);
+      final task = Task.optional(message: message, type: TaskType.task);
       await dao.insertTask(task);
       _textEditingController.clear();
     }
