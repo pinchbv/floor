@@ -36,7 +36,7 @@ class InsertionMethodProcessor implements Processor<InsertionMethod> {
     final flattenedReturnType =
         _getFlattenedReturnType(returnType, returnsList);
 
-    final returnsVoid = flattenedReturnType.isVoid;
+    final returnsVoid = flattenedReturnType is VoidType;
     final returnsInt = flattenedReturnType.isDartCoreInt;
     final returnsIntList = returnsList && flattenedReturnType.isDartCoreInt;
 

@@ -13,6 +13,7 @@ import 'package:floor_generator/value_object/queryable.dart';
 import 'package:floor_generator/value_object/type_converter.dart';
 import 'package:floor_generator/value_object/view.dart';
 import 'package:floor_generator/writer/writer.dart';
+import 'package:source_gen/source_gen.dart';
 
 class QueryMethodWriter implements Writer {
   final QueryMethod _queryMethod;
@@ -113,8 +114,13 @@ class QueryMethodWriter implements Writer {
           .map((parameter) {
         final type = parameter.type;
         final displayName = parameter.displayName;
+        final typeConverter = _queryMethod.typeConverters.getClosestOrNull(
+          type,
+        );
 
-        if (type.isDartCoreBool) {
+        if (typeConverter != null) {
+          return '_${typeConverter.name.decapitalize()}.encode($displayName)';
+        } else if (type.isDartCoreBool) {
           // query method parameters can't be null
           return '$displayName ? 1 : 0';
         } else if (type.isEnumType) {
@@ -122,8 +128,11 @@ class QueryMethodWriter implements Writer {
         } else if (type.isDefaultSqlType) {
           return displayName;
         } else {
-          final typeConverter = _queryMethod.typeConverters.getClosest(type);
-          return '_${typeConverter.name.decapitalize()}.encode($displayName)';
+          throw InvalidGenerationSourceError(
+            'Parameter type is not supported for $type',
+            todo:
+                'Either use a supported type https://pinchbv.github.io/floor/entities/#supported-types or supply a type converter.',
+          );
         }
       }),
       ..._queryMethod.parameters
@@ -132,12 +141,19 @@ class QueryMethodWriter implements Writer {
         // TODO #403 what about type converters that map between e.g. string and list?
         final DartType flatType = parameter.type.flatten();
         final displayName = parameter.displayName;
-        if (flatType.isDefaultSqlType || flatType.isEnumType) {
+        final typeConverter = _queryMethod.typeConverters.getClosestOrNull(
+          flatType,
+        );
+        if (typeConverter != null) {
+          return '...$displayName.map((element) => _${typeConverter.name.decapitalize()}.encode(element))';
+        } else if (flatType.isDefaultSqlType || flatType.isEnumType) {
           return '...$displayName';
         } else {
-          final typeConverter =
-              _queryMethod.typeConverters.getClosest(flatType);
-          return '...$displayName.map((element) => _${typeConverter.name.decapitalize()}.encode(element))';
+          throw InvalidGenerationSourceError(
+            'Parameter type is not supported for $flatType',
+            todo:
+                'Either use a supported type https://pinchbv.github.io/floor/entities/#supported-types or supply a type converter.',
+          );
         }
       })
     ];
@@ -177,10 +193,10 @@ class QueryMethodWriter implements Writer {
     String? mapper;
     if (queryable != null) {
       mapper = _generateMapper(queryable);
-    } else if (returnType.isDefaultSqlType || returnType.isEnumType) {
-      mapper = _generateDartCoreMapper(returnType);
     } else if (converter != null) {
       mapper = _generateConverterMapper(converter);
+    } else if (returnType.isDefaultSqlType || returnType.isEnumType) {
+      mapper = _generateDartCoreMapper(returnType);
     } else {
       throw QueryMethodWriterError(_queryMethod.methodElement)
           .queryMethodReturnType();

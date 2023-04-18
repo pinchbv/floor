@@ -29,8 +29,7 @@ class DeletionMethodProcessor implements Processor<DeletionMethod> {
 
     final flattenedReturnType = _getFlattenedReturnType(returnType);
     _assertMethodReturnsNoList(flattenedReturnType);
-
-    final returnsVoid = flattenedReturnType.isVoid;
+    final returnsVoid = flattenedReturnType is VoidType;
     final returnsInt = flattenedReturnType.isDartCoreInt;
 
     if (!returnsVoid && !returnsInt) {
