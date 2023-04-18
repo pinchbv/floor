@@ -1,9 +1,19 @@
 import 'package:floor/floor.dart';
 
-enum TaskType {
+enum TaskStatus {
   open('Open'),
   inProgress('In Progress'),
   done('Done');
+
+  final String title;
+
+  const TaskStatus(this.title);
+}
+
+enum TaskType {
+  bug('Bug'),
+  story('Story'),
+  task('Task');
 
   final String title;
 
@@ -21,15 +31,25 @@ class Task {
 
   final DateTime timestamp;
 
+  final TaskStatus? status;
+
   final TaskType? type;
 
-  Task(this.id, this.isRead, this.message, this.timestamp, this.type);
+  Task(
+    this.id,
+    this.isRead,
+    this.message,
+    this.timestamp,
+    this.status,
+    this.type,
+  );
 
   factory Task.optional({
     int? id,
     DateTime? timestamp,
     String? message,
     bool? isRead,
+    TaskStatus? status,
     TaskType? type,
   }) =>
       Task(
@@ -37,12 +57,13 @@ class Task {
         isRead ?? false,
         message ?? 'empty',
         timestamp ?? DateTime.now(),
+        status,
         type,
       );
 
   @override
   String toString() {
-    return 'Task{id: $id, message: $message, read: $isRead, timestamp: $timestamp, type: $type}';
+    return 'Task{id: $id, message: $message, read: $isRead, timestamp: $timestamp, status: $status, type: $type}';
   }
 
   Task copyWith({
@@ -50,6 +71,7 @@ class Task {
     String? message,
     bool? isRead,
     DateTime? timestamp,
+    TaskStatus? status,
     TaskType? type,
   }) {
     return Task(
@@ -57,6 +79,7 @@ class Task {
       isRead ?? this.isRead,
       message ?? this.message,
       timestamp ?? this.timestamp,
+      status ?? this.status,
       type ?? this.type,
     );
   }
@@ -70,6 +93,7 @@ class Task {
           message == other.message &&
           isRead == other.isRead &&
           timestamp == other.timestamp &&
+          status == other.status &&
           type == other.type;
 
   @override
@@ -78,11 +102,12 @@ class Task {
       message.hashCode ^
       isRead.hashCode ^
       timestamp.hashCode ^
+      status.hashCode ^
       type.hashCode;
 }
 
 extension TaskExtension on Task {
-  String get typeTitle => type?.title ?? 'Empty';
+  String get statusTitle => status?.title ?? 'Empty';
 
-  int get typeIndex => type?.index ?? 0;
+  int get statusIndex => status?.index ?? 0;
 }

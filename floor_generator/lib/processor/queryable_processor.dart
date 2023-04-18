@@ -13,6 +13,7 @@ import 'package:floor_generator/value_object/field.dart';
 import 'package:floor_generator/value_object/queryable.dart';
 import 'package:floor_generator/value_object/type_converter.dart';
 import 'package:meta/meta.dart';
+import 'package:source_gen/source_gen.dart';
 
 abstract class QueryableProcessor<T extends Queryable> extends Processor<T> {
   final QueryableProcessorError _queryableProcessorError;
@@ -74,16 +75,11 @@ abstract class QueryableProcessor<T extends Queryable> extends Processor<T> {
 
       String parameterValue;
 
-      if (parameterElement.type.isDefaultSqlType ||
-          parameterElement.type.isEnumType) {
-        parameterValue = databaseValue.cast(
-          parameterElement.type,
-          parameterElement,
-        );
-      } else {
-        final typeConverter = [...queryableTypeConverters, field.typeConverter]
-            .whereNotNull()
-            .getClosest(parameterElement.type);
+      final typeConverter = [...queryableTypeConverters, field.typeConverter]
+          .whereNotNull()
+          .getClosestOrNull(parameterElement.type);
+
+      if (typeConverter != null) {
         final castedDatabaseValue = databaseValue.cast(
           typeConverter.databaseType,
           parameterElement,
@@ -91,6 +87,18 @@ abstract class QueryableProcessor<T extends Queryable> extends Processor<T> {
 
         parameterValue =
             '_${typeConverter.name.decapitalize()}.decode($castedDatabaseValue)';
+      } else if (parameterElement.type.isDefaultSqlType ||
+          parameterElement.type.isEnumType) {
+        parameterValue = databaseValue.cast(
+          parameterElement.type,
+          parameterElement,
+        );
+      } else {
+        throw InvalidGenerationSourceError(
+          'Column type is not supported for ${parameterElement.type}',
+          todo:
+              'Either use a supported type https://pinchbv.github.io/floor/entities/#supported-types or supply a type converter.',
+        );
       }
 
       if (parameterElement.isNamed) {
