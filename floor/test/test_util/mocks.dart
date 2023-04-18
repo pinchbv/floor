@@ -313,17 +313,6 @@ class MockDatabase extends _i1.Mock implements _i2.Database {
           returnValue: Future.value(null)) as _i3.Future<T>);
 
   @override
-  _i3.Future<int> getVersion() =>
-      (super.noSuchMethod(Invocation.method(#getVersion, []),
-          returnValue: Future.value(0)) as _i3.Future<int>);
-
-  @override
-  _i3.Future<void> setVersion(int? version) =>
-      (super.noSuchMethod(Invocation.method(#setVersion, [version]),
-          returnValue: Future.value(null),
-          returnValueForMissingStub: Future<void>.value()) as _i3.Future<void>);
-
-  @override
   _i3.Future<T> devInvokeMethod<T>(String? method, [dynamic arguments]) =>
       (super.noSuchMethod(
           Invocation.method(#devInvokeMethod, [method, arguments]),
