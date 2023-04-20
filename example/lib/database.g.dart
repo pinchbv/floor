@@ -12,7 +12,7 @@ class $FloorFlutterDatabase {
   /// Once a database is built, you should keep a reference to it and re-use it.
   static _$FlutterDatabaseBuilder databaseBuilder(
     String name, [
-    String password,
+    String? password,
   ]) =>
       _$FlutterDatabaseBuilder(name, password);
 
@@ -31,7 +31,7 @@ class _$FlutterDatabaseBuilder {
 
   final String? name;
 
-  final String password;
+  final String? password;
 
   final List<Migration> _migrations = [];
 

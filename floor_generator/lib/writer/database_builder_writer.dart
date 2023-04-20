@@ -18,7 +18,7 @@ class DatabaseBuilderWriter extends Writer {
 
     final passwordField = Field((builder) => builder
       ..name = 'password'
-      ..type = refer('String')
+      ..type = refer('String?')
       ..modifier = FieldModifier.final$);
 
     final migrationsField = Field((builder) => builder
