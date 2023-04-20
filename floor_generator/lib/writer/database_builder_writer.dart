@@ -34,7 +34,7 @@ class DatabaseBuilderWriter extends Writer {
     final constructor = Constructor((builder) => builder
       ..requiredParameters.add(Parameter((builder) => builder
         ..toThis = true
-        ..name = 'name')))
+        ..name = 'name'))
       ..optionalParameters.add(Parameter((builder) => builder
         ..toThis = true
         ..name = 'password')));
