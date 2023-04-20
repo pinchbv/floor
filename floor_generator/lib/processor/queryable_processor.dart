@@ -52,13 +52,21 @@ abstract class QueryableProcessor<T extends Queryable> extends Processor<T> {
 
   @protected
   String getConstructor(final List<Field> fields) {
-    final constructorParameters = classElement.constructors.first.parameters;
-    final parameterValues = constructorParameters
-        .map((parameterElement) => _getParameterValue(parameterElement, fields))
-        .where((parameterValue) => parameterValue != null)
-        .join(', ');
+    final constructorParameters = classElement.constructors
+        .firstWhereOrNull((element) => element.isPublic && !element.isFactory)
+        ?.parameters;
 
-    return '${classElement.displayName}($parameterValues)';
+    if (constructorParameters == null) {
+      throw _queryableProcessorError.missingUnnamedConstructor;
+    } else {
+      final parameterValues = constructorParameters
+          .map((parameterElement) =>
+              _getParameterValue(parameterElement, fields))
+          .where((parameterValue) => parameterValue != null)
+          .join(', ');
+
+      return '${classElement.displayName}($parameterValues)';
+    }
   }
 
   /// Returns `null` whenever field is @ignored
