@@ -36,7 +36,7 @@ class UpdateMethodProcessor implements Processor<UpdateMethod> {
     _assertMethodReturnsNoList(flattenedReturnType);
 
     final returnsInt = flattenedReturnType.isDartCoreInt;
-    final returnsVoid = flattenedReturnType.isVoid;
+    final returnsVoid = flattenedReturnType is VoidType;
 
     if (!returnsInt && !returnsVoid) {
       throw _errors.doesNotReturnVoidNorInt;

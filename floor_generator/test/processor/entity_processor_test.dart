@@ -4,6 +4,7 @@ import 'package:floor_annotation/floor_annotation.dart' as annotations;
 import 'package:floor_generator/misc/constants.dart';
 import 'package:floor_generator/processor/entity_processor.dart';
 import 'package:floor_generator/processor/error/entity_processor_error.dart';
+import 'package:floor_generator/processor/error/queryable_processor_error.dart';
 import 'package:floor_generator/processor/field_processor.dart';
 import 'package:floor_generator/value_object/entity.dart';
 import 'package:floor_generator/value_object/foreign_key.dart';
@@ -167,6 +168,51 @@ void main() {
       Index('i1', 'Person', true, ['id']),
       Index('index_Person_name_id', 'Person', false, ['name', 'id'])
     ];
+    const constructor = "Person(row['id'] as int, row['name'] as String)";
+    const valueMapping = "<String, Object?>{'id': item.id, 'name': item.name}";
+    final expected = Entity(
+      classElement,
+      name,
+      fields,
+      primaryKey,
+      foreignKeys,
+      indices,
+      false,
+      constructor,
+      valueMapping,
+      null,
+    );
+    expect(actual, equals(expected));
+  });
+
+  test(
+      'Process entity with named constructor declarations first, before unnamed ones.',
+      () async {
+    final classElement = await createClassElement('''
+      @entity
+      class Person {
+        @primaryKey
+        final int id;
+      
+        final String name;
+
+        factory Person.from(Person other) {
+          return Person(other.id, other.name);
+        }
+      
+        Person(this.id, this.name);
+      }
+    ''');
+
+    final actual = EntityProcessor(classElement, {}).process();
+
+    const name = 'Person';
+    final fields = classElement.fields
+        .map((fieldElement) => FieldProcessor(fieldElement, null).process())
+        .toList();
+    final primaryKey = PrimaryKey([fields[0]], false);
+    const foreignKeys = <ForeignKey>[];
+    const indices = <Index>[];
     const constructor = "Person(row['id'] as int, row['name'] as String)";
     const valueMapping = "<String, Object?>{'id': item.id, 'name': item.name}";
     final expected = Entity(
@@ -724,6 +770,31 @@ void main() {
           processor.process,
           throwsInvalidGenerationSourceError(
               EntityProcessorError(classElement).autoIncrementInWithoutRowid));
+    });
+
+    test('missing unnamed constructor.', () async {
+      final classElement = await createClassElement('''
+      @entity
+      class Person {
+        @primaryKey
+        final int id;
+      
+        final String name;
+
+        factory Person.from(Person other) {
+          return Person(other.id, other.name);
+        }
+      }
+    ''');
+
+      final actual = EntityProcessor(classElement, {});
+
+      expect(
+        actual.process,
+        throwsInvalidGenerationSourceError(
+          QueryableProcessorError(classElement).missingUnnamedConstructor,
+        ),
+      );
     });
   });
 }
