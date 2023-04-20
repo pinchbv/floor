@@ -215,21 +215,23 @@ packages:
       path: "../floor"
       relative: true
     source: path
-    version: "1.4.1"
+    version: "1.4.2"
   floor_annotation:
     dependency: transitive
     description:
-      path: "../floor_annotation"
-      relative: true
-    source: path
-    version: "1.4.1"
+      path: floor_annotation
+      ref: develop
+      resolved-ref: "574abcfd7fdd988e3b974e6fcaee3f8eb33539d5"
+      url: "https://github.com/ryosuji/floor_cipher.git"
+    source: git
+    version: "1.4.2"
   floor_generator:
     dependency: "direct dev"
     description:
       path: "../floor_generator"
       relative: true
     source: path
-    version: "1.4.1"
+    version: "1.4.2"
   flutter:
     dependency: "direct main"
     description: flutter
@@ -429,14 +431,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.9.1"
-  sqflite:
-    dependency: transitive
-    description:
-      name: sqflite
-      sha256: "500d6fec583d2c021f2d25a056d96654f910662c64f836cd2063167b8f1fa758"
-      url: "https://pub.dev"
-    source: hosted
-    version: "2.2.6"
   sqflite_common:
     dependency: transitive
     description:
@@ -453,6 +447,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.2.3"
+  sqflite_sqlcipher:
+    dependency: transitive
+    description:
+      name: sqflite_sqlcipher
+      sha256: bcc02bfcc549895338558ba9acd0e3c54f808ef7095bb1294973751c521c9ba2
+      url: "https://pub.dev"
+    source: hosted
+    version: "2.1.1+1"
   sqlite3:
     dependency: transitive
     description:
@@ -591,4 +593,4 @@ packages:
     version: "3.1.1"
 sdks:
   dart: ">=2.19.0 <3.0.0"
-  flutter: ">=3.3.0"
+  flutter: ">=1.24.0-10"

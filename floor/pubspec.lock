@@ -212,16 +212,20 @@ packages:
   floor_annotation:
     dependency: "direct main"
     description:
-      path: "../floor_annotation"
-      relative: true
-    source: path
+      path: floor_annotation
+      ref: develop
+      resolved-ref: d8fc86989dd9c546edfa32949ae78353a87d42d0
+      url: "https://github.com/ryosuji/floor_cipher.git"
+    source: git
     version: "1.4.1"
   floor_generator:
     dependency: "direct dev"
     description:
-      path: "../floor_generator"
-      relative: true
-    source: path
+      path: floor_generator
+      ref: develop
+      resolved-ref: d8fc86989dd9c546edfa32949ae78353a87d42d0
+      url: "https://github.com/ryosuji/floor_cipher.git"
+    source: git
     version: "1.4.1"
   flutter:
     dependency: "direct main"

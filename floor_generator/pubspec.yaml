@@ -2,7 +2,7 @@ name: floor_generator
 description: >
   The typesafe, reactive, and lightweight SQLite abstraction for your Flutter applications.
   This library is the dev dependency.
-version: 1.4.2
+version: 1.4.3
 homepage: https://pinchbv.github.io/floor/
 repository: https://github.com/pinchbv/floor
 issue_tracker: https://github.com/pinchbv/floor/issues

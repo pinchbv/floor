@@ -94,7 +94,7 @@ class DatabaseWriter implements Writer {
       ..type = refer('Callback?'));
     final passwordParameter = Parameter((builder) => builder
       ..name = 'password'
-      ..type = refer('String'));
+      ..type = refer('String?'));
 
     return Method((builder) => builder
       ..name = 'open'

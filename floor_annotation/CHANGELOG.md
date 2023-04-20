@@ -1,5 +1,17 @@
 # Changelog
 
+## 1.4.3
+
+### Changes
+
+* make password nullable
+
+## 1.4.2
+
+### Changes
+
+* fix list addition for optional parameter
+
 ## 1.4.1
 
 ### Changes

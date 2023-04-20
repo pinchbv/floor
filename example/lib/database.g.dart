@@ -10,8 +10,11 @@ part of 'database.dart';
 class $FloorFlutterDatabase {
   /// Creates a database builder for a persistent database.
   /// Once a database is built, you should keep a reference to it and re-use it.
-  static _$FlutterDatabaseBuilder databaseBuilder(String name) =>
-      _$FlutterDatabaseBuilder(name);
+  static _$FlutterDatabaseBuilder databaseBuilder(
+    String name, [
+    String password,
+  ]) =>
+      _$FlutterDatabaseBuilder(name, password);
 
   /// Creates a database builder for an in memory database.
   /// Information stored in an in memory database disappears when the process is killed.
@@ -21,9 +24,14 @@ class $FloorFlutterDatabase {
 }
 
 class _$FlutterDatabaseBuilder {
-  _$FlutterDatabaseBuilder(this.name);
+  _$FlutterDatabaseBuilder(
+    this.name, [
+    this.password,
+  ]);
 
   final String? name;
+
+  final String password;
 
   final List<Migration> _migrations = [];
 
@@ -51,6 +59,7 @@ class _$FlutterDatabaseBuilder {
       path,
       _migrations,
       _callback,
+      password,
     );
     return database;
   }
@@ -67,8 +76,10 @@ class _$FlutterDatabase extends FlutterDatabase {
     String path,
     List<Migration> migrations, [
     Callback? callback,
+    String? password,
   ]) async {
-    final databaseOptions = sqflite.OpenDatabaseOptions(
+    final databaseOptions = sqflite.SqlCipherOpenDatabaseOptions(
+      password: password,
       version: 1,
       onConfigure: (database) async {
         await database.execute('PRAGMA foreign_keys = ON');
