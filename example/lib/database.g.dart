@@ -226,6 +226,17 @@ class _$TaskDao extends TaskDao {
   }
 
   @override
+  Future<int?> updateTypeById(
+    TaskType type,
+    int id,
+  ) async {
+    return _queryAdapter.query(
+        'UPDATE OR ABORT Task SET type = ?1 WHERE id = ?2',
+        mapper: (Map<String, Object?> row) => row.values.first as int,
+        arguments: [type.index, id]);
+  }
+
+  @override
   Future<void> insertTask(Task task) async {
     await _taskInsertionAdapter.insert(task, OnConflictStrategy.abort);
   }
