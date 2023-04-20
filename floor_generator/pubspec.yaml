@@ -18,7 +18,10 @@ dependencies:
   code_builder: ^4.1.0
   collection: ^1.15.0
   floor_annotation:
-    path: ../floor_annotation/
+    git:
+      url: https://github.com/ryosuji/floor_cipher.git
+      ref: develop
+      path: floor_annotation
   meta: ^1.7.0
   source_gen: ^1.2.2
   strings: ^0.2.1
