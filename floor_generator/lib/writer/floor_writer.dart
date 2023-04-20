@@ -25,7 +25,7 @@ class FloorWriter extends Writer {
         ..type = refer('String')))
       ..optionalParameters.add(Parameter((builder) => builder
         ..name = 'password'
-        ..type = refer('String')))
+        ..type = refer('String?')))
       ..body = Code('$databaseBuilderName(name, password)'));
 
     final inMemoryDatabaseBuilderMethod = Method((builder) => builder

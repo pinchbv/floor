@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.4.5
+
+### Changes
+
+* still make password nullable (added missing)
+
 ## 1.4.4
 
 ### Changes
