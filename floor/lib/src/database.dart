@@ -1,7 +1,7 @@
 import 'dart:async';
 
 import 'package:meta/meta.dart';
-import 'package:sqflite/sqflite.dart' as sqflite;
+import 'package:sqflite_sqlcipher/sqflite.dart' as sqflite;
 
 /// Extend this class to enable database functionality.
 abstract class FloorDatabase {
@@ -17,9 +17,9 @@ abstract class FloorDatabase {
   Future<void> close() async {
     await changeListener.close();
 
-    final database = this.database;
-    if (database is sqflite.Database && database.isOpen) {
-      await database.close();
+    final immutableDatabase = database;
+    if (immutableDatabase is sqflite.Database && (immutableDatabase.isOpen)) {
+      await immutableDatabase.close();
     }
   }
 }

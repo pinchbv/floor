@@ -1,6 +1,6 @@
 import 'package:floor/floor.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:sqflite/sqflite.dart';
+import 'package:sqflite_sqlcipher/sqflite.dart';
 
 import '../test_util/extensions.dart';
 import 'dao/dog_dao.dart';
