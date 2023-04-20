@@ -180,9 +180,11 @@ packages:
   floor_annotation:
     dependency: "direct main"
     description:
-      path: "../floor_annotation"
-      relative: true
-    source: path
+      path: floor_annotation
+      ref: develop
+      resolved-ref: "84ff735002f3b59a4fe3febd71eab753724a9a2f"
+      url: "https://github.com/ryosuji/floor_cipher.git"
+    source: git
     version: "1.4.1"
   frontend_server_client:
     dependency: transitive

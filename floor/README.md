@@ -37,10 +37,10 @@ The third dependency is `build_runner` which has to be included as a dev depende
 dependencies:
   flutter:
     sdk: flutter
-  floor: ^1.4.3
+  floor: ^1.4.4
 
 dev_dependencies:
-  floor_generator: ^1.4.3
+  floor_generator: ^1.4.4
   build_runner: ^2.1.2
 ```
 
