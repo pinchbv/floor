@@ -14,4 +14,13 @@ class QueryableProcessorError {
       element: _classElement,
     );
   }
+
+  InvalidGenerationSourceError get missingUnnamedConstructor {
+    return InvalidGenerationSourceError(
+      'Entity constructor is not recognized.',
+      todo:
+          'Entity class must provide a public non-factory constructor for code generation.',
+      element: _classElement,
+    );
+  }
 }

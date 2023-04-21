@@ -28,7 +28,8 @@ extension DartTypeChecker on DartType {
 }
 
 extension StreamTypeChecker on DartType {
-  bool get isStream => !isVoid && _streamTypeChecker.isExactlyType(this);
+  bool get isStream =>
+      !(this is VoidType) && _streamTypeChecker.isExactlyType(this);
 }
 
 extension FlattenUtil on DartType {

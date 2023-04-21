@@ -1,3 +1,4 @@
+import 'package:analyzer/dart/element/type.dart';
 import 'package:code_builder/code_builder.dart';
 import 'package:floor_generator/misc/change_method_writer_helper.dart';
 import 'package:floor_generator/misc/extension/string_extension.dart';
@@ -26,7 +27,7 @@ class InsertionMethodWriter implements Writer {
         _method.entity.classElement.displayName.decapitalize();
     final methodSignatureParameterName = _method.parameterElement.displayName;
 
-    if (_method.flattenedReturnType.isVoid) {
+    if (_method.flattenedReturnType is VoidType) {
       return _generateVoidReturnMethodBody(
         methodSignatureParameterName,
         entityClassName,
