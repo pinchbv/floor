@@ -180,10 +180,11 @@ packages:
   floor_annotation:
     dependency: "direct main"
     description:
-      path: "../floor_annotation"
-      relative: true
-    source: path
-    version: "1.4.1"
+      name: floor_annotation
+      sha256: fa3fa4f198cdd1d922a69ceb06e54663fe59256bf1cb3c036eff206b445a6960
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.4.2"
   frontend_server_client:
     dependency: transitive
     description:
@@ -337,7 +338,7 @@ packages:
     source: hosted
     version: "1.5.1"
   pub_semver:
-    dependency: transitive
+    dependency: "direct dev"
     description:
       name: pub_semver
       sha256: "307de764d305289ff24ad257ad5c5793ce56d04947599ad68b3baa124105fc17"
@@ -554,4 +555,4 @@ packages:
     source: hosted
     version: "3.1.1"
 sdks:
-  dart: ">=2.19.0 <3.0.0"
+  dart: ">=2.19.0 <=3.3.8"
