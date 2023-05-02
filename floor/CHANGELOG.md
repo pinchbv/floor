@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.4.6
+
+### Changes
+
+* Changed TypeConverters priority
+* Ignore ordering of constructors to always take the public, non-factory constructor
+* Return result of table modifications through queries
+
 ## 1.4.5
 
 ### Changes
