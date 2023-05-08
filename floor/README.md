@@ -37,10 +37,10 @@ The third dependency is `build_runner` which has to be included as a dev depende
 dependencies:
   flutter:
     sdk: flutter
-  floor: ^1.4.1
+  floor: ^1.4.2
 
 dev_dependencies:
-  floor_generator: ^1.4.1
+  floor_generator: ^1.4.2
   build_runner: ^2.1.2
 ```
 
@@ -86,7 +86,10 @@ import 'package:floor/floor.dart';
 @dao
 abstract class PersonDao {
   @Query('SELECT * FROM Person')
-  Future<List<Person>> findAllPersons();
+  Future<List<Person>> findAllPeople();
+
+  @Query('SELECT name FROM Person')
+  Stream<List<String>> findAllPeopleName();
 
   @Query('SELECT * FROM Person WHERE id = :id')
   Stream<Person?> findPersonById(int id);
@@ -163,7 +166,7 @@ For bugs please use [GitHub Issues](https://github.com/pinchbv/floor/issues).
 For questions, ideas, and discussions use [GitHub Discussions](https://github.com/pinchbv/floor/discussions).
 
 ## License
-    Copyright 2022 The Floor Project Authors
+    Copyright 2023 The Floor Project Authors
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.

@@ -146,7 +146,7 @@ packages:
     source: hosted
     version: "4.4.0"
   collection:
-    dependency: "direct dev"
+    dependency: "direct main"
     description:
       name: collection
       sha256: cfc915e6923fe5ce6e153b0723c753045de46de1b4d63771530504004a45fae0
@@ -231,14 +231,14 @@ packages:
       path: "../floor_annotation"
       relative: true
     source: path
-    version: "1.4.1"
+    version: "1.4.2"
   floor_generator:
     dependency: "direct dev"
     description:
       path: "../floor_generator"
       relative: true
     source: path
-    version: "1.4.1"
+    version: "1.4.2"
   flutter:
     dependency: "direct main"
     description: flutter
@@ -511,7 +511,7 @@ packages:
     source: hosted
     version: "2.2.7"
   sqflite_common:
-    dependency: transitive
+    dependency: "direct dev"
     description:
       name: sqflite_common
       sha256: "220831bf0bd5333ff2445eee35ec131553b804e6b5d47a4a37ca6f5eb66e282c"
@@ -703,5 +703,5 @@ packages:
     source: hosted
     version: "3.1.1"
 sdks:
-  dart: ">=2.19.0 <3.0.0"
+  dart: ">=2.19.0 <4.0.0"
   flutter: ">=3.3.0"
