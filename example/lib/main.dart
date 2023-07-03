@@ -6,7 +6,9 @@ import 'package:flutter/material.dart';
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  final database = await $FloorFlutterDatabase.databaseBuilder('flutter_database.db').build();
+  final database = await $FloorFlutterDatabase
+      .databaseBuilder('flutter_database.db')
+      .build();
   final dao = database.taskDao;
 
   runApp(FloorApp(dao));
@@ -63,7 +65,8 @@ class TasksWidgetState extends State<TasksWidget> {
           PopupMenuButton<int>(
             itemBuilder: (context) {
               return List.generate(
-                TaskStatus.values.length + 1, //Uses increment to handle All types
+                TaskStatus.values.length +
+                    1, //Uses increment to handle All types
                 (index) {
                   return PopupMenuItem<int>(
                     value: index,
@@ -113,7 +116,9 @@ class TasksListView extends StatelessWidget {
   Widget build(BuildContext context) {
     return Expanded(
       child: StreamBuilder<List<Task>>(
-        stream: selectedType == null ? dao.findAllTasksAsStream() : dao.findAllTasksByStatusAsStream(selectedType!),
+        stream: selectedType == null
+            ? dao.findAllTasksAsStream()
+            : dao.findAllTasksByStatusAsStream(selectedType!),
         builder: (_, snapshot) {
           if (!snapshot.hasData) return Container();
 
@@ -185,8 +190,10 @@ class TaskListCell extends StatelessWidget {
             break;
           case DismissDirection.startToEnd:
             final tasksLength = TaskStatus.values.length;
-            final nextIndex = (tasksLength + task.statusIndex + 1) % tasksLength;
-            final taskCopy = task.copyWith(status: TaskStatus.values[nextIndex]);
+            final nextIndex =
+                (tasksLength + task.statusIndex + 1) % tasksLength;
+            final taskCopy =
+                task.copyWith(status: TaskStatus.values[nextIndex]);
             await dao.updateTask(taskCopy);
             statusMessage = 'Updated task status by: ${taskCopy.statusTitle}';
             break;
