@@ -17,7 +17,7 @@ Future<void> main() async {
 class FloorApp extends StatelessWidget {
   final TaskDao dao;
 
-  const FloorApp(this.dao);
+  const FloorApp(this.dao, {super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -47,7 +47,7 @@ class TasksWidget extends StatefulWidget {
 }
 
 class TasksWidgetState extends State<TasksWidget> {
-  TaskStatus? _selectedType;
+  TaskStatusFilter _selectedFilter = TaskStatusFilter.all;
 
   @override
   Widget build(BuildContext context) {
@@ -65,13 +65,12 @@ class TasksWidgetState extends State<TasksWidget> {
           PopupMenuButton<int>(
             itemBuilder: (context) {
               return List.generate(
-                TaskStatus.values.length +
-                    1, //Uses increment to handle All types
+                TaskStatusFilter.values.length,
                 (index) {
                   return PopupMenuItem<int>(
                     value: index,
                     child: Text(
-                      index == 0 ? 'All' : _getMenuType(index).title,
+                      index == 0 ? 'All' : _getMenuType(index).label,
                     ),
                   );
                 },
@@ -79,7 +78,7 @@ class TasksWidgetState extends State<TasksWidget> {
             },
             onSelected: (index) {
               setState(() {
-                _selectedType = index == 0 ? null : _getMenuType(index);
+                _selectedFilter = _getMenuType(index);
               });
             },
           )
@@ -90,7 +89,7 @@ class TasksWidgetState extends State<TasksWidget> {
           children: <Widget>[
             TasksListView(
               dao: widget.dao,
-              selectedType: _selectedType,
+              selectedStatus: _selectedFilter,
             ),
             TasksTextField(dao: widget.dao),
           ],
@@ -99,26 +98,29 @@ class TasksWidgetState extends State<TasksWidget> {
     );
   }
 
-  TaskStatus _getMenuType(int index) => TaskStatus.values[index - 1];
+  TaskStatusFilter _getMenuType(int index) => TaskStatusFilter.values[index];
 }
 
 class TasksListView extends StatelessWidget {
   final TaskDao dao;
-  final TaskStatus? selectedType;
+  final TaskStatusFilter selectedStatus;
 
   const TasksListView({
     Key? key,
     required this.dao,
-    required this.selectedType,
+    required this.selectedStatus,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return Expanded(
       child: StreamBuilder<List<Task>>(
-        stream: selectedType == null
+        stream: selectedStatus == TaskStatusFilter.all
             ? dao.findAllTasksAsStream()
-            : dao.findAllTasksByStatusAsStream(selectedType!),
+            : selectedStatus == TaskStatusFilter.uncategorized
+                ? dao.findAllTasksWithoutStatusAsStream()
+                : dao.findAllTasksByStatusAsStream(
+                    _getTaskStatusFromFilter(selectedStatus)),
         builder: (_, snapshot) {
           if (!snapshot.hasData) return Container();
 
@@ -136,6 +138,19 @@ class TasksListView extends StatelessWidget {
         },
       ),
     );
+  }
+
+  TaskStatus _getTaskStatusFromFilter(TaskStatusFilter filter) {
+    switch (filter) {
+      case TaskStatusFilter.open:
+        return TaskStatus.open;
+      case TaskStatusFilter.inProgress:
+        return TaskStatus.inProgress;
+      case TaskStatusFilter.done:
+        return TaskStatus.done;
+      default:
+        return throw 'Invalid filter';
+    }
   }
 }
 
@@ -157,22 +172,22 @@ class TaskListCell extends StatelessWidget {
         padding: const EdgeInsets.only(left: 16),
         color: Colors.green,
         child: const Align(
+          alignment: Alignment.centerLeft,
           child: Text(
             'Change status',
             style: TextStyle(color: Colors.white),
           ),
-          alignment: Alignment.centerLeft,
         ),
       ),
       secondaryBackground: Container(
         padding: const EdgeInsets.only(right: 16),
         color: Colors.red,
         child: const Align(
+          alignment: Alignment.centerRight,
           child: Text(
             'Delete',
             style: TextStyle(color: Colors.white),
           ),
-          alignment: Alignment.centerRight,
         ),
       ),
       direction: DismissDirection.horizontal,
@@ -190,8 +205,9 @@ class TaskListCell extends StatelessWidget {
             break;
           case DismissDirection.startToEnd:
             final tasksLength = TaskStatus.values.length;
-            final nextIndex =
-                (tasksLength + task.statusIndex + 1) % tasksLength;
+            final nextIndex = task.statusIndex == null
+                ? 0
+                : (tasksLength + task.statusIndex! + 1) % tasksLength;
             final taskCopy =
                 task.copyWith(status: TaskStatus.values[nextIndex]);
             await dao.updateTask(taskCopy);
@@ -267,10 +283,22 @@ class TasksTextField extends StatelessWidget {
       final task = Task.optional(
         message: message,
         type: TaskType.task,
-        status: TaskStatus.open,
+        status: null,
       );
       await dao.insertTask(task);
       _textEditingController.clear();
     }
   }
+}
+
+enum TaskStatusFilter {
+  all('All'),
+  uncategorized('Uncategorized'),
+  open('Open'),
+  inProgress('In Progress'),
+  done('Done');
+
+  final String label;
+
+  const TaskStatusFilter(this.label);
 }

@@ -226,6 +226,23 @@ class _$TaskDao extends TaskDao {
   }
 
   @override
+  Stream<List<Task>> findAllTasksWithoutStatusAsStream() {
+    return _queryAdapter.queryListStream(
+        'SELECT * FROM task WHERE status IS NULL',
+        mapper: (Map<String, Object?> row) => Task(
+            row['id'] as int?,
+            row['isRead'] == null ? null : (row['isRead'] as int) != 0,
+            row['message'] as String,
+            _dateTimeConverter.decode(row['timestamp'] as int),
+            row['status'] == null
+                ? null
+                : TaskStatus.values[row['status'] as int],
+            _taskTypeConverter.decode(row['type'] as String?)),
+        queryableName: 'task',
+        isView: false);
+  }
+
+  @override
   Future<int?> updateTypeById(
     TaskType type,
     int id,

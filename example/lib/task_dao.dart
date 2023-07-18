@@ -18,6 +18,9 @@ abstract class TaskDao {
   @Query('SELECT * FROM task WHERE status = :status')
   Stream<List<Task>> findAllTasksByStatusAsStream(TaskStatus status);
 
+  @Query('SELECT * FROM task WHERE status IS NULL')
+  Stream<List<Task>> findAllTasksWithoutStatusAsStream();
+
   @Query('UPDATE OR ABORT Task SET type = :type WHERE id = :id')
   Future<int?> updateTypeById(TaskType type, int id);
 

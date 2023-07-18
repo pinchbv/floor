@@ -109,5 +109,5 @@ class Task {
 extension TaskExtension on Task {
   String get statusTitle => status?.title ?? 'Empty';
 
-  int get statusIndex => status?.index ?? 0;
+  int? get statusIndex => status?.index;
 }
