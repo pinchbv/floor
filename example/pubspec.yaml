@@ -12,6 +12,7 @@ environment:
 dependencies:
   floor:
     path: ../floor/
+  sqflite: ^2.2.8+4
   flutter:
     sdk: flutter
 

@@ -6,9 +6,7 @@ import 'package:flutter/material.dart';
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  final database = await $FloorFlutterDatabase
-      .databaseBuilder('flutter_database.db')
-      .build();
+  final database = await $FloorFlutterDatabase.databaseBuilder('flutter_database.db').build();
   final dao = database.taskDao;
 
   runApp(FloorApp(dao));
@@ -119,8 +117,7 @@ class TasksListView extends StatelessWidget {
             ? dao.findAllTasksAsStream()
             : selectedStatus == TaskStatusFilter.uncategorized
                 ? dao.findAllTasksWithoutStatusAsStream()
-                : dao.findAllTasksByStatusAsStream(
-                    _getTaskStatusFromFilter(selectedStatus)),
+                : dao.findAllTasksByStatusAsStream(_getTaskStatusFromFilter(selectedStatus)),
         builder: (_, snapshot) {
           if (!snapshot.hasData) return Container();
 
@@ -197,6 +194,7 @@ class TaskListCell extends StatelessWidget {
         trailing: Text(task.timestamp.toIso8601String()),
       ),
       confirmDismiss: (direction) async {
+        final scaffoldMessengerState = ScaffoldMessenger.of(context);
         String? statusMessage;
         switch (direction) {
           case DismissDirection.endToStart:
@@ -205,11 +203,8 @@ class TaskListCell extends StatelessWidget {
             break;
           case DismissDirection.startToEnd:
             final tasksLength = TaskStatus.values.length;
-            final nextIndex = task.statusIndex == null
-                ? 0
-                : (tasksLength + task.statusIndex! + 1) % tasksLength;
-            final taskCopy =
-                task.copyWith(status: TaskStatus.values[nextIndex]);
+            final nextIndex = task.statusIndex == null ? 0 : (tasksLength + task.statusIndex! + 1) % tasksLength;
+            final taskCopy = task.copyWith(status: TaskStatus.values[nextIndex]);
             await dao.updateTask(taskCopy);
             statusMessage = 'Updated task status by: ${taskCopy.statusTitle}';
             break;
@@ -218,7 +213,6 @@ class TaskListCell extends StatelessWidget {
         }
 
         if (statusMessage != null) {
-          final scaffoldMessengerState = ScaffoldMessenger.of(context);
           scaffoldMessengerState.hideCurrentSnackBar();
           scaffoldMessengerState.showSnackBar(
             SnackBar(content: Text(statusMessage)),

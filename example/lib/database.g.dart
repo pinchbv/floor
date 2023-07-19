@@ -7,17 +7,16 @@ part of 'database.dart';
 // **************************************************************************
 
 // ignore: avoid_classes_with_only_static_members
+// ignore_for_file: library_private_types_in_public_api
 class $FloorFlutterDatabase {
   /// Creates a database builder for a persistent database.
   /// Once a database is built, you should keep a reference to it and re-use it.
-  static _$FlutterDatabaseBuilder databaseBuilder(String name) =>
-      _$FlutterDatabaseBuilder(name);
+  static _$FlutterDatabaseBuilder databaseBuilder(String name) => _$FlutterDatabaseBuilder(name);
 
   /// Creates a database builder for an in memory database.
   /// Information stored in an in memory database disappears when the process is killed.
   /// Once a database is built, you should keep a reference to it and re-use it.
-  static _$FlutterDatabaseBuilder inMemoryDatabaseBuilder() =>
-      _$FlutterDatabaseBuilder(null);
+  static _$FlutterDatabaseBuilder inMemoryDatabaseBuilder() => _$FlutterDatabaseBuilder(null);
 }
 
 class _$FlutterDatabaseBuilder {
@@ -43,9 +42,7 @@ class _$FlutterDatabaseBuilder {
 
   /// Creates the database and initializes it.
   Future<FlutterDatabase> build() async {
-    final path = name != null
-        ? await sqfliteDatabaseFactory.getDatabasePath(name!)
-        : ':memory:';
+    final path = name != null ? await sqfliteDatabaseFactory.getDatabasePath(name!) : ':memory:';
     final database = _$FlutterDatabase();
     database.database = await database.open(
       path,
@@ -78,8 +75,7 @@ class _$FlutterDatabase extends FlutterDatabase {
         await callback?.onOpen?.call(database);
       },
       onUpgrade: (database, startVersion, endVersion) async {
-        await MigrationAdapter.runMigrations(
-            database, startVersion, endVersion, migrations);
+        await MigrationAdapter.runMigrations(database, startVersion, endVersion, migrations);
 
         await callback?.onUpgrade?.call(database, startVersion, endVersion);
       },
@@ -163,9 +159,7 @@ class _$TaskDao extends TaskDao {
             row['isRead'] == null ? null : (row['isRead'] as int) != 0,
             row['message'] as String,
             _dateTimeConverter.decode(row['timestamp'] as int),
-            row['status'] == null
-                ? null
-                : TaskStatus.values[row['status'] as int],
+            row['status'] == null ? null : TaskStatus.values[row['status'] as int],
             _taskTypeConverter.decode(row['type'] as String?)),
         arguments: [id]);
   }
@@ -178,9 +172,7 @@ class _$TaskDao extends TaskDao {
             row['isRead'] == null ? null : (row['isRead'] as int) != 0,
             row['message'] as String,
             _dateTimeConverter.decode(row['timestamp'] as int),
-            row['status'] == null
-                ? null
-                : TaskStatus.values[row['status'] as int],
+            row['status'] == null ? null : TaskStatus.values[row['status'] as int],
             _taskTypeConverter.decode(row['type'] as String?)));
   }
 
@@ -192,9 +184,7 @@ class _$TaskDao extends TaskDao {
             row['isRead'] == null ? null : (row['isRead'] as int) != 0,
             row['message'] as String,
             _dateTimeConverter.decode(row['timestamp'] as int),
-            row['status'] == null
-                ? null
-                : TaskStatus.values[row['status'] as int],
+            row['status'] == null ? null : TaskStatus.values[row['status'] as int],
             _taskTypeConverter.decode(row['type'] as String?)),
         queryableName: 'task',
         isView: false);
@@ -203,9 +193,7 @@ class _$TaskDao extends TaskDao {
   @override
   Stream<int?> findUniqueMessagesCountAsStream() {
     return _queryAdapter.queryStream('SELECT DISTINCT COUNT(message) FROM task',
-        mapper: (Map<String, Object?> row) => row.values.first as int,
-        queryableName: 'task',
-        isView: false);
+        mapper: (Map<String, Object?> row) => row.values.first as int, queryableName: 'task', isView: false);
   }
 
   @override
@@ -216,9 +204,7 @@ class _$TaskDao extends TaskDao {
             row['isRead'] == null ? null : (row['isRead'] as int) != 0,
             row['message'] as String,
             _dateTimeConverter.decode(row['timestamp'] as int),
-            row['status'] == null
-                ? null
-                : TaskStatus.values[row['status'] as int],
+            row['status'] == null ? null : TaskStatus.values[row['status'] as int],
             _taskTypeConverter.decode(row['type'] as String?)),
         arguments: [status.index],
         queryableName: 'task',
@@ -227,16 +213,13 @@ class _$TaskDao extends TaskDao {
 
   @override
   Stream<List<Task>> findAllTasksWithoutStatusAsStream() {
-    return _queryAdapter.queryListStream(
-        'SELECT * FROM task WHERE status IS NULL',
+    return _queryAdapter.queryListStream('SELECT * FROM task WHERE status IS NULL',
         mapper: (Map<String, Object?> row) => Task(
             row['id'] as int?,
             row['isRead'] == null ? null : (row['isRead'] as int) != 0,
             row['message'] as String,
             _dateTimeConverter.decode(row['timestamp'] as int),
-            row['status'] == null
-                ? null
-                : TaskStatus.values[row['status'] as int],
+            row['status'] == null ? null : TaskStatus.values[row['status'] as int],
             _taskTypeConverter.decode(row['type'] as String?)),
         queryableName: 'task',
         isView: false);
@@ -247,10 +230,8 @@ class _$TaskDao extends TaskDao {
     TaskType type,
     int id,
   ) async {
-    return _queryAdapter.query(
-        'UPDATE OR ABORT Task SET type = ?1 WHERE id = ?2',
-        mapper: (Map<String, Object?> row) => row.values.first as int,
-        arguments: [type.index, id]);
+    return _queryAdapter.query('UPDATE OR ABORT Task SET type = ?1 WHERE id = ?2',
+        mapper: (Map<String, Object?> row) => row.values.first as int, arguments: [type.index, id]);
   }
 
   @override
