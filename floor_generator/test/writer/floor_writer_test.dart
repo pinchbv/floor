@@ -14,6 +14,7 @@ void main() {
 
     expect(actual, equalsDart(r'''
       // ignore: avoid_classes_with_only_static_members
+      // ignore_for_file: library_private_types_in_public_api
       class $FloorFooBar {
         /// Creates a database builder for a persistent database.
         /// Once a database is built, you should keep a reference to it and re-use it.
