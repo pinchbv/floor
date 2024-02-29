@@ -299,10 +299,6 @@ class FakeClassElement implements ClassElement {
   bool get isDartCoreEnum => throw UnimplementedError();
 
   @override
-  // TODO: implement augmentation
-  ClassAugmentationElement? get augmentation => throw UnimplementedError();
-
-  @override
   // TODO: implement augmented
   AugmentedClassElement get augmented => throw UnimplementedError();
 
@@ -377,6 +373,34 @@ class FakeClassElement implements ClassElement {
   @override
   // TODO: implement sinceSdkVersion
   Version? get sinceSdkVersion => throw UnimplementedError();
+
+  @override
+  // TODO: implement augmentationTarget
+  ClassElement? get augmentationTarget => throw UnimplementedError();
+
+  @override
+  // TODO: implement hasImmutable
+  bool get hasImmutable => throw UnimplementedError();
+
+  @override
+  // TODO: implement hasRedeclare
+  bool get hasRedeclare => throw UnimplementedError();
+
+  @override
+  // TODO: implement hasVisibleOutsideTemplate
+  bool get hasVisibleOutsideTemplate => throw UnimplementedError();
+
+  @override
+  // TODO: implement isAugmentation
+  bool get isAugmentation => throw UnimplementedError();
+
+  @override
+  // TODO: implement isInline
+  bool get isInline => throw UnimplementedError();
+
+  @override
+  // TODO: implement augmentation
+  ClassElement? get augmentation => throw UnimplementedError();
 }
 
 class FakeFieldElement implements FieldElement {
@@ -582,10 +606,6 @@ class FakeFieldElement implements FieldElement {
   Element get nonSynthetic => throw UnimplementedError();
 
   @override
-  // TODO: implement augmentation
-  FieldAugmentationElement? get augmentation => throw UnimplementedError();
-
-  @override
   // TODO: implement enclosingElement3
   Element get enclosingElement3 => throw UnimplementedError();
 
@@ -614,6 +634,30 @@ class FakeFieldElement implements FieldElement {
   @override
   // TODO: implement sinceSdkVersion
   Version? get sinceSdkVersion => throw UnimplementedError();
+
+  @override
+  // TODO: implement augmentationTarget
+  FieldElement? get augmentationTarget => throw UnimplementedError();
+
+  @override
+  // TODO: implement hasImmutable
+  bool get hasImmutable => throw UnimplementedError();
+
+  @override
+  // TODO: implement hasRedeclare
+  bool get hasRedeclare => throw UnimplementedError();
+
+  @override
+  // TODO: implement hasVisibleOutsideTemplate
+  bool get hasVisibleOutsideTemplate => throw UnimplementedError();
+
+  @override
+  // TODO: implement isAugmentation
+  bool get isAugmentation => throw UnimplementedError();
+
+  @override
+  // TODO: implement augmentation
+  FieldElement? get augmentation => throw UnimplementedError();
 }
 
 class FakeDartObject implements DartObject {

@@ -68,7 +68,7 @@ void main() {
       primaryKeys:null,
       withoutRowid:null,
       )
-      @Fts3(tokenizerArgs:null)
+      @Fts3()
       class Person {
         @primaryKey
         final int id;
@@ -566,7 +566,6 @@ void main() {
                 childColumns: ['owner_id'],
                 parentColumns: [],
                 entity: Person,
-                onUpdate: null
                 onDelete: ForeignKeyAction.setNull,
               )
             ],
@@ -608,7 +607,6 @@ void main() {
                 childColumns: [],
                 parentColumns: ['id'],
                 entity: Person,
-                onUpdate: null
                 onDelete: ForeignKeyAction.setNull,
               )
             ],
@@ -675,7 +673,6 @@ void main() {
                 childColumns: ['owner_id'],
                 parentColumns: ['id'],
                 entity: Person,
-                onUpdate: null
                 onDelete: ForeignKeyAction.setNull,
               )
             ],

@@ -24,5 +24,5 @@ class TypeConverters {
   /// The list of type converter classes.
   final List<Type> value;
 
-  const TypeConverters(this.value);
+  const TypeConverters({this.value = const []});
 }
