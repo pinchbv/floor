@@ -22,7 +22,7 @@ import 'package:meta/meta.dart';
 @experimental
 class TypeConverters {
   /// The list of type converter classes.
-  final List<Type> value;
+  final List<Type>? value;
 
-  const TypeConverters({this.value = const []});
+  const TypeConverters(this.value);
 }

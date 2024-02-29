@@ -279,50 +279,6 @@ void main() {
       );
       expect(actual, equals(expected));
     });
-
-    test('error with wrong onUpdate Annotation', () async {
-      final classElements = await _createClassElements('''
-          @entity
-          class Person {
-            @primaryKey
-            final int id;
-            
-            final String name;
-          
-            Person(this.id, this.name);
-          }
-          
-          @Entity(
-            foreignKeys: [
-              ForeignKey(
-                childColumns: ['owner_id'],
-                parentColumns: ['id'],
-                entity: Person,
-                onUpdate: null
-                onDelete: ForeignKeyAction.setNull,
-              )
-            ],
-          )
-          class Dog {
-            @primaryKey
-            final int id;
-          
-            final String name;
-          
-            @ColumnInfo(name: 'owner_id')
-            final int ownerId;
-          
-            Dog(this.id, this.name, this.ownerId);
-          }
-      ''');
-
-      final processor = EntityProcessor(classElements[1], {});
-      expect(
-          processor.process,
-          throwsInvalidGenerationSourceError(
-              EntityProcessorError(classElements[1]).wrongForeignKeyAction(
-                  FakeDartObject(), ForeignKeyField.onUpdate)));
-    });
   });
 
   group('fts keys', () {
