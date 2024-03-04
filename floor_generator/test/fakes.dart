@@ -258,7 +258,6 @@ class FakeClassElement implements ClassElement {
   @override
   Source get source => throw UnimplementedError();
 
-  @override
   List<InterfaceType> get superclassConstraints => throw UnimplementedError();
 
   @override
@@ -302,7 +301,6 @@ class FakeClassElement implements ClassElement {
   // TODO: implement augmented
   AugmentedClassElement get augmented => throw UnimplementedError();
 
-  @override
   // TODO: implement enclosingElement3
   CompilationUnitElement get enclosingElement3 => throw UnimplementedError();
 
@@ -310,7 +308,6 @@ class FakeClassElement implements ClassElement {
   // TODO: implement hasMustBeOverridden
   bool get hasMustBeOverridden => throw UnimplementedError();
 
-  @override
   bool isAccessibleIn2(LibraryElement library) {
     // TODO: implement isAccessibleIn2
     throw UnimplementedError();
@@ -605,7 +602,6 @@ class FakeFieldElement implements FieldElement {
   @override
   Element get nonSynthetic => throw UnimplementedError();
 
-  @override
   // TODO: implement enclosingElement3
   Element get enclosingElement3 => throw UnimplementedError();
 
@@ -613,7 +609,6 @@ class FakeFieldElement implements FieldElement {
   // TODO: implement hasMustBeOverridden
   bool get hasMustBeOverridden => throw UnimplementedError();
 
-  @override
   bool isAccessibleIn2(LibraryElement library) {
     // TODO: implement isAccessibleIn2
     throw UnimplementedError();
