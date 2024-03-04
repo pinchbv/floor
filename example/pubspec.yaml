@@ -7,7 +7,7 @@ homepage: https://pinchbv.github.io/floor/
 publish_to: none
 
 environment:
-  sdk: '>=2.17.0 <3.0.0'
+  sdk: '>=3.2.6 <4.0.0'
 
 dependencies:
   floor:
@@ -16,8 +16,8 @@ dependencies:
     sdk: flutter
 
 dev_dependencies:
-  analyzer: ^5.0.0
-  build_runner: ^2.2.1
+  analyzer: ^6.4.1
+  build_runner: ^2.4.8
   floor_generator:
     path: ../floor_generator/
   flutter_test:
