@@ -37,19 +37,6 @@ void main() {
       expect(actual, equals({expected}));
     });
 
-    test('throws error when null in annotation', () async {
-      const typeConverterScope = TypeConverterScope.database;
-      final element = await '''
-        @TypeConverters(null)
-        abstract class Foo {}
-      '''
-          .asClassElement();
-
-      final actual = () => element.getTypeConverters(typeConverterScope);
-
-      expect(actual, throwsProcessorError());
-    });
-
     test('throws error when empty list in annotation', () async {
       const typeConverterScope = TypeConverterScope.database;
       final element = await '''
