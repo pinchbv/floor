@@ -595,9 +595,6 @@ class FakeFieldElement implements FieldElement {
   @override
   Element get nonSynthetic => throw UnimplementedError();
 
-  // TODO: implement enclosingElement3
-  Element get enclosingElement3 => throw UnimplementedError();
-
   @override
   // TODO: implement hasMustBeOverridden
   bool get hasMustBeOverridden => throw UnimplementedError();
