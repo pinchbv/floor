@@ -299,9 +299,6 @@ class FakeClassElement implements ClassElement {
   // TODO: implement augmented
   AugmentedClassElement get augmented => throw UnimplementedError();
 
-  // TODO: implement enclosingElement3
-  CompilationUnitElement get enclosingElement3 => throw UnimplementedError();
-
   @override
   // TODO: implement hasMustBeOverridden
   bool get hasMustBeOverridden => throw UnimplementedError();
