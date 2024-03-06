@@ -21,7 +21,7 @@ dependencies:
   path: ^1.8.1
   sqflite: ^2.0.0+4
   sqflite_common_ffi: ^2.0.0+3
-  sqflite_common_ffi_web: ^0.3.2
+  sqflite_common_ffi_web: ^0.4.2+3
   sqlparser: ^0.27.0
 
 dev_dependencies:
