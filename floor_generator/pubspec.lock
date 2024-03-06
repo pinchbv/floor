@@ -180,10 +180,9 @@ packages:
   floor_annotation:
     dependency: "direct main"
     description:
-      name: floor_annotation
-      sha256: fa3fa4f198cdd1d922a69ceb06e54663fe59256bf1cb3c036eff206b445a6960
-      url: "https://pub.dev"
-    source: hosted
+      path: "../floor_annotation"
+      relative: true
+    source: path
     version: "1.4.2"
   frontend_server_client:
     dependency: transitive
