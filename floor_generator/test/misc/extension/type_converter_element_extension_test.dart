@@ -40,6 +40,19 @@ void main() {
     test('throws error when empty list in annotation', () async {
       const typeConverterScope = TypeConverterScope.database;
       final element = await '''
+        @TypeConverters(null)
+        abstract class Foo {}
+      '''
+          .asClassElement();
+
+      final actual = () => element.getTypeConverters(typeConverterScope);
+
+      expect(actual, throwsUnresolvedAnnotationException());
+    });
+
+    test('throws error when empty list in annotation', () async {
+      const typeConverterScope = TypeConverterScope.database;
+      final element = await '''
         @TypeConverters([])
         abstract class Foo {}
       '''

@@ -157,6 +157,12 @@ Matcher throwsProcessorError([
   }
 }
 
+Matcher throwsUnresolvedAnnotationException() {
+  return throwsA(isA<UnresolvedAnnotationException>());
+}
+
+
+
 Future<Dao> createDao(final String methodSignature) async {
   final library = await resolveSource('''
       library test;
