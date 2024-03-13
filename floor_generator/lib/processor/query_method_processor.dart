@@ -39,7 +39,6 @@ class QueryMethodProcessor extends Processor<QueryMethod> {
 
     final query = QueryProcessor(_methodElement, _getQuery()).process();
 
-    _getQuery();
     final returnsStream = rawReturnType.isStream;
 
     _assertReturnsFutureOrStream(rawReturnType, returnsStream);
@@ -133,7 +132,7 @@ class QueryMethodProcessor extends Processor<QueryMethod> {
     final DartType flattenedReturnType,
   ) {
     if (!returnsList &&
-        !flattenedReturnType.isVoid &&
+        !(flattenedReturnType is VoidType) &&
         !flattenedReturnType.isNullable) {
       if (returnsStream) {
         throw _processorError.doesNotReturnNullableStream;

@@ -5,6 +5,7 @@ import 'package:analyzer/dart/element/nullability_suffix.dart';
 import 'package:analyzer/dart/element/type.dart';
 import 'package:analyzer/src/generated/engine.dart';
 import 'package:analyzer/src/generated/source.dart';
+import 'package:pub_semver/src/version.dart';
 
 class FakeClassElement implements ClassElement {
   @override
@@ -127,9 +128,6 @@ class FakeClassElement implements ClassElement {
   bool get hasSealed => throw UnimplementedError();
 
   @override
-  bool get hasStaticMember => throw UnimplementedError();
-
-  @override
   bool get hasVisibleForTemplate => throw UnimplementedError();
 
   @override
@@ -158,12 +156,6 @@ class FakeClassElement implements ClassElement {
 
   @override
   bool get isDartCoreObject => throw UnimplementedError();
-
-  @override
-  bool get isEnum => throw UnimplementedError();
-
-  @override
-  bool get isMixin => throw UnimplementedError();
 
   @override
   bool get isMixinApplication => throw UnimplementedError();
@@ -302,6 +294,89 @@ class FakeClassElement implements ClassElement {
 
   @override
   Element get nonSynthetic => throw UnimplementedError();
+
+  @override
+  bool get isDartCoreEnum => throw UnimplementedError();
+
+  @override
+  // TODO: implement augmentation
+  ClassAugmentationElement? get augmentation => throw UnimplementedError();
+
+  @override
+  // TODO: implement augmented
+  AugmentedClassElement get augmented => throw UnimplementedError();
+
+  @override
+  // TODO: implement enclosingElement3
+  CompilationUnitElement get enclosingElement3 => throw UnimplementedError();
+
+  @override
+  // TODO: implement hasMustBeOverridden
+  bool get hasMustBeOverridden => throw UnimplementedError();
+
+  @override
+  bool isAccessibleIn2(LibraryElement library) {
+    // TODO: implement isAccessibleIn2
+    throw UnimplementedError();
+  }
+
+  @override
+  // TODO: implement children
+  List<Element> get children => throw UnimplementedError();
+
+  @override
+  // TODO: implement hasReopen
+  bool get hasReopen => throw UnimplementedError();
+
+  @override
+  // TODO: implement isBase
+  bool get isBase => throw UnimplementedError();
+
+  @override
+  // TODO: implement isConstructable
+  bool get isConstructable => throw UnimplementedError();
+
+  @override
+  // TODO: implement isExhaustive
+  bool get isExhaustive => throw UnimplementedError();
+
+  @override
+  bool isExtendableIn(LibraryElement library) {
+    // TODO: implement isExtendableIn
+    throw UnimplementedError();
+  }
+
+  @override
+  // TODO: implement isFinal
+  bool get isFinal => throw UnimplementedError();
+
+  @override
+  bool isImplementableIn(LibraryElement library) {
+    // TODO: implement isImplementableIn
+    throw UnimplementedError();
+  }
+
+  @override
+  // TODO: implement isInterface
+  bool get isInterface => throw UnimplementedError();
+
+  @override
+  bool isMixableIn(LibraryElement library) {
+    // TODO: implement isMixableIn
+    throw UnimplementedError();
+  }
+
+  @override
+  // TODO: implement isMixinClass
+  bool get isMixinClass => throw UnimplementedError();
+
+  @override
+  // TODO: implement isSealed
+  bool get isSealed => throw UnimplementedError();
+
+  @override
+  // TODO: implement sinceSdkVersion
+  Version? get sinceSdkVersion => throw UnimplementedError();
 }
 
 class FakeFieldElement implements FieldElement {
@@ -505,6 +580,40 @@ class FakeFieldElement implements FieldElement {
 
   @override
   Element get nonSynthetic => throw UnimplementedError();
+
+  @override
+  // TODO: implement augmentation
+  FieldAugmentationElement? get augmentation => throw UnimplementedError();
+
+  @override
+  // TODO: implement enclosingElement3
+  Element get enclosingElement3 => throw UnimplementedError();
+
+  @override
+  // TODO: implement hasMustBeOverridden
+  bool get hasMustBeOverridden => throw UnimplementedError();
+
+  @override
+  bool isAccessibleIn2(LibraryElement library) {
+    // TODO: implement isAccessibleIn2
+    throw UnimplementedError();
+  }
+
+  @override
+  // TODO: implement children
+  List<Element> get children => throw UnimplementedError();
+
+  @override
+  // TODO: implement hasReopen
+  bool get hasReopen => throw UnimplementedError();
+
+  @override
+  // TODO: implement isPromotable
+  bool get isPromotable => throw UnimplementedError();
+
+  @override
+  // TODO: implement sinceSdkVersion
+  Version? get sinceSdkVersion => throw UnimplementedError();
 }
 
 class FakeDartObject implements DartObject {
@@ -574,4 +683,8 @@ class FakeDartObject implements DartObject {
 
   @override
   ParameterizedType? get type => throw UnimplementedError();
+
+  @override
+  // TODO: implement variable
+  VariableElement? get variable => throw UnimplementedError();
 }

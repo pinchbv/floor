@@ -41,9 +41,11 @@ void main() {
             .write();
 
     expect(actual, equalsDart(r'''
-        class _$PersonDao extends PersonDao {
-          _$PersonDao(this.database, this.changeListener)
-              : _queryAdapter = QueryAdapter(database),
+      class _$PersonDao extends PersonDao {
+          _$PersonDao(
+            this.database,
+            this.changeListener,
+          )   : _queryAdapter = QueryAdapter(database),
                 _personInsertionAdapter = InsertionAdapter(
                     database,
                     'Person',
@@ -76,25 +78,27 @@ void main() {
         
           @override
           Future<List<Person>> findAllPersons() async {
-            return _queryAdapter.queryList('SELECT * FROM person', mapper: (Map<String, Object?> row) => Person(row['id'] as int, row['name'] as String));
+            return _queryAdapter.queryList('SELECT * FROM person',
+                mapper: (Map<String, Object?> row) =>
+                    Person(row['id'] as int, row['name'] as String));
           }
-          
+        
           @override
           Future<void> insertPerson(Person person) async {
             await _personInsertionAdapter.insert(person, OnConflictStrategy.abort);
           }
-          
+        
           @override
           Future<void> updatePerson(Person person) async {
             await _personUpdateAdapter.update(person, OnConflictStrategy.abort);
           }
-          
+        
           @override
           Future<void> deletePerson(Person person) async {
             await _personDeletionAdapter.delete(person);
           }
         }
-      '''));
+        '''));
   });
 
   test('create DAO stream query', () async {
@@ -121,8 +125,10 @@ void main() {
 
     expect(actual, equalsDart(r'''
         class _$PersonDao extends PersonDao {
-          _$PersonDao(this.database, this.changeListener)
-              : _queryAdapter = QueryAdapter(database, changeListener),
+          _$PersonDao(
+            this.database,
+            this.changeListener,
+          ) : _queryAdapter = QueryAdapter(database, changeListener),
                 _personInsertionAdapter = InsertionAdapter(
                     database,
                     'Person',
@@ -158,7 +164,7 @@ void main() {
         
           @override
           Stream<List<Person>> findAllPersonsAsStream() {
-            return _queryAdapter.queryListStream('SELECT * FROM person', mapper: (Map<String, Object?> row) => Person(row['id'] as int, row['name'] as String), queryableName: 'Person', isView: false);
+            return _queryAdapter.queryListStream('SELECT * FROM person', mapper: (Map<String, Object?> row) => Person(row['id'] as int, row['name'] as String), queryableName: 'person', isView: false);
           }
           
           @override
@@ -199,8 +205,10 @@ void main() {
 
     expect(actual, equalsDart(r'''
         class _$PersonDao extends PersonDao {
-          _$PersonDao(this.database, this.changeListener)
-              : _personInsertionAdapter = InsertionAdapter(
+          _$PersonDao(
+            this.database,
+            this.changeListener,
+          ) : _personInsertionAdapter = InsertionAdapter(
                     database,
                     'Person',
                     (Person item) =>
@@ -280,8 +288,10 @@ void main() {
 
     expect(actual, equalsDart(r'''
       class _$PersonDao extends PersonDao {
-        _$PersonDao(this.database, this.changeListener)
-            : _personInsertionAdapter = InsertionAdapter(
+          _$PersonDao(
+            this.database,
+            this.changeListener,
+          ) : _personInsertionAdapter = InsertionAdapter(
                   database,
                   'Person',
                   (Person item) =>
@@ -346,8 +356,10 @@ void main() {
 
     expect(actual, equalsDart(r'''
         class _$PersonDao extends PersonDao {
-          _$PersonDao(this.database, this.changeListener)
-              : _personInsertionAdapter = InsertionAdapter(
+          _$PersonDao(
+            this.database,
+            this.changeListener,
+          ) : _personInsertionAdapter = InsertionAdapter(
                     database,
                     'Person',
                     (Person item) =>
@@ -422,7 +434,10 @@ Future<Dao> _createDao(final String dao) async {
         Name(this.name);
       }
       ''', (resolver) async {
-    return LibraryReader((await resolver.findLibraryByName('test'))!);
+    return resolver
+        .findLibraryByName('test')
+        .then((value) => ArgumentError.checkNotNull(value))
+        .then((value) => LibraryReader(value));
   });
 
   final daoClass = library.classes.firstWhere((classElement) =>

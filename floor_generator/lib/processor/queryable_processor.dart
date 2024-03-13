@@ -1,8 +1,6 @@
 import 'package:analyzer/dart/element/element.dart';
-import 'package:analyzer/dart/element/type.dart';
 import 'package:collection/collection.dart';
 import 'package:floor_annotation/floor_annotation.dart' as annotations;
-import 'package:floor_generator/misc/extension/dart_type_extension.dart';
 import 'package:floor_generator/misc/extension/set_extension.dart';
 import 'package:floor_generator/misc/extension/string_extension.dart';
 import 'package:floor_generator/misc/extension/type_converter_element_extension.dart';
@@ -54,13 +52,21 @@ abstract class QueryableProcessor<T extends Queryable> extends Processor<T> {
 
   @protected
   String getConstructor(final List<Field> fields) {
-    final constructorParameters = classElement.constructors.first.parameters;
-    final parameterValues = constructorParameters
-        .map((parameterElement) => _getParameterValue(parameterElement, fields))
-        .where((parameterValue) => parameterValue != null)
-        .join(', ');
+    final constructorParameters = classElement.constructors
+        .firstWhereOrNull((element) => element.isPublic && !element.isFactory)
+        ?.parameters;
 
-    return '${classElement.displayName}($parameterValues)';
+    if (constructorParameters == null) {
+      throw _queryableProcessorError.missingUnnamedConstructor;
+    } else {
+      final parameterValues = constructorParameters
+          .map((parameterElement) =>
+              _getParameterValue(parameterElement, fields))
+          .where((parameterValue) => parameterValue != null)
+          .join(', ');
+
+      return '${classElement.displayName}($parameterValues)';
+    }
   }
 
   /// Returns `null` whenever field is @ignored
@@ -77,15 +83,11 @@ abstract class QueryableProcessor<T extends Queryable> extends Processor<T> {
 
       String parameterValue;
 
-      if (parameterElement.type.isDefaultSqlType) {
-        parameterValue = databaseValue.cast(
-          parameterElement.type,
-          parameterElement,
-        );
-      } else {
-        final typeConverter = [...queryableTypeConverters, field.typeConverter]
-            .whereNotNull()
-            .getClosest(parameterElement.type);
+      final typeConverter = [...queryableTypeConverters, field.typeConverter]
+          .whereNotNull()
+          .getClosestOrNull(parameterElement.type);
+
+      if (typeConverter != null) {
         final castedDatabaseValue = databaseValue.cast(
           typeConverter.databaseType,
           parameterElement,
@@ -93,6 +95,18 @@ abstract class QueryableProcessor<T extends Queryable> extends Processor<T> {
 
         parameterValue =
             '_${typeConverter.name.decapitalize()}.decode($castedDatabaseValue)';
+      } else if (parameterElement.type.isDefaultSqlType ||
+          parameterElement.type.isEnumType) {
+        parameterValue = databaseValue.cast(
+          parameterElement.type,
+          parameterElement,
+        );
+      } else {
+        throw InvalidGenerationSourceError(
+          'Column type is not supported for ${parameterElement.type}',
+          todo:
+              'Either use a supported type https://pinchbv.github.io/floor/entities/#supported-types or supply a type converter.',
+        );
       }
 
       if (parameterElement.isNamed) {
@@ -101,32 +115,6 @@ abstract class QueryableProcessor<T extends Queryable> extends Processor<T> {
       return parameterValue; // also covers positional parameter
     } else {
       return null;
-    }
-  }
-}
-
-extension on String {
-  String cast(DartType dartType, ParameterElement parameterElement) {
-    if (dartType.isDartCoreBool) {
-      if (dartType.isNullable) {
-        // if the value is null, return null
-        // if the value is not null, interpret 1 as true and 0 as false
-        return '$this == null ? null : ($this as int) != 0';
-      } else {
-        return '($this as int) != 0';
-      }
-    } else if (dartType.isDartCoreString ||
-        dartType.isDartCoreInt ||
-        dartType.isUint8List ||
-        dartType.isDartCoreDouble) {
-      final typeString = dartType.getDisplayString(withNullability: true);
-      return '$this as $typeString';
-    } else {
-      throw InvalidGenerationSourceError(
-        'Trying to convert unsupported type $dartType.',
-        todo: 'Consider adding a type converter.',
-        element: parameterElement,
-      );
     }
   }
 }

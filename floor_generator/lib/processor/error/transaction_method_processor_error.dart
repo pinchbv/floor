@@ -4,7 +4,7 @@ import 'package:source_gen/source_gen.dart';
 class TransactionMethodProcessorError {
   final MethodElement _methodElement;
 
-  TransactionMethodProcessorError(final this._methodElement);
+  TransactionMethodProcessorError(this._methodElement);
 
   InvalidGenerationSourceError get shouldReturnFuture {
     return InvalidGenerationSourceError(

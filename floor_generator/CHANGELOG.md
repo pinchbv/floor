@@ -1,10 +1,36 @@
 # Changelog
 
+## 1.4.2
+
+* Changed TypeConverters priority
+* Ignore ordering of constructors to always take the public, non-factory constructor
+* Return result of table modifications through queries
+
+## 1.4.1
+
+### Changes
+
+* Fix issue with nullable enum declaration in entity
+
+## 1.4.0
+
+### Changes
+
+* Update to Analyzer 5
+* Add Enum support
+* Add primitive Dart type support in queries
+
 ## 1.3.0
 
 ### Changes
 
-* Support analyzer version 3.+
+* Remove Slack invite links
+
+### 🛠 Maintenance
+
+* Update Analyzer to 4.1.0
+* Allow release drafter to create GitHub releases
+* Support latest analyzer
 
 ## 1.2.0
 

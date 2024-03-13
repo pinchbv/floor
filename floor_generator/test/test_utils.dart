@@ -4,7 +4,7 @@ import 'package:analyzer/dart/element/element.dart';
 import 'package:analyzer/dart/element/type.dart';
 import 'package:build/build.dart';
 import 'package:build_test/build_test.dart';
-import 'package:code_builder/code_builder.dart';
+import 'package:code_builder/code_builder.dart' hide FunctionType;
 import 'package:dart_style/dart_style.dart';
 import 'package:floor_annotation/floor_annotation.dart' as annotations;
 import 'package:floor_generator/misc/type_utils.dart';
@@ -60,9 +60,11 @@ Future<DartType> getDartTypeWithPerson(String value) async {
   }
   ''';
   return resolveSource(source, (item) async {
-    final libraryReader =
-        LibraryReader((await item.findLibraryByName('test'))!);
-    return (libraryReader.allElements.first as PropertyAccessorElement)
+    final libraryReader = await item
+        .findLibraryByName('test')
+        .then((value) => ArgumentError.checkNotNull(value))
+        .then((value) => LibraryReader(value));
+    return (libraryReader.allElements.elementAt(1) as PropertyAccessorElement)
         .type
         .returnType;
   });
@@ -84,9 +86,11 @@ Future<DartType> getDartTypeWithName(String value) async {
   }
   ''';
   return resolveSource(source, (item) async {
-    final libraryReader =
-        LibraryReader((await item.findLibraryByName('test'))!);
-    return (libraryReader.allElements.first as PropertyAccessorElement)
+    final libraryReader = await item
+        .findLibraryByName('test')
+        .then((value) => ArgumentError.checkNotNull(value))
+        .then((value) => LibraryReader(value));
+    return (libraryReader.allElements.elementAt(1) as PropertyAccessorElement)
         .type
         .returnType;
   });
@@ -102,7 +106,9 @@ Future<DartType> getDartTypeFromDeclaration(final String declaration) async {
   return resolveSource(source, (item) async {
     final libraryReader =
         LibraryReader((await item.findLibraryByName('test'))!);
-    return (libraryReader.allElements.elementAt(1) as VariableElement).type;
+    return (libraryReader.allElements.elementAt(1) as PropertyAccessorElement)
+        .type
+        .returnType;
   });
 }
 
@@ -156,17 +162,23 @@ Future<Dao> createDao(final String methodSignature) async {
       library test;
       
       import 'package:floor_annotation/floor_annotation.dart';
+      import 'dart:typed_data';
       
       @dao
       abstract class PersonDao {
         $methodSignature
       }
       
+      $characterType
+      
       $_personEntity
       
       $_nameView
       ''', (resolver) async {
-    return LibraryReader((await resolver.findLibraryByName('test'))!);
+    return resolver
+        .findLibraryByName('test')
+        .then((value) => ArgumentError.checkNotNull(value))
+        .then((value) => LibraryReader(value));
   });
 
   final daoClass = library.classes.firstWhere((classElement) =>
@@ -195,7 +207,10 @@ Future<ClassElement> createClassElement(final String clazz) async {
       
       $clazz
       ''', (resolver) async {
-    return LibraryReader((await resolver.findLibraryByName('test'))!);
+    return resolver
+        .findLibraryByName('test')
+        .then((value) => ArgumentError.checkNotNull(value))
+        .then((value) => LibraryReader(value));
   });
 
   return library.classes.first;
@@ -214,7 +229,10 @@ extension StringTestExtension on String {
       
       $this
       ''', (resolver) async {
-      return LibraryReader((await resolver.findLibraryByName('test'))!);
+      return resolver
+          .findLibraryByName('test')
+          .then((value) => ArgumentError.checkNotNull(value))
+          .then((value) => LibraryReader(value));
     });
 
     return library.classes.first;
@@ -226,10 +244,14 @@ Future<Entity> getPersonEntity() async {
       library test;
       
       import 'package:floor_annotation/floor_annotation.dart';
+      import 'dart:typed_data';
       
       $_personEntity
     ''', (resolver) async {
-    return LibraryReader((await resolver.findLibraryByName('test'))!);
+    return resolver
+        .findLibraryByName('test')
+        .then((value) => ArgumentError.checkNotNull(value))
+        .then((value) => LibraryReader(value));
   });
 
   return library.classes
@@ -244,6 +266,7 @@ extension StringExtension on String {
       library test;
             
       import 'package:floor_annotation/floor_annotation.dart';
+      import 'dart:typed_data';
       
       @dao
       abstract class PersonDao {
@@ -252,7 +275,10 @@ extension StringExtension on String {
       
       $_personEntity
     ''', (resolver) async {
-      return LibraryReader((await resolver.findLibraryByName('test'))!);
+      return resolver
+          .findLibraryByName('test')
+          .then((value) => ArgumentError.checkNotNull(value))
+          .then((value) => LibraryReader(value));
     });
 
     return library.classes.first.methods.first;
@@ -266,8 +292,14 @@ const _personEntity = '''
     final int id;
         
     final String name;
+    
+    final double weight;
+    
+    final bool admin;
+    
+    final Uint8List avatar;
         
-    Person(this.id, this.name);
+    Person(this.id, this.name, this.weight, this.admin, this.avatar);
   }
 ''';
 
@@ -279,4 +311,8 @@ const _nameView = '''
     Name(this.name);
   }
 
+''';
+
+const characterType = '''
+  enum CharacterType { generous, honest, faithful, faithful, loving, kind, sincere }
 ''';

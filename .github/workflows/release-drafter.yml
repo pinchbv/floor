@@ -7,6 +7,8 @@ on:
 
 jobs:
   update-release-draft:
+    permissions:
+      contents: write  # to create a GitHub release
     runs-on: ubuntu-latest
     steps:
       - uses: release-drafter/release-drafter@v5

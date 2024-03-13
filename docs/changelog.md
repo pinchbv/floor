@@ -1,5 +1,37 @@
 # Changelog
 
+## 1.4.2
+
+* Changed TypeConverters priority
+* Ignore ordering of constructors to always take the public, non-factory constructor
+* Return result of table modifications through queries
+
+## 1.4.1
+
+### Changes
+
+* Fix issue with nullable enum declaration in entity
+
+## 1.4.0
+
+### Changes
+
+* Update to Analyzer 5
+* Add Enum support
+* Add primitive Dart type support in queries
+
+## 1.3.0
+
+### Changes
+
+* Remove Slack invite links
+
+### 🛠 Maintenance
+
+* Update Analyzer to 4.1.0
+* Allow release drafter to create GitHub releases
+* Support latest analyzer
+
 ## 1.2.0
 
 ### Changes
@@ -135,12 +167,12 @@ All credits for this release go to mqus.
 
 ## 0.13.0
 
-!!! attention
-    ### Breaking Change
+### ⚠️ Breaking Changes
 
-    * Apply camel case to constants
+**You need to migrate the explicit usages of `OnConflictStrategy` and `ForeignKeyAction` from snake
+case to camel case.**
 
-    You need to migrate the explicit usages of `OnConflictStrategy` and `ForeignKeyAction` from snake case to camel case.
+* Apply camel case to constants
 
 ### Changes
 

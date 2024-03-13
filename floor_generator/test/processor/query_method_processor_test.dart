@@ -478,7 +478,10 @@ Future<MethodElement> _createQueryMethodElement(
         Name(this.name);
       }
     ''', (resolver) async {
-    return LibraryReader((await resolver.findLibraryByName('test'))!);
+    return resolver
+        .findLibraryByName('test')
+        .then((value) => ArgumentError.checkNotNull(value))
+        .then((value) => LibraryReader(value));
   });
 
   return library.classes.first.methods.first;
@@ -500,7 +503,10 @@ Future<List<Entity>> _getEntities() async {
         Person(this.id, this.name);
       }
     ''', (resolver) async {
-    return LibraryReader((await resolver.findLibraryByName('test'))!);
+    return resolver
+        .findLibraryByName('test')
+        .then((value) => ArgumentError.checkNotNull(value))
+        .then((value) => LibraryReader(value));
   });
 
   return library.classes
@@ -522,7 +528,10 @@ Future<List<View>> _getViews() async {
         Name(this.name);
       }
     ''', (resolver) async {
-    return LibraryReader((await resolver.findLibraryByName('test'))!);
+    return resolver
+        .findLibraryByName('test')
+        .then((value) => ArgumentError.checkNotNull(value))
+        .then((value) => LibraryReader(value));
   });
 
   return library.classes

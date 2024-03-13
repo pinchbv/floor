@@ -6,11 +6,14 @@ import 'package:floor_generator/misc/annotation_expression.dart';
 import 'package:floor_generator/misc/extension/string_extension.dart';
 import 'package:floor_generator/misc/extension/type_converters_extension.dart';
 import 'package:floor_generator/misc/type_utils.dart';
+import 'package:floor_generator/processor/error/query_method_writer_error.dart';
 import 'package:floor_generator/value_object/query.dart';
 import 'package:floor_generator/value_object/query_method.dart';
 import 'package:floor_generator/value_object/queryable.dart';
+import 'package:floor_generator/value_object/type_converter.dart';
 import 'package:floor_generator/value_object/view.dart';
 import 'package:floor_generator/writer/writer.dart';
+import 'package:source_gen/source_gen.dart';
 
 class QueryMethodWriter implements Writer {
   final QueryMethod _queryMethod;
@@ -60,12 +63,10 @@ class QueryMethodWriter implements Writer {
     final arguments = _generateArguments();
     final query = _generateQueryString();
 
-    final queryable = _queryMethod.queryable;
-    // null queryable implies void-returning query method
-    if (_queryMethod.returnsVoid || queryable == null) {
+    if (_queryMethod.returnsVoid) {
       _methodBody.write(_generateNoReturnQuery(query, arguments));
     } else {
-      _methodBody.write(_generateQuery(query, arguments, queryable));
+      _methodBody.write(_generateQuery(query, arguments));
     }
 
     return _methodBody.toString();
@@ -111,17 +112,27 @@ class QueryMethodWriter implements Writer {
       ..._queryMethod.parameters
           .where((parameter) => !parameter.type.isDartCoreList)
           .map((parameter) {
-        if (parameter.type.isDefaultSqlType) {
-          if (parameter.type.isDartCoreBool) {
-            // query method parameters can't be null
-            return '${parameter.displayName} ? 1 : 0';
-          } else {
-            return parameter.displayName;
-          }
+        final type = parameter.type;
+        final displayName = parameter.displayName;
+        final typeConverter = _queryMethod.typeConverters.getClosestOrNull(
+          type,
+        );
+
+        if (typeConverter != null) {
+          return '_${typeConverter.name.decapitalize()}.encode($displayName)';
+        } else if (type.isDartCoreBool) {
+          // query method parameters can't be null
+          return '$displayName ? 1 : 0';
+        } else if (type.isEnumType) {
+          return '$displayName.index';
+        } else if (type.isDefaultSqlType) {
+          return displayName;
         } else {
-          final typeConverter =
-              _queryMethod.typeConverters.getClosest(parameter.type);
-          return '_${typeConverter.name.decapitalize()}.encode(${parameter.displayName})';
+          throw InvalidGenerationSourceError(
+            'Parameter type is not supported for $type',
+            todo:
+                'Either use a supported type https://pinchbv.github.io/floor/entities/#supported-types or supply a type converter.',
+          );
         }
       }),
       ..._queryMethod.parameters
@@ -129,12 +140,20 @@ class QueryMethodWriter implements Writer {
           .map((parameter) {
         // TODO #403 what about type converters that map between e.g. string and list?
         final DartType flatType = parameter.type.flatten();
-        if (flatType.isDefaultSqlType) {
-          return '...${parameter.displayName}';
+        final displayName = parameter.displayName;
+        final typeConverter = _queryMethod.typeConverters.getClosestOrNull(
+          flatType,
+        );
+        if (typeConverter != null) {
+          return '...$displayName.map((element) => _${typeConverter.name.decapitalize()}.encode(element))';
+        } else if (flatType.isDefaultSqlType || flatType.isEnumType) {
+          return '...$displayName';
         } else {
-          final typeConverter =
-              _queryMethod.typeConverters.getClosest(flatType);
-          return '...${parameter.displayName}.map((element) => _${typeConverter.name.decapitalize()}.encode(element))';
+          throw InvalidGenerationSourceError(
+            'Parameter type is not supported for $flatType',
+            todo:
+                'Either use a supported type https://pinchbv.github.io/floor/entities/#supported-types or supply a type converter.',
+          );
         }
       })
     ];
@@ -166,12 +185,23 @@ class QueryMethodWriter implements Writer {
     return 'await _queryAdapter.queryNoReturn($parameters);';
   }
 
-  String _generateQuery(
-    final String query,
-    final String? arguments,
-    final Queryable queryable,
-  ) {
-    final mapper = _generateMapper(queryable);
+  String _generateQuery(final String query, final String? arguments) {
+    final queryable = _queryMethod.queryable;
+    final returnType = _queryMethod.flattenedReturnType;
+    final converter = _queryMethod.typeConverters.getClosestOrNull(returnType);
+
+    String? mapper;
+    if (queryable != null) {
+      mapper = _generateMapper(queryable);
+    } else if (converter != null) {
+      mapper = _generateConverterMapper(converter);
+    } else if (returnType.isDefaultSqlType || returnType.isEnumType) {
+      mapper = _generateDartCoreMapper(returnType);
+    } else {
+      throw QueryMethodWriterError(_queryMethod.methodElement)
+          .queryMethodReturnType();
+    }
+
     final parameters = StringBuffer(query)..write(', mapper: $mapper');
     if (arguments != null) parameters.write(', arguments: $arguments');
 
@@ -179,7 +209,7 @@ class QueryMethodWriter implements Writer {
       // for streamed queries, we need to provide the queryable to know which
       // entity to monitor. For views, we monitor all entities.
       parameters
-        ..write(", queryableName: '${queryable.name}'")
+        ..write(", queryableName: '${_parseTableName(query)}'")
         ..write(', isView: ${queryable is View}');
     }
 
@@ -187,6 +217,30 @@ class QueryMethodWriter implements Writer {
     final stream = _queryMethod.returnsStream ? 'Stream' : '';
 
     return 'return _queryAdapter.query$list$stream($parameters);';
+  }
+
+  String _generateDartCoreMapper(final DartType returnType) {
+    final castedDatabaseValue = 'row.values.first'.cast(
+      returnType,
+      returnType.element,
+      withNullability: false,
+    );
+    return '(Map<String, Object?> row) => $castedDatabaseValue';
+  }
+
+  String _generateConverterMapper(final TypeConverter typeConverter) {
+    final castedDatabaseValue = 'row.values.first'.cast(
+      typeConverter.databaseType,
+      typeConverter.fieldType.element,
+    );
+    return '(Map<String, Object?> row) => _${typeConverter.name.decapitalize()}.decode($castedDatabaseValue)';
+  }
+
+  String _parseTableName(String query) {
+    return RegExp(r'(?<=FROM )\w+', caseSensitive: false)
+            .firstMatch(query)
+            ?.group(0) ??
+        'no_table_name';
   }
 }
 

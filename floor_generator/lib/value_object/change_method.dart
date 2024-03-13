@@ -20,7 +20,7 @@ class ChangeMethod {
     this.entity,
   );
 
-  bool get requiresAsyncModifier => flattenedReturnType.isVoid;
+  bool get requiresAsyncModifier => flattenedReturnType is VoidType;
 
   bool get changesMultipleItems => parameterElement.type.isDartCoreList;
 

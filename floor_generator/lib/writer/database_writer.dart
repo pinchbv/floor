@@ -9,7 +9,7 @@ import 'package:floor_generator/writer/writer.dart';
 class DatabaseWriter implements Writer {
   final Database database;
 
-  DatabaseWriter(final this.database);
+  DatabaseWriter(this.database);
 
   @override
   Class write() {

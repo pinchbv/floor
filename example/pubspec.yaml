@@ -3,11 +3,11 @@ description: >
   The typesafe, reactive and lightweight SQLite abstraction for your Flutter applications.
   This is an example on how to use the library.
 version: 1.0.0
-homepage: https://floor.codes
+homepage: https://pinchbv.github.io/floor/
 publish_to: none
 
 environment:
-  sdk: '>=2.12.0 <3.0.0'
+  sdk: '>=2.17.0 <3.0.0'
 
 dependencies:
   floor:
@@ -16,8 +16,8 @@ dependencies:
     sdk: flutter
 
 dev_dependencies:
-  analyzer: ^3.1.0
-  build_runner: ^2.1.7
+  analyzer: ^5.0.0
+  build_runner: ^2.2.1
   floor_generator:
     path: ../floor_generator/
   flutter_test:

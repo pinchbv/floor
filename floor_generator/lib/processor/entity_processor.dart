@@ -276,30 +276,32 @@ class EntityProcessor extends QueryableProcessor<Entity> {
     final fieldElement = field.fieldElement;
     final parameterName = fieldElement.displayName;
     final fieldType = fieldElement.type;
+    final typeConverter = [...queryableTypeConverters, field.typeConverter]
+        .whereNotNull()
+        .getClosestOrNull(fieldType);
+    String attributeValue = 'item.$parameterName';
 
-    String attributeValue;
-
-    if (fieldType.isDefaultSqlType) {
-      attributeValue = 'item.$parameterName';
-    } else {
-      final typeConverter = [
-        ...queryableTypeConverters,
-        field.typeConverter,
-      ].whereNotNull().getClosest(fieldType);
+    if (typeConverter != null) {
       attributeValue =
           '_${typeConverter.name.decapitalize()}.encode(item.$parameterName)';
+    } else if (fieldType.isDartCoreBool) {
+      attributeValue = _serializeBoolean(field, attributeValue);
+    } else if (fieldType.isEnumType) {
+      attributeValue = _serializeEnum(attributeValue, field);
     }
+    return attributeValue;
+  }
 
-    if (fieldType.isDartCoreBool) {
-      if (field.isNullable) {
+  String _serializeBoolean(Field field, String attributeValue) {
+    return field.isNullable
         // force! underlying non-nullable type as null check has been done
-        return '$attributeValue == null ? null : ($attributeValue! ? 1 : 0)';
-      } else {
-        return '$attributeValue ? 1 : 0';
-      }
-    } else {
-      return attributeValue;
-    }
+        ? '$attributeValue == null ? null : ($attributeValue! ? 1 : 0)'
+        : '$attributeValue ? 1 : 0';
+  }
+
+  String _serializeEnum(String attributeValue, Field field) {
+    final operator = field.isNullable ? '?.' : '.';
+    return '$attributeValue${operator}index';
   }
 
   annotations.ForeignKeyAction _getForeignKeyAction(
