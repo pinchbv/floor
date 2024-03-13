@@ -21,7 +21,7 @@ dependencies:
     path: ../floor_annotation
   meta:
   source_gen: ^1.5.0
-  strings: ^3.0.0
+  strings: ^3.1.1
 
 dev_dependencies:
   build_test: ^2.2.2
