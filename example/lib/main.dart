@@ -100,6 +100,7 @@ class TasksWidgetState extends State<TasksWidget> {
   }
 
   TaskStatus _getMenuType(int index) => TaskStatus.values[index - 1];
+
 }
 
 class TasksListView extends StatelessWidget {

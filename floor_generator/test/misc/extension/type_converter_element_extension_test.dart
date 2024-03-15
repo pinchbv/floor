@@ -47,7 +47,7 @@ void main() {
 
       final actual = () => element.getTypeConverters(typeConverterScope);
 
-      expect(actual, throwsProcessorError());
+      expect(actual, throwsUnresolvedAnnotationException());
     });
 
     test('throws error when empty list in annotation', () async {
