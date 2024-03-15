@@ -7,16 +7,16 @@ class Entity {
   final String? tableName;
 
   /// List of indices on the table.
-  final List<Index> indices;
+  final List<Index>? indices;
 
   /// List of [ForeignKey] constraints on this entity.
-  final List<ForeignKey> foreignKeys;
+  final List<ForeignKey>? foreignKeys;
 
   /// List of primary key column names.
-  final List<String> primaryKeys;
+  final List<String>? primaryKeys;
 
   /// Whether the table is a "WITHOUT ROWID table".
-  final bool withoutRowid;
+  final bool? withoutRowid;
 
   /// Marks a class as a database entity (table).
   const Entity({
