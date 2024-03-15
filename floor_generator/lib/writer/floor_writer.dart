@@ -39,6 +39,7 @@ class FloorWriter extends Writer {
     return Class((builder) => builder
       ..name = '\$Floor$_databaseName'
       ..methods.addAll([databaseBuilderMethod, inMemoryDatabaseBuilderMethod])
+      ..docs.add('// ignore_for_file: library_private_types_in_public_api')
       ..docs.add('// ignore: avoid_classes_with_only_static_members'));
   }
 }

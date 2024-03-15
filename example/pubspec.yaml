@@ -12,6 +12,7 @@ environment:
 dependencies:
   floor:
     path: ../floor/
+  sqflite: ^2.2.8+4
   flutter:
     sdk: flutter
 
@@ -22,3 +23,4 @@ dev_dependencies:
     path: ../floor_generator/
   flutter_test:
     sdk: flutter
+  flutter_lints: ^2.0.2
