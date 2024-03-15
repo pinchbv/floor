@@ -223,6 +223,13 @@ packages:
       relative: true
     source: path
     version: "1.4.2"
+  floor_common:
+    dependency: transitive
+    description:
+      path: "../floor_common"
+      relative: true
+    source: path
+    version: "1.2.0"
   floor_generator:
     dependency: "direct dev"
     description:
@@ -489,10 +496,10 @@ packages:
     dependency: transitive
     description:
       name: sqlparser
-      sha256: dc384bb1f56d1384ce078edb5ff8247976abdab79d0c83e437210c85f06ecb61
+      sha256: "7b20045d1ccfb7bc1df7e8f9fee5ae58673fce6ff62cefbb0e0fd7214e90e5a0"
       url: "https://pub.dev"
     source: hosted
-    version: "0.34.0"
+    version: "0.34.1"
   stack_trace:
     dependency: transitive
     description:
@@ -529,10 +536,10 @@ packages:
     dependency: transitive
     description:
       name: strings
-      sha256: "1f3db7347b8dfd9844ee7fb34883cffbe6cc723a63cb9f4a0aa19e619304b030"
+      sha256: b33f40c4dd3e597bf6d9e7f4f4dc282dad0f19b07d9f320cb5c2183859cbccf5
       url: "https://pub.dev"
     source: hosted
-    version: "3.0.0"
+    version: "3.1.1"
   synchronized:
     dependency: transitive
     description:

@@ -23,7 +23,7 @@ dependencies:
   path: ^1.9.0
   sqflite: ^2.3.2
   sqflite_common_ffi: ^2.3.2+1
-  sqlparser: ^0.34.0
+  sqlparser: ^0.34.1
 
 dev_dependencies:
   build_runner: ^2.4.8
