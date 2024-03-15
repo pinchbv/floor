@@ -1,7 +1,6 @@
 import 'package:analyzer/dart/element/element.dart';
 import 'package:build_test/build_test.dart';
 import 'package:floor_annotation/floor_annotation.dart' as annotations;
-import 'package:floor_generator/misc/constants.dart';
 import 'package:floor_generator/processor/entity_processor.dart';
 import 'package:floor_generator/processor/error/entity_processor_error.dart';
 import 'package:floor_generator/processor/error/queryable_processor_error.dart';
@@ -14,7 +13,6 @@ import 'package:floor_generator/value_object/primary_key.dart';
 import 'package:source_gen/source_gen.dart';
 import 'package:test/test.dart';
 
-import '../fakes.dart';
 import '../test_utils.dart';
 
 void main() {
@@ -68,7 +66,7 @@ void main() {
       primaryKeys:null,
       withoutRowid:null,
       )
-      @Fts3(tokenizerArgs:null)
+      @Fts3()
       class Person {
         @primaryKey
         final int id;
@@ -278,50 +276,6 @@ void main() {
         annotations.ForeignKeyAction.setNull,
       );
       expect(actual, equals(expected));
-    });
-
-    test('error with wrong onUpdate Annotation', () async {
-      final classElements = await _createClassElements('''
-          @entity
-          class Person {
-            @primaryKey
-            final int id;
-            
-            final String name;
-          
-            Person(this.id, this.name);
-          }
-          
-          @Entity(
-            foreignKeys: [
-              ForeignKey(
-                childColumns: ['owner_id'],
-                parentColumns: ['id'],
-                entity: Person,
-                onUpdate: null
-                onDelete: ForeignKeyAction.setNull,
-              )
-            ],
-          )
-          class Dog {
-            @primaryKey
-            final int id;
-          
-            final String name;
-          
-            @ColumnInfo(name: 'owner_id')
-            final int ownerId;
-          
-            Dog(this.id, this.name, this.ownerId);
-          }
-      ''');
-
-      final processor = EntityProcessor(classElements[1], {});
-      expect(
-          processor.process,
-          throwsInvalidGenerationSourceError(
-              EntityProcessorError(classElements[1]).wrongForeignKeyAction(
-                  FakeDartObject(), ForeignKeyField.onUpdate)));
     });
   });
 
@@ -566,7 +520,6 @@ void main() {
                 childColumns: ['owner_id'],
                 parentColumns: [],
                 entity: Person,
-                onUpdate: null
                 onDelete: ForeignKeyAction.setNull,
               )
             ],
@@ -608,7 +561,6 @@ void main() {
                 childColumns: [],
                 parentColumns: ['id'],
                 entity: Person,
-                onUpdate: null
                 onDelete: ForeignKeyAction.setNull,
               )
             ],
@@ -675,7 +627,6 @@ void main() {
                 childColumns: ['owner_id'],
                 parentColumns: ['id'],
                 entity: Person,
-                onUpdate: null
                 onDelete: ForeignKeyAction.setNull,
               )
             ],
