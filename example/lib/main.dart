@@ -17,7 +17,7 @@ Future<void> main() async {
 class FloorApp extends StatelessWidget {
   final TaskDao dao;
 
-  const FloorApp(this.dao);
+  const FloorApp(this.dao, {super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -37,10 +37,10 @@ class TasksWidget extends StatefulWidget {
   final TaskDao dao;
 
   const TasksWidget({
-    Key? key,
+    super.key,
     required this.title,
     required this.dao,
-  }) : super(key: key);
+  });
 
   @override
   State<StatefulWidget> createState() => TasksWidgetState();
@@ -100,7 +100,6 @@ class TasksWidgetState extends State<TasksWidget> {
   }
 
   TaskStatus _getMenuType(int index) => TaskStatus.values[index - 1];
-
 }
 
 class TasksListView extends StatelessWidget {
@@ -108,10 +107,10 @@ class TasksListView extends StatelessWidget {
   final TaskStatus? selectedType;
 
   const TasksListView({
-    Key? key,
+    super.key,
     required this.dao,
     required this.selectedType,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -145,10 +144,10 @@ class TaskListCell extends StatelessWidget {
   final TaskDao dao;
 
   const TaskListCell({
-    Key? key,
+    super.key,
     required this.task,
     required this.dao,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -158,22 +157,22 @@ class TaskListCell extends StatelessWidget {
         padding: const EdgeInsets.only(left: 16),
         color: Colors.green,
         child: const Align(
+          alignment: Alignment.centerLeft,
           child: Text(
             'Change status',
             style: TextStyle(color: Colors.white),
           ),
-          alignment: Alignment.centerLeft,
         ),
       ),
       secondaryBackground: Container(
         padding: const EdgeInsets.only(right: 16),
         color: Colors.red,
         child: const Align(
+          alignment: Alignment.centerRight,
           child: Text(
             'Delete',
             style: TextStyle(color: Colors.white),
           ),
-          alignment: Alignment.centerRight,
         ),
       ),
       direction: DismissDirection.horizontal,
@@ -202,7 +201,7 @@ class TaskListCell extends StatelessWidget {
             break;
         }
 
-        if (statusMessage != null) {
+        if (statusMessage != null && context.mounted) {
           final scaffoldMessengerState = ScaffoldMessenger.of(context);
           scaffoldMessengerState.hideCurrentSnackBar();
           scaffoldMessengerState.showSnackBar(
@@ -220,10 +219,9 @@ class TasksTextField extends StatelessWidget {
   final TaskDao dao;
 
   TasksTextField({
-    Key? key,
+    super.key,
     required this.dao,
-  })  : _textEditingController = TextEditingController(),
-        super(key: key);
+  }) : _textEditingController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {

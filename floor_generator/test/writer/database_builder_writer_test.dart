@@ -13,7 +13,7 @@ void main() {
     final actual = DatabaseBuilderWriter(databaseName).write();
 
     expect(actual, equalsDart(r'''
-      class _$FooBarBuilder {
+      class _$FooBarBuilder implements $FooBarBuilderContract {
         _$FooBarBuilder(this.name);
       
         final String? name;
@@ -22,19 +22,19 @@ void main() {
 
         Callback? _callback;
       
-        /// Adds migrations to the builder.
-        _$FooBarBuilder addMigrations(List<Migration> migrations) {
+        @override
+        $FooBarBuilderContract addMigrations(List<Migration> migrations) {
           _migrations.addAll(migrations);
           return this;
         }
 
-        /// Adds a database [Callback] to the builder.
-        _$FooBarBuilder addCallback(Callback callback) {
+        @override
+        $FooBarBuilderContract addCallback(Callback callback) {
           _callback = callback;
           return this;
         }
 
-        /// Creates the database and initializes it.
+        @override
         Future<FooBar> build() async {
           final path = name != null
             ? await sqfliteDatabaseFactory.getDatabasePath(name!)
