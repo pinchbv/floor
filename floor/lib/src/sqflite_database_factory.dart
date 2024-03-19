@@ -1,12 +1,17 @@
 import 'dart:io';
 
+import 'package:flutter/foundation.dart';
 import 'package:path/path.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
+import 'package:sqflite_common_ffi_web/sqflite_ffi_web.dart';
+import 'package:sqflite_common/src/sqflite_database_factory.dart' as dbf;
 
 // infers factory as nullable without explicit type definition
 final DatabaseFactory sqfliteDatabaseFactory = () {
-  if (Platform.isAndroid || Platform.isIOS) {
-    return databaseFactory;
+  if (kIsWeb){
+    return databaseFactoryFfiWeb;
+  } else if (Platform.isAndroid || Platform.isIOS) {
+    return dbf.databaseFactory;
   } else if (Platform.isLinux || Platform.isMacOS || Platform.isWindows) {
     sqfliteFfiInit();
     return databaseFactoryFfi;
