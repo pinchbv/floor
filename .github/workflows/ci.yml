@@ -101,7 +101,7 @@ jobs:
 
       - name: Run tests
         run: flutter test --coverage --coverage-path coverage/lcov.info
-        working-directory: floor
+        working-directory: floor_common
 
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v3
