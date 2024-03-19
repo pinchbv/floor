@@ -6,21 +6,32 @@ part of 'database.dart';
 // FloorGenerator
 // **************************************************************************
 
+abstract class $FlutterDatabaseBuilderContract {
+  /// Adds migrations to the builder.
+  $FlutterDatabaseBuilderContract addMigrations(List<Migration> migrations);
+
+  /// Adds a database [Callback] to the builder.
+  $FlutterDatabaseBuilderContract addCallback(Callback callback);
+
+  /// Creates the database and initializes it.
+  Future<FlutterDatabase> build();
+}
+
 // ignore: avoid_classes_with_only_static_members
 class $FloorFlutterDatabase {
   /// Creates a database builder for a persistent database.
   /// Once a database is built, you should keep a reference to it and re-use it.
-  static _$FlutterDatabaseBuilder databaseBuilder(String name) =>
+  static $FlutterDatabaseBuilderContract databaseBuilder(String name) =>
       _$FlutterDatabaseBuilder(name);
 
   /// Creates a database builder for an in memory database.
   /// Information stored in an in memory database disappears when the process is killed.
   /// Once a database is built, you should keep a reference to it and re-use it.
-  static _$FlutterDatabaseBuilder inMemoryDatabaseBuilder() =>
+  static $FlutterDatabaseBuilderContract inMemoryDatabaseBuilder() =>
       _$FlutterDatabaseBuilder(null);
 }
 
-class _$FlutterDatabaseBuilder {
+class _$FlutterDatabaseBuilder implements $FlutterDatabaseBuilderContract {
   _$FlutterDatabaseBuilder(this.name);
 
   final String? name;
@@ -29,19 +40,19 @@ class _$FlutterDatabaseBuilder {
 
   Callback? _callback;
 
-  /// Adds migrations to the builder.
-  _$FlutterDatabaseBuilder addMigrations(List<Migration> migrations) {
+  @override
+  $FlutterDatabaseBuilderContract addMigrations(List<Migration> migrations) {
     _migrations.addAll(migrations);
     return this;
   }
 
-  /// Adds a database [Callback] to the builder.
-  _$FlutterDatabaseBuilder addCallback(Callback callback) {
+  @override
+  $FlutterDatabaseBuilderContract addCallback(Callback callback) {
     _callback = callback;
     return this;
   }
 
-  /// Creates the database and initializes it.
+  @override
   Future<FlutterDatabase> build() async {
     final path = name != null
         ? await sqfliteDatabaseFactory.getDatabasePath(name!)
