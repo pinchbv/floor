@@ -1,4 +1,5 @@
 import 'package:code_builder/code_builder.dart';
+import 'package:floor_generator/misc/annotation_expression.dart';
 import 'package:floor_generator/writer/writer.dart';
 
 class DatabaseBuilderWriter extends Writer {
@@ -10,6 +11,9 @@ class DatabaseBuilderWriter extends Writer {
   @override
   Class write() {
     final databaseBuilderName = '_\$${_databaseName}Builder';
+    final databaseBuilderContractRefer = refer(
+      '\$${_databaseName}BuilderContract',
+    );
 
     final nameField = Field((builder) => builder
       ..name = 'name'
@@ -32,34 +36,34 @@ class DatabaseBuilderWriter extends Writer {
         ..name = 'name')));
 
     final addMigrationsMethod = Method((builder) => builder
+      ..annotations.add(overrideAnnotationExpression)
       ..name = 'addMigrations'
-      ..returns = refer(databaseBuilderName)
+      ..returns = databaseBuilderContractRefer
       ..body = const Code('''
         _migrations.addAll(migrations);
         return this;
       ''')
-      ..docs.add('/// Adds migrations to the builder.')
       ..requiredParameters.add(Parameter((builder) => builder
         ..name = 'migrations'
         ..type = refer('List<Migration>'))));
 
     final addCallbackMethod = Method((builder) => builder
+      ..annotations.add(overrideAnnotationExpression)
       ..name = 'addCallback'
-      ..returns = refer(databaseBuilderName)
+      ..returns = databaseBuilderContractRefer
       ..body = const Code('''
         _callback = callback;
         return this;
       ''')
-      ..docs.add('/// Adds a database [Callback] to the builder.')
       ..requiredParameters.add(Parameter((builder) => builder
         ..name = 'callback'
         ..type = refer('Callback'))));
 
     final buildMethod = Method((builder) => builder
+      ..annotations.add(overrideAnnotationExpression)
       ..returns = refer('Future<$_databaseName>')
       ..name = 'build'
       ..modifier = MethodModifier.async
-      ..docs.add('/// Creates the database and initializes it.')
       ..body = Code('''
         final path = name != null
           ? await sqfliteDatabaseFactory.getDatabasePath(name!)
@@ -75,6 +79,9 @@ class DatabaseBuilderWriter extends Writer {
 
     return Class((builder) => builder
       ..name = databaseBuilderName
+      ..implements.addAll([
+        databaseBuilderContractRefer,
+      ])
       ..fields.addAll([
         nameField,
         migrationsField,

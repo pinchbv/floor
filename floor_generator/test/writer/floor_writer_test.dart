@@ -17,13 +17,13 @@ void main() {
       class $FloorFooBar {
         /// Creates a database builder for a persistent database.
         /// Once a database is built, you should keep a reference to it and re-use it.
-        static _$FooBarBuilder databaseBuilder(String name) =>
+        static $FooBarBuilderContract databaseBuilder(String name) =>
             _$FooBarBuilder(name);
       
         /// Creates a database builder for an in memory database.
         /// Information stored in an in memory database disappears when the process is killed.
         /// Once a database is built, you should keep a reference to it and re-use it.
-        static _$FooBarBuilder inMemoryDatabaseBuilder() =>
+        static $FooBarBuilderContract inMemoryDatabaseBuilder() =>
             _$FooBarBuilder(null);
       }   
     '''));
