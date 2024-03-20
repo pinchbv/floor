@@ -44,7 +44,7 @@ class QueryAdapter {
   }) async {
     final rootNode = _parseRootNode(sql);
 
-    if (rootNode is SelectStatement) {
+    if (rootNode is BaseSelectStatement) {
       return _database
           .rawQuery(sql, arguments)
           .then((rows) => rows.map((row) => mapper(row)).toList());
