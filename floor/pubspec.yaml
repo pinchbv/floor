@@ -21,6 +21,7 @@ dependencies:
   path: ^1.9.0
   sqflite: ^2.3.2
   sqflite_common_ffi: ^2.3.2+1
+  sqflite_common_ffi_web: ^0.4.3
   sqlparser: ^0.34.0
 
 dev_dependencies:
@@ -31,4 +32,3 @@ dev_dependencies:
     sdk: flutter
   matcher: ^0.12.16+1
   mockito: ^5.4.4
-  sqflite_common: ^2.5.3
