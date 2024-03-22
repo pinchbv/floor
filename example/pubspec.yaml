@@ -14,11 +14,13 @@ dependencies:
     path: ../floor/
   flutter:
     sdk: flutter
+  sqflite: any # This dependency is needed to solve the problem with warning about transitive dependencies
 
 dev_dependencies:
   analyzer: ^6.4.1
   build_runner: ^2.4.8
   floor_generator:
     path: ../floor_generator/
+  flutter_lints: ^3.0.1
   flutter_test:
     sdk: flutter
