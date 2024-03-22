@@ -15,7 +15,6 @@ dependencies:
   meta:
   path: ^1.9.0
   sqflite_common: ^2.5.3
-  sqflite: ^2.3.2
   sqlparser: ^0.34.1
 
 dev_dependencies:
