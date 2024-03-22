@@ -87,7 +87,7 @@ jobs:
 
       - name: Run generator
         run: flutter packages pub run build_runner build --delete-conflicting-outputs
-        working-directory: floor
+        working-directory: floor_common
 
       - name: Analyze
         run: flutter analyze
