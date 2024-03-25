@@ -6,6 +6,10 @@ cd floor
 flutter packages pub upgrade
 cd ..
 
+cd floor_common
+flutter packages pub upgrade
+cd ..
+
 cd floor_annotation
 flutter packages pub upgrade
 cd ..
