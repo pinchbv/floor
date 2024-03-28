@@ -482,7 +482,7 @@ void main() {
           throwsInvalidGenerationSourceError(
               EntityProcessorError(classElements).missingPrimaryKey));
     });
-    test('one primary key missing in compound primary key', () async {
+    test('compound primary key element is not a column', () async {
       final classElements = await createClassElement('''
             @Entity(primaryKeys: ['ID', 'email'])
             class Example {
