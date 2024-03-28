@@ -482,6 +482,21 @@ void main() {
           throwsInvalidGenerationSourceError(
               EntityProcessorError(classElements).missingPrimaryKey));
     });
+    test('one primary key missing in compound primary key', () async {
+      final classElements = await createClassElement('''
+            @Entity(primaryKeys: ['ID', 'email'])
+            class Example {
+              final int id;
+              final String email;
+            }
+      ''');
+
+      final processor = EntityProcessor(classElements, {});
+      expect(
+          processor.process,
+          throwsInvalidGenerationSourceError(
+            EntityProcessorError(classElements).primaryKeyNotFound));
+    });
     test('compound primary key mismatch', () async {
       final classElements = await createClassElement('''
           @Entity(
