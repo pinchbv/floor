@@ -495,7 +495,7 @@ void main() {
       expect(
           processor.process,
           throwsInvalidGenerationSourceError(
-            EntityProcessorError(classElements).primaryKeyNotFound));
+              EntityProcessorError(classElements).primaryKeyNotFound));
     });
     test('compound primary key mismatch', () async {
       final classElements = await createClassElement('''
