@@ -18,6 +18,14 @@ class EntityProcessorError {
     );
   }
 
+  InvalidGenerationSourceError get primaryKeyNotFound {
+    return InvalidGenerationSourceError(
+      'Primary key not found for ${_classElement.displayName}.',
+      todo: 'Make sure that all the primary keys you defined exist as columns.',
+      element: _classElement,
+    );
+  }
+
   InvalidGenerationSourceError get missingParentColumns {
     return InvalidGenerationSourceError(
       'No parent columns defined for foreign key.',
