@@ -76,6 +76,12 @@ void main() {
         expect(actual, throwsStateError);
         verify(mockDatabaseExecutor.rawQuery(sql));
       });
+
+      test('exception because query can not be parsed', () async {
+        final deleteQueryFuture = underTest.queryNoReturn('DELETE * FROM foo');
+
+        expect(deleteQueryFuture, throwsA(isA<Exception>().having((e) => e.toString(), 'message', contains('Failed to parse'))));
+      });
     });
 
     group('query list', () {
