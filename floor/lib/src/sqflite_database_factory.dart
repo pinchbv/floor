@@ -18,16 +18,17 @@ final DatabaseFactory sqfliteDatabaseFactory = () {
 }();
 
 extension DatabaseFactoryExtension on DatabaseFactory {
-  Future<String> getDatabasePath(final String name) async {
-    late String databasesPath;
-
-    final file = File(name);
-    if (file.isAbsolute) {
-      databasesPath = file.path;
-    } else {
-      databasesPath = join(await this.getDatabasesPath(), name);
+  Future<String> getDatabasePath(final String name, {String? path}) async {
+    if(path == null){
+      path = await this.getDatabasesPath();
     }
 
-    return databasesPath;
+    var dir=  Directory(path);
+
+    if (!dir.existsSync()) {
+      dir.create(recursive: true);
+    }
+
+    return join(dir.path, name);
   }
 }
