@@ -19,7 +19,15 @@ final DatabaseFactory sqfliteDatabaseFactory = () {
 
 extension DatabaseFactoryExtension on DatabaseFactory {
   Future<String> getDatabasePath(final String name) async {
-    final databasesPath = await this.getDatabasesPath();
-    return join(databasesPath, name);
+    late String databasesPath;
+
+    final file = File(name);
+    if (file.isAbsolute) {
+      databasesPath = file.path;
+    } else {
+      databasesPath = join(await this.getDatabasesPath(), name);
+    }
+
+    return databasesPath;
   }
 }
