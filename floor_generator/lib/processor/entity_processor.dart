@@ -22,7 +22,7 @@ class EntityProcessor extends QueryableProcessor<Entity> {
   final EntityProcessorError _processorError;
 
   EntityProcessor(
-    final ClassElement classElement,dd
+    final ClassElement classElement,
     final Set<TypeConverter> typeConverters,
   )   : _processorError = EntityProcessorError(classElement),
         super(classElement, typeConverters);
