@@ -108,7 +108,7 @@ jobs:
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           flags: floor
-          file: ./floor/coverage/lcov.info
+          file: ./floor_common/coverage/lcov.info
 
   example:
     runs-on: ubuntu-latest
