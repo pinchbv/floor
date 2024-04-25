@@ -20,7 +20,7 @@ class QueryMethodProcessor extends Processor<QueryMethod> {
 
   final MethodElement _methodElement;
   final List<Queryable> _queryables;
-  final Set<TypeConverter> _typeConverters;
+  final Set<TypeConverter> _typeConverter
 
   QueryMethodProcessor(
     final MethodElement methodElement,
