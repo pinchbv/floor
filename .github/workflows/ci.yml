@@ -62,7 +62,7 @@ jobs:
         working-directory: floor_generator
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
-          flags: floor_generator
+          flags: floor_generatorh
           file: ./coverage/lcov.info
 
   floor:
