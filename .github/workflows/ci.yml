@@ -55,7 +55,7 @@ jobs:
 
       - name: Run tests
         working-directory: floor_generator
-        run: dart run test_cov
+        run: flutter test --coverage --coverage-path coverage/lcov.info
 
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v3
