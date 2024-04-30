@@ -55,14 +55,15 @@ jobs:
 
       - name: Run tests
         working-directory: floor_generator
-        run: dart test --coverage --coverage-path coverage/lcov.info
+        run: dart run test_cov
 
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v3
+        working-directory: floor_generator
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           flags: floor_generator
-          file: ./floor_generator/coverage/lcov.info
+          file: ./coverage/lcov.info
 
   floor:
     runs-on: ${{ matrix.os }}
