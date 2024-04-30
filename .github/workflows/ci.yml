@@ -59,11 +59,10 @@ jobs:
 
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v3
-        working-directory: floor_generator
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           flags: floor_generator
-          file: ./coverage/lcov.info
+          file: ./floor_generator/coverage/lcov.info
 
   floor:
     runs-on: ${{ matrix.os }}
