@@ -14,7 +14,9 @@ environment:
 dependencies:
   collection: ^1.18.0
   floor_annotation:
-    path: ../floor_annotation
+    path: ../floor_annotation/
+  floor_common:
+    path: ../floor_common/
   flutter:
     sdk: flutter
   meta:
@@ -22,7 +24,7 @@ dependencies:
   sqflite: ^2.3.2
   sqflite_common_ffi: ^2.3.2+1
   sqflite_common_ffi_web: ^0.4.3
-  sqlparser: ^0.34.0
+  sqlparser: ^0.34.1
 
 dev_dependencies:
   build_runner: ^2.4.8

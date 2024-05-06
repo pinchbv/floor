@@ -87,7 +87,7 @@ jobs:
 
       - name: Run generator
         run: flutter packages pub run build_runner build --delete-conflicting-outputs
-        working-directory: floor
+        working-directory: floor_common
 
       - name: Analyze
         run: flutter analyze
@@ -101,14 +101,14 @@ jobs:
 
       - name: Run tests
         run: flutter test --coverage --coverage-path coverage/lcov.info
-        working-directory: floor
+        working-directory: floor_common
 
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v3
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           flags: floor
-          file: ./floor/coverage/lcov.info
+          file: ./floor_common/coverage/lcov.info
 
   example:
     runs-on: ubuntu-latest

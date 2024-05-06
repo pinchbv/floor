@@ -224,6 +224,13 @@ packages:
       relative: true
     source: path
     version: "1.4.2"
+  floor_common:
+    dependency: "direct main"
+    description:
+      path: "../floor_common"
+      relative: true
+    source: path
+    version: "1.2.0"
   floor_generator:
     dependency: "direct dev"
     description:
