@@ -1,5 +1,14 @@
 # Changelog
 
+## 1.5.0
+
+### Changes
+
+* Dependency updates
+* Analyzer issues
+* Web support
+* Independence of Flutter
+
 ## 1.4.2
 
 * Changed TypeConverters priority
