@@ -1,5 +1,15 @@
 # Changelog
 
+## 1.5.0
+
+### Changes
+
+* Dependency updates
+* Analyzer issues
+* Web support
+* Independence of Flutter
+
+
 ## 1.2.0
 
 ### Changes
