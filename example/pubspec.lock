@@ -223,7 +223,7 @@ packages:
       path: "../floor"
       relative: true
     source: path
-    version: "1.4.2"
+    version: "1.5.0"
   floor_annotation:
     dependency: transitive
     description:

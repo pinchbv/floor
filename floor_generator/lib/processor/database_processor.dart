@@ -6,6 +6,7 @@ import 'package:floor_generator/misc/extension/set_extension.dart';
 import 'package:floor_generator/misc/extension/type_converter_element_extension.dart';
 import 'package:floor_generator/misc/type_utils.dart';
 import 'package:floor_generator/processor/dao_processor.dart';
+import 'package:floor_generator/processor/embed_processor.dart';
 import 'package:floor_generator/processor/entity_processor.dart';
 import 'package:floor_generator/processor/error/database_processor_error.dart';
 import 'package:floor_generator/processor/processor.dart';
@@ -13,6 +14,7 @@ import 'package:floor_generator/processor/view_processor.dart';
 import 'package:floor_generator/value_object/dao_getter.dart';
 import 'package:floor_generator/value_object/database.dart';
 import 'package:floor_generator/value_object/entity.dart';
+import 'package:floor_generator/value_object/embed.dart';
 import 'package:floor_generator/value_object/queryable.dart';
 import 'package:floor_generator/value_object/type_converter.dart';
 import 'package:floor_generator/value_object/view.dart';
@@ -31,8 +33,10 @@ class DatabaseProcessor extends Processor<Database> {
     final databaseName = _classElement.displayName;
     final databaseTypeConverters =
         _classElement.getTypeConverters(TypeConverterScope.database);
-    final entities = _getEntities(_classElement, databaseTypeConverters);
-    final views = _getViews(_classElement, databaseTypeConverters);
+    final embeds = _getEmbeds(_classElement, databaseTypeConverters);
+    final entities =
+        _getEntities(_classElement, databaseTypeConverters, embeds);
+    final views = _getViews(_classElement, databaseTypeConverters, embeds);
     final daoGetters = _getDaoGetters(
       databaseName,
       entities,
@@ -102,9 +106,34 @@ class DatabaseProcessor extends Processor<Database> {
         classElement.isAbstract;
   }
 
+  Set<Embed> _getEmbeds(
+    final ClassElement databaseClassElement,
+    final Set<TypeConverter> typeConverters,
+  ) {
+    final entities = _classElement
+        .getAnnotation(annotations.Database)
+        ?.getField(AnnotationField.databaseEmbeds)
+        ?.toListValue()
+        ?.mapNotNull((object) => object.toTypeValue()?.element)
+        .whereType<ClassElement>()
+        .where(_isEmbed)
+        .map((classElement) => EmbedProcessor(
+              classElement,
+              typeConverters,
+            ).process())
+        .toSet();
+
+    if (entities == null || entities.isEmpty) {
+      throw _processorError.noEntitiesDefined;
+    }
+
+    return entities;
+  }
+
   List<Entity> _getEntities(
     final ClassElement databaseClassElement,
     final Set<TypeConverter> typeConverters,
+    final Set<Embed> embedConverters,
   ) {
     final entities = _classElement
         .getAnnotation(annotations.Database)
@@ -116,6 +145,7 @@ class DatabaseProcessor extends Processor<Database> {
         .map((classElement) => EntityProcessor(
               classElement,
               typeConverters,
+              embedConverters,
             ).process())
         .toList();
 
@@ -129,6 +159,7 @@ class DatabaseProcessor extends Processor<Database> {
   List<View> _getViews(
     final ClassElement databaseClassElement,
     final Set<TypeConverter> typeConverters,
+    final Set<Embed> embedConverters,
   ) {
     return _classElement
             .getAnnotation(annotations.Database)
@@ -140,6 +171,7 @@ class DatabaseProcessor extends Processor<Database> {
             .map((classElement) => ViewProcessor(
                   classElement,
                   typeConverters,
+                  embedConverters,
                 ).process())
             .toList() ??
         [];
@@ -167,6 +199,11 @@ class DatabaseProcessor extends Processor<Database> {
     return daoQueryMethodTypeConverters +
         daoTypeConverters +
         fieldTypeConverters;
+  }
+
+  bool _isEmbed(final ClassElement classElement) {
+    return classElement.hasAnnotation(annotations.Embed) &&
+        !classElement.isAbstract;
   }
 
   bool _isEntity(final ClassElement classElement) {

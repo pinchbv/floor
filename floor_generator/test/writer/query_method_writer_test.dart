@@ -897,10 +897,8 @@ Future<Dao> createOrderDao(
 
   final entities = library.classes
       .where((classElement) => classElement.hasAnnotation(annotations.Entity))
-      .map((classElement) => EntityProcessor(
-            classElement,
-            typeConverters,
-          ).process())
+      .map((classElement) =>
+          EntityProcessor(classElement, typeConverters, {}).process())
       .toList();
 
   return DaoProcessor(

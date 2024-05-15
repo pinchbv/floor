@@ -445,13 +445,13 @@ Future<Dao> _createDao(final String dao) async {
 
   final entities = library.classes
       .where((classElement) => classElement.hasAnnotation(annotations.Entity))
-      .map((classElement) => EntityProcessor(classElement, {}).process())
+      .map((classElement) => EntityProcessor(classElement, {}, {}).process())
       .toList();
 
   final views = library.classes
       .where((classElement) =>
           classElement.hasAnnotation(annotations.DatabaseView))
-      .map((classElement) => ViewProcessor(classElement, {}).process())
+      .map((classElement) => ViewProcessor(classElement, {}, {}).process())
       .toList();
 
   return DaoProcessor(

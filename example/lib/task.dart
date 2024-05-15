@@ -1,3 +1,4 @@
+import 'package:example/timestamp.dart';
 import 'package:floor/floor.dart';
 
 enum TaskStatus {
@@ -29,7 +30,7 @@ class Task {
 
   final bool? isRead;
 
-  final DateTime timestamp;
+  final Timestamp timestamp;
 
   final TaskStatus? status;
 
@@ -46,7 +47,7 @@ class Task {
 
   factory Task.optional({
     int? id,
-    DateTime? timestamp,
+    Timestamp? timestamp,
     String? message,
     bool? isRead,
     TaskStatus? status,
@@ -56,7 +57,7 @@ class Task {
         id,
         isRead ?? false,
         message ?? 'empty',
-        timestamp ?? DateTime.now(),
+        timestamp!,
         status,
         type,
       );
@@ -70,7 +71,7 @@ class Task {
     int? id,
     String? message,
     bool? isRead,
-    DateTime? timestamp,
+    Timestamp? timestamp,
     TaskStatus? status,
     TaskType? type,
   }) {

@@ -16,7 +16,7 @@ void main() {
       final int id;
     ''');
 
-    final actual = FieldProcessor(fieldElement, null).process();
+    final actual = FieldProcessor(fieldElement, null, null).process();
 
     const name = 'id';
     const columnName = 'id';
@@ -29,6 +29,7 @@ void main() {
       isNullable,
       sqlType,
       null,
+      null,
     );
     expect(actual, equals(expected));
   });
@@ -38,7 +39,7 @@ void main() {
       final int? id;
     ''');
 
-    final actual = FieldProcessor(fieldElement, null).process();
+    final actual = FieldProcessor(fieldElement, null, null).process();
 
     const name = 'id';
     const columnName = 'id';
@@ -51,6 +52,7 @@ void main() {
       isNullable,
       sqlType,
       null,
+      null,
     );
     expect(actual, equals(expected));
   });
@@ -61,7 +63,7 @@ void main() {
       final Uint8List bytes;
     ''');
 
-    final actual = FieldProcessor(fieldElement, null).process();
+    final actual = FieldProcessor(fieldElement, null, null).process();
 
     const name = 'bytes';
     const columnName = 'data';
@@ -73,6 +75,7 @@ void main() {
       columnName,
       isNullable,
       sqlType,
+      null,
       null,
     );
     expect(actual, equals(expected));
@@ -89,7 +92,7 @@ void main() {
       final DateTime dateTime;
     ''');
 
-    final actual = FieldProcessor(fieldElement, typeConverter).process();
+    final actual = FieldProcessor(fieldElement, typeConverter, null).process();
 
     const name = 'dateTime';
     const columnName = 'dateTime';
@@ -102,6 +105,7 @@ void main() {
       isNullable,
       sqlType,
       typeConverter,
+      null,
     );
     expect(actual, equals(expected));
   });
@@ -112,7 +116,7 @@ void main() {
       final DateTime dateTime;
     ''');
 
-    final actual = FieldProcessor(fieldElement, null).process();
+    final actual = FieldProcessor(fieldElement, null, null).process();
 
     const name = 'dateTime';
     const columnName = 'dateTime';
@@ -131,6 +135,7 @@ void main() {
       isNullable,
       sqlType,
       typeConverter,
+      null,
     );
     expect(actual, equals(expected));
   });
@@ -148,7 +153,7 @@ void main() {
     ''');
 
     final actual =
-        FieldProcessor(fieldElement, externalTypeConverter).process();
+        FieldProcessor(fieldElement, externalTypeConverter, null).process();
 
     const name = 'dateTime';
     const columnName = 'dateTime';
@@ -167,6 +172,7 @@ void main() {
       isNullable,
       sqlType,
       typeConverter,
+      null,
     );
     expect(actual, equals(expected));
   });
@@ -176,7 +182,7 @@ void main() {
     ''');
 
     expect(
-        FieldProcessor(fieldElement, null).process,
+        FieldProcessor(fieldElement, null, null).process,
         throwsInvalidGenerationSourceError(InvalidGenerationSourceError(
           'Column type is not supported for List<int>.',
           todo:

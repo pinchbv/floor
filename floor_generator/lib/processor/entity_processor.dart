@@ -18,14 +18,17 @@ import 'package:floor_generator/value_object/index.dart';
 import 'package:floor_generator/value_object/primary_key.dart';
 import 'package:floor_generator/value_object/type_converter.dart';
 
+import '../value_object/embed.dart';
+
 class EntityProcessor extends QueryableProcessor<Entity> {
   final EntityProcessorError _processorError;
 
   EntityProcessor(
     final ClassElement classElement,
     final Set<TypeConverter> typeConverters,
+    final Set<Embed> embedConverters,
   )   : _processorError = EntityProcessorError(classElement),
-        super(classElement, typeConverters);
+        super(classElement, typeConverters, embedConverters);
 
   @override
   Entity process() {
@@ -262,28 +265,51 @@ class EntityProcessor extends QueryableProcessor<Entity> {
         false;
   }
 
+  void _processFields(
+    final Map map,
+    final List<Field> fields, {
+    String columnNamePrefix = '',
+    String parameterPrefix = '',
+  }) {
+    for (final field in fields) {
+      if (field.embedConverter != null) {
+        final embedVar = field.columnName.isEmpty ? '' : '${field.columnName}_';
+        _processFields(
+          map,
+          field.embedConverter?.fields ?? [],
+          columnNamePrefix: '$columnNamePrefix$embedVar',
+          parameterPrefix: '$parameterPrefix${field.fieldElement.name}.',
+        );
+      } else {
+        map['$columnNamePrefix${field.columnName}'] =
+            _getAttributeValue(field, parameterPrefix);
+      }
+    }
+  }
+
   String _getValueMapping(final List<Field> fields) {
-    final keyValueList = fields.map((field) {
-      final columnName = field.columnName;
-      final attributeValue = _getAttributeValue(field);
-      return "'$columnName': $attributeValue";
-    }).toList();
+    final Map<String, String> map = {};
+    _processFields(map, fields);
+
+    final keyValueList = map.entries
+        .map((entry) => "'${entry.key}': ${entry.value}")
+        .toList();
 
     return '<String, Object?>{${keyValueList.join(', ')}}';
   }
 
-  String _getAttributeValue(final Field field) {
+  String _getAttributeValue(final Field field, String parameterPrefix) {
     final fieldElement = field.fieldElement;
     final parameterName = fieldElement.displayName;
     final fieldType = fieldElement.type;
     final typeConverter = [...queryableTypeConverters, field.typeConverter]
         .whereNotNull()
         .getClosestOrNull(fieldType);
-    String attributeValue = 'item.$parameterName';
+    String attributeValue = 'item.$parameterPrefix$parameterName';
 
     if (typeConverter != null) {
       attributeValue =
-          '_${typeConverter.name.decapitalize()}.encode(item.$parameterName)';
+          '_${typeConverter.name.decapitalize()}.encode(item.$parameterPrefix$parameterName)';
     } else if (fieldType.isDartCoreBool) {
       attributeValue = _serializeBoolean(field, attributeValue);
     } else if (fieldType.isEnumType) {

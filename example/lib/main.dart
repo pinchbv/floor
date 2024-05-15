@@ -1,6 +1,7 @@
 import 'package:example/database.dart';
 import 'package:example/task.dart';
 import 'package:example/task_dao.dart';
+import 'package:example/timestamp.dart';
 import 'package:flutter/material.dart';
 
 Future<void> main() async {
@@ -179,7 +180,7 @@ class TaskListCell extends StatelessWidget {
       child: ListTile(
         title: Text(task.message),
         subtitle: Text('Status: ${task.statusTitle}'),
-        trailing: Text(task.timestamp.toIso8601String()),
+        trailing: Text("task.timestamp.toIso8601String()"),
       ),
       confirmDismiss: (direction) async {
         String? statusMessage;
@@ -263,7 +264,13 @@ class TasksTextField extends StatelessWidget {
     if (message.trim().isEmpty) {
       _textEditingController.clear();
     } else {
-      final task = Task.optional(message: message, type: TaskType.task);
+      final task = Task.optional(
+          message: message,
+          type: TaskType.task,
+          timestamp: Timestamp(
+            createdAt: DateTime.now(),
+            updatedAt: DateTime.now(),
+          ));
       await dao.insertTask(task);
       _textEditingController.clear();
     }
