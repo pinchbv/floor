@@ -180,7 +180,7 @@ class TaskListCell extends StatelessWidget {
       child: ListTile(
         title: Text(task.message),
         subtitle: Text('Status: ${task.statusTitle}'),
-        trailing: Text("task.timestamp.toIso8601String()"),
+        trailing: Text(task.timestamp.createdAt.toIso8601String()),
       ),
       confirmDismiss: (direction) async {
         String? statusMessage;
