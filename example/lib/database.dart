@@ -9,7 +9,7 @@ import 'package:sqflite/sqflite.dart' as sqflite;
 
 part 'database.g.dart';
 
-@TypeConverters([DateTimeConverter, TaskTypeConverter])
+@TypeConverters([DateTimeConverter, TaskTypeConverter, TaskStatusConverter])
 @Database(version: 1, entities: [Task], embeds: [Timestamp])
 abstract class FlutterDatabase extends FloorDatabase {
   TaskDao get taskDao;
