@@ -1,18 +1,19 @@
 #!/bin/bash
 
+folders=(
+  example
+  floor
+  floor_annotation
+  floor_common
+  floor_ffi
+  floor_generator
+)
+
 cd ..
 
-cd floor
-flutter analyze
-cd ..
-
-cd floor_annotation
-dart analyze --fatal-infos --fatal-warnings .
-cd ..
-
-cd floor_generator
-dart analyze --fatal-infos --fatal-warnings .
-cd ..
-
-cd example
-flutter analyze
+for folder in "${folders[@]}"
+do
+  cd "$folder" || exit;
+  dart analyze .
+  cd ..
+done

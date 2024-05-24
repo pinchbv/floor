@@ -1,18 +1,19 @@
 #!/bin/bash
 
+folders=(
+  example
+  floor
+  floor_annotation
+  floor_common
+  floor_ffi
+  floor_generator
+)
+
 cd ..
 
-cd floor
-dart format .
-cd ..
-
-cd floor_annotation
-dart  format .
-cd ..
-
-cd floor_generator
-dart format .
-cd ..
-
-cd example
-dart format .
+for folder in "${folders[@]}"
+do
+  cd "$folder" || exit;
+  dart format .
+  cd ..
+done

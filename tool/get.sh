@@ -1,18 +1,19 @@
 #!/bin/bash
 
+folders=(
+  example
+  floor
+  floor_annotation
+  floor_common
+  floor_ffi
+  floor_generator
+)
+
 cd ..
 
-cd floor
-flutter packages pub get
-cd ..
-
-cd floor_annotation
-flutter packages pub get
-cd ..
-
-cd floor_generator
-flutter packages pub get
-cd ..
-
-cd example
-flutter packages pub get
+for folder in "${folders[@]}"
+do
+  cd "$folder" || exit;
+  flutter packages pub get
+  cd ..
+done
