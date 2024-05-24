@@ -17,8 +17,7 @@ folders=(
 cd ..
 
 # Iterate over the modules
-for folder in "${folders[@]}"
-do
+for folder in "${folders[@]}"; do
   # Navigate to the module folder, or continue to the next one if that fails
   cd "$folder" || continue;
   #  Run the passed in command
