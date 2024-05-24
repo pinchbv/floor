@@ -4,4 +4,4 @@
 chmod u+x foreach_module.sh
 
 # Run dart analyze . on every module
-./foreach_module.sh 'dart analyze .'
+./foreach_module.sh 'dart analyze --fatal-infos --fatal-warnings .'
