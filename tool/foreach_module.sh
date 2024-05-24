@@ -2,6 +2,7 @@
 
 # This script lists all Flutter module folders in this project. Next it iterates over them
 # and runs the passed in command in every one of those folders.
+# Example usage: ./foreach_module.sh 'dart analyze .'
 
 # All Flutter module folders
 folders=(
