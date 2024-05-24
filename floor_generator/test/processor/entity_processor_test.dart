@@ -33,7 +33,8 @@ void main() {
 
     const name = 'Person';
     final fields = classElement.fields
-        .map((fieldElement) => FieldProcessor(fieldElement, null, null).process())
+        .map((fieldElement) =>
+            FieldProcessor(fieldElement, null, null).process())
         .toList();
     final primaryKey = PrimaryKey([fields[0]], false);
     const foreignKeys = <ForeignKey>[];
@@ -81,7 +82,8 @@ void main() {
 
     const name = 'Person';
     final fields = classElement.fields
-        .map((fieldElement) => FieldProcessor(fieldElement, null, null).process())
+        .map((fieldElement) =>
+            FieldProcessor(fieldElement, null, null).process())
         .toList();
     final primaryKey = PrimaryKey([fields[0]], false);
     const foreignKeys = <ForeignKey>[];
@@ -119,7 +121,8 @@ void main() {
 
     const name = 'Person';
     final fields = classElement.fields
-        .map((fieldElement) => FieldProcessor(fieldElement, null, null).process())
+        .map((fieldElement) =>
+            FieldProcessor(fieldElement, null, null).process())
         .toList();
     final primaryKey = PrimaryKey(fields, false);
     const foreignKeys = <ForeignKey>[];
@@ -158,7 +161,8 @@ void main() {
 
     const name = 'Person';
     final fields = classElement.fields
-        .map((fieldElement) => FieldProcessor(fieldElement, null, null).process())
+        .map((fieldElement) =>
+            FieldProcessor(fieldElement, null, null).process())
         .toList();
     final primaryKey = PrimaryKey(fields.sublist(0, 1), false);
     const foreignKeys = <ForeignKey>[];
@@ -206,7 +210,8 @@ void main() {
 
     const name = 'Person';
     final fields = classElement.fields
-        .map((fieldElement) => FieldProcessor(fieldElement, null, null).process())
+        .map((fieldElement) =>
+            FieldProcessor(fieldElement, null, null).process())
         .toList();
     final primaryKey = PrimaryKey([fields[0]], false);
     const foreignKeys = <ForeignKey>[];
@@ -346,7 +351,8 @@ void main() {
 
     const name = 'Person';
     final fields = classElement.fields
-        .map((fieldElement) => FieldProcessor(fieldElement, null, null).process())
+        .map((fieldElement) =>
+            FieldProcessor(fieldElement, null, null).process())
         .toList();
     final primaryKey = PrimaryKey([fields[0]], false);
     const foreignKeys = <ForeignKey>[];
@@ -381,7 +387,8 @@ void main() {
       }
     ''');
 
-      final actual = EntityProcessor(classElement, {}, {}).process().valueMapping;
+      final actual =
+          EntityProcessor(classElement, {}, {}).process().valueMapping;
 
       const expected = '<String, Object?>{'
           "'id': item.id, "
@@ -403,7 +410,8 @@ void main() {
       }
     ''');
 
-      final actual = EntityProcessor(classElement, {}, {}).process().valueMapping;
+      final actual =
+          EntityProcessor(classElement, {}, {}).process().valueMapping;
 
       const expected = '<String, Object?>{'
           "'id': item.id, "
@@ -428,7 +436,8 @@ void main() {
       }
     ''');
 
-      final actual = EntityProcessor(classElement, {}, {}).process().valueMapping;
+      final actual =
+          EntityProcessor(classElement, {}, {}).process().valueMapping;
 
       const expected = '<String, Object?>{'
           "'id': item.id, "
@@ -453,7 +462,8 @@ void main() {
       }
     ''');
 
-      final actual = EntityProcessor(classElement, {}, {}).process().valueMapping;
+      final actual =
+          EntityProcessor(classElement, {}, {}).process().valueMapping;
 
       const expected = '<String, Object?>{'
           "'id': item.id, "

@@ -22,7 +22,8 @@ void main() {
 
     const name = 'Person';
     final fields = classElement.fields
-        .map((fieldElement) => FieldProcessor(fieldElement, null, null).process())
+        .map((fieldElement) =>
+            FieldProcessor(fieldElement, null, null).process())
         .toList();
     const query = 'SELECT * from otherentity';
     const constructor = "Person(row['id'] as int, row['name'] as String)";
@@ -52,7 +53,8 @@ void main() {
 
     const name = 'Person';
     final fields = classElement.fields
-        .map((fieldElement) => FieldProcessor(fieldElement, null, null).process())
+        .map((fieldElement) =>
+            FieldProcessor(fieldElement, null, null).process())
         .toList();
     const query =
         'WITH subquery as (SELECT * from otherentity) SELECT subquery.*';
@@ -179,7 +181,8 @@ void main() {
 
     const name = 'personview';
     final fields = classElement.fields
-        .map((fieldElement) => FieldProcessor(fieldElement, null, null).process())
+        .map((fieldElement) =>
+            FieldProcessor(fieldElement, null, null).process())
         .toList();
     const query = 'SELECT * from otherentity';
     const constructor = "Person(row['id'] as int, row['name'] as String)";

@@ -14,15 +14,8 @@ void main() {
   final fakeClassElement = FakeClassElement();
   final fakeFieldElement = FakeFieldElement();
 
-  final field = Field(
-    fakeFieldElement,
-    'field1Name',
-    'field1ColumnName',
-    false,
-    SqlType.integer,
-    null,
-    null
-  );
+  final field = Field(fakeFieldElement, 'field1Name', 'field1ColumnName', false,
+      SqlType.integer, null, null);
   final nullableField = Field(
     fakeFieldElement,
     'field2Name',

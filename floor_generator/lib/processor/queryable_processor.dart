@@ -31,8 +31,8 @@ abstract class QueryableProcessor<T extends Queryable> extends Processor<T> {
   QueryableProcessor(
     this.classElement,
     final Set<TypeConverter> typeConverters,
-      this.embedConverters,
-      ) : _queryableProcessorError = QueryableProcessorError(classElement),
+    this.embedConverters,
+  )   : _queryableProcessorError = QueryableProcessorError(classElement),
         queryableTypeConverters = typeConverters +
             classElement.getTypeConverters(TypeConverterScope.queryable);
 
@@ -48,9 +48,13 @@ abstract class QueryableProcessor<T extends Queryable> extends Processor<T> {
 
     return fields.map((field) {
       if (field.isEmbedded) {
-        return FieldProcessor(field, null, embedConverters.getClosestOrNull(field.type)).process();
+        return FieldProcessor(
+                field, null, embedConverters.getClosestOrNull(field.type))
+            .process();
       } else {
-        return FieldProcessor(field, queryableTypeConverters.getClosestOrNull(field.type), null).process();
+        return FieldProcessor(field,
+                queryableTypeConverters.getClosestOrNull(field.type), null)
+            .process();
       }
     }).toList();
   }
@@ -60,7 +64,8 @@ abstract class QueryableProcessor<T extends Queryable> extends Processor<T> {
     return _getConstructor(classElement, fields);
   }
 
-  String _getConstructor(ClassElement classElement, final List<Field> fields, {String prefix = ''}) {
+  String _getConstructor(ClassElement classElement, final List<Field> fields,
+      {String prefix = ''}) {
     final constructorParameters = classElement.constructors
         .firstWhereOrNull((element) => element.isPublic && !element.isFactory)
         ?.parameters;
@@ -81,12 +86,12 @@ abstract class QueryableProcessor<T extends Queryable> extends Processor<T> {
   /// Returns `null` whenever field is @ignored
   String? _getParameterValue(
     final ParameterElement parameterElement,
-      final List<Field> fields, {
-        final String prefix = '',
-      }
-  ) {
+    final List<Field> fields, {
+    final String prefix = '',
+  }) {
     final parameterName = parameterElement.displayName;
-    final field = fields.firstWhereOrNull((field) => field.fieldElement.displayName == parameterName);
+    final field = fields.firstWhereOrNull(
+        (field) => field.fieldElement.displayName == parameterName);
     if (field != null) {
       final databaseValue = "row['$prefix${field.columnName}']";
 
@@ -98,7 +103,9 @@ abstract class QueryableProcessor<T extends Queryable> extends Processor<T> {
         );
       } else if (field.embedConverter != null) {
         final embedVar = field.columnName.isEmpty ? '' : '${field.columnName}_';
-        parameterValue = _getConstructor(field.embedConverter!.classElement, field.embedConverter!.fields, prefix: '$prefix$embedVar');
+        parameterValue = _getConstructor(
+            field.embedConverter!.classElement, field.embedConverter!.fields,
+            prefix: '$prefix$embedVar');
       } else {
         final typeConverter = [
           ...queryableTypeConverters,
@@ -110,14 +117,15 @@ abstract class QueryableProcessor<T extends Queryable> extends Processor<T> {
           parameterElement,
         );
 
-        parameterValue = '_${typeConverter.name.decapitalize()}.decode($castedDatabaseValue)';
+        parameterValue =
+            '_${typeConverter.name.decapitalize()}.decode($castedDatabaseValue)';
       }
 
       if (parameterElement.isNamed) {
         return '$parameterName: $parameterValue';
       }
       return parameterValue; // also covers positional parameter
-        }
+    }
     return null;
   }
 }

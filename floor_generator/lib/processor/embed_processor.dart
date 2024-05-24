@@ -24,7 +24,9 @@ class EmbedProcessor extends Processor<Embed> {
   List<Field> _getFields() {
     final fields = _classElement.fields
         .where((fieldElement) => fieldElement.shouldBeIncluded())
-        .map((field) => FieldProcessor(field, typeConverters.getClosestOrNull(field.type), null).process())
+        .map((field) => FieldProcessor(
+                field, typeConverters.getClosestOrNull(field.type), null)
+            .process())
         .toList();
 
     return fields;

@@ -291,9 +291,8 @@ class EntityProcessor extends QueryableProcessor<Entity> {
     final Map<String, String> map = {};
     _processFields(map, fields);
 
-    final keyValueList = map.entries
-        .map((entry) => "'${entry.key}': ${entry.value}")
-        .toList();
+    final keyValueList =
+        map.entries.map((entry) => "'${entry.key}': ${entry.value}").toList();
 
     return '<String, Object?>{${keyValueList.join(', ')}}';
   }

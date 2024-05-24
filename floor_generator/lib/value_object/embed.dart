@@ -11,9 +11,9 @@ class Embed {
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-          other is Embed &&
-              runtimeType == other.runtimeType &&
-              const ListEquality<Field>().equals(fields, other.fields);
+      other is Embed &&
+          runtimeType == other.runtimeType &&
+          const ListEquality<Field>().equals(fields, other.fields);
 
   @override
   int get hashCode => classElement.hashCode ^ fields.hashCode;

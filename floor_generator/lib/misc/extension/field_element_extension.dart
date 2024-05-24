@@ -9,6 +9,7 @@ extension FieldElementExtension on FieldElement {
   }
 
   bool get isEmbedded {
-    return (type.element?.hasAnnotation(annotations.Embed) ?? false) && type.element is ClassElement;
+    return (type.element?.hasAnnotation(annotations.Embed) ?? false) &&
+        type.element is ClassElement;
   }
 }

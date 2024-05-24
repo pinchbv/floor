@@ -27,7 +27,7 @@ class Field {
   String getDatabaseDefinition(final bool autoGenerate) {
     if (embedConverter != null) {
       throw InvalidGenerationSourceError(
-          'You ',
+        'You ',
         todo: 'Either make to use a supported type or supply a type converter.',
         element: fieldElement,
       );
@@ -47,13 +47,16 @@ class Field {
 
   Field copyWith({
     String columnNamePrefix = '',
-  }) => Field(fieldElement,
-    name,
-    '$columnNamePrefix$columnName',
-    isNullable,
-    sqlType,
-    typeConverter, embedConverter,
-  );
+  }) =>
+      Field(
+        fieldElement,
+        name,
+        '$columnNamePrefix$columnName',
+        isNullable,
+        sqlType,
+        typeConverter,
+        embedConverter,
+      );
 
   @override
   bool operator ==(Object other) =>

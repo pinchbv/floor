@@ -7,8 +7,7 @@ extension EmbedsExtension on Iterable<Embed> {
   /// Returns the [Embed] in the closest [TypeConverterScope] for
   /// [dartType] or null
   Embed? getClosestOrNull(DartType dartType) {
-    return toList()
-        .firstWhereOrNull(
-            (embed) => embed.classElement.name == dartType.toString());
+    return toList().firstWhereOrNull(
+        (embed) => embed.classElement.name == dartType.toString());
   }
 }

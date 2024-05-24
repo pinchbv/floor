@@ -36,14 +36,13 @@ class FieldProcessor extends Processor<Field> {
     }.whereNotNull().closestOrNull;
 
     return Field(
-      _fieldElement,
-      name,
-      columnName,
-      isNullable,
-      _getSqlType(typeConverter, _embedConverter),
-      typeConverter,
-      _embedConverter
-    );
+        _fieldElement,
+        name,
+        columnName,
+        isNullable,
+        _getSqlType(typeConverter, _embedConverter),
+        typeConverter,
+        _embedConverter);
   }
 
   String _getColumnName(final String name) {
@@ -56,15 +55,16 @@ class FieldProcessor extends Processor<Field> {
         : name;
   }
 
-  String _getSqlType(final TypeConverter? typeConverter, final Embed? embedConverter) {
+  String _getSqlType(
+      final TypeConverter? typeConverter, final Embed? embedConverter) {
     final type = _fieldElement.type;
     if (typeConverter != null) {
       return typeConverter.databaseType.asSqlType();
     } else if (type.isDefaultSqlType || type.isEnumType) {
       return type.asSqlType();
-    }  else if (embedConverter != null) {
+    } else if (embedConverter != null) {
       return '';
-    }else {
+    } else {
       throw InvalidGenerationSourceError(
         'Column type is not supported for $type.',
         todo: 'Either make to use a supported type or supply a type converter.',
