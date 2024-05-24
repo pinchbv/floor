@@ -1,4 +1,5 @@
 import 'package:floor/floor.dart';
+import 'package:intl/intl.dart';
 
 @Embed()
 class Timestamp {
@@ -23,6 +24,9 @@ class Timestamp {
 
   @override
   String toString() {
-    return 'Timestamp{createdAt: $createdAt, updatedAt: $updatedAt}';
+    final DateFormat formatter = DateFormat('yyyy-MM-dd');
+    final String formattedCreatedAt = formatter.format(createdAt);
+    final String formattedUpdatedAt = formatter.format(updatedAt);
+    return 'Timestamp{createdAt: $formattedCreatedAt, updatedAt: $formattedUpdatedAt}';
   }
 }
