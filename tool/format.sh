@@ -1,19 +1,7 @@
 #!/bin/bash
 
-folders=(
-  example
-  floor
-  floor_annotation
-  floor_common
-  floor_ffi
-  floor_generator
-)
+# Make foreach_module script executable, in case it isn't yet
+chmod u+x foreach_module.sh
 
-cd ..
-
-for folder in "${folders[@]}"
-do
-  cd "$folder" || exit;
-  dart format .
-  cd ..
-done
+# Run dart format . on every module
+./foreach_module.sh 'dart format .'
