@@ -110,24 +110,19 @@ class DatabaseProcessor extends Processor<Database> {
     final ClassElement databaseClassElement,
     final Set<TypeConverter> typeConverters,
   ) {
-    final entities = _classElement
-        .getAnnotation(annotations.Database)
-        ?.getField(AnnotationField.databaseEmbeds)
-        ?.toListValue()
-        ?.mapNotNull((object) => object.toTypeValue()?.element)
-        .whereType<ClassElement>()
-        .where(_isEmbed)
-        .map((classElement) => EmbedProcessor(
-              classElement,
-              typeConverters,
-            ).process())
-        .toSet();
-
-    if (entities == null || entities.isEmpty) {
-      throw _processorError.noEntitiesDefined;
-    }
-
-    return entities;
+    return _classElement
+            .getAnnotation(annotations.Database)
+            ?.getField(AnnotationField.databaseEmbeds)
+            ?.toListValue()
+            ?.mapNotNull((object) => object.toTypeValue()?.element)
+            .whereType<ClassElement>()
+            .where(_isEmbed)
+            .map((classElement) => EmbedProcessor(
+                  classElement,
+                  typeConverters,
+                ).process())
+            .toSet() ??
+        {};
   }
 
   List<Entity> _getEntities(
