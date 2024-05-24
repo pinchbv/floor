@@ -4,6 +4,11 @@
 # and runs the passed in command in every one of those folders.
 # Example usage: ./foreach_module.sh 'dart analyze .'
 
+if [ $# -eq 0 ]; then
+  echo "No arguments supplied. Pass the desired command as a string argument.
+  For example: ./foreach_module.sh 'dart analyze .'"
+fi
+
 # All Flutter module folders
 folders=(
   example
