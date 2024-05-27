@@ -96,7 +96,8 @@ abstract class QueryableProcessor<T extends Queryable> extends Processor<T> {
       final databaseValue = "row['$prefix${field.columnName}']";
 
       String parameterValue;
-      if (parameterElement.type.isDefaultSqlType) {
+      if (parameterElement.type.isDefaultSqlType ||
+      parameterElement.type.isEnumType) {
         parameterValue = databaseValue.cast(
           parameterElement.type,
           parameterElement,
