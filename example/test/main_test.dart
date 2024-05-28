@@ -14,6 +14,7 @@ void main() {
   });
 
   tearDown(() async {
+    await Future.delayed(const Duration(milliseconds: 100));
     await database.close();
   });
 
