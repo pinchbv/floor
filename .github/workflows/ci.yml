@@ -12,7 +12,7 @@ jobs:
     timeout-minutes: 10
 
     container:
-      image: dart:3.4.1
+      image: dart:3.3.0
 
     steps:
       - name: Check out code
@@ -35,7 +35,7 @@ jobs:
     timeout-minutes: 10
 
     container:
-      image: dart:3.4.1
+      image: dart:3.3.0
 
     steps:
       - name: Check out code
