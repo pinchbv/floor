@@ -1,18 +1,7 @@
 #!/bin/bash
 
-cd ..
+# Make foreach_module script executable, in case it isn't yet
+chmod u+x foreach_module.sh
 
-cd floor
-dart format .
-cd ..
-
-cd floor_annotation
-dart  format .
-cd ..
-
-cd floor_generator
-dart format .
-cd ..
-
-cd example
-dart format .
+# Run dart format . on every module
+./foreach_module.sh 'dart format .'
