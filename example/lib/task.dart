@@ -57,7 +57,11 @@ class Task {
         id,
         isRead ?? false,
         message ?? 'empty',
-        timestamp!,
+        timestamp ??
+            Timestamp(
+              createdAt: DateTime.now(),
+              updatedAt: DateTime.now(),
+            ),
         status,
         type,
       );

@@ -14,10 +14,10 @@ class Timestamp {
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-          other is Timestamp &&
-              runtimeType == other.runtimeType &&
-              createdAt == other.createdAt &&
-              updatedAt == other.updatedAt;
+      other is Timestamp &&
+          runtimeType == other.runtimeType &&
+          createdAt == other.createdAt &&
+          updatedAt == other.updatedAt;
 
   @override
   int get hashCode => createdAt.hashCode ^ updatedAt.hashCode;
@@ -27,6 +27,6 @@ class Timestamp {
     final DateFormat formatter = DateFormat('yyyy-MM-dd');
     final String formattedCreatedAt = formatter.format(createdAt);
     final String formattedUpdatedAt = formatter.format(updatedAt);
-    return 'Timestamp{createdAt: $formattedCreatedAt, updatedAt: $formattedUpdatedAt}';
+    return 'createdAt: $formattedCreatedAt \n updatedAt: $formattedUpdatedAt';
   }
 }
