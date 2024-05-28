@@ -18,15 +18,17 @@ void main() {
   });
 
   testWidgets('Tapping save stores task in database', (tester) async {
-    await tester.pumpWidget(FloorApp(taskDao));
-    final textFieldFinder = find.byType(TextField);
-    final raisedButtonFinder = find.byType(OutlinedButton);
+    await tester.runAsync(() async {
+      await tester.pumpWidget(FloorApp(taskDao));
+      final textFieldFinder = find.byType(TextField);
+      final raisedButtonFinder = find.byType(OutlinedButton);
 
-    await tester.enterText(textFieldFinder, 'Hello world!');
-    await tester.tap(raisedButtonFinder);
+      await tester.enterText(textFieldFinder, 'Hello world!');
+      await tester.tap(raisedButtonFinder);
 
-    final tasks = await taskDao.findAllTasks();
-    expect(tasks, isNotEmpty);
+      final tasks = await taskDao.findAllTasks();
+      expect(tasks, isNotEmpty);
+    });
   });
 
   testWidgets('Tapping save clears text input field', (tester) async {
