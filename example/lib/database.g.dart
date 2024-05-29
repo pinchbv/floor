@@ -96,7 +96,7 @@ class _$FlutterDatabase extends FlutterDatabase {
       },
       onCreate: (database, version) async {
         await database.execute(
-            'CREATE TABLE IF NOT EXISTS `Task` (`id` INTEGER PRIMARY KEY AUTOINCREMENT, `message` TEXT NOT NULL, `isRead` INTEGER, `timestamp_created_at` INTEGER NOT NULL, `timestamp_updated_at` INTEGER NOT NULL, `status` TEXT, `type` TEXT)');
+            'CREATE TABLE IF NOT EXISTS `Task` (`id` INTEGER PRIMARY KEY AUTOINCREMENT, `message` TEXT NOT NULL, `isRead` INTEGER, `timestamp_created_at` INTEGER NOT NULL, `timestamp_updated_at` INTEGER NOT NULL, `status` INTEGER, `type` TEXT)');
 
         await callback?.onCreate?.call(database, version);
       },
@@ -126,7 +126,7 @@ class _$TaskDao extends TaskDao {
                       _dateTimeConverter.encode(item.timestamp.createdAt),
                   'timestamp_updated_at':
                       _dateTimeConverter.encode(item.timestamp.updatedAt),
-                  'status': _taskStatusConverter.encode(item.status),
+                  'status': item.status?.index,
                   'type': _taskTypeConverter.encode(item.type)
                 },
             changeListener),
@@ -142,7 +142,7 @@ class _$TaskDao extends TaskDao {
                       _dateTimeConverter.encode(item.timestamp.createdAt),
                   'timestamp_updated_at':
                       _dateTimeConverter.encode(item.timestamp.updatedAt),
-                  'status': _taskStatusConverter.encode(item.status),
+                  'status': item.status?.index,
                   'type': _taskTypeConverter.encode(item.type)
                 },
             changeListener),
@@ -158,7 +158,7 @@ class _$TaskDao extends TaskDao {
                       _dateTimeConverter.encode(item.timestamp.createdAt),
                   'timestamp_updated_at':
                       _dateTimeConverter.encode(item.timestamp.updatedAt),
-                  'status': _taskStatusConverter.encode(item.status),
+                  'status': item.status?.index,
                   'type': _taskTypeConverter.encode(item.type)
                 },
             changeListener);
@@ -187,7 +187,9 @@ class _$TaskDao extends TaskDao {
                     .decode(row['timestamp_created_at'] as int),
                 updatedAt: _dateTimeConverter
                     .decode(row['timestamp_updated_at'] as int)),
-            _taskStatusConverter.decode(row['status'] as String?),
+            row['status'] == null
+                ? null
+                : TaskStatus.values[row['status'] as int],
             _taskTypeConverter.decode(row['type'] as String?)),
         arguments: [id]);
   }
@@ -204,7 +206,9 @@ class _$TaskDao extends TaskDao {
                     .decode(row['timestamp_created_at'] as int),
                 updatedAt: _dateTimeConverter
                     .decode(row['timestamp_updated_at'] as int)),
-            _taskStatusConverter.decode(row['status'] as String?),
+            row['status'] == null
+                ? null
+                : TaskStatus.values[row['status'] as int],
             _taskTypeConverter.decode(row['type'] as String?)));
   }
 
@@ -220,7 +224,9 @@ class _$TaskDao extends TaskDao {
                     .decode(row['timestamp_created_at'] as int),
                 updatedAt: _dateTimeConverter
                     .decode(row['timestamp_updated_at'] as int)),
-            _taskStatusConverter.decode(row['status'] as String?),
+            row['status'] == null
+                ? null
+                : TaskStatus.values[row['status'] as int],
             _taskTypeConverter.decode(row['type'] as String?)),
         queryableName: 'task',
         isView: false);
@@ -246,7 +252,9 @@ class _$TaskDao extends TaskDao {
                     .decode(row['timestamp_created_at'] as int),
                 updatedAt: _dateTimeConverter
                     .decode(row['timestamp_updated_at'] as int)),
-            _taskStatusConverter.decode(row['status'] as String?),
+            row['status'] == null
+                ? null
+                : TaskStatus.values[row['status'] as int],
             _taskTypeConverter.decode(row['type'] as String?)),
         arguments: [status.index],
         queryableName: 'task',
@@ -298,4 +306,3 @@ class _$TaskDao extends TaskDao {
 // ignore_for_file: unused_element
 final _dateTimeConverter = DateTimeConverter();
 final _taskTypeConverter = TaskTypeConverter();
-final _taskStatusConverter = TaskStatusConverter();

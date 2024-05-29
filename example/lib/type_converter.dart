@@ -24,15 +24,3 @@ class TaskTypeConverter extends TypeConverter<TaskType?, String?> {
     return value?.name;
   }
 }
-
-class TaskStatusConverter extends TypeConverter<TaskStatus?, String?> {
-  @override
-  TaskStatus? decode(String? databaseValue) {
-    return databaseValue == null ? null : TaskStatus.values.byName(databaseValue);
-  }
-
-  @override
-  String? encode(TaskStatus? value) {
-    return value?.name;
-  }
-}
