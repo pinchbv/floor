@@ -141,7 +141,7 @@ The name is being composed by `$Floor` and the database class name.
 The string passed to `databaseBuilder()` will be the database file name.
 For initializing the database, call `build()` and make sure to `await` the result.
 
-In order to retrieve the `PersonDao` instance, invoking the `persoDao` getter on the database instance is enough.
+In order to retrieve the `PersonDao` instance, invoking the `personDao` getter on the database instance is enough.
 Its functions can be used as shown in the following snippet.
 
 ```dart
