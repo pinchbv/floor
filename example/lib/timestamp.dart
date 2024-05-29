@@ -2,6 +2,7 @@ import 'package:floor/floor.dart';
 import 'package:intl/intl.dart';
 
 @Embed()
+@Entity()
 class Timestamp {
   @ColumnInfo(name: 'created_at')
   final DateTime createdAt;
