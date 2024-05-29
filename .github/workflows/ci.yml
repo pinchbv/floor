@@ -82,7 +82,7 @@ jobs:
           architecture: x64
 
       - name: Install dependencies
-        run: flutter pub get
+        run: flutter packages get
         working-directory: floor
 
       - name: Run generator
@@ -124,7 +124,7 @@ jobs:
           channel: stable
 
       - name: Install dependencies
-        run: flutter pub get
+        run: flutter packages get
         working-directory: example
 
       - name: Analyze
