@@ -22,11 +22,15 @@ class Timestamp {
   @override
   int get hashCode => createdAt.hashCode ^ updatedAt.hashCode;
 
-  @override
-  String toString() {
+  String format() {
     final DateFormat formatter = DateFormat('yyyy-MM-dd');
     final String formattedCreatedAt = formatter.format(createdAt);
     final String formattedUpdatedAt = formatter.format(updatedAt);
-    return 'createdAt: $formattedCreatedAt \n updatedAt: $formattedUpdatedAt';
+    return 'Created at: $formattedCreatedAt \nUpdated at: $formattedUpdatedAt';
+  }
+
+  @override
+  String toString() {
+    return 'Timestamp(createdAt: $createdAt, updatedAt: $updatedAt)';
   }
 }
