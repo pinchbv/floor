@@ -221,7 +221,8 @@ class EntityProcessor extends QueryableProcessor<Entity> {
         .getAnnotation(annotations.Entity)
         ?.getField(AnnotationField.entityPrimaryKeys)
         ?.toListValue()
-        ?.map((object) => object.toStringValue());
+        ?.map((object) => object.toStringValue())
+        .toSet();
 
     if (compoundPrimaryKeyColumnNames == null ||
         compoundPrimaryKeyColumnNames.isEmpty) {
@@ -229,12 +230,16 @@ class EntityProcessor extends QueryableProcessor<Entity> {
     }
 
     final compoundPrimaryKeyFields = fields.where((field) {
-      return compoundPrimaryKeyColumnNames.any(
-          (primaryKeyColumnName) => field.columnName == primaryKeyColumnName);
+      return compoundPrimaryKeyColumnNames.contains(field.columnName);
     }).toList();
 
     if (compoundPrimaryKeyFields.isEmpty) {
       throw _processorError.missingPrimaryKey;
+    }
+
+    if (compoundPrimaryKeyFields.length !=
+        compoundPrimaryKeyColumnNames.length) {
+      throw _processorError.primaryKeyNotFound;
     }
 
     return PrimaryKey(compoundPrimaryKeyFields, false);
