@@ -96,7 +96,7 @@ class _$FlutterDatabase extends FlutterDatabase {
       },
       onCreate: (database, version) async {
         await database.execute(
-            'CREATE TABLE IF NOT EXISTS `Task` (`id` INTEGER PRIMARY KEY AUTOINCREMENT, `message` TEXT NOT NULL, `isRead` INTEGER, `timestamp` INTEGER NOT NULL, `status` INTEGER, `type` TEXT)');
+            'CREATE TABLE IF NOT EXISTS `Task` (`id` INTEGER PRIMARY KEY AUTOINCREMENT, `message` TEXT NOT NULL, `isRead` INTEGER, `timestamp_created_at` INTEGER NOT NULL, `timestamp_updated_at` INTEGER NOT NULL, `status` INTEGER, `type` TEXT)');
 
         await callback?.onCreate?.call(database, version);
       },
@@ -122,7 +122,10 @@ class _$TaskDao extends TaskDao {
                   'id': item.id,
                   'message': item.message,
                   'isRead': item.isRead == null ? null : (item.isRead! ? 1 : 0),
-                  'timestamp': _dateTimeConverter.encode(item.timestamp),
+                  'timestamp_created_at':
+                      _dateTimeConverter.encode(item.timestamp.createdAt),
+                  'timestamp_updated_at':
+                      _dateTimeConverter.encode(item.timestamp.updatedAt),
                   'status': item.status?.index,
                   'type': _taskTypeConverter.encode(item.type)
                 },
@@ -135,7 +138,10 @@ class _$TaskDao extends TaskDao {
                   'id': item.id,
                   'message': item.message,
                   'isRead': item.isRead == null ? null : (item.isRead! ? 1 : 0),
-                  'timestamp': _dateTimeConverter.encode(item.timestamp),
+                  'timestamp_created_at':
+                      _dateTimeConverter.encode(item.timestamp.createdAt),
+                  'timestamp_updated_at':
+                      _dateTimeConverter.encode(item.timestamp.updatedAt),
                   'status': item.status?.index,
                   'type': _taskTypeConverter.encode(item.type)
                 },
@@ -148,7 +154,10 @@ class _$TaskDao extends TaskDao {
                   'id': item.id,
                   'message': item.message,
                   'isRead': item.isRead == null ? null : (item.isRead! ? 1 : 0),
-                  'timestamp': _dateTimeConverter.encode(item.timestamp),
+                  'timestamp_created_at':
+                      _dateTimeConverter.encode(item.timestamp.createdAt),
+                  'timestamp_updated_at':
+                      _dateTimeConverter.encode(item.timestamp.updatedAt),
                   'status': item.status?.index,
                   'type': _taskTypeConverter.encode(item.type)
                 },
@@ -173,7 +182,11 @@ class _$TaskDao extends TaskDao {
             row['id'] as int?,
             row['isRead'] == null ? null : (row['isRead'] as int) != 0,
             row['message'] as String,
-            _dateTimeConverter.decode(row['timestamp'] as int),
+            Timestamp(
+                createdAt: _dateTimeConverter
+                    .decode(row['timestamp_created_at'] as int),
+                updatedAt: _dateTimeConverter
+                    .decode(row['timestamp_updated_at'] as int)),
             row['status'] == null
                 ? null
                 : TaskStatus.values[row['status'] as int],
@@ -188,7 +201,11 @@ class _$TaskDao extends TaskDao {
             row['id'] as int?,
             row['isRead'] == null ? null : (row['isRead'] as int) != 0,
             row['message'] as String,
-            _dateTimeConverter.decode(row['timestamp'] as int),
+            Timestamp(
+                createdAt: _dateTimeConverter
+                    .decode(row['timestamp_created_at'] as int),
+                updatedAt: _dateTimeConverter
+                    .decode(row['timestamp_updated_at'] as int)),
             row['status'] == null
                 ? null
                 : TaskStatus.values[row['status'] as int],
@@ -202,7 +219,11 @@ class _$TaskDao extends TaskDao {
             row['id'] as int?,
             row['isRead'] == null ? null : (row['isRead'] as int) != 0,
             row['message'] as String,
-            _dateTimeConverter.decode(row['timestamp'] as int),
+            Timestamp(
+                createdAt: _dateTimeConverter
+                    .decode(row['timestamp_created_at'] as int),
+                updatedAt: _dateTimeConverter
+                    .decode(row['timestamp_updated_at'] as int)),
             row['status'] == null
                 ? null
                 : TaskStatus.values[row['status'] as int],
@@ -226,7 +247,11 @@ class _$TaskDao extends TaskDao {
             row['id'] as int?,
             row['isRead'] == null ? null : (row['isRead'] as int) != 0,
             row['message'] as String,
-            _dateTimeConverter.decode(row['timestamp'] as int),
+            Timestamp(
+                createdAt: _dateTimeConverter
+                    .decode(row['timestamp_created_at'] as int),
+                updatedAt: _dateTimeConverter
+                    .decode(row['timestamp_updated_at'] as int)),
             row['status'] == null
                 ? null
                 : TaskStatus.values[row['status'] as int],

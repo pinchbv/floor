@@ -26,7 +26,8 @@ void main() {
     final actual = TestProcessor(classElement).process();
 
     final fields = classElement.fields
-        .map((fieldElement) => FieldProcessor(fieldElement, null).process())
+        .map((fieldElement) =>
+            FieldProcessor(fieldElement, null, null).process())
         .toList();
     const constructor = "Person(row['id'] as int, row['name'] as String)";
     final expected = TestQueryable(
@@ -57,9 +58,10 @@ void main() {
 
       final actual = TestProcessor(classElement, {typeConverter}).process();
 
-      final idField = FieldProcessor(classElement.fields[0], null).process();
+      final idField =
+          FieldProcessor(classElement.fields[0], null, null).process();
       final dateTimeField =
-          FieldProcessor(classElement.fields[1], typeConverter).process();
+          FieldProcessor(classElement.fields[1], typeConverter, null).process();
       final fields = [idField, dateTimeField];
       const constructor =
           "Order(row['id'] as int, _typeConverter.decode(row['dateTime'] as int))";
@@ -103,9 +105,10 @@ void main() {
         await intDartType,
         TypeConverterScope.queryable,
       );
-      final idField = FieldProcessor(classElement.fields[0], null).process();
+      final idField =
+          FieldProcessor(classElement.fields[0], null, null).process();
       final dateTimeField =
-          FieldProcessor(classElement.fields[1], typeConverter).process();
+          FieldProcessor(classElement.fields[1], typeConverter, null).process();
       final fields = [idField, dateTimeField];
       const constructor =
           "Order(row['id'] as int, _dateTimeConverter.decode(row['dateTime'] as int))";
@@ -157,9 +160,10 @@ void main() {
         await intDartType,
         TypeConverterScope.queryable,
       );
-      final idField = FieldProcessor(classElement.fields[0], null).process();
+      final idField =
+          FieldProcessor(classElement.fields[0], null, null).process();
       final dateTimeField =
-          FieldProcessor(classElement.fields[1], typeConverter).process();
+          FieldProcessor(classElement.fields[1], typeConverter, null).process();
       final fields = [idField, dateTimeField];
       const constructor =
           "Order(row['id'] as int, _dateTimeConverter.decode(row['dateTime'] as int))";
@@ -689,7 +693,7 @@ class TestProcessor extends QueryableProcessor<TestQueryable> {
   TestProcessor(
     ClassElement classElement, [
     Set<TypeConverter>? typeConverters,
-  ]) : super(classElement, typeConverters ?? {});
+  ]) : super(classElement, typeConverters ?? {}, {});
 
   @override
   TestQueryable process() {

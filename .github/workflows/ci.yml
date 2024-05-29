@@ -83,7 +83,7 @@ jobs:
 
       - name: Install dependencies
         run: flutter packages get
-        working-directory: floor
+        working-directory: floor_common
 
       - name: Run generator
         run: flutter packages pub run build_runner build --delete-conflicting-outputs

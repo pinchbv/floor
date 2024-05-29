@@ -4,6 +4,7 @@ abstract class AnnotationField {
   static const onConflict = 'onConflict';
 
   static const databaseVersion = 'version';
+  static const databaseEmbeds = 'embeds';
   static const databaseEntities = 'entities';
   static const databaseViews = 'views';
 

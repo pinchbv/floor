@@ -29,11 +29,12 @@ void main() {
       }
     ''');
 
-    final actual = EntityProcessor(classElement, {}).process();
+    final actual = EntityProcessor(classElement, {}, {}).process();
 
     const name = 'Person';
     final fields = classElement.fields
-        .map((fieldElement) => FieldProcessor(fieldElement, null).process())
+        .map((fieldElement) =>
+            FieldProcessor(fieldElement, null, null).process())
         .toList();
     final primaryKey = PrimaryKey([fields[0]], false);
     const foreignKeys = <ForeignKey>[];
@@ -77,11 +78,12 @@ void main() {
       }
     ''');
 
-    final actual = EntityProcessor(classElement, {}).process();
+    final actual = EntityProcessor(classElement, {}, {}).process();
 
     const name = 'Person';
     final fields = classElement.fields
-        .map((fieldElement) => FieldProcessor(fieldElement, null).process())
+        .map((fieldElement) =>
+            FieldProcessor(fieldElement, null, null).process())
         .toList();
     final primaryKey = PrimaryKey([fields[0]], false);
     const foreignKeys = <ForeignKey>[];
@@ -115,11 +117,12 @@ void main() {
       }
     ''');
 
-    final actual = EntityProcessor(classElement, {}).process();
+    final actual = EntityProcessor(classElement, {}, {}).process();
 
     const name = 'Person';
     final fields = classElement.fields
-        .map((fieldElement) => FieldProcessor(fieldElement, null).process())
+        .map((fieldElement) =>
+            FieldProcessor(fieldElement, null, null).process())
         .toList();
     final primaryKey = PrimaryKey(fields, false);
     const foreignKeys = <ForeignKey>[];
@@ -154,11 +157,12 @@ void main() {
       }
     ''');
 
-    final actual = EntityProcessor(classElement, {}).process();
+    final actual = EntityProcessor(classElement, {}, {}).process();
 
     const name = 'Person';
     final fields = classElement.fields
-        .map((fieldElement) => FieldProcessor(fieldElement, null).process())
+        .map((fieldElement) =>
+            FieldProcessor(fieldElement, null, null).process())
         .toList();
     final primaryKey = PrimaryKey(fields.sublist(0, 1), false);
     const foreignKeys = <ForeignKey>[];
@@ -202,11 +206,12 @@ void main() {
       }
     ''');
 
-    final actual = EntityProcessor(classElement, {}).process();
+    final actual = EntityProcessor(classElement, {}, {}).process();
 
     const name = 'Person';
     final fields = classElement.fields
-        .map((fieldElement) => FieldProcessor(fieldElement, null).process())
+        .map((fieldElement) =>
+            FieldProcessor(fieldElement, null, null).process())
         .toList();
     final primaryKey = PrimaryKey([fields[0]], false);
     const foreignKeys = <ForeignKey>[];
@@ -266,7 +271,7 @@ void main() {
     ''');
 
       final actual =
-          EntityProcessor(classElements[1], {}).process().foreignKeys[0];
+          EntityProcessor(classElements[1], {}, {}).process().foreignKeys[0];
 
       final expected = ForeignKey(
         'Person',
@@ -296,7 +301,7 @@ void main() {
         }
     ''');
 
-      final actual = EntityProcessor(classElements[0], {}).process().fts;
+      final actual = EntityProcessor(classElements[0], {}, {}).process().fts;
 
       final Fts expected = Fts3('simple', []);
 
@@ -321,7 +326,7 @@ void main() {
         }
     ''');
 
-      final actual = EntityProcessor(classElements[0], {}).process().fts;
+      final actual = EntityProcessor(classElements[0], {}, {}).process().fts;
 
       final Fts expected = Fts4('simple', []);
 
@@ -342,11 +347,12 @@ void main() {
       }
     ''');
 
-    final actual = EntityProcessor(classElement, {}).process();
+    final actual = EntityProcessor(classElement, {}, {}).process();
 
     const name = 'Person';
     final fields = classElement.fields
-        .map((fieldElement) => FieldProcessor(fieldElement, null).process())
+        .map((fieldElement) =>
+            FieldProcessor(fieldElement, null, null).process())
         .toList();
     final primaryKey = PrimaryKey([fields[0]], false);
     const foreignKeys = <ForeignKey>[];
@@ -381,7 +387,8 @@ void main() {
       }
     ''');
 
-      final actual = EntityProcessor(classElement, {}).process().valueMapping;
+      final actual =
+          EntityProcessor(classElement, {}, {}).process().valueMapping;
 
       const expected = '<String, Object?>{'
           "'id': item.id, "
@@ -403,7 +410,8 @@ void main() {
       }
     ''');
 
-      final actual = EntityProcessor(classElement, {}).process().valueMapping;
+      final actual =
+          EntityProcessor(classElement, {}, {}).process().valueMapping;
 
       const expected = '<String, Object?>{'
           "'id': item.id, "
@@ -428,7 +436,8 @@ void main() {
       }
     ''');
 
-      final actual = EntityProcessor(classElement, {}).process().valueMapping;
+      final actual =
+          EntityProcessor(classElement, {}, {}).process().valueMapping;
 
       const expected = '<String, Object?>{'
           "'id': item.id, "
@@ -453,7 +462,8 @@ void main() {
       }
     ''');
 
-      final actual = EntityProcessor(classElement, {}).process().valueMapping;
+      final actual =
+          EntityProcessor(classElement, {}, {}).process().valueMapping;
 
       const expected = '<String, Object?>{'
           "'id': item.id, "
@@ -476,7 +486,7 @@ void main() {
           }
       ''');
 
-      final processor = EntityProcessor(classElements, {});
+      final processor = EntityProcessor(classElements, {}, {});
       expect(
           processor.process,
           throwsInvalidGenerationSourceError(
@@ -496,7 +506,7 @@ void main() {
           }
       ''');
 
-      final processor = EntityProcessor(classElements, {});
+      final processor = EntityProcessor(classElements, {}, {});
       expect(
           processor.process,
           throwsInvalidGenerationSourceError(
@@ -537,7 +547,7 @@ void main() {
           }
       ''');
 
-      final processor = EntityProcessor(classElements[1], {});
+      final processor = EntityProcessor(classElements[1], {}, {});
       expect(
           processor.process,
           throwsInvalidGenerationSourceError(
@@ -578,7 +588,7 @@ void main() {
           }
       ''');
 
-      final processor = EntityProcessor(classElements[1], {});
+      final processor = EntityProcessor(classElements[1], {}, {});
       expect(
           processor.process,
           throwsInvalidGenerationSourceError(
@@ -612,7 +622,7 @@ void main() {
           }
       ''');
 
-      final processor = EntityProcessor(classElements[0], {});
+      final processor = EntityProcessor(classElements[0], {}, {});
       expect(
           processor.process,
           throwsInvalidGenerationSourceError(
@@ -644,7 +654,7 @@ void main() {
           }
       ''');
 
-      final processor = EntityProcessor(classElements, {});
+      final processor = EntityProcessor(classElements, {}, {});
       expect(
           processor.process,
           throwsInvalidGenerationSourceError(
@@ -668,7 +678,7 @@ void main() {
           }
       ''');
 
-      final processor = EntityProcessor(classElement, {});
+      final processor = EntityProcessor(classElement, {}, {});
       expect(
           processor.process,
           throwsInvalidGenerationSourceError(
@@ -692,7 +702,7 @@ void main() {
           }
       ''');
 
-      final processor = EntityProcessor(classElement, {});
+      final processor = EntityProcessor(classElement, {}, {});
       expect(
           processor.process,
           throwsInvalidGenerationSourceError(EntityProcessorError(classElement)
@@ -716,7 +726,7 @@ void main() {
           }
       ''');
 
-      final processor = EntityProcessor(classElement, {});
+      final processor = EntityProcessor(classElement, {}, {});
       expect(
           processor.process,
           throwsInvalidGenerationSourceError(
@@ -738,7 +748,7 @@ void main() {
       }
     ''');
 
-      final actual = EntityProcessor(classElement, {});
+      final actual = EntityProcessor(classElement, {}, {});
 
       expect(
         actual.process,

@@ -232,7 +232,7 @@ Future<List<Entity>> _getEntities() async {
 
   return library.classes
       .where((classElement) => classElement.hasAnnotation(annotations.Entity))
-      .map((classElement) => EntityProcessor(classElement, {}).process())
+      .map((classElement) => EntityProcessor(classElement, {}, {}).process())
       .toList();
 }
 
@@ -258,6 +258,6 @@ Future<List<View>> _getViews() async {
   return library.classes
       .where((classElement) =>
           classElement.hasAnnotation(annotations.DatabaseView))
-      .map((classElement) => ViewProcessor(classElement, {}).process())
+      .map((classElement) => ViewProcessor(classElement, {}, {}).process())
       .toList();
 }

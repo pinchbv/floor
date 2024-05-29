@@ -14,6 +14,8 @@ void main() {
   });
 
   tearDown(() async {
+    //Delay is necessary, otherwise test wil fail after completion
+    await Future.delayed(const Duration(milliseconds: 100));
     await database.close();
   });
 
