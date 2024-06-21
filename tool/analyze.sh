@@ -1,18 +1,7 @@
 #!/bin/bash
 
-cd ..
+# Make foreach_module script executable, in case it isn't yet
+chmod u+x foreach_module.sh
 
-cd floor
-flutter analyze
-cd ..
-
-cd floor_annotation
-dart analyze --fatal-infos --fatal-warnings .
-cd ..
-
-cd floor_generator
-dart analyze --fatal-infos --fatal-warnings .
-cd ..
-
-cd example
-flutter analyze
+# Run dart analyze . on every module
+./foreach_module.sh 'dart analyze --fatal-infos --fatal-warnings .'

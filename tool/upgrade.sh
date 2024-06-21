@@ -1,22 +1,7 @@
 #!/bin/bash
 
-cd ..
+# Make foreach_module script executable, in case it isn't yet
+chmod u+x foreach_module.sh
 
-cd floor
-flutter packages pub upgrade
-cd ..
-
-cd floor_common
-flutter packages pub upgrade
-cd ..
-
-cd floor_annotation
-flutter packages pub upgrade
-cd ..
-
-cd floor_generator
-flutter packages pub upgrade
-cd ..
-
-cd example
-flutter packages pub upgrade
+# Run flutter packages pub upgrade on every module
+./foreach_module.sh 'flutter packages pub upgrade'
