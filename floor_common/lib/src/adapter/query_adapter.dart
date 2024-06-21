@@ -150,6 +150,11 @@ class QueryAdapter {
     } else if (rootNode is DeleteStatement) {
       result = await _database.rawDelete(sql, arguments).then(_mapResult);
       tableName = rootNode.table.tableName;
+    } else if (rootNode is InvalidStatement) {
+      // The underlying error is not contained in the node, so in order to find the root cause one needs to run with the debugger stopping on "all exceptions"
+      throw Exception('Failed to parse "$sql"');
+    } else {
+      throw Exception('Unknown statement type: $rootNode');
     }
 
     _notifyIfChanged(tableName, result);
