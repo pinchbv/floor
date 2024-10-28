@@ -1,5 +1,5 @@
 import 'package:floor_common/floor_common.dart';
-import 'package:sqflite_common/sqlite_api.dart';
+import 'package:sqflite_sqlcipher/sqlite_api.dart';
 import 'package:test/test.dart';
 
 import '../test_util/extensions.dart';

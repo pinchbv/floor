@@ -1,7 +1,7 @@
 import 'dart:async' as _i3;
 
 import 'package:mockito/mockito.dart' as _i1;
-import 'package:sqflite_common/sqlite_api.dart' as _i2;
+import 'package:sqflite_sqlcipher/sqlite_api.dart' as _i2;
 import 'package:sqflite_common/src/sql_builder.dart' as _i4;
 
 // ignore_for_file: comment_references

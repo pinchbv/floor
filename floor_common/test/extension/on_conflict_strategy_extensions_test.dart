@@ -1,6 +1,6 @@
 import 'package:floor_common/floor_common.dart';
 import 'package:floor_common/src/extension/on_conflict_strategy_extensions.dart';
-import 'package:sqflite_common/sqlite_api.dart';
+import 'package:sqflite_sqlcipher/sqlite_api.dart';
 import 'package:test/test.dart';
 
 void main() {

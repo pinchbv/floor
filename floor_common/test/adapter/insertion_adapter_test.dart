@@ -1,6 +1,6 @@
 import 'package:floor_common/floor_common.dart';
 import 'package:mockito/mockito.dart';
-import 'package:sqflite_common/sqlite_api.dart';
+import 'package:sqflite_sqlcipher/sqlite_api.dart';
 import 'package:test/test.dart';
 
 import '../test_util/mocks.dart';

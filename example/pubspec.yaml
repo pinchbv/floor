@@ -14,7 +14,7 @@ dependencies:
     path: ../floor/
   flutter:
     sdk: flutter
-  sqflite: any # This dependency is needed to solve the problem with warning about transitive dependencies
+  #sqflite: any # This dependency is needed to solve the problem with warning about transitive dependencies
 
 dev_dependencies:
   analyzer: ^6.4.1

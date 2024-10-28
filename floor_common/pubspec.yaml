@@ -14,8 +14,10 @@ dependencies:
     path: ../floor_annotation/
   meta:
   path: ^1.9.0
-  sqflite_common: ^2.5.3
+ # sqflite_common: ^2.5.3
   sqlparser: ^0.34.1
+  sqflite_sqlcipher: ^3.0.0
+  frontend_server_client: ^4.0.0
 
 dev_dependencies:
   build_runner: ^2.4.8

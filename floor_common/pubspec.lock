@@ -77,10 +77,10 @@ packages:
     dependency: "direct dev"
     description:
       name: build_runner
-      sha256: "581bacf68f89ec8792f5e5a0b2c4decd1c948e97ce659dc783688c8a88fbec21"
+      sha256: "644dc98a0f179b872f612d3eb627924b578897c629788e858157fa5e704ca0c7"
       url: "https://pub.dev"
     source: hosted
-    version: "2.4.8"
+    version: "2.4.11"
   build_runner_core:
     dependency: transitive
     description:
@@ -215,14 +215,19 @@ packages:
       relative: true
     source: path
     version: "1.4.2"
-  frontend_server_client:
+  flutter:
     dependency: transitive
+    description: flutter
+    source: sdk
+    version: "0.0.0"
+  frontend_server_client:
+    dependency: "direct main"
     description:
       name: frontend_server_client
-      sha256: "408e3ca148b31c20282ad6f37ebfa6f4bdc8fede5b74bc2f08d9d92b55db3612"
+      sha256: f64a0333a82f30b0cca061bc3d143813a486dc086b574bfb233b7c1372427694
       url: "https://pub.dev"
     source: hosted
-    version: "3.2.0"
+    version: "4.0.0"
   glob:
     dependency: transitive
     description:
@@ -303,14 +308,22 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "0.12.16+1"
+  material_color_utilities:
+    dependency: transitive
+    description:
+      name: material_color_utilities
+      sha256: f7142bb1154231d7ea5f96bc7bde4bda2a0945d2806bb11670e30b850d56bdec
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.11.1"
   meta:
     dependency: "direct main"
     description:
       name: meta
-      sha256: d584fa6707a52763a52446f02cc621b077888fb63b93bbcb1143a7be5a0c0c04
+      sha256: bdb68674043280c3428e9ec998512fb681678676b3c54e773629ffe74419f8c7
       url: "https://pub.dev"
     source: hosted
-    version: "1.11.0"
+    version: "1.15.0"
   mime:
     dependency: transitive
     description:
@@ -407,6 +420,11 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.0.4"
+  sky_engine:
+    dependency: transitive
+    description: flutter
+    source: sdk
+    version: "0.0.99"
   source_gen:
     dependency: transitive
     description:
@@ -440,7 +458,7 @@ packages:
     source: hosted
     version: "1.10.0"
   sqflite_common:
-    dependency: "direct main"
+    dependency: transitive
     description:
       name: sqflite_common
       sha256: "3da423ce7baf868be70e2c0976c28a1bb2f73644268b7ffa7d2e08eab71f16a4"
@@ -455,6 +473,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.3.3"
+  sqflite_sqlcipher:
+    dependency: "direct main"
+    description:
+      name: sqflite_sqlcipher
+      sha256: "16033fde6c7d7bd657b71a2bc42332ab02bc8001c3212f502d2e02714e735ec9"
+      url: "https://pub.dev"
+    source: hosted
+    version: "3.1.0+1"
   sqlite3:
     dependency: transitive
     description:
@@ -575,6 +601,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "0.3.1"
+  vector_math:
+    dependency: transitive
+    description:
+      name: vector_math
+      sha256: "80b3257d1492ce4d091729e3a67a60407d227c27241d6927be0130c98e741803"
+      url: "https://pub.dev"
+    source: hosted
+    version: "2.1.4"
   vm_service:
     dependency: transitive
     description:
@@ -624,4 +658,5 @@ packages:
     source: hosted
     version: "3.1.2"
 sdks:
-  dart: ">=3.3.0 <4.0.0"
+  dart: ">=3.4.0 <4.0.0"
+  flutter: ">=3.19.0"

@@ -19,7 +19,8 @@ class DatabaseWriter implements Writer {
   Class _generateDatabaseImplementation(final Database database) {
     final databaseName = database.name;
 
-    return Class((builder) => builder
+    return Class((builder) =>
+    builder
       ..name = '_\$$databaseName'
       ..extend = refer(databaseName)
       ..methods.add(_generateOpenMethod(database))
@@ -30,7 +31,8 @@ class DatabaseWriter implements Writer {
 
   Constructor _generateConstructor() {
     return Constructor((builder) {
-      final parameter = Parameter((builder) => builder
+      final parameter = Parameter((builder) =>
+      builder
         ..name = 'listener'
         ..type = refer('StreamController<String>?'));
 
@@ -47,7 +49,8 @@ class DatabaseWriter implements Writer {
       final daoGetterName = daoGetter.name;
       final daoTypeName = daoGetter.dao.classElement.displayName;
 
-      return Method((builder) => builder
+      return Method((builder) =>
+      builder
         ..annotations.add(overrideAnnotationExpression)
         ..type = MethodType.getter
         ..returns = refer(daoTypeName)
@@ -62,7 +65,8 @@ class DatabaseWriter implements Writer {
       final daoGetterName = daoGetter.name;
       final daoTypeName = daoGetter.dao.classElement.displayName;
 
-      return Field((builder) => builder
+      return Field((builder) =>
+      builder
         ..type = refer('$daoTypeName?')
         ..name = '_${daoGetterName}Instance');
     }).toList();
@@ -70,7 +74,7 @@ class DatabaseWriter implements Writer {
 
   Method _generateOpenMethod(final Database database) {
     final createTableStatements = _generateCreateTableSqlStatements(
-            database.entities)
+        database.entities)
         .map((statement) => 'await database.execute(${statement.toLiteral()});')
         .join('\n');
     final createIndexStatements = database.entities
@@ -83,24 +87,33 @@ class DatabaseWriter implements Writer {
         .map((statement) => 'await database.execute($statement);')
         .join('\n');
 
-    final pathParameter = Parameter((builder) => builder
+    final pathParameter = Parameter((builder) =>
+    builder
       ..name = 'path'
       ..type = refer('String'));
-    final migrationsParameter = Parameter((builder) => builder
+    final passwordParameter = Parameter((builder) =>
+    builder
+      ..name = 'password'
+      ..type = refer('String?'));
+    final migrationsParameter = Parameter((builder) =>
+    builder
       ..name = 'migrations'
       ..type = refer('List<Migration>'));
-    final callbackParameter = Parameter((builder) => builder
+    final callbackParameter = Parameter((builder) =>
+    builder
       ..name = 'callback'
       ..type = refer('Callback?'));
 
-    return Method((builder) => builder
+    return Method((builder) =>
+    builder
       ..name = 'open'
       ..returns = refer('Future<sqflite.Database>')
       ..modifier = MethodModifier.async
-      ..requiredParameters.addAll([pathParameter, migrationsParameter])
+      ..requiredParameters.addAll([pathParameter, passwordParameter, migrationsParameter])
       ..optionalParameters.add(callbackParameter)
       ..body = Code('''
-          final databaseOptions = sqflite.OpenDatabaseOptions(
+          final databaseOptions = sqflite.SqlCipherOpenDatabaseOptions(
+            password: password,
             version: ${database.version},
             onConfigure: (database) async {
               await database.execute('PRAGMA foreign_keys = ON');

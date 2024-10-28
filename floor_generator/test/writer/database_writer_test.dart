@@ -36,11 +36,13 @@ void main() {
         }
       
         Future<sqflite.Database> open(
-          String path,
-          List<Migration> migrations, [
-          Callback? callback,
+        String path,
+        String password,
+        List<Migration> migrations, [
+        Callback? callback, String password
         ]) async {
           final databaseOptions = sqflite.OpenDatabaseOptions(
+            password: password,
             version: 1,
             onConfigure: (database) async {
               await database.execute('PRAGMA foreign_keys = ON');
@@ -62,7 +64,7 @@ void main() {
               await callback?.onCreate?.call(database, version);
             },
           );
-          return sqfliteDatabaseFactory.openDatabase(path, options: databaseOptions);
+          return sqfliteDatabaseFactory.openDatabase(path, password, options: databaseOptions);
         }
       } 
       '''));
@@ -104,10 +106,12 @@ void main() {
         
         Future<sqflite.Database> open(
           String path,
+          String password,
           List<Migration> migrations, [
           Callback? callback,
         ]) async {
           final databaseOptions = sqflite.OpenDatabaseOptions(
+            password: password,
             version: 1,
             onConfigure: (database) async {
               await database.execute('PRAGMA foreign_keys = ON');
@@ -167,10 +171,12 @@ void main() {
         
         Future<sqflite.Database> open(
           String path,
+          String password,
           List<Migration> migrations, [
-          Callback? callback,
+          Callback? callback
         ]) async {
           final databaseOptions = sqflite.OpenDatabaseOptions(
+            password: password,
             version: 1,
             onConfigure: (database) async {
               await database.execute('PRAGMA foreign_keys = ON');
@@ -233,10 +239,12 @@ void main() {
       
         Future<sqflite.Database> open(
           String path,
+          String password,
           List<Migration> migrations, [
-          Callback? callback,
+          Callback? callback
         ]) async {
           final databaseOptions = sqflite.OpenDatabaseOptions(
+            password: password,
             version: 1,
             onConfigure: (database) async {
               await database.execute('PRAGMA foreign_keys = ON');

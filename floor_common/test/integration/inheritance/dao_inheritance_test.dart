@@ -2,7 +2,7 @@ import 'dart:async';
 
 import 'package:floor_common/floor_common.dart';
 import 'package:test/test.dart';
-import 'package:sqflite_common/sqlite_api.dart' as sqflite;
+import 'package:sqflite_sqlcipher/sqlite_api.dart' as sqflite;
 
 import '../../test_util/database_factory.dart';
 

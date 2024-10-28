@@ -5,8 +5,7 @@ import 'package:floor_generator/writer/writer.dart';
 class DatabaseBuilderWriter extends Writer {
   final String _databaseName;
 
-  DatabaseBuilderWriter(final String databaseName)
-      : _databaseName = databaseName;
+  DatabaseBuilderWriter(final String databaseName) : _databaseName = databaseName;
 
   @override
   Class write() {
@@ -17,6 +16,11 @@ class DatabaseBuilderWriter extends Writer {
 
     final nameField = Field((builder) => builder
       ..name = 'name'
+      ..type = refer('String?')
+      ..modifier = FieldModifier.final$);
+
+    final passwordField = Field((builder) => builder
+      ..name = 'password'
       ..type = refer('String?')
       ..modifier = FieldModifier.final$);
 
@@ -33,7 +37,10 @@ class DatabaseBuilderWriter extends Writer {
     final constructor = Constructor((builder) => builder
       ..requiredParameters.add(Parameter((builder) => builder
         ..toThis = true
-        ..name = 'name')));
+        ..name = 'name'))
+      ..optionalParameters.add(Parameter((builder) => builder
+        ..toThis = true
+        ..name = 'password')));
 
     final addMigrationsMethod = Method((builder) => builder
       ..annotations.add(overrideAnnotationExpression)
@@ -71,6 +78,7 @@ class DatabaseBuilderWriter extends Writer {
         final database = _\$$_databaseName();
         database.database = await database.open(
           path,
+          password,
           _migrations,
           _callback,
         );
@@ -84,6 +92,7 @@ class DatabaseBuilderWriter extends Writer {
       ])
       ..fields.addAll([
         nameField,
+        passwordField,
         migrationsField,
         callbackField,
       ])

@@ -1,6 +1,6 @@
 import 'dart:async';
 
-import 'package:sqflite_common/sqlite_api.dart';
+import 'package:sqflite_sqlcipher/sqlite_api.dart';
 
 /// Callback class that can be attached to the Floor builder.
 class Callback {

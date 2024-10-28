@@ -7,7 +7,7 @@ Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   final database = await $FloorFlutterDatabase
-      .databaseBuilder('flutter_database.db')
+      .databaseBuilder('flutter_database.db','password')
       .build();
   final dao = database.taskDao;
 

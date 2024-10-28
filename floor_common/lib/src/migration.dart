@@ -1,4 +1,4 @@
-import 'package:sqflite_common/sqlite_api.dart' as sqflite;
+import 'package:sqflite_sqlcipher/sqlite_api.dart' as sqflite;
 
 /// Base class for a database migration.
 ///

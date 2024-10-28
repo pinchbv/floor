@@ -21,7 +21,8 @@ dependencies:
     sdk: flutter
   meta:
   path: ^1.9.0
-  sqflite: ^2.3.2
+ # sqflite: ^2.3.2
+  sqflite_sqlcipher: ^3.1.0+1
   sqflite_common_ffi: ^2.3.2+1
   sqflite_common_ffi_web: ^0.4.3
   sqlparser: ^0.34.1
