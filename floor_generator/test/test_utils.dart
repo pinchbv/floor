@@ -15,8 +15,11 @@ import 'package:floor_generator/processor/view_processor.dart';
 import 'package:floor_generator/value_object/dao.dart';
 import 'package:floor_generator/value_object/entity.dart';
 import 'package:path/path.dart' as path;
+import 'package:pub_semver/pub_semver.dart';
 import 'package:source_gen/source_gen.dart';
 import 'package:test/test.dart';
+
+final targetLanguageVersion = Version(3, 7, 0);
 
 /// Creates a [LibraryReader] of the [sourceFile].
 Future<LibraryReader> resolveCompilationUnit(final String sourceFile) async {
@@ -112,7 +115,7 @@ Future<DartType> getDartTypeFromDeclaration(final String declaration) async {
   });
 }
 
-final _dartfmt = DartFormatter();
+final _dartfmt = DartFormatter(languageVersion: targetLanguageVersion);
 
 String _format(final String source) {
   try {

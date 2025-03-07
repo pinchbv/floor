@@ -1,26 +1,28 @@
 name: example
-description: >
-  The typesafe, reactive and lightweight SQLite abstraction for your Flutter applications.
-  This is an example on how to use the library.
-version: 1.0.0
+description: "This is an example on how to use the typesafe, reactive and lightweight SQLite abstraction within your Flutter applications."
 homepage: https://pinchbv.github.io/floor/
-publish_to: none
+publish_to: 'none'
+
+version: 1.0.0+1
 
 environment:
-  sdk: '>=3.2.6 <4.0.0'
+  sdk: ^3.7.0
 
 dependencies:
-  floor:
-    path: ../floor/
   flutter:
     sdk: flutter
-  sqflite: any # This dependency is needed to solve the problem with warning about transitive dependencies
+  floor:
+    path: ../floor/
+  cupertino_icons: ^1.0.8
 
 dev_dependencies:
-  analyzer: ^6.4.1
-  build_runner: ^2.4.8
-  floor_generator:
-    path: ../floor_generator/
-  flutter_lints: ^3.0.1
   flutter_test:
     sdk: flutter
+  flutter_lints: ^5.0.0
+  analyzer: ^7.0.0
+  build_runner: ^2.4.15
+  floor_generator:
+    path: ../floor_generator/
+
+flutter:
+  uses-material-design: true

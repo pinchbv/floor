@@ -36,7 +36,7 @@ void main() {
             .process();
 
     expect(
-      actual,
+      actual.toString(),
       equals(
         QueryMethod(
           methodElement,
@@ -47,7 +47,7 @@ void main() {
           [],
           entities.first,
           {},
-        ),
+        ).toString(),
       ),
     );
   });
@@ -63,7 +63,7 @@ void main() {
             .process();
 
     expect(
-      actual,
+      actual.toString(),
       equals(
         QueryMethod(
           methodElement,
@@ -74,7 +74,7 @@ void main() {
           [],
           views.first,
           {},
-        ),
+        ).toString(),
       ),
     );
   });
