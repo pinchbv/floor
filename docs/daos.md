@@ -69,6 +69,17 @@ final name = '%foo%';
 await dao.findPeopleWithNamesLike(name);
 ```
 
+Sometimes, we may need to dynamically concatenate SQL statements.
+```dart
+// dao
+@Query('SELECT * FROM Person WHERE {whereCon}')
+Future<List<Person>> findPeopleWithNamesLike(String whereCon);
+
+// usage
+final whereCon = "age > 1 and name = '李四'";
+await dao.findPeopleWithNamesLike(whereCon);
+```
+
 ## Data Changes
 Use the `@insert`, `@update` and `@delete` annotations for inserting and changing persistent data.
 All these methods accept single or multiple entity instances.

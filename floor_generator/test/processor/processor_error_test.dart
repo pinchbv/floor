@@ -17,10 +17,10 @@ void main() {
         error.toString(),
         equals('mymessage mytodo\n'
             'package:_resolve_source/_resolve_source.dart:9:20\n'
-            '  ╷\n'
-            '9 │       Future<void> insertPerson(Person person);\n'
-            '  │                    ^^^^^^^^^^^^\n'
-            '  ╵'));
+            '  ,\n'
+            '9 |       Future<void> insertPerson(Person person);\n'
+            '  |                    ^^^^^^^^^^^^\n'
+            '  \''));
   });
   test('toString with empty source element', () async {
     final element = FakeClassElement();

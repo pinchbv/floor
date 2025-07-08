@@ -1,3 +1,5 @@
+import 'dart:collection';
+
 import 'package:analyzer/dart/element/element.dart';
 import 'package:floor_generator/misc/extension/dart_type_extension.dart';
 import 'package:floor_generator/processor/error/query_processor_error.dart';
@@ -19,52 +21,57 @@ class QueryProcessor extends Processor<Query> {
   Query process() {
     _assertNoNullableParameters();
 
-    final indices = <String, int>{};
-    final fixedParameters = <String>{};
-    //map parameters to index (1-based) or 0 (if its a list)
-    int currentIndex = 1;
-    for (final parameter in _parameters) {
-      if (parameter.type.isDartCoreList) {
-        indices[':${parameter.name}'] = 0;
-      } else {
-        fixedParameters.add(parameter.name);
-        indices[':${parameter.name}'] = currentIndex++;
-      }
-    }
-
     //get List of query variables
     final variables = findVariables(_query);
     _assertAllParametersAreUsed(variables);
 
+    /// linkedHash ensures order
+    final LinkedHashMap<String, Set<ParamType>> useTos = LinkedHashMap();
+    final paramTypeMap = <String, ParamType>{};
+    for (final parameter in _parameters) {
+      final typeSet = variables.where((va) => va.prop == parameter.name)
+          .map((e) => e.type).toSet();
+      useTos[parameter.name] = typeSet;
+      paramTypeMap[parameter.name] = parameter.type.isDartCoreList?ParamType.list: ParamType.normal;
+    }
+
+    final normalArgs = useTos.entries
+        .where((element) => element.value.contains(ParamType.normal))
+        .map((e) => e.key).toList();
+
     final newQuery = StringBuffer();
-    final listParameters = <ListParameter>[];
+    final queryParameters = <QueryParameter>[];
     // iterate over all found variables, replace them with their assigned
     // numbered variable (?1,?2,...) or a placeholder if the variable is a list.
     // the list variables have to be handled in the writer, so write down their
     // positions and names.
     int currentLast = 0;
+
     for (final varToken in variables) {
+      final paramType = paramTypeMap[varToken.prop];
+      if (paramType == null) {
+        throw _processorError.unknownQueryVariable(varToken.name);
+      }
+      if(paramType == ParamType.list && varToken.type != ParamType.list){
+        throw _processorError.queryMethodParameterIsListButVariableIsNot(varToken.name);
+      }
+      if(paramType != ParamType.list && varToken.type == ParamType.list){
+        throw _processorError.queryMethodParameterIsNormalButVariableIsList(varToken.name);
+      }
       newQuery.write(_query
           .substring(currentLast, varToken.startPosition)
           .replaceAll('\n', ' '));
-      final varIndexInMethod = indices[varToken.name];
-      if (varIndexInMethod == null) {
-        throw _processorError.unknownQueryVariable(varToken.name);
-      } else if (varIndexInMethod > 0) {
-        //normal variable/parameter
-        if (varToken.isListVar)
-          throw _processorError
-              .queryMethodParameterIsNormalButVariableIsList(varToken.name);
-        newQuery.write('?');
-        newQuery.write(varIndexInMethod);
-      } else {
-        //list variable/parameter
-        if (!varToken.isListVar)
-          throw _processorError
-              .queryMethodParameterIsListButVariableIsNot(varToken.name);
-        listParameters
-            .add(ListParameter(newQuery.length, varToken.name.substring(1)));
-        newQuery.write(varlistPlaceholder);
+      switch(varToken.type) {
+        case ParamType.list:
+          queryParameters.add(QueryParameter(newQuery.length, varToken.prop, ParamType.list));
+          newQuery.write(varlistPlaceholder);
+        case ParamType.custom:
+          queryParameters.add(QueryParameter(newQuery.length, varToken.prop, ParamType.custom));
+          newQuery.write(varToken.name);
+        default:
+        //normal variable/parameter placeholder
+          queryParameters.add(QueryParameter(newQuery.length, varToken.prop, ParamType.normal));
+          newQuery.write('?${normalArgs.indexOf(varToken.prop) + 1}');
       }
       currentLast = varToken.endPosition;
     }
@@ -72,7 +79,7 @@ class QueryProcessor extends Processor<Query> {
 
     return Query(
       newQuery.toString(),
-      listParameters,
+      queryParameters,
     );
   }
 
@@ -85,7 +92,7 @@ class QueryProcessor extends Processor<Query> {
   }
 
   void _assertAllParametersAreUsed(List<VariableToken> variables) {
-    final queryVariables = variables.map((e) => e.name.substring(1)).toSet();
+    final queryVariables = variables.map((e) => e.prop).toSet();
     for (final param in _parameters) {
       if (!queryVariables.contains(param.displayName)) {
         throw _processorError.unusedQueryMethodParameter(param);
@@ -100,15 +107,20 @@ class QueryProcessor extends Processor<Query> {
 List<VariableToken> findVariables(final String query) {
   final output = <VariableToken>[];
   for (final match
-      in RegExp(r':[\w]+| [iI][nN]\s*\((:[\w]+)\)').allMatches(query)) {
+      in RegExp(r':[\w]+| [iI][nN]\s*\((:[\w]+)\)|(\{\w+\})').allMatches(query)) {
     final content = match.group(0)!;
     final expectsList = content.toLowerCase().startsWith(' in');
+    final customParam =  match.group(2);
+    if(customParam != null) {
+      output.add(VariableToken(content, match.start, ParamType.custom));
+      continue;
+    }
     if (expectsList) {
       final varname = match.group(1)!;
       output.add(
-          VariableToken(varname, query.indexOf(varname, match.start), true));
+          VariableToken(varname, query.indexOf(varname, match.start), ParamType.list));
     } else {
-      output.add(VariableToken(content, match.start, false));
+      output.add(VariableToken(content, match.start, ParamType.normal));
     }
   }
   return output;
@@ -116,7 +128,7 @@ List<VariableToken> findVariables(final String query) {
 
 /// Represents a variable within an sqlite query.
 class VariableToken {
-  /// the variable name including `:` (e.g. `:foo`)
+  /// the variable name including `:` (e.g. `:foo`) or `{}` (e.g `{bar}`)
   final String name;
 
   /// the offset within the query, where the variable name starts. Useful for
@@ -127,10 +139,16 @@ class VariableToken {
   /// splitting the query here.
   int get endPosition => startPosition + name.length;
 
-  /// denotes if the variable was determined to contain a list
-  final bool isListVar;
+  /// the variable name excluding `:` and `{}`
+  String get prop {
+    if(type == ParamType.custom) return name.substring(1, name.length - 1);
+    return name.substring(1);
+  }
 
-  VariableToken(this.name, this.startPosition, this.isListVar);
+  /// denotes if the variable was determined to contain a list
+  final ParamType type;
+
+  VariableToken(this.name, this.startPosition, this.type);
 
   @override
   bool operator ==(Object other) =>
@@ -139,9 +157,9 @@ class VariableToken {
           runtimeType == other.runtimeType &&
           name == other.name &&
           startPosition == other.startPosition &&
-          isListVar == other.isListVar;
+          type == other.type;
 
   @override
   int get hashCode =>
-      name.hashCode ^ startPosition.hashCode ^ isListVar.hashCode;
+      name.hashCode ^ startPosition.hashCode ^ type.hashCode;
 }
