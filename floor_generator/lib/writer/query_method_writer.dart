@@ -180,16 +180,15 @@ class QueryMethodWriter implements Writer {
         code.write(' + _sqliteVariablesFor${parameter.name.capitalize()} + ');
         start = parameter.position + varlistPlaceholder.length;
       }
-      //custom variable add `$` e.g: `bar` -> `${bar}`
-      if(parameter.type == ParamType.custom) {
-        code.write(originalQuery.substring(start, parameter.position).toLiteral());
-        code.write("+'\${${parameter.name}}'+");
-        start = parameter.position + parameter.name.length + 2;
-      }
     }
     code.write(originalQuery.substring(start).toLiteral());
-
-    return code.toString();
+    var str = code.toString();
+    final set = queryParameters.where((element) => element.type == ParamType.custom)
+        .map((e) => e.name).toSet();
+    for (final prop in set) {
+      str = str.replaceAll('{$prop}', '\${$prop}');
+    }
+    return str;
   }
 
   String _generateNoReturnQuery(final String query, final String? arguments) {

@@ -830,7 +830,7 @@ void main() {
               final _sqliteVariablesForIds =
                   Iterable<String>.generate(ids.length, (i) => '?${i + offset}').join(',');
               return _queryAdapter.queryList(
-                  ''+'${foo}'+'SELECT * FROM Person WHERE id IN (' +
+                  '${foo}SELECT * FROM Person WHERE id IN (' +
                       _sqliteVariablesForIds +
                       ') AND id IN (' +
                       _sqliteVariablesForIdx +
@@ -858,7 +858,7 @@ void main() {
             @override
             Future<List<Person>> findWithIds(int foo,String bar,) async {
               return _queryAdapter.queryList(
-                  ''+'${foo}'+' and '+'${bar}'+'',
+                  '${foo} and ${bar}',
                   mapper: (Map<String, Object?> row) =>
                       Person(row['id'] as int, row['name'] as String, row['weight'] as double, (row['admin'] as int) != 0, row['avatar'] as Uint8List));
             }
@@ -880,7 +880,7 @@ void main() {
             @override
             Future<List<Person>> findWithIds(int foo,String bar,) async {
               return _queryAdapter.queryList(
-                  ''+'${foo}'+' and '+'${bar}'+' ?2 ?1 ?1',
+                  '${foo} and ${bar} ?2 ?1 ?1',
                   mapper: (Map<String, Object?> row) =>
                       Person(row['id'] as int, row['name'] as String, row['weight'] as double, (row['admin'] as int) != 0, row['avatar'] as Uint8List),
                        arguments: [foo, bar]
