@@ -90,7 +90,9 @@ void main() {
           QueryMethodProcessor(methodElement, [], {}).process().query;
 
       expect(actual.sql, equals('SELECT * FROM Person WHERE id = ?1'));
-      expect(actual.listParameters, equals(<ListParameter>[]));
+      expect(actual.queryParameters, equals(<QueryParameter>[
+        QueryParameter(32, 'id', ParamType.normal)
+      ]));
     });
 
     test('parse query reusing a single parameter', () async {
@@ -168,7 +170,7 @@ void main() {
         actual.sql,
         equals(r'update sports set rated = 1 where id in (:varlist)'),
       );
-      expect(actual.listParameters, equals([ListParameter(41, 'ids')]));
+      expect(actual.queryParameters, equals([QueryParameter(41, 'ids', ParamType.list)]));
     });
 
     test('parses IN clause without space after IN', () async {
@@ -184,7 +186,7 @@ void main() {
         actual.sql,
         equals(r'update sports set rated = 1 where id in(:varlist)'),
       );
-      expect(actual.listParameters, equals([ListParameter(40, 'ids')]));
+      expect(actual.queryParameters, equals([QueryParameter(40, 'ids', ParamType.list)]));
     });
 
     test('parses IN clause with multiple spaces after IN', () async {
@@ -200,7 +202,7 @@ void main() {
         actual.sql,
         equals(r'update sports set rated = 1 where id in      (:varlist)'),
       );
-      expect(actual.listParameters, equals([ListParameter(46, 'ids')]));
+      expect(actual.queryParameters, equals([QueryParameter(46, 'ids', ParamType.list)]));
     });
 
     test('Parse query with multiple IN clauses', () async {
@@ -219,8 +221,8 @@ void main() {
           r'and where foo in (:varlist)',
         ),
       );
-      expect(actual.listParameters,
-          equals([ListParameter(41, 'ids'), ListParameter(69, 'bar')]));
+      expect(actual.queryParameters,
+          equals([QueryParameter(41, 'ids', ParamType.list), QueryParameter(69, 'bar', ParamType.list)]));
     });
 
     test('Parse query with IN clause and other parameter', () async {
@@ -235,11 +237,13 @@ void main() {
       expect(
         actual.sql,
         equals(
-          r'update sports set rated = 1 where id in (:varlist) '
-          r'AND foo = ?1',
+          r'update sports set rated = 1 where id in (:varlist) AND foo = ?1',
         ),
       );
-      expect(actual.listParameters, equals([ListParameter(41, 'ids')]));
+      expect(actual.queryParameters, equals([
+        QueryParameter(41, 'ids', ParamType.list),
+        QueryParameter(61, 'bar', ParamType.normal),
+      ]));
     });
 
     test('Parse query with mixed IN clauses and other parameters', () async {
@@ -258,8 +262,14 @@ void main() {
           r'AND name in (:varlist) and ?2 = ?1',
         ),
       );
-      expect(actual.listParameters,
-          equals([ListParameter(41, 'ids'), ListParameter(77, 'names')]));
+      expect(actual.queryParameters,
+          equals([
+            QueryParameter(41, 'ids', ParamType.list),
+            QueryParameter(61, 'bar', ParamType.normal),
+            QueryParameter(77, 'names', ParamType.list),
+            QueryParameter(91, 'bar', ParamType.normal),
+            QueryParameter(96, 'foo', ParamType.normal),
+          ]));
     });
 
     test('Parse query with LIKE operator', () async {
@@ -287,6 +297,99 @@ void main() {
       // names. But the Processor is not aware of this.
       expect(actual, equals('SELECT * FROM ?1, ?2'));
     });
+  });
+
+  test('Parse query with single custom str', () async {
+    final methodElement = await _createQueryMethodElement('''
+      @Query('my name is cola , nice to meet u {tt1}')
+      Future<void> setRated(String tt1);
+    ''');
+
+    final actual =
+        QueryMethodProcessor(methodElement, [], {}).process().query;
+
+    expect(
+      actual.sql,
+      equals(
+        r'my name is cola , nice to meet u {tt1}'
+      ),
+    );
+    expect(actual.queryParameters,
+        equals([
+          QueryParameter(33, 'tt1', ParamType.custom),
+        ]));
+  });
+
+  test('Parse query with multiple custom str', () async {
+    final methodElement = await _createQueryMethodElement('''
+      @Query('my name is cola , nice to meet u {tt1} {tt1}')
+      Future<void> setRated(String tt1);
+    ''');
+
+    final actual =
+        QueryMethodProcessor(methodElement, [], {}).process().query;
+
+    expect(
+      actual.sql,
+      equals(
+        r'my name is cola , nice to meet u {tt1} {tt1}'
+      ),
+    );
+    expect(actual.queryParameters,
+        equals([
+          QueryParameter(33, 'tt1', ParamType.custom),
+          QueryParameter(39, 'tt1', ParamType.custom),
+        ]));
+  });
+
+  test('Parse query with multiple custom str and normal multiple parameter', () async {
+    final methodElement = await _createQueryMethodElement('''
+      @Query('my name is cola , nice to meet u {tt1} {foo} :bar = :foo')
+      Future<void> setRated(String tt1, String foo, int bar);
+    ''');
+
+    final actual =
+        QueryMethodProcessor(methodElement, [], {}).process().query;
+
+    expect(
+      actual.sql,
+      equals(
+        r'my name is cola , nice to meet u {tt1} {foo} ?2 = ?1'
+      ),
+    );
+    expect(actual.queryParameters,
+        equals([
+          QueryParameter(33, 'tt1', ParamType.custom),
+          QueryParameter(39, 'foo', ParamType.custom),
+          QueryParameter(45, 'bar', ParamType.normal),
+          QueryParameter(50, 'foo', ParamType.normal),
+        ]));
+  });
+
+  test('Parse query with multiple custom str and normal multiple parameter and multiple list parameter', () async {
+    final methodElement = await _createQueryMethodElement('''
+      @Query('my name is cola in(:ids) In (:ids), nice to meet u {tt1} {foo} :bar = :foo')
+      Future<void> setRated(String tt1, bool foo, int bar, List<int> ids);
+    ''');
+
+    final actual =
+        QueryMethodProcessor(methodElement, [], {}).process().query;
+
+    expect(
+      actual.sql,
+      equals(
+        r'my name is cola in(:varlist) In (:varlist), nice to meet u {tt1} {foo} ?2 = ?1'
+      ),
+    );
+    expect(actual.queryParameters,
+        equals([
+          QueryParameter(19, 'ids', ParamType.list),
+          QueryParameter(33, 'ids', ParamType.list),
+          QueryParameter(59, 'tt1', ParamType.custom),
+          QueryParameter(65, 'foo', ParamType.custom),
+          QueryParameter(71, 'bar', ParamType.normal),
+          QueryParameter(76, 'foo', ParamType.normal),
+        ]));
   });
 
   group('errors', () {

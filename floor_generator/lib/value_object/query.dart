@@ -4,9 +4,9 @@ const String varlistPlaceholder = ':varlist';
 
 class Query {
   final String sql;
-  final List<ListParameter> listParameters;
+  final List<QueryParameter> queryParameters;
 
-  Query(this.sql, this.listParameters);
+  Query(this.sql, this.queryParameters);
 
   @override
   bool operator ==(Object other) =>
@@ -14,37 +14,44 @@ class Query {
       other is Query &&
           runtimeType == other.runtimeType &&
           sql == other.sql &&
-          const ListEquality<ListParameter>()
-              .equals(listParameters, other.listParameters);
+          const ListEquality<QueryParameter>()
+              .equals(queryParameters, other.queryParameters);
 
   @override
-  int get hashCode => sql.hashCode ^ listParameters.hashCode;
+  int get hashCode => sql.hashCode ^ queryParameters.hashCode;
 
   @override
   String toString() {
-    return 'Query{sql: $sql, listParameters: $listParameters}';
+    return 'Query{sql: $sql, listParameters: $queryParameters}';
   }
 }
 
-class ListParameter {
+class QueryParameter {
   final int position;
   final String name;
+  final ParamType type;
 
-  ListParameter(this.position, this.name);
+  QueryParameter(this.position, this.name, this.type);
 
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      other is ListParameter &&
+      other is QueryParameter &&
           runtimeType == other.runtimeType &&
           position == other.position &&
-          name == other.name;
+          name == other.name &&
+          type == other.type;
 
   @override
-  int get hashCode => position.hashCode ^ name.hashCode;
+  int get hashCode => position.hashCode ^ name.hashCode ^ type.hashCode;
 
   @override
   String toString() {
-    return 'ListParameter{position: $position, name: $name}';
+    return 'ListParameter{position: $position, name: $name, type: $type}';
   }
+}
+
+// Parameter type
+enum ParamType {
+  normal,list,custom
 }

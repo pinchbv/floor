@@ -111,6 +111,11 @@ class QueryMethodWriter implements Writer {
     return [
       ..._queryMethod.parameters
           .where((parameter) => !parameter.type.isDartCoreList)
+          // exclude list parameters and custom parameters
+          .where((i) {
+            return _queryMethod.query.queryParameters
+            .any((j) => j.name == i.displayName && j.type == ParamType.normal);
+          })
           .map((parameter) {
         final type = parameter.type;
         final displayName = parameter.displayName;
@@ -168,11 +173,19 @@ class QueryMethodWriter implements Writer {
     final code = StringBuffer();
     int start = 0;
     final originalQuery = _queryMethod.query.sql;
-    for (final listParameter in _queryMethod.query.listParameters) {
-      code.write(
-          originalQuery.substring(start, listParameter.position).toLiteral());
-      code.write(' + _sqliteVariablesFor${listParameter.name.capitalize()} + ');
-      start = listParameter.position + varlistPlaceholder.length;
+    final queryParameters = _queryMethod.query.queryParameters;
+    for (final parameter in queryParameters) {
+      if(parameter.type == ParamType.list) {
+        code.write(originalQuery.substring(start, parameter.position).toLiteral());
+        code.write(' + _sqliteVariablesFor${parameter.name.capitalize()} + ');
+        start = parameter.position + varlistPlaceholder.length;
+      }
+      //custom variable add `$` e.g: `bar` -> `${bar}`
+      if(parameter.type == ParamType.custom) {
+        code.write(originalQuery.substring(start, parameter.position).toLiteral());
+        code.write("+'\${${parameter.name}}'+");
+        start = parameter.position + parameter.name.length + 2;
+      }
     }
     code.write(originalQuery.substring(start).toLiteral());
 

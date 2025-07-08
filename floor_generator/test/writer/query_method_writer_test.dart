@@ -803,6 +803,93 @@ void main() {
             '''));
   });
 
+
+
+  test(
+      'Query with multiple IN clauses, reusing and mixing with normal parameters and custom str',
+          () async {
+        final queryMethod = await _createQueryMethod('''
+      @Query('{foo}SELECT * FROM Person WHERE id IN (:ids) AND id IN (:idx) OR foo in (:ids) AND bar = :foo OR name = :name')
+      Future<List<Person>> findWithIds(List<int> idx, String name, List<int> ids, int foo);
+    ''');
+
+        final actual = QueryMethodWriter(queryMethod).write();
+
+        expect(actual, equalsDart(r'''
+            @override
+            Future<List<Person>> findWithIds(
+              List<int> idx,
+              String name,
+              List<int> ids,
+              int foo,
+            ) async {
+              int offset = 3;
+              final _sqliteVariablesForIdx =
+                  Iterable<String>.generate(idx.length, (i) => '?${i + offset}').join(',');
+              offset += idx.length;
+              final _sqliteVariablesForIds =
+                  Iterable<String>.generate(ids.length, (i) => '?${i + offset}').join(',');
+              return _queryAdapter.queryList(
+                  ''+'${foo}'+'SELECT * FROM Person WHERE id IN (' +
+                      _sqliteVariablesForIds +
+                      ') AND id IN (' +
+                      _sqliteVariablesForIdx +
+                      ') OR foo in (' +
+                      _sqliteVariablesForIds +
+                      ') AND bar = ?2 OR name = ?1',
+                  mapper: (Map<String, Object?> row) =>
+                      Person(row['id'] as int, row['name'] as String, row['weight'] as double, (row['admin'] as int) != 0, row['avatar'] as Uint8List),
+                  arguments: [name, foo, ...idx, ...ids]);
+            }
+            '''));
+      });
+
+  test(
+      'Query with multiple  custom str',
+          () async {
+        final queryMethod = await _createQueryMethod('''
+      @Query('{foo} and {bar}')
+      Future<List<Person>> findWithIds(int foo, String bar);
+    ''');
+
+        final actual = QueryMethodWriter(queryMethod).write();
+
+        expect(actual, equalsDart(r'''
+            @override
+            Future<List<Person>> findWithIds(int foo,String bar,) async {
+              return _queryAdapter.queryList(
+                  ''+'${foo}'+' and '+'${bar}'+'',
+                  mapper: (Map<String, Object?> row) =>
+                      Person(row['id'] as int, row['name'] as String, row['weight'] as double, (row['admin'] as int) != 0, row['avatar'] as Uint8List));
+            }
+            '''));
+      });
+
+
+  test(
+      'Query with multiple  custom str and normal parameter',
+          () async {
+        final queryMethod = await _createQueryMethod('''
+      @Query('{foo} and {bar} :bar :foo :foo')
+      Future<List<Person>> findWithIds(int foo, String bar);
+    ''');
+
+        final actual = QueryMethodWriter(queryMethod).write();
+
+        expect(actual, equalsDart(r'''
+            @override
+            Future<List<Person>> findWithIds(int foo,String bar,) async {
+              return _queryAdapter.queryList(
+                  ''+'${foo}'+' and '+'${bar}'+' ?2 ?1 ?1',
+                  mapper: (Map<String, Object?> row) =>
+                      Person(row['id'] as int, row['name'] as String, row['weight'] as double, (row['admin'] as int) != 0, row['avatar'] as Uint8List),
+                       arguments: [foo, bar]
+              );
+            }
+            '''));
+      });
+
+
   test('query with unsupported type throws', () async {
     final queryMethod = await _createQueryMethod('''
       @Query('SELECT * FROM Person WHERE id = :person')
