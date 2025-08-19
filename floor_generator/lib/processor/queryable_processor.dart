@@ -1,4 +1,4 @@
-import 'package:analyzer/dart/element/element.dart';
+import 'package:analyzer/dart/element/element2.dart';
 import 'package:collection/collection.dart';
 import 'package:floor_annotation/floor_annotation.dart' as annotations;
 import 'package:floor_generator/misc/extension/set_extension.dart';
@@ -19,7 +19,7 @@ abstract class QueryableProcessor<T extends Queryable> extends Processor<T> {
   final QueryableProcessorError _queryableProcessorError;
 
   @protected
-  final ClassElement classElement;
+  final ClassElement2 classElement;
 
   final Set<TypeConverter> queryableTypeConverters;
 
@@ -28,8 +28,7 @@ abstract class QueryableProcessor<T extends Queryable> extends Processor<T> {
     this.classElement,
     final Set<TypeConverter> typeConverters,
   )   : _queryableProcessorError = QueryableProcessorError(classElement),
-        queryableTypeConverters = typeConverters +
-            classElement.getTypeConverters(TypeConverterScope.queryable);
+        queryableTypeConverters = typeConverters + classElement.getTypeConverters(TypeConverterScope.queryable);
 
   @protected
   List<Field> getFields() {
@@ -37,31 +36,27 @@ abstract class QueryableProcessor<T extends Queryable> extends Processor<T> {
       throw _queryableProcessorError.prohibitedMixinUsage;
     }
     final fields = [
-      ...classElement.fields,
-      ...classElement.allSupertypes.expand((type) => type.element.fields),
+      ...classElement.fields2,
+      ...classElement.allSupertypes.expand((type) => type.element3.fields2),
     ];
 
-    return fields
-        .where((fieldElement) => fieldElement.shouldBeIncluded())
-        .map((field) {
-      final typeConverter =
-          queryableTypeConverters.getClosestOrNull(field.type);
+    return fields.where((fieldElement) => fieldElement.shouldBeIncluded()).map((field) {
+      final typeConverter = queryableTypeConverters.getClosestOrNull(field.type);
       return FieldProcessor(field, typeConverter).process();
     }).toList();
   }
 
   @protected
   String getConstructor(final List<Field> fields) {
-    final constructorParameters = classElement.constructors
+    final constructorParameters = classElement.constructors2
         .firstWhereOrNull((element) => element.isPublic && !element.isFactory)
-        ?.parameters;
+        ?.formalParameters;
 
     if (constructorParameters == null) {
       throw _queryableProcessorError.missingUnnamedConstructor;
     } else {
       final parameterValues = constructorParameters
-          .map((parameterElement) =>
-              _getParameterValue(parameterElement, fields))
+          .map((parameterElement) => _getParameterValue(parameterElement, fields))
           .where((parameterValue) => parameterValue != null)
           .join(', ');
 
@@ -71,7 +66,7 @@ abstract class QueryableProcessor<T extends Queryable> extends Processor<T> {
 
   /// Returns `null` whenever field is @ignored
   String? _getParameterValue(
-    final ParameterElement parameterElement,
+    final FormalParameterElement parameterElement,
     final List<Field> fields,
   ) {
     final parameterName = parameterElement.displayName;
@@ -83,9 +78,8 @@ abstract class QueryableProcessor<T extends Queryable> extends Processor<T> {
 
       String parameterValue;
 
-      final typeConverter = [...queryableTypeConverters, field.typeConverter]
-          .whereNotNull()
-          .getClosestOrNull(parameterElement.type);
+      final typeConverter =
+          [...queryableTypeConverters, field.typeConverter].nonNulls.getClosestOrNull(parameterElement.type);
 
       if (typeConverter != null) {
         final castedDatabaseValue = databaseValue.cast(
@@ -93,10 +87,8 @@ abstract class QueryableProcessor<T extends Queryable> extends Processor<T> {
           parameterElement,
         );
 
-        parameterValue =
-            '_${typeConverter.name.decapitalize()}.decode($castedDatabaseValue)';
-      } else if (parameterElement.type.isDefaultSqlType ||
-          parameterElement.type.isEnumType) {
+        parameterValue = '_${typeConverter.name.decapitalize()}.decode($castedDatabaseValue)';
+      } else if (parameterElement.type.isDefaultSqlType || parameterElement.type.isEnumType) {
         parameterValue = databaseValue.cast(
           parameterElement.type,
           parameterElement,
@@ -119,7 +111,7 @@ abstract class QueryableProcessor<T extends Queryable> extends Processor<T> {
   }
 }
 
-extension on FieldElement {
+extension on FieldElement2 {
   bool shouldBeIncluded() {
     final isIgnored = hasAnnotation(annotations.ignore.runtimeType);
     return !(isStatic || isSynthetic || isIgnored);

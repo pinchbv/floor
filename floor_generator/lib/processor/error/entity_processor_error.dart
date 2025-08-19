@@ -1,18 +1,16 @@
 import 'package:analyzer/dart/constant/value.dart';
-import 'package:analyzer/dart/element/element.dart';
+import 'package:analyzer/dart/element/element2.dart';
 import 'package:source_gen/source_gen.dart';
 
 class EntityProcessorError {
-  final ClassElement _classElement;
+  final ClassElement2 _classElement;
 
-  EntityProcessorError(final ClassElement classElement)
-      : _classElement = classElement;
+  EntityProcessorError(final ClassElement2 classElement) : _classElement = classElement;
 
   InvalidGenerationSourceError get missingPrimaryKey {
     return InvalidGenerationSourceError(
       'There is no primary key defined on the entity ${_classElement.displayName}.',
-      todo:
-          'Define a primary key for this entity with @primaryKey/@PrimaryKey() '
+      todo: 'Define a primary key for this entity with @primaryKey/@PrimaryKey() '
           'or by using the primaryKeys field of @Entity().',
       element: _classElement,
     );
@@ -53,8 +51,7 @@ class EntityProcessorError {
   InvalidGenerationSourceError get missingIndexColumnName {
     return InvalidGenerationSourceError(
       'No index column name defined.',
-      todo:
-          "Make sure to add an index column name like: Index(values: ['foo'])').",
+      todo: "Make sure to add an index column name like: Index(values: ['foo'])').",
       element: _classElement,
     );
   }
@@ -64,18 +61,15 @@ class EntityProcessorError {
   ) {
     return InvalidGenerationSourceError(
       'No matching column found for the given index. (`$columnName`)',
-      todo:
-          "Make sure to add a correct index column name like: Index(values: ['foo'])').",
+      todo: "Make sure to add a correct index column name like: Index(values: ['foo'])').",
       element: _classElement,
     );
   }
 
-  InvalidGenerationSourceError wrongForeignKeyAction(
-      DartObject field, String triggerName) {
+  InvalidGenerationSourceError wrongForeignKeyAction(DartObject field, String triggerName) {
     return InvalidGenerationSourceError(
       'No ForeignKeyAction with the value $field exists for the $triggerName trigger.',
-      todo:
-          'Make sure to add a correct ForeignKeyAction like `ForeignKeyAction.noAction` or leave it out entirely.',
+      todo: 'Make sure to add a correct ForeignKeyAction like `ForeignKeyAction.noAction` or leave it out entirely.',
       element: _classElement,
     );
   }
@@ -83,8 +77,7 @@ class EntityProcessorError {
   InvalidGenerationSourceError get autoIncrementInWithoutRowid {
     return InvalidGenerationSourceError(
       'autoGenerate is not allowed in WITHOUT ROWID tables',
-      todo:
-          'Remove autoGenerate in @PrimaryKey() or withoutRowid in @Entity().',
+      todo: 'Remove autoGenerate in @PrimaryKey() or withoutRowid in @Entity().',
       element: _classElement,
     );
   }

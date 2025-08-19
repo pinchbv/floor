@@ -1,9 +1,9 @@
-import 'package:analyzer/dart/element/element.dart';
+import 'package:analyzer/dart/element/element2.dart';
 import 'package:floor_generator/value_object/type_converter.dart';
 
 /// Represents an Entity field and thus a table column.
 class Field {
-  final FieldElement fieldElement;
+  final FieldElement2 fieldElement;
   final String name;
   final String columnName;
   final bool isNullable;

@@ -1,4 +1,4 @@
-import 'package:analyzer/dart/element/element.dart';
+import 'package:analyzer/dart/element/element2.dart';
 import 'package:analyzer/dart/element/type.dart';
 import 'package:floor_generator/misc/change_method_processor_helper.dart';
 import 'package:floor_generator/processor/error/change_method_processor_error.dart';
@@ -7,22 +7,21 @@ import 'package:floor_generator/value_object/deletion_method.dart';
 import 'package:floor_generator/value_object/entity.dart';
 
 class DeletionMethodProcessor implements Processor<DeletionMethod> {
-  final MethodElement _methodElement;
+  final MethodElement2 _methodElement;
   final ChangeMethodProcessorHelper _helper;
   final ChangeMethodProcessorError _errors;
 
   DeletionMethodProcessor(
-    final MethodElement methodElement,
+    final MethodElement2 methodElement,
     final List<Entity> entities, [
     final ChangeMethodProcessorHelper? changeMethodProcessorHelper,
   ])  : _methodElement = methodElement,
         _errors = ChangeMethodProcessorError(methodElement, 'Deletion'),
-        _helper = changeMethodProcessorHelper ??
-            ChangeMethodProcessorHelper(methodElement, entities);
+        _helper = changeMethodProcessorHelper ?? ChangeMethodProcessorHelper(methodElement, entities);
 
   @override
   DeletionMethod process() {
-    final name = _methodElement.name;
+    final name = _methodElement.displayName; //TODO 19.08.25: Name?
     final returnType = _methodElement.returnType;
 
     _assertMethodReturnsFuture(returnType);
@@ -37,8 +36,7 @@ class DeletionMethodProcessor implements Processor<DeletionMethod> {
     }
 
     final parameterElement = _helper.getParameterElement();
-    final flattenedParameterType =
-        _helper.getFlattenedParameterType(parameterElement);
+    final flattenedParameterType = _helper.getFlattenedParameterType(parameterElement);
 
     final entity = _helper.getEntity(flattenedParameterType);
 
@@ -53,7 +51,7 @@ class DeletionMethodProcessor implements Processor<DeletionMethod> {
   }
 
   DartType _getFlattenedReturnType(final DartType returnType) {
-    return _methodElement.library.typeSystem.flatten(returnType);
+    return _methodElement.library2.typeSystem.flatten(returnType);
   }
 
   void _assertMethodReturnsNoList(final DartType flattenedReturnType) {

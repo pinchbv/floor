@@ -1,5 +1,4 @@
-import 'package:analyzer/dart/element/element.dart';
-import 'package:build_test/build_test.dart';
+import 'package:analyzer/dart/element/element2.dart';
 import 'package:floor_generator/misc/constants.dart';
 import 'package:floor_generator/processor/field_processor.dart';
 import 'package:floor_generator/value_object/field.dart';
@@ -147,8 +146,7 @@ void main() {
       final DateTime dateTime;
     ''');
 
-    final actual =
-        FieldProcessor(fieldElement, externalTypeConverter).process();
+    final actual = FieldProcessor(fieldElement, externalTypeConverter).process();
 
     const name = 'dateTime';
     const columnName = 'dateTime';
@@ -179,15 +177,14 @@ void main() {
         FieldProcessor(fieldElement, null).process,
         throwsInvalidGenerationSourceError(InvalidGenerationSourceError(
           'Column type is not supported for List<int>.',
-          todo:
-              'Either make to use a supported type or supply a type converter.',
+          todo: 'Either make to use a supported type or supply a type converter.',
           element: fieldElement,
         )));
   });
 }
 
-Future<FieldElement> _generateFieldElement(final String field) async {
-  final library = await resolveSource('''
+Future<FieldElement2> _generateFieldElement(final String field) async {
+  final library = await getLibraryReader('''
       library test;
       
       import 'package:floor_annotation/floor_annotation.dart';
@@ -208,12 +205,7 @@ Future<FieldElement> _generateFieldElement(final String field) async {
           return value.millisecondsSinceEpoch;
         }
       }
-      ''', (resolver) async {
-    return resolver
-        .findLibraryByName('test')
-        .then((value) => ArgumentError.checkNotNull(value))
-        .then((value) => LibraryReader(value));
-  });
+      ''');
 
-  return library.classes.first.fields.first;
+  return library.classes.first.fields2.first;
 }

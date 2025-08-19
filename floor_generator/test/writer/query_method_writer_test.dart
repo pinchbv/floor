@@ -1,4 +1,3 @@
-import 'package:build_test/build_test.dart';
 import 'package:code_builder/code_builder.dart';
 import 'package:floor_annotation/floor_annotation.dart' as annotations;
 import 'package:floor_generator/misc/type_utils.dart';
@@ -401,8 +400,7 @@ void main() {
     '''));
     });
 
-    test('generates method with local method parameter type converter',
-        () async {
+    test('generates method with local method parameter type converter', () async {
       final typeConverter = TypeConverter(
         'ExternalTypeConverter',
         await dateTimeDartType,
@@ -425,8 +423,7 @@ void main() {
     '''));
     });
 
-    test('generates method with type converter receiving list of orders',
-        () async {
+    test('generates method with type converter receiving list of orders', () async {
       final typeConverter = TypeConverter(
         'DateTimeConverter',
         await dateTimeDartType,
@@ -478,9 +475,7 @@ void main() {
     });
   });
 
-  test(
-      'Query with multiple IN clauses, reusing and mixing with normal parameters, including converters',
-      () async {
+  test('Query with multiple IN clauses, reusing and mixing with normal parameters, including converters', () async {
     final typeConverter = TypeConverter(
       'DateTimeConverter',
       await dateTimeDartType,
@@ -764,9 +759,7 @@ void main() {
             '''));
   });
 
-  test(
-      'Query with multiple IN clauses, reusing and mixing with normal parameters',
-      () async {
+  test('Query with multiple IN clauses, reusing and mixing with normal parameters', () async {
     final queryMethod = await _createQueryMethod('''
       @Query('SELECT * FROM Person WHERE id IN (:ids) AND id IN (:idx) OR foo in (:ids) AND bar = :foo OR name = :name')
       Future<List<Person>> findWithIds(List<int> idx, String name, List<int> ids, int foo);
@@ -820,8 +813,7 @@ void main() {
       void deleteByName(String name);
     ''');
 
-    expect(queryMethod,
-        throwsA(const TypeMatcher<InvalidGenerationSourceError>()));
+    expect(queryMethod, throwsA(const TypeMatcher<InvalidGenerationSourceError>()));
   });
 
   test('query without TypeConverter for return type throws', () async {
@@ -854,7 +846,7 @@ Future<Dao> createOrderDao(
   final String methodSignature,
   final Set<TypeConverter> typeConverters,
 ) async {
-  final library = await resolveSource('''
+  final library = await getLibraryReader('''
       library test;
       
       import 'package:floor_annotation/floor_annotation.dart';
@@ -885,15 +877,10 @@ Future<Dao> createOrderDao(
           return DateTime.fromMillisecondsSinceEpoch(databaseValue);
         }
       }
-      ''', (resolver) async {
-    return resolver
-        .findLibraryByName('test')
-        .then((value) => ArgumentError.checkNotNull(value))
-        .then((value) => LibraryReader(value));
-  });
+      ''');
 
-  final daoClass = library.classes.firstWhere((classElement) =>
-      classElement.hasAnnotation(annotations.dao.runtimeType));
+  final daoClass =
+      library.classes.firstWhere((classElement) => classElement.hasAnnotation(annotations.dao.runtimeType));
 
   final entities = library.classes
       .where((classElement) => classElement.hasAnnotation(annotations.Entity))

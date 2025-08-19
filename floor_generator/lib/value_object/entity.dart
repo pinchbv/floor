@@ -1,4 +1,4 @@
-import 'package:analyzer/dart/element/element.dart';
+import 'package:analyzer/dart/element/element2.dart';
 import 'package:collection/collection.dart';
 import 'package:floor_generator/value_object/field.dart';
 import 'package:floor_generator/value_object/foreign_key.dart';
@@ -17,7 +17,7 @@ class Entity extends Queryable {
   final Fts? fts;
 
   Entity(
-    ClassElement classElement,
+    ClassElement2 classElement,
     String name,
     List<Field> fields,
     this.primaryKey,
@@ -31,13 +31,11 @@ class Entity extends Queryable {
 
   String getCreateTableStatement() {
     final databaseDefinition = fields.map((field) {
-      final autoIncrement =
-          primaryKey.fields.contains(field) && primaryKey.autoGenerateId;
+      final autoIncrement = primaryKey.fields.contains(field) && primaryKey.autoGenerateId;
       return field.getDatabaseDefinition(autoIncrement);
     }).toList();
 
-    final foreignKeyDefinitions =
-        foreignKeys.map((foreignKey) => foreignKey.getDefinition()).toList();
+    final foreignKeyDefinitions = foreignKeys.map((foreignKey) => foreignKey.getDefinition()).toList();
     databaseDefinition.addAll(foreignKeyDefinitions);
 
     final primaryKeyDefinition = _createPrimaryKeyDefinition();
@@ -61,8 +59,7 @@ class Entity extends Queryable {
     if (primaryKey.autoGenerateId) {
       return null;
     } else {
-      final columns =
-          primaryKey.fields.map((field) => '`${field.columnName}`').join(', ');
+      final columns = primaryKey.fields.map((field) => '`${field.columnName}`').join(', ');
       return 'PRIMARY KEY ($columns)';
     }
   }

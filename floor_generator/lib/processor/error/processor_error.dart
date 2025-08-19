@@ -1,4 +1,4 @@
-import 'package:analyzer/dart/element/element.dart';
+import 'package:analyzer/dart/element/element2.dart';
 import 'package:source_gen/source_gen.dart';
 
 class ProcessorError extends Error {
@@ -9,7 +9,7 @@ class ProcessorError extends Error {
   final String todo;
 
   /// The code element associated with this error.
-  final Element element;
+  final Element2 element;
 
   ProcessorError({
     required this.message,

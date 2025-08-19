@@ -1,4 +1,4 @@
-import 'package:analyzer/dart/element/element.dart';
+import 'package:analyzer/dart/element/element2.dart';
 import 'package:floor_annotation/floor_annotation.dart' as annotations;
 import 'package:floor_generator/misc/extension/set_extension.dart';
 import 'package:floor_generator/misc/extension/type_converter_element_extension.dart';
@@ -20,7 +20,7 @@ import 'package:floor_generator/value_object/update_method.dart';
 import 'package:floor_generator/value_object/view.dart';
 
 class DaoProcessor extends Processor<Dao> {
-  final ClassElement _classElement;
+  final ClassElement2 _classElement;
   final String _daoGetterName;
   final String _databaseName;
   final List<Entity> _entities;
@@ -28,7 +28,7 @@ class DaoProcessor extends Processor<Dao> {
   final Set<TypeConverter> _typeConverters;
 
   DaoProcessor(
-    final ClassElement classElement,
+    final ClassElement2 classElement,
     final String daoGetterName,
     final String databaseName,
     final List<Entity> entities,
@@ -44,13 +44,9 @@ class DaoProcessor extends Processor<Dao> {
   @override
   Dao process() {
     final name = _classElement.displayName;
-    final methods = [
-      ..._classElement.methods,
-      ..._classElement.allSupertypes.expand((type) => type.methods)
-    ];
+    final methods = [..._classElement.methods2, ..._classElement.allSupertypes.expand((type) => type.methods2)];
 
-    final typeConverters = _typeConverters +
-        _classElement.getTypeConverters(TypeConverterScope.dao);
+    final typeConverters = _typeConverters + _classElement.getTypeConverters(TypeConverterScope.dao);
 
     final queryMethods = _getQueryMethods(methods, typeConverters);
     final insertionMethods = _getInsertionMethods(methods);
@@ -58,9 +54,7 @@ class DaoProcessor extends Processor<Dao> {
     final deletionMethods = _getDeletionMethods(methods);
     final transactionMethods = _getTransactionMethods(methods);
 
-    final streamQueryables = queryMethods
-        .where((method) => method.returnsStream)
-        .map((method) => method.queryable);
+    final streamQueryables = queryMethods.where((method) => method.returnsStream).map((method) => method.queryable);
     final streamEntities = streamQueryables.whereType<Entity>().toSet();
     final streamViews = streamQueryables.whereType<View>().toSet();
 
@@ -79,7 +73,7 @@ class DaoProcessor extends Processor<Dao> {
   }
 
   List<QueryMethod> _getQueryMethods(
-    final List<MethodElement> methods,
+    final List<MethodElement2> methods,
     final Set<TypeConverter> typeConverters,
   ) {
     return methods
@@ -93,43 +87,37 @@ class DaoProcessor extends Processor<Dao> {
   }
 
   List<InsertionMethod> _getInsertionMethods(
-    final List<MethodElement> methodElements,
+    final List<MethodElement2> methodElements,
   ) {
     return methodElements
-        .where(
-            (methodElement) => methodElement.hasAnnotation(annotations.Insert))
+        .where((methodElement) => methodElement.hasAnnotation(annotations.Insert))
         .map((method) => InsertionMethodProcessor(method, _entities).process())
         .toList();
   }
 
   List<UpdateMethod> _getUpdateMethods(
-    final List<MethodElement> methodElements,
+    final List<MethodElement2> methodElements,
   ) {
     return methodElements
-        .where(
-            (methodElement) => methodElement.hasAnnotation(annotations.Update))
-        .map((methodElement) =>
-            UpdateMethodProcessor(methodElement, _entities).process())
+        .where((methodElement) => methodElement.hasAnnotation(annotations.Update))
+        .map((methodElement) => UpdateMethodProcessor(methodElement, _entities).process())
         .toList();
   }
 
   List<DeletionMethod> _getDeletionMethods(
-    final List<MethodElement> methodElements,
+    final List<MethodElement2> methodElements,
   ) {
     return methodElements
-        .where((methodElement) =>
-            methodElement.hasAnnotation(annotations.delete.runtimeType))
-        .map((methodElement) =>
-            DeletionMethodProcessor(methodElement, _entities).process())
+        .where((methodElement) => methodElement.hasAnnotation(annotations.delete.runtimeType))
+        .map((methodElement) => DeletionMethodProcessor(methodElement, _entities).process())
         .toList();
   }
 
   List<TransactionMethod> _getTransactionMethods(
-    final List<MethodElement> methodElements,
+    final List<MethodElement2> methodElements,
   ) {
     return methodElements
-        .where((methodElement) =>
-            methodElement.hasAnnotation(annotations.transaction.runtimeType))
+        .where((methodElement) => methodElement.hasAnnotation(annotations.transaction.runtimeType))
         .map((methodElement) => TransactionMethodProcessor(
               methodElement,
               _daoGetterName,

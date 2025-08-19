@@ -25,7 +25,7 @@ class TransactionMethodWriter implements Writer {
 
   String _generateMethodBody() {
     final parameters =
-        method.parameterElements.map((parameter) => parameter.name).join(', ');
+        method.parameterElements.map((parameter) => parameter.displayName).join(', '); //TODO 19.08.25: Name?
     final methodCall = '${method.name}($parameters)';
     final innerType = method.returnType.flatten();
     final innerTypeName = innerType.getDisplayString(withNullability: false);
@@ -46,7 +46,7 @@ class TransactionMethodWriter implements Writer {
   List<Parameter> _generateParameters() {
     return method.parameterElements.map((parameter) {
       return Parameter((builder) => builder
-        ..name = parameter.name
+        ..name = parameter.displayName //TODO 19.08.25: Name?
         ..type = refer(parameter.type.getDisplayString(
           withNullability: true,
         )));

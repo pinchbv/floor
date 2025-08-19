@@ -1,12 +1,11 @@
-import 'package:analyzer/dart/element/element.dart';
+import 'package:analyzer/dart/element/element2.dart';
 import 'package:floor_generator/processor/error/processor_error.dart';
 import 'package:source_gen/source_gen.dart';
 
 class QueryMethodProcessorError {
-  final MethodElement _methodElement;
+  final MethodElement2 _methodElement;
 
-  QueryMethodProcessorError(final MethodElement methodElement)
-      : _methodElement = methodElement;
+  QueryMethodProcessorError(final MethodElement2 methodElement) : _methodElement = methodElement;
 
   InvalidGenerationSourceError get noQueryDefined {
     return InvalidGenerationSourceError(
@@ -27,8 +26,7 @@ class QueryMethodProcessorError {
   ProcessorError get doesNotReturnNullableStream {
     return ProcessorError(
       message: 'Queries returning streams of single elements might emit null.',
-      todo:
-          'Make the method return a Stream of a nullable type e.g. Stream<Person?>.',
+      todo: 'Make the method return a Stream of a nullable type e.g. Stream<Person?>.',
       element: _methodElement,
     );
   }
@@ -36,8 +34,7 @@ class QueryMethodProcessorError {
   ProcessorError get doesNotReturnNullableFuture {
     return ProcessorError(
       message: 'Queries returning single elements might return null.',
-      todo:
-          'Make the method return a Future of a nullable type e.g. Future<Person?>.',
+      todo: 'Make the method return a Future of a nullable type e.g. Future<Person?>.',
       element: _methodElement,
     );
   }

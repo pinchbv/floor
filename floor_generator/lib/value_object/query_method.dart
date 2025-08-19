@@ -1,4 +1,4 @@
-import 'package:analyzer/dart/element/element.dart';
+import 'package:analyzer/dart/element/element2.dart';
 import 'package:analyzer/dart/element/type.dart';
 import 'package:collection/collection.dart';
 import 'package:floor_generator/misc/extension/set_equality_extension.dart';
@@ -10,7 +10,7 @@ import 'package:floor_generator/value_object/type_converter.dart';
 /// Wraps a method annotated with Query
 /// to enable easy access to code generation relevant data.
 class QueryMethod {
-  final MethodElement methodElement;
+  final MethodElement2 methodElement;
 
   final String name;
 
@@ -29,7 +29,7 @@ class QueryMethod {
   /// Stream<List<T>> -> T
   final DartType flattenedReturnType;
 
-  final List<ParameterElement> parameters;
+  final List<FormalParameterElement> parameters;
 
   final Queryable? queryable;
 
@@ -47,9 +47,7 @@ class QueryMethod {
   );
 
   bool get returnsList {
-    final type = returnsStream
-        ? rawReturnType.flatten()
-        : methodElement.library.typeSystem.flatten(rawReturnType);
+    final type = returnsStream ? rawReturnType.flatten() : methodElement.library2.typeSystem.flatten(rawReturnType);
 
     return type.isDartCoreList;
   }

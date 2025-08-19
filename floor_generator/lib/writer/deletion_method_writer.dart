@@ -23,9 +23,8 @@ class DeletionMethodWriter implements Writer {
   }
 
   String _generateMethodBody() {
-    final entityClassName =
-        _method.entity.classElement.displayName.decapitalize();
-    final methodSignatureParameterName = _method.parameterElement.name;
+    final entityClassName = _method.entity.classElement.displayName.decapitalize();
+    final methodSignatureParameterName = _method.parameterElement.displayName; //TODO 19.08.25: Name?
 
     if (_method.flattenedReturnType is VoidType) {
       return _generateVoidReturnMethodBody(

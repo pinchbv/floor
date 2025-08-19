@@ -40,7 +40,7 @@ class QueryMethodWriter implements Writer {
   List<Parameter> _generateMethodParameters() {
     return _queryMethod.parameters.map((parameter) {
       return Parameter((builder) => builder
-        ..name = parameter.name
+        ..name = parameter.displayName //TODO 19.08.25: Name?
         ..type = refer(parameter.type.getDisplayString(
           // processor disallows nullable method parameters and throws if found,
           // still interested in nullability here to future-proof codebase
@@ -77,18 +77,13 @@ class QueryMethodWriter implements Writer {
     // because we ultimately want to give a query with numbered variables to sqflite, we have to compute them dynamically when working with lists.
     // We establish the conventions that we provide the fixed parameters first and then append the list parameters one by one.
     // parameters 1,2,... start-1 are already used by fixed (non-list) parameters.
-    final start = _queryMethod.parameters
-            .where((param) => !param.type.isDartCoreList)
-            .length +
-        1;
+    final start = _queryMethod.parameters.where((param) => !param.type.isDartCoreList).length + 1;
 
     String? lastParam;
-    for (final listParam in _queryMethod.parameters
-        .where((param) => param.type.isDartCoreList)) {
+    for (final listParam in _queryMethod.parameters.where((param) => param.type.isDartCoreList)) {
       if (lastParam == null) {
         //make start final if it is only used once, fixes a lint
-        final constInt =
-            (start == _queryMethod.parameters.length) ? 'const' : 'int';
+        final constInt = (start == _queryMethod.parameters.length) ? 'const' : 'int';
         code.writeln('$constInt offset = $start;');
       } else {
         code.writeln('offset += $lastParam.length;');
@@ -109,9 +104,7 @@ class QueryMethodWriter implements Writer {
   List<String> _generateParameters() {
     //first, take fixed parameters, then insert list parameters.
     return [
-      ..._queryMethod.parameters
-          .where((parameter) => !parameter.type.isDartCoreList)
-          .map((parameter) {
+      ..._queryMethod.parameters.where((parameter) => !parameter.type.isDartCoreList).map((parameter) {
         final type = parameter.type;
         final displayName = parameter.displayName;
         final typeConverter = _queryMethod.typeConverters.getClosestOrNull(
@@ -135,9 +128,7 @@ class QueryMethodWriter implements Writer {
           );
         }
       }),
-      ..._queryMethod.parameters
-          .where((parameter) => parameter.type.isDartCoreList)
-          .map((parameter) {
+      ..._queryMethod.parameters.where((parameter) => parameter.type.isDartCoreList).map((parameter) {
         // TODO #403 what about type converters that map between e.g. string and list?
         final DartType flatType = parameter.type.flatten();
         final displayName = parameter.displayName;
@@ -169,8 +160,7 @@ class QueryMethodWriter implements Writer {
     int start = 0;
     final originalQuery = _queryMethod.query.sql;
     for (final listParameter in _queryMethod.query.listParameters) {
-      code.write(
-          originalQuery.substring(start, listParameter.position).toLiteral());
+      code.write(originalQuery.substring(start, listParameter.position).toLiteral());
       code.write(' + _sqliteVariablesFor${listParameter.name.capitalize()} + ');
       start = listParameter.position + varlistPlaceholder.length;
     }
@@ -198,8 +188,7 @@ class QueryMethodWriter implements Writer {
     } else if (returnType.isDefaultSqlType || returnType.isEnumType) {
       mapper = _generateDartCoreMapper(returnType);
     } else {
-      throw QueryMethodWriterError(_queryMethod.methodElement)
-          .queryMethodReturnType();
+      throw QueryMethodWriterError(_queryMethod.methodElement).queryMethodReturnType();
     }
 
     final parameters = StringBuffer(query)..write(', mapper: $mapper');
@@ -222,7 +211,7 @@ class QueryMethodWriter implements Writer {
   String _generateDartCoreMapper(final DartType returnType) {
     final castedDatabaseValue = 'row.values.first'.cast(
       returnType,
-      returnType.element,
+      returnType.element3,
       withNullability: false,
     );
     return '(Map<String, Object?> row) => $castedDatabaseValue';
@@ -231,16 +220,13 @@ class QueryMethodWriter implements Writer {
   String _generateConverterMapper(final TypeConverter typeConverter) {
     final castedDatabaseValue = 'row.values.first'.cast(
       typeConverter.databaseType,
-      typeConverter.fieldType.element,
+      typeConverter.fieldType.element3,
     );
     return '(Map<String, Object?> row) => _${typeConverter.name.decapitalize()}.decode($castedDatabaseValue)';
   }
 
   String _parseTableName(String query) {
-    return RegExp(r'(?<=FROM )\w+', caseSensitive: false)
-            .firstMatch(query)
-            ?.group(0) ??
-        'no_table_name';
+    return RegExp(r'(?<=FROM )\w+', caseSensitive: false).firstMatch(query)?.group(0) ?? 'no_table_name';
   }
 }
 

@@ -1,6 +1,5 @@
-import 'package:analyzer/dart/element/element.dart';
+import 'package:analyzer/dart/element/element2.dart';
 import 'package:analyzer/dart/element/type.dart';
-import 'package:collection/collection.dart';
 import 'package:floor_annotation/floor_annotation.dart' as annotations;
 import 'package:floor_generator/misc/constants.dart';
 import 'package:floor_generator/misc/extension/dart_type_extension.dart';
@@ -13,24 +12,22 @@ import 'package:floor_generator/value_object/type_converter.dart';
 import 'package:source_gen/source_gen.dart';
 
 class FieldProcessor extends Processor<Field> {
-  final FieldElement _fieldElement;
+  final FieldElement2 _fieldElement;
   final TypeConverter? _typeConverter;
 
   FieldProcessor(
-    final FieldElement fieldElement,
+    final FieldElement2 fieldElement,
     final TypeConverter? typeConverter,
   )   : _fieldElement = fieldElement,
         _typeConverter = typeConverter;
 
   @override
   Field process() {
-    final name = _fieldElement.name;
+    final name = _fieldElement.displayName; //TODO 19.08.25: Name?
     final columnName = _getColumnName(name);
     final isNullable = _fieldElement.type.isNullable;
-    final typeConverter = {
-      ..._fieldElement.getTypeConverters(TypeConverterScope.field),
-      _typeConverter
-    }.whereNotNull().closestOrNull;
+    final typeConverter =
+        {..._fieldElement.getTypeConverters(TypeConverterScope.field), _typeConverter}.nonNulls.closestOrNull;
 
     return Field(
       _fieldElement,

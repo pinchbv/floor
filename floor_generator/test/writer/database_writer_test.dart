@@ -1,9 +1,7 @@
-import 'package:build_test/build_test.dart';
 import 'package:code_builder/code_builder.dart';
 import 'package:floor_generator/processor/database_processor.dart';
 import 'package:floor_generator/value_object/database.dart';
 import 'package:floor_generator/writer/database_writer.dart';
-import 'package:source_gen/source_gen.dart';
 import 'package:test/test.dart';
 
 import '../test_utils.dart';
@@ -269,18 +267,13 @@ void main() {
 }
 
 Future<Database> _createDatabase(final String definition) async {
-  final library = await resolveSource('''
+  final library = await getLibraryReader('''
       library test;
       
       import 'package:floor_annotation/floor_annotation.dart';
       
       $definition
-      ''', (resolver) async {
-    return resolver
-        .findLibraryByName('test')
-        .then((value) => ArgumentError.checkNotNull(value))
-        .then((value) => LibraryReader(value));
-  });
+      ''');
 
   return DatabaseProcessor(library.classes.first).process();
 }

@@ -1,4 +1,4 @@
-import 'package:analyzer/dart/element/element.dart';
+import 'package:analyzer/dart/element/element2.dart';
 import 'package:floor_annotation/floor_annotation.dart' as annotations;
 import 'package:floor_generator/misc/constants.dart';
 import 'package:floor_generator/misc/type_utils.dart';
@@ -11,7 +11,7 @@ class ViewProcessor extends QueryableProcessor<View> {
   final ViewProcessorError _processorError;
 
   ViewProcessor(
-    final ClassElement classElement,
+    final ClassElement2 classElement,
     final Set<TypeConverter> typeConverters,
   )   : _processorError = ViewProcessorError(classElement),
         super(classElement, typeConverters);
@@ -29,18 +29,13 @@ class ViewProcessor extends QueryableProcessor<View> {
   }
 
   String _getName() {
-    return classElement
-            .getAnnotation(annotations.DatabaseView)
-            ?.getField(AnnotationField.viewName)
-            ?.toStringValue() ??
+    return classElement.getAnnotation(annotations.DatabaseView)?.getField(AnnotationField.viewName)?.toStringValue() ??
         classElement.displayName;
   }
 
   String _getQuery() {
-    final query = classElement
-        .getAnnotation(annotations.DatabaseView)
-        ?.getField(AnnotationField.viewQuery)
-        ?.toStringValue();
+    final query =
+        classElement.getAnnotation(annotations.DatabaseView)?.getField(AnnotationField.viewQuery)?.toStringValue();
 
     if (query == null || !(query.isSelectQuery || query.isCteWithSelect)) {
       throw _processorError.missingQuery;
@@ -56,7 +51,6 @@ extension on String {
   /// followed by a `SELECT` query
   bool get isCteWithSelect {
     final lowerCasedString = toLowerCase();
-    return lowerCasedString.trimLeft().startsWith('with') &&
-        'select'.allMatches(lowerCasedString).length >= 2;
+    return lowerCasedString.trimLeft().startsWith('with') && 'select'.allMatches(lowerCasedString).length >= 2;
   }
 }

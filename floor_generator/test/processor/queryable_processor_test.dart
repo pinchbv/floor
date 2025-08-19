@@ -1,4 +1,4 @@
-import 'package:analyzer/dart/element/element.dart';
+import 'package:analyzer/dart/element/element2.dart';
 import 'package:collection/collection.dart';
 import 'package:floor_generator/processor/error/queryable_processor_error.dart';
 import 'package:floor_generator/processor/field_processor.dart';
@@ -25,9 +25,7 @@ void main() {
 
     final actual = TestProcessor(classElement).process();
 
-    final fields = classElement.fields
-        .map((fieldElement) => FieldProcessor(fieldElement, null).process())
-        .toList();
+    final fields = classElement.fields2.map((fieldElement) => FieldProcessor(fieldElement, null).process()).toList();
     const constructor = "Person(row['id'] as int, row['name'] as String)";
     final expected = TestQueryable(
       classElement,
@@ -57,12 +55,10 @@ void main() {
 
       final actual = TestProcessor(classElement, {typeConverter}).process();
 
-      final idField = FieldProcessor(classElement.fields[0], null).process();
-      final dateTimeField =
-          FieldProcessor(classElement.fields[1], typeConverter).process();
+      final idField = FieldProcessor(classElement.fields2[0], null).process();
+      final dateTimeField = FieldProcessor(classElement.fields2[1], typeConverter).process();
       final fields = [idField, dateTimeField];
-      const constructor =
-          "Order(row['id'] as int, _typeConverter.decode(row['dateTime'] as int))";
+      const constructor = "Order(row['id'] as int, _typeConverter.decode(row['dateTime'] as int))";
       final expected = TestQueryable(
         classElement,
         fields,
@@ -103,12 +99,10 @@ void main() {
         await intDartType,
         TypeConverterScope.queryable,
       );
-      final idField = FieldProcessor(classElement.fields[0], null).process();
-      final dateTimeField =
-          FieldProcessor(classElement.fields[1], typeConverter).process();
+      final idField = FieldProcessor(classElement.fields2[0], null).process();
+      final dateTimeField = FieldProcessor(classElement.fields2[1], typeConverter).process();
       final fields = [idField, dateTimeField];
-      const constructor =
-          "Order(row['id'] as int, _dateTimeConverter.decode(row['dateTime'] as int))";
+      const constructor = "Order(row['id'] as int, _dateTimeConverter.decode(row['dateTime'] as int))";
       final expected = TestQueryable(
         classElement,
         fields,
@@ -117,8 +111,7 @@ void main() {
       expect(actual, equals(expected));
     });
 
-    test('process queryable and prefer local type converter over external',
-        () async {
+    test('process queryable and prefer local type converter over external', () async {
       final externalTypeConverter = TypeConverter(
         'ExternalConverter',
         await dateTimeDartType,
@@ -148,8 +141,7 @@ void main() {
       }
     ''');
 
-      final actual =
-          TestProcessor(classElement, {externalTypeConverter}).process();
+      final actual = TestProcessor(classElement, {externalTypeConverter}).process();
 
       final typeConverter = TypeConverter(
         'DateTimeConverter',
@@ -157,12 +149,10 @@ void main() {
         await intDartType,
         TypeConverterScope.queryable,
       );
-      final idField = FieldProcessor(classElement.fields[0], null).process();
-      final dateTimeField =
-          FieldProcessor(classElement.fields[1], typeConverter).process();
+      final idField = FieldProcessor(classElement.fields2[0], null).process();
+      final dateTimeField = FieldProcessor(classElement.fields2[1], typeConverter).process();
       final fields = [idField, dateTimeField];
-      const constructor =
-          "Order(row['id'] as int, _dateTimeConverter.decode(row['dateTime'] as int))";
+      const constructor = "Order(row['id'] as int, _dateTimeConverter.decode(row['dateTime'] as int))";
       final expected = TestQueryable(
         classElement,
         fields,
@@ -193,8 +183,7 @@ void main() {
       final fieldNames = actual.fields.map((field) => field.name).toList();
 
       final expectedFieldNames = ['id', 'name'];
-      const expectedConstructor =
-          "TestEntity(row['id'] as int, row['name'] as String)";
+      const expectedConstructor = "TestEntity(row['id'] as int, row['name'] as String)";
       expect(fieldNames, containsAll(expectedFieldNames));
       expect(actual.constructor, equals(expectedConstructor));
     });
@@ -225,8 +214,7 @@ void main() {
       final fieldNames = actual.fields.map((field) => field.name).toList();
 
       final expectedFieldNames = ['id', 'foo', 'name'];
-      const expectedConstructor =
-          "TestEntity(row['id'] as int, row['foo'] as double, row['name'] as String)";
+      const expectedConstructor = "TestEntity(row['id'] as int, row['foo'] as double, row['name'] as String)";
       expect(fieldNames, containsAll(expectedFieldNames));
       expect(actual.constructor, equals(expectedConstructor));
     });
@@ -251,8 +239,7 @@ void main() {
       final fieldNames = actual.fields.map((field) => field.name).toList();
 
       final expectedFieldNames = ['id', 'name'];
-      const expectedConstructor =
-          "TestEntity(row['id'] as int, row['name'] as String)";
+      const expectedConstructor = "TestEntity(row['id'] as int, row['name'] as String)";
       expect(fieldNames, containsAll(expectedFieldNames));
       expect(actual.constructor, equals(expectedConstructor));
     });
@@ -279,8 +266,7 @@ void main() {
       final fieldNames = actual.fields.map((field) => field.name).toList();
 
       final expectedFieldNames = ['id', 'name'];
-      const expectedConstructor =
-          "TestEntity(row['id'] as int, row['name'] as String)";
+      const expectedConstructor = "TestEntity(row['id'] as int, row['name'] as String)";
       expect(fieldNames, containsAll(expectedFieldNames));
       expect(actual.constructor, equals(expectedConstructor));
     });
@@ -356,11 +342,7 @@ void main() {
       }
     ''');
 
-      final actual = TestProcessor(classElement)
-          .process()
-          .fields
-          .map((field) => field.name)
-          .toList();
+      final actual = TestProcessor(classElement).process().fields.map((field) => field.name).toList();
 
       expect(actual, equals(['id', 'name']));
     });
@@ -381,11 +363,7 @@ void main() {
       }
     ''');
 
-      final actual = TestProcessor(classElement)
-          .process()
-          .fields
-          .map((field) => field.name)
-          .toList();
+      final actual = TestProcessor(classElement).process().fields.map((field) => field.name).toList();
 
       expect(actual, equals(['id', 'name']));
     });
@@ -424,8 +402,7 @@ void main() {
 
       final actual = TestProcessor(classElement).process().constructor;
 
-      const expected =
-          "Person(row['id'] as int, row['name'] as String, bar: row['bar'] as String)";
+      const expected = "Person(row['id'] as int, row['name'] as String, bar: row['bar'] as String)";
       expect(actual, equals(expected));
     });
 
@@ -495,8 +472,7 @@ void main() {
 
       final actual = TestProcessor(classElement).process().constructor;
 
-      const expected =
-          "Person(id: row['id'] as int, name: row['name'] as String, bar: row['bar'] as String)";
+      const expected = "Person(id: row['id'] as int, name: row['name'] as String, bar: row['bar'] as String)";
       expect(actual, equals(expected));
     });
 
@@ -515,8 +491,7 @@ void main() {
 
       final actual = TestProcessor(classElement).process().constructor;
 
-      const expected =
-          "Person(row['id'] as int, row['name'] as String, row['bar'] as String?)";
+      const expected = "Person(row['id'] as int, row['name'] as String, row['bar'] as String?)";
       expect(actual, equals(expected));
     });
 
@@ -535,8 +510,7 @@ void main() {
 
       final actual = TestProcessor(classElement).process().constructor;
 
-      const expected =
-          "Person(row['id'] as int?, row['name'] as String?, row['bar'] as String?)";
+      const expected = "Person(row['id'] as int?, row['name'] as String?, row['bar'] as String?)";
       expect(actual, equals(expected));
     });
 
@@ -628,10 +602,7 @@ void main() {
       }
     ''');
 
-      final actual = TestProcessor(classElement)
-          .process()
-          .fields
-          .map((field) => field.name);
+      final actual = TestProcessor(classElement).process().fields.map((field) => field.name);
 
       const expected = 'foo';
       expect(actual, isNot(contains(expected)));
@@ -661,7 +632,7 @@ void main() {
 
 class TestQueryable extends Queryable {
   TestQueryable(
-    ClassElement classElement,
+    ClassElement2 classElement,
     List<Field> fields,
     String constructor,
   ) : super(classElement, '', fields, constructor);
@@ -676,8 +647,7 @@ class TestQueryable extends Queryable {
           constructor == other.constructor;
 
   @override
-  int get hashCode =>
-      classElement.hashCode ^ fields.hashCode ^ constructor.hashCode;
+  int get hashCode => classElement.hashCode ^ fields.hashCode ^ constructor.hashCode;
 
   @override
   String toString() {
@@ -687,7 +657,7 @@ class TestQueryable extends Queryable {
 
 class TestProcessor extends QueryableProcessor<TestQueryable> {
   TestProcessor(
-    ClassElement classElement, [
+    ClassElement2 classElement, [
     Set<TypeConverter>? typeConverters,
   ]) : super(classElement, typeConverters ?? {});
 

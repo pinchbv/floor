@@ -1,4 +1,4 @@
-import 'package:analyzer/dart/element/element.dart';
+import 'package:analyzer/dart/element/element2.dart';
 import 'package:floor_generator/misc/extension/dart_type_extension.dart';
 import 'package:floor_generator/processor/error/query_processor_error.dart';
 import 'package:floor_generator/processor/processor.dart';
@@ -9,10 +9,10 @@ class QueryProcessor extends Processor<Query> {
 
   final String _query;
 
-  final List<ParameterElement> _parameters;
+  final List<FormalParameterElement> _parameters;
 
-  QueryProcessor(MethodElement methodElement, this._query)
-      : _parameters = methodElement.parameters,
+  QueryProcessor(MethodElement2 methodElement, this._query)
+      : _parameters = methodElement.formalParameters,
         _processorError = QueryProcessorError(methodElement);
 
   @override
@@ -25,10 +25,10 @@ class QueryProcessor extends Processor<Query> {
     int currentIndex = 1;
     for (final parameter in _parameters) {
       if (parameter.type.isDartCoreList) {
-        indices[':${parameter.name}'] = 0;
+        indices[':${parameter.displayName}'] = 0; //TODO 19.08.25: Name?
       } else {
-        fixedParameters.add(parameter.name);
-        indices[':${parameter.name}'] = currentIndex++;
+        fixedParameters.add(parameter.displayName); //TODO 19.08.25: Name?
+        indices[':${parameter.displayName}'] = currentIndex++; //TODO 19.08.25: Name?
       }
     }
 
@@ -44,26 +44,19 @@ class QueryProcessor extends Processor<Query> {
     // positions and names.
     int currentLast = 0;
     for (final varToken in variables) {
-      newQuery.write(_query
-          .substring(currentLast, varToken.startPosition)
-          .replaceAll('\n', ' '));
+      newQuery.write(_query.substring(currentLast, varToken.startPosition).replaceAll('\n', ' '));
       final varIndexInMethod = indices[varToken.name];
       if (varIndexInMethod == null) {
         throw _processorError.unknownQueryVariable(varToken.name);
       } else if (varIndexInMethod > 0) {
         //normal variable/parameter
-        if (varToken.isListVar)
-          throw _processorError
-              .queryMethodParameterIsNormalButVariableIsList(varToken.name);
+        if (varToken.isListVar) throw _processorError.queryMethodParameterIsNormalButVariableIsList(varToken.name);
         newQuery.write('?');
         newQuery.write(varIndexInMethod);
       } else {
         //list variable/parameter
-        if (!varToken.isListVar)
-          throw _processorError
-              .queryMethodParameterIsListButVariableIsNot(varToken.name);
-        listParameters
-            .add(ListParameter(newQuery.length, varToken.name.substring(1)));
+        if (!varToken.isListVar) throw _processorError.queryMethodParameterIsListButVariableIsNot(varToken.name);
+        listParameters.add(ListParameter(newQuery.length, varToken.name.substring(1)));
         newQuery.write(varlistPlaceholder);
       }
       currentLast = varToken.endPosition;
@@ -99,14 +92,12 @@ class QueryProcessor extends Processor<Query> {
 /// context.
 List<VariableToken> findVariables(final String query) {
   final output = <VariableToken>[];
-  for (final match
-      in RegExp(r':[\w]+| [iI][nN]\s*\((:[\w]+)\)').allMatches(query)) {
+  for (final match in RegExp(r':[\w]+| [iI][nN]\s*\((:[\w]+)\)').allMatches(query)) {
     final content = match.group(0)!;
     final expectsList = content.toLowerCase().startsWith(' in');
     if (expectsList) {
       final varname = match.group(1)!;
-      output.add(
-          VariableToken(varname, query.indexOf(varname, match.start), true));
+      output.add(VariableToken(varname, query.indexOf(varname, match.start), true));
     } else {
       output.add(VariableToken(content, match.start, false));
     }
@@ -142,6 +133,5 @@ class VariableToken {
           isListVar == other.isListVar;
 
   @override
-  int get hashCode =>
-      name.hashCode ^ startPosition.hashCode ^ isListVar.hashCode;
+  int get hashCode => name.hashCode ^ startPosition.hashCode ^ isListVar.hashCode;
 }

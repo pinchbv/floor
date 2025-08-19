@@ -1,4 +1,4 @@
-import 'package:analyzer/dart/element/element.dart';
+import 'package:analyzer/dart/element/element2.dart';
 import 'package:collection/collection.dart';
 import 'package:floor_generator/misc/extension/set_equality_extension.dart';
 import 'package:floor_generator/value_object/deletion_method.dart';
@@ -11,7 +11,7 @@ import 'package:floor_generator/value_object/update_method.dart';
 import 'package:floor_generator/value_object/view.dart';
 
 class Dao {
-  final ClassElement classElement;
+  final ClassElement2 classElement;
   final String name;
   final List<QueryMethod> queryMethods;
   final List<InsertionMethod> insertionMethods;

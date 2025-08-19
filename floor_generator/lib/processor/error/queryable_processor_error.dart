@@ -1,11 +1,10 @@
-import 'package:analyzer/dart/element/element.dart';
+import 'package:analyzer/dart/element/element2.dart';
 import 'package:source_gen/source_gen.dart';
 
 class QueryableProcessorError {
-  final ClassElement _classElement;
+  final ClassElement2 _classElement;
 
-  QueryableProcessorError(final ClassElement classElement)
-      : _classElement = classElement;
+  QueryableProcessorError(final ClassElement2 classElement) : _classElement = classElement;
 
   InvalidGenerationSourceError get prohibitedMixinUsage {
     return InvalidGenerationSourceError(
@@ -18,8 +17,7 @@ class QueryableProcessorError {
   InvalidGenerationSourceError get missingUnnamedConstructor {
     return InvalidGenerationSourceError(
       'Entity constructor is not recognized.',
-      todo:
-          'Entity class must provide a public non-factory constructor for code generation.',
+      todo: 'Entity class must provide a public non-factory constructor for code generation.',
       element: _classElement,
     );
   }

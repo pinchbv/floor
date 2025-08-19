@@ -1,4 +1,4 @@
-import 'package:analyzer/dart/element/element.dart';
+import 'package:analyzer/dart/element/element2.dart';
 import 'package:collection/collection.dart';
 import 'package:floor_generator/value_object/field.dart';
 import 'package:floor_generator/value_object/queryable.dart';
@@ -7,7 +7,7 @@ class View extends Queryable {
   final String query;
 
   View(
-    ClassElement classElement,
+    ClassElement2 classElement,
     String name,
     List<Field> fields,
     this.query,
@@ -30,12 +30,7 @@ class View extends Queryable {
           constructor == other.constructor;
 
   @override
-  int get hashCode =>
-      classElement.hashCode ^
-      name.hashCode ^
-      fields.hashCode ^
-      query.hashCode ^
-      constructor.hashCode;
+  int get hashCode => classElement.hashCode ^ name.hashCode ^ fields.hashCode ^ query.hashCode ^ constructor.hashCode;
 
   @override
   String toString() {

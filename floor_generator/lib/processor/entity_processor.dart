@@ -1,6 +1,5 @@
 import 'package:analyzer/dart/constant/value.dart';
-import 'package:analyzer/dart/element/element.dart';
-import 'package:collection/collection.dart';
+import 'package:analyzer/dart/element/element2.dart';
 import 'package:floor_annotation/floor_annotation.dart' as annotations;
 import 'package:floor_generator/misc/constants.dart';
 import 'package:floor_generator/misc/extension/dart_object_extension.dart';
@@ -22,7 +21,7 @@ class EntityProcessor extends QueryableProcessor<Entity> {
   final EntityProcessorError _processorError;
 
   EntityProcessor(
-    final ClassElement classElement,
+    final ClassElement2 classElement,
     final Set<TypeConverter> typeConverters,
   )   : _processorError = EntityProcessorError(classElement),
         super(classElement, typeConverters);
@@ -53,10 +52,7 @@ class EntityProcessor extends QueryableProcessor<Entity> {
   }
 
   String _getName() {
-    return classElement
-            .getAnnotation(annotations.Entity)
-            ?.getField(AnnotationField.entityTableName)
-            ?.toStringValue() ??
+    return classElement.getAnnotation(annotations.Entity)?.getField(AnnotationField.entityTableName)?.toStringValue() ??
         classElement.displayName;
   }
 
@@ -66,13 +62,11 @@ class EntityProcessor extends QueryableProcessor<Entity> {
             ?.getField(AnnotationField.entityForeignKeys)
             ?.toListValue()
             ?.map((foreignKeyObject) {
-          final parentType = foreignKeyObject
-                  .getField(ForeignKeyField.entity)
-                  ?.toTypeValue() ??
+          final parentType = foreignKeyObject.getField(ForeignKeyField.entity)?.toTypeValue() ??
               (throw _processorError.foreignKeyNoEntity);
 
-          final parentElement = parentType.element;
-          final parentName = parentElement is ClassElement
+          final parentElement = parentType.element3;
+          final parentName = parentElement is ClassElement2
               ? parentElement
                       .getAnnotation(annotations.Entity)
                       ?.getField(AnnotationField.entityTableName)
@@ -80,23 +74,19 @@ class EntityProcessor extends QueryableProcessor<Entity> {
                   parentType.getDisplayString(withNullability: false)
               : throw _processorError.foreignKeyDoesNotReferenceEntity;
 
-          final childColumns =
-              _getColumns(foreignKeyObject, ForeignKeyField.childColumns);
+          final childColumns = _getColumns(foreignKeyObject, ForeignKeyField.childColumns);
           if (childColumns.isEmpty) {
             throw _processorError.missingChildColumns;
           }
 
-          final parentColumns =
-              _getColumns(foreignKeyObject, ForeignKeyField.parentColumns);
+          final parentColumns = _getColumns(foreignKeyObject, ForeignKeyField.parentColumns);
           if (parentColumns.isEmpty) {
             throw _processorError.missingParentColumns;
           }
 
-          final onUpdate =
-              _getForeignKeyAction(foreignKeyObject, ForeignKeyField.onUpdate);
+          final onUpdate = _getForeignKeyAction(foreignKeyObject, ForeignKeyField.onUpdate);
 
-          final onDelete =
-              _getForeignKeyAction(foreignKeyObject, ForeignKeyField.onDelete);
+          final onDelete = _getForeignKeyAction(foreignKeyObject, ForeignKeyField.onDelete);
 
           return ForeignKey(
             parentName,
@@ -122,9 +112,7 @@ class EntityProcessor extends QueryableProcessor<Entity> {
   Fts _getFts3() {
     final ftsObject = classElement.getAnnotation(annotations.Fts3);
 
-    final tokenizer =
-        ftsObject?.getField(Fts3Field.tokenizer)?.toStringValue() ??
-            annotations.FtsTokenizer.simple;
+    final tokenizer = ftsObject?.getField(Fts3Field.tokenizer)?.toStringValue() ?? annotations.FtsTokenizer.simple;
 
     final tokenizerArgs = ftsObject
             ?.getField(Fts3Field.tokenizerArgs)
@@ -139,9 +127,7 @@ class EntityProcessor extends QueryableProcessor<Entity> {
   Fts _getFts4() {
     final ftsObject = classElement.getAnnotation(annotations.Fts4);
 
-    final tokenizer =
-        ftsObject?.getField(Fts4Field.tokenizer)?.toStringValue() ??
-            annotations.FtsTokenizer.simple;
+    final tokenizer = ftsObject?.getField(Fts4Field.tokenizer)?.toStringValue() ?? annotations.FtsTokenizer.simple;
 
     final tokenizerArgs = ftsObject
             ?.getField(Fts4Field.tokenizerArgs)
@@ -179,8 +165,8 @@ class EntityProcessor extends QueryableProcessor<Entity> {
             }
           }
 
-          final name = indexObject.getField(IndexField.name)?.toStringValue() ??
-              _generateIndexName(tableName, indexColumnNames);
+          final name =
+              indexObject.getField(IndexField.name)?.toStringValue() ?? _generateIndexName(tableName, indexColumnNames);
 
           return Index(name, tableName, unique, indexColumnNames);
         }).toList() ??
@@ -198,11 +184,7 @@ class EntityProcessor extends QueryableProcessor<Entity> {
     final DartObject object,
     final String foreignKeyField,
   ) {
-    return object
-            .getField(foreignKeyField)
-            ?.toListValue()
-            ?.mapNotNull((object) => object.toStringValue())
-            .toList() ??
+    return object.getField(foreignKeyField)?.toListValue()?.mapNotNull((object) => object.toStringValue()).toList() ??
         [];
   }
 
@@ -223,14 +205,12 @@ class EntityProcessor extends QueryableProcessor<Entity> {
         ?.toListValue()
         ?.map((object) => object.toStringValue());
 
-    if (compoundPrimaryKeyColumnNames == null ||
-        compoundPrimaryKeyColumnNames.isEmpty) {
+    if (compoundPrimaryKeyColumnNames == null || compoundPrimaryKeyColumnNames.isEmpty) {
       return null;
     }
 
     final compoundPrimaryKeyFields = fields.where((field) {
-      return compoundPrimaryKeyColumnNames.any(
-          (primaryKeyColumnName) => field.columnName == primaryKeyColumnName);
+      return compoundPrimaryKeyColumnNames.any((primaryKeyColumnName) => field.columnName == primaryKeyColumnName);
     }).toList();
 
     if (compoundPrimaryKeyFields.isEmpty) {
@@ -241,8 +221,7 @@ class EntityProcessor extends QueryableProcessor<Entity> {
   }
 
   PrimaryKey _getPrimaryKeyFromAnnotation(final List<Field> fields) {
-    final primaryKeyField = fields.firstWhere(
-        (field) => field.fieldElement.hasAnnotation(annotations.PrimaryKey),
+    final primaryKeyField = fields.firstWhere((field) => field.fieldElement.hasAnnotation(annotations.PrimaryKey),
         orElse: () => throw _processorError.missingPrimaryKey);
 
     final autoGenerate = primaryKeyField.fieldElement
@@ -276,14 +255,11 @@ class EntityProcessor extends QueryableProcessor<Entity> {
     final fieldElement = field.fieldElement;
     final parameterName = fieldElement.displayName;
     final fieldType = fieldElement.type;
-    final typeConverter = [...queryableTypeConverters, field.typeConverter]
-        .whereNotNull()
-        .getClosestOrNull(fieldType);
+    final typeConverter = [...queryableTypeConverters, field.typeConverter].nonNulls.getClosestOrNull(fieldType);
     String attributeValue = 'item.$parameterName';
 
     if (typeConverter != null) {
-      attributeValue =
-          '_${typeConverter.name.decapitalize()}.encode(item.$parameterName)';
+      attributeValue = '_${typeConverter.name.decapitalize()}.encode(item.$parameterName)';
     } else if (fieldType.isDartCoreBool) {
       attributeValue = _serializeBoolean(field, attributeValue);
     } else if (fieldType.isEnumType) {

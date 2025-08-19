@@ -1,6 +1,6 @@
 import 'dart:async';
 
-import 'package:analyzer/dart/element/element.dart';
+import 'package:analyzer/dart/element/element2.dart';
 import 'package:build/build.dart';
 import 'package:code_builder/code_builder.dart';
 import 'package:floor_annotation/floor_annotation.dart' as annotations;
@@ -19,24 +19,21 @@ import 'package:source_gen/source_gen.dart';
 class FloorGenerator extends GeneratorForAnnotation<annotations.Database> {
   @override
   FutureOr<String> generateForAnnotatedElement(
-    final Element element,
+    final Element2 element,
     final ConstantReader annotation,
     final BuildStep buildStep,
   ) {
     final database = _getDatabase(element);
 
     final databaseClass = DatabaseWriter(database).write();
-    final daoClasses = database.daoGetters
-        .map((daoGetter) => daoGetter.dao)
-        .map((dao) => DaoWriter(
-              dao,
-              database.streamEntities,
-              database.hasViewStreams,
-            ).write());
+    final daoClasses = database.daoGetters.map((daoGetter) => daoGetter.dao).map((dao) => DaoWriter(
+          dao,
+          database.streamEntities,
+          database.hasViewStreams,
+        ).write());
     final distinctTypeConverterFields = database.allTypeConverters
         .distinctBy((element) => element.name)
-        .map((typeConverter) =>
-            TypeConverterFieldWriter(typeConverter.name).write());
+        .map((typeConverter) => TypeConverterFieldWriter(typeConverter.name).write());
 
     final library = Library((builder) {
       builder
@@ -56,17 +53,13 @@ class FloorGenerator extends GeneratorForAnnotation<annotations.Database> {
     return library.accept(DartEmitter()).toString();
   }
 
-  Database _getDatabase(final Element element) {
-    if (element is! ClassElement) {
-      throw InvalidGenerationSourceError(
-          'The element annotated with @Database is not a class.',
-          element: element);
+  Database _getDatabase(final Element2 element) {
+    if (element is! ClassElement2) {
+      throw InvalidGenerationSourceError('The element annotated with @Database is not a class.', element: element);
     }
 
     if (!element.isAbstract) {
-      throw InvalidGenerationSourceError(
-          'The database class has to be abstract.',
-          element: element);
+      throw InvalidGenerationSourceError('The database class has to be abstract.', element: element);
     }
 
     return DatabaseProcessor(element).process();
